@@ -44,6 +44,7 @@ try {
     const log = (n, ...a) => T.calls.push([n, ...a]);
     const S = { items: [{ id: 'ak', n: 1, mag: 30, res: 90 }, { id: 'a545', n: 60 }, { id: 'watch', n: 2 }, { id: 'rk', n: 1 }, { id: 'band', n: 3 }], loadout: { slots: { primary: null, sidearm: { id: 'pm', n: 1, mag: 8, res: 24 }, armor: { id: 'vest', n: 1 }, pack: null }, bag: [{ id: 'cog', n: 1 }] } };
     T.S = S;
+    delete EFC.services['stash:equip']; // real ITEMS service: this test drives the fake stash through inv:equip
     efcProvide('item:def', (id) => D[id]);
     efcProvide('stash:get', () => S);
     efcProvide('stash:toLoadout', (i) => { log('stash:toLoadout', i); const it = S.items.splice(i, 1)[0]; if (!it) return false; S.loadout.bag.push(it); return true; });
@@ -92,7 +93,8 @@ try {
   await page.waitForFunction(() => UI.screen === 'deploy' && !UI.busy, null, { timeout: 120000, polling: 200 });
   const dp = await page.evaluate(() => ({ raid: $('scr-deploy').classList.contains('raid'), mode: Settings.mode, kit: $('efcDepKit').getClientRects().length > 0, picker: $('cpDeploy').getClientRects().length > 0, h2: $('scr-deploy').querySelector('h2').textContent }));
   check(dp.raid && dp.mode === 'raid' && dp.kit && !dp.picker && dp.h2 === 'Ready to deploy', 'deploy screen in its raid view, Settings.mode raid', dp);
-  await page.evaluate(() => { menuDeploy(); });
+  // the panels are tested against fakes: run the match as tdm so the real RAID, WORLD and Warden code stays inert
+  await page.evaluate(() => { Settings.mode = 'tdm'; menuDeploy(); });
   await page.waitForFunction(() => MATCH.state === 'playing', null, { timeout: 60000, polling: 200 });
   await simRun(page, 1, 'PL.ent.health = 100;');
 

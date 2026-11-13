@@ -1,6 +1,14 @@
 # Escape From Claudov: vertical slice plan
 
-Status: proposal, 13 November 2026. Nothing below is built yet. Lead: Claude Fable 5.2. Workers: Claude Opus 5.5 subagents.
+Status: in progress, 13 November 2026. Lead: Claude Fable 5.2. Workers: Claude Opus 5.5 subagents.
+
+**Owner decisions (13 November 2026):** the name is Escape From Claudov; soldier animations will be rebaked by the owner from his own
+Mixamo account (until then the game runs on the engine's procedural poses); the repo and build are public; friends-only lobbies
+with no hit validation are accepted for the slice; slot inventory; desktop only, phones are out of scope.
+
+**Changes to this plan during the build:** work packages own whole engine files instead of sharing pre-cut seams (the table in
+`docs/contracts/CONTRACT.md` is authoritative), waves 1 and 2 run as one wave of seven packages against that contract, and the
+engine's unused features are hidden rather than deleted.
 
 ## 1. What the slice is
 

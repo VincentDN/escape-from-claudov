@@ -49,7 +49,7 @@ function clvBackdrop() {
 /* ---------- Atmosphere: overcast cold daylight, light sea fog low on the water and the quays, lamps still on ---------- */
 const ATMO_CLAUDOV = Object.assign({}, ATMO_DEFAULT, {
   sun: [0.35, 0.62, 0.55], sunColor: 0xdce4ec, sunI: 1.0, vmSun: 0xdce4ec,
-  fog: [0.6, 0.64, 0.68], fogD: 0.0105, fogH: [12, 0], fogSun: 0.15,
+  fog: [0.6, 0.64, 0.68], fogD: 0.0085, fogH: [12, 0], fogSun: 0.15,
   hemi: [0xb6c2ce, 0x4c5156, 0.95], vmHemi: [0xb6c2ce, 0x4c5156],
   sky: {
     zen: [0.4, 0.45, 0.5], mid: [0.56, 0.6, 0.64], hor: [0.68, 0.7, 0.72], gnd: [0.36, 0.38, 0.4],

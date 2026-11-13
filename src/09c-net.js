@@ -228,7 +228,7 @@ function netHostRelay(code, key) {
     if (st === 'up') { NET.tx.relay = 'ok'; NETD.rel = 'ok'; netOldConnClose(); netMigDone(); if (NET.joined) netLobbyChanged(); else netHostUp(NET_PREFIX + code); } // (déjà dans le salon : partie reprise, ou retour après une coupure)
     else if (st === 'taken') { // code déjà pris : on en tire un autre (celui d'un salon du serveur vient du serveur) ; en partie, un autre joueur l'a reprise
       const o = NET.hostOpts, live = NET.on && !!o.srv;
-      netReset(live ? _t('Connexion perdue. La partie continue chez un autre joueur.') : undefined);
+      netReset(live ? _t('Connexion perdue. La partie continue chez un autre joueur.') : undefined, live);
       if (live) toMenu(); else if (!o.srv) netHost(o);
     } else if (st === 'fail') netTxFail('relay', netViaServer() ? _t('Le serveur de jeu est injoignable.') : _t('Le relais de secours est injoignable.'));
   }, key);
@@ -385,7 +385,8 @@ function netPeerError(peer, err) {
 }
 /* Ferme tout ce qui touche au salon ; msg : texte d'état à afficher ensuite. Dans un salon public (SRV.on), seul le salon de la
    partie se ferme : la discussion et les joueurs masqués du salon public restent */
-function netReset(msg) {
+function netReset(msg, viaMenu) {
+  if (NET.on && !viaMenu && MATCH.mode === 'raid' && MATCH.state !== 'menu') efcEmit('match:left'); // raid quitté sans passer par toMenu (coupure, salon fermé) : RAID solde le raid
   if (NET.on) netLeaveMatch(true);
   if (NET.srv && NET.role === 'host' && SRV.hostCode && SRV.hostCode === NET.code) srvRoomFailed(); // la partie que j'héberge se ferme avant sa fin
   const peer = NET.peer, relay = NET.relay, rc = NET.relayConn;
@@ -416,9 +417,9 @@ function netLeaveClose(quit) {
 /* Perte de l'hôte côté client : retour au menu si une partie était en cours */
 function netLost(msg) {
   if (NET.role !== 'client') return;
-  const wasPlaying = NET.on, launching = !!(UI.flow && UI.flow.online);
-  netReset(msg);
-  if (wasPlaying && MATCH.state !== 'menu' && !(SRV.on && MATCH.fin)) toMenu(); // salon public : une partie qui finit va à son terme (annonce, killcam finale, résultats)
+  const wasPlaying = NET.on, launching = !!(UI.flow && UI.flow.online), toM = wasPlaying && MATCH.state !== 'menu' && !(SRV.on && MATCH.fin);
+  netReset(msg, toM);
+  if (toM) toMenu(); // salon public : une partie qui finit va à son terme (annonce, killcam finale, résultats)
   else if (launching) uiOpen('multi', ['main']); // chargement ou choix de la classe en cours
   netStatus(msg);
 }

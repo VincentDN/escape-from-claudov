@@ -81,3 +81,12 @@ function efcNetOut(e) {
   if (e.model) { e.model.rag = null; e.model.root.visible = false; }
   for (const o of entities) if (o.target === e) o.target = null;
 }
+
+/* Service 'squad:of' (used by RAID online): a lobby player's squad index, or undefined when the id is not a lobby player or the lobby
+   is not a raid. My own id gives my squad. */
+efcProvide('squad:of', (id) => {
+  if (!efcNetIsRaid() || NET.role === 'off') return undefined;
+  const p = NET.players.get(id);
+  if (p) return efcNetTeamOk(p.t);
+  return id === NET.me && NET.squad != null ? NET.squad : undefined;
+});

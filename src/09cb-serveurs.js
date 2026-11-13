@@ -135,7 +135,7 @@ function srvSync() {
   const code = st.ph === 'partie' ? st.code : '', mine = NET.role === 'host' && NET.code === SRV.hostCode && (st.ph === 'lancement' || st.ph === 'partie');
   if (NET.role !== 'off' && NET.code !== code && !mine) {
     const live = NET.on && !MATCH.fin && (MATCH.state === 'playing' || MATCH.state === 'paused' || MATCH.state === 'killcam'); // (MATCH.fin : la partie finit, annonce, killcam finale et résultats vont à leur terme)
-    if (live) { netReset(_t('La partie a été interrompue, son hôte est parti.')); toMenu(); return; }
+    if (live) { netReset(_t('La partie a été interrompue, son hôte est parti.'), true); toMenu(); return; }
     if (MATCH.state === 'menu' && !UI.flow) netReset('');
   }
   if (code && NET.role === 'off' && !UI.flow && (SRV.tried !== code || performance.now() - SRV.triedT > 5000)) srvJoinRoom(code);

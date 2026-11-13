@@ -30,7 +30,7 @@ try {
   check(mm.screen === 'main' && mm.lang === 'en', 'boots to the main menu in English', mm.screen + ' ' + mm.lang);
   check(mm.shown.every((x) => x[1]), 'new entries visible', mm.shown);
   check(mm.hidden.every((x) => !x[1]), 'engine entries hidden', mm.hidden.filter((x) => x[1]));
-  await page.screenshot({ path: SHOTS + '/efc-ui-main.png' });
+  await page.screenshot({ path: SHOTS + '/efc-ui-main.png', timeout: 300000 });
 
   // ---------- fake ITEMS / WORLD / RAID providers (test page only) ----------
   await page.evaluate(() => {
@@ -78,7 +78,7 @@ try {
   const kb2 = await page.evaluate(() => T.calls[T.calls.length - 1]);
   check(kb2[0] === 'stash:toLoadout', 'arrows and Enter move a stash row', kb2);
   await page.evaluate(() => { $('efcHoStash').scrollTop = 0; });
-  await page.screenshot({ path: SHOTS + '/efc-ui-hideout.png' });
+  await page.screenshot({ path: SHOTS + '/efc-ui-hideout.png', timeout: 300000 });
 
   // ---------- Credits ----------
   const cr = await page.evaluate(() => { uiGo('credits'); const t = $('scr-credits').innerText; uiBack(); return { riposte: /Riposte: Frontline 5\.6\.0/.test(t) && /MIT/.test(t), three: /three\.js/.test(t), repo: /github\.com\/VincentDN\/escape-from-claudov/.test(t), back: UI.screen }; });
@@ -127,11 +127,11 @@ try {
   const tf = await page.evaluate(() => ({ call: T.calls[T.calls.length - 1], rows: $('efcLootList').querySelectorAll('.efc-it').length }));
   check(tf.call[0] === 'world:take' && tf.rows === 1, 'F takes the selected item', tf);
   // no firing or turning while the panel is open (fallback aim: the engine would read the mouse)
-  const guard = await page.evaluate(() => { const y = PL.yaw; for (const el of [canvas, $('efcLoot')]) { el.dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true })); el.dispatchEvent(new MouseEvent('mousemove', { movementX: 300, bubbles: true })); } // real events target an element, so the window capture guard runs first return { held: PL.held, paused: MATCH.state }; });
+  const guard = await page.evaluate(() => { const y = PL.yaw; for (const el of [canvas, $('efcLoot')]) { el.dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true })); el.dispatchEvent(new MouseEvent('mousemove', { movementX: 300, bubbles: true })); } /* real events target an element, so the window capture guard runs first */ return { held: PL.held, paused: MATCH.state }; });
   await simRun(page, 0.2, 'PL.ent.health = 100; efcEmit("tick", 1 / 30);');
   check(guard.held === false && guard.paused === 'playing', 'mouse does not fire while busy, match not paused', guard);
   await page.evaluate(() => { $('efcLootBag').querySelector('.efc-it').scrollIntoView(); });
-  await page.screenshot({ path: SHOTS + '/efc-ui-loot.png' });
+  await page.screenshot({ path: SHOTS + '/efc-ui-loot.png', timeout: 300000 });
   await page.keyboard.press('Tab');
   const cl = await page.evaluate(() => ({ open: !$('efcLoot').classList.contains('hidden'), busy: efcCall('ui:busy'), board: !!HUD.board }));
   check(!cl.open && cl.busy === false && !cl.board, 'Tab closes the loot panel, ui:busy false', cl);

@@ -26,3 +26,6 @@ audio-out/
 .vercel/
 .dev.vars
 **/.dev.vars
+
+# build output (python3 build.py); deployed by .github/workflows/pages.yml
+/dist/

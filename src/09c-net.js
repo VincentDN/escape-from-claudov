@@ -525,6 +525,7 @@ function netHostMsg(c, m) {
     case 'leave':
       if (pl.ig) { pl.ig = false; netRemoveById(id); netBroadcast({ t: 'gone', id }, true, id); netLobbyChanged(); netRebalanceBots(); netCheckGo(); }
       break;
+    case 'efc': if (pl.ig) efcNetHostIn(id, m); break; // Escape From Claudov: game messages from a guest (src/efc/00-efc-core.js)
     case 'ld': // progression du chargement de la carte (0 à 100)
       pl.ld = m.m === NET.cfg.map ? clamp(m.p | 0, 0, 100) : 0;
       netLobbySoon(); netCheckGo();
@@ -772,6 +773,7 @@ function netClientMsg(m) {
       if (typeof m.tl === 'number' && isFinite(m.tl)) { MATCH.timeLeft = m.tl; cdNetIn(m.cd); } // (tl : l'envoi de l'hôte lui-même, pas un état relayé)
       if (m.dm && MATCH.mode === 'dom') domNetApply(m.dm);
       break;
+    case 'efc': efcNetClientIn(m); break; // Escape From Claudov: game messages from the host (src/efc/00-efc-core.js)
     case 'gone': if (typeof m.id === 'string') netRemoveById(m.id); break;
     case 'away': if (typeof m.id === 'string') netRemoteAway(m.id); break;
     case 'end':

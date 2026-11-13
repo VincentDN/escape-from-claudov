@@ -2,7 +2,7 @@
 // node tools/dev/efc/test-net.mjs   (needs a build: python3 build.py). Exits non-zero on failure.
 import { openPair, createLobby, joinLobby, launch, waitInMatch, stepBoth, settle } from './net2.mjs';
 
-const MAP = process.env.MAP || 'simoun', KEEP = 'PL.ent.health = 100;';
+const MAP = process.env.MAP || 'simoun', KEEP = 'PL.ent.health = 100;', EFC_HOLD = 7;
 // MODES.raid comes from the RAID package; when it is missing in this worktree, a minimal stand-in (test page only)
 const RAID_STANDIN = `window.EFC_RAID_STANDIN = () => { if (!MODES.raid) { MODES.raid = Object.assign({}, MODES.tdm, { name: 'Raid', btn: 'Raid', sub: 'Raid', key: 'limit' }); return true; } return false; };`;
 let fails = 0;
@@ -103,7 +103,19 @@ try {
   ok(moved > 1.5 && gap < 1, '(d) host copy follows the guest', { moved: +moved.toFixed(2), gap: +gap.toFixed(2) });
 
   // (e) out flag: the guest's raid is over, the host's copy is gone within 2 s of game time
-  await guest.evaluate(() => { PL.ent.out = true; });
+  // with the real RAID package the guest really extracts (stands in an open extract for the hold time); with the stand-in the flag is set by hand
+  const realOut = await guest.evaluate(() => {
+    const r = efcCall('raid:state');
+    if (!r || r.state !== 'live') { PL.ent.out = true; return false; }
+    const x = r.extracts.find((e) => !e.openAt) || r.extracts[0];
+    PL.ent.pos.set(x.x, gy0(x.x, x.z), x.z); PL.ent.vel.set(0, 0, 0);
+    return true;
+  });
+  if (realOut) {
+    await stepBoth(both, EFC_HOLD + 1, KEEP);
+    const gs = await guest.evaluate(() => efcCall('raid:state').state);
+    ok(gs === 'out', '(e) guest extracted through the real raid code', gs);
+  }
   let gone = null;
   for (let s = 0; s < 10 && !gone; s++) {
     await stepBoth(both, 0.2, KEEP);
@@ -121,8 +133,11 @@ try {
   // end: the host ends the raid, the guest goes through matchFinish ('end' message)
   await host.evaluate(() => matchFinish());
   await settle(400); await stepBoth(both, 0.4);
-  const eh = await host.evaluate(() => MATCH.state), eg = await guest.evaluate(() => ({ s: MATCH.state, tl: Math.round(MATCH.timeLeft) }));
-  ok(eh === 'finish' && eg.s === 'finish' && eg.tl > 60, '(end) host ends the raid, guest finishes with it', [eh, eg]);
+  // with the real RAID package a raid that the host ends makes everyone still inside missing in action; with the stand-in the engine state is 'finish'
+  const rs = () => { const r = efcCall('raid:state'); return { s: MATCH.state, r: r ? r.state : null, tl: Math.round(MATCH.timeLeft) }; };
+  const eh = await host.evaluate(rs), eg = await guest.evaluate(rs);
+  const over = (x) => (x.r ? x.r === 'mia' || x.r === 'out' : x.s === 'finish'); // the guest may already have extracted in (e)
+  ok(over(eh) && over(eg) && eg.tl > 60, '(end) host ends the raid, guest finishes with it', [eh, eg]);
 
   // (f) back to the lobby, switch to team deathmatch, launch again
   await host.evaluate(() => toMenu()); await guest.evaluate(() => toMenu()); await settle(600);

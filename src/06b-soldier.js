@@ -482,7 +482,7 @@ function animSoldier(e, dt) {
     S.sink = 0; S.rag = null; S.root.visible = true; e.voidDead = false; if (S.gun) S.gun.visible = true; // l'arme quitte le corps à la mort (dropKilledWeapon)
     poseSoldier(e, dt);
     layoutSoldier(S, true);
-  } else if (e.respawnT === Infinity || S.cyc === undefined) {
+  } else if (e.out || e.respawnT === Infinity || S.cyc === undefined) { // e.out : Escape From Claudov, soldat extrait du raid, aucun corps
     // bot hors jeu (retiré du match à mort : modeRoster ; inactif en ligne : netBotOff, startMatch) : aucun corps. La fin d'une killcam et
     // l'écran de fin animent tous les morts : il apparaissait debout dans sa dernière pose (au centre de la carte s'il n'avait pas joué),
     // et, sa mise à jour s'arrêtant là (updateBot), y restait jusqu'à la fin de la partie.

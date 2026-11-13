@@ -127,7 +127,7 @@ try {
   const tf = await page.evaluate(() => ({ call: T.calls[T.calls.length - 1], rows: $('efcLootList').querySelectorAll('.efc-it').length }));
   check(tf.call[0] === 'world:take' && tf.rows === 1, 'F takes the selected item', tf);
   // no firing or turning while the panel is open (fallback aim: the engine would read the mouse)
-  const guard = await page.evaluate(() => { const y = PL.yaw; dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true })); dispatchEvent(new MouseEvent('mousemove', { movementX: 300, bubbles: true })); return { held: PL.held, paused: MATCH.state }; });
+  const guard = await page.evaluate(() => { const y = PL.yaw; for (const el of [canvas, $('efcLoot')]) { el.dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true })); el.dispatchEvent(new MouseEvent('mousemove', { movementX: 300, bubbles: true })); } // real events target an element, so the window capture guard runs first return { held: PL.held, paused: MATCH.state }; });
   await simRun(page, 0.2, 'PL.ent.health = 100; efcEmit("tick", 1 / 30);');
   check(guard.held === false && guard.paused === 'playing', 'mouse does not fire while busy, match not paused', guard);
   await page.evaluate(() => { $('efcLootBag').querySelector('.efc-it').scrollIntoView(); });

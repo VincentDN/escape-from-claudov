@@ -100,3 +100,11 @@ efcProvide('stash:toStash', efcStashToStash);
 efcProvide('stash:save', efcStashSave);
 efcProvide('raid:kit', efcRaidKit);
 efcProvide('raid:commit', efcRaidCommit);
+/* Hideout: equip a bag item of the stored loadout into its slot, and save */
+function efcStashEquip(bagIdx) {
+  const st = efcStash();
+  if (!efcInvEquip(st.loadout, bagIdx)) return false;
+  efcStashSave();
+  return true;
+}
+efcProvide('stash:equip', efcStashEquip);

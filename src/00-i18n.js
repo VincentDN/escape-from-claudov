@@ -16,7 +16,7 @@ const LANG_PREF = (() => {
 const LANG = (() => {
   if (LANG_PREF !== 'auto') return LANG_PREF;
   const l = (typeof navigator !== 'undefined' && (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language])) || [];
-  for (const x of l) { const c = String(x || '').slice(0, 2).toLowerCase(); if (c === 'fr' || c === 'en') return c; }
+  // Escape From Claudov: the new screens are English only, so 'auto' means English whatever the browser asks for
   return 'en';
 })();
 const LOCALE = LANG === 'fr' ? 'fr-FR' : 'en-US';

@@ -216,11 +216,12 @@ function srvSetupSet(k, v) {
   const st = SRV.st; if (!srvChief() || st.ph !== 'attente') return;
   const c = { map: st.m, mode: st.o, ...st.cfg };
   if (k === 'bots') { c.bots = v === 'off' ? 0 : 1; if (v !== 'off') c.diff = v; }
-  else if (k === 'mode') { c.mode = v; c.limit = Settings[MODES[v].key]; }
+  else if (k === 'mode') { c.mode = v; c.limit = MODES[v] ? Settings[MODES[v].key] : 0; }
+  else if (efcNetIsRaid(c.mode) && (k === 'limit' || k === 'time')) return; // raid : durée fixe, pas de limite d'éliminations
   else c[k] = v;
   const n = netCfg(c); // (mode et limite validés comme dans un salon)
   Object.assign(st, { m: n.map, o: n.mode }); Object.assign(st.cfg, { bots: n.bots, diff: n.diff, limit: n.limit, time: n.time, pub: c.pub ? 1 : 0 });
-  Settings.map = n.map; Settings.mode = n.mode; Settings.minutes = n.time; Settings[MODES[n.mode].key] = n.limit; if (n.bots) Settings.difficulty = n.diff;
+  Settings.map = n.map; Settings.mode = n.mode; if (MODES[n.mode] && !efcNetIsRaid(n.mode)) { Settings.minutes = n.time; Settings[MODES[n.mode].key] = n.limit; } if (n.bots) Settings.difficulty = n.diff;
   if (k === 'pub') { NETP.vis = v ? 1 : 0; try { localStorage.setItem('cod_salon_pub', String(NETP.vis)); } catch (e) { /* stockage indisponible */ } }
   saveSettings(); sfxUi('click');
   srvSend({ t: 'cfg', m: n.map, o: n.mode, b: n.bots, df: n.diff, lim: n.limit, min: n.time, pub: st.cfg.pub });

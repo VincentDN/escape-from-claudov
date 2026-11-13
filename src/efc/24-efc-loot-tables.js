@@ -48,12 +48,13 @@ function efcLootEntry(rng, e) {
 function efcAmmoFor(wid) { const d = efcItemDef(wid); return d && d.weapon ? 'ammo_' + d.weapon.fam : null; }
 /* A Warden body: a weapon with partial ammo, some rounds for it, sometimes medicine, armour or a valuable. Elites carry better. */
 function efcLootWarden(rng, elite) {
-  const out = [], add = (it) => { if (it) out.push(it); };
+  const out = [], add = (it) => { if (it) efcStackInto(out, it); };
   const cats = elite ? (efcRand(rng) < 0.3 ? ['sniper'] : ['ar']) : (efcRand(rng) < 0.25 ? ['pistol'] : efcRand(rng) < 0.5 ? ['smg', 'shotgun'] : ['ar', 'smg']);
   const ids = efcWeaponIds(cats), wid = ids.length ? efcPick(rng, ids) : null;
   if (wid) {
     add(efcLootWeapon(rng, wid, elite ? 0.4 : 0.1, elite ? 1 : 0.7));
-    add(efcItemNorm({ id: efcAmmoFor(wid), n: (elite ? 20 : 6) + Math.floor(efcRand(rng) * (elite ? 40 : 20)) }));
+    const aid = efcAmmoFor(wid), k = elite ? 0.4 + efcRand(rng) * 0.6 : 0.1 + efcRand(rng) * 0.35; // share of one full stack
+    add(efcItemNorm({ id: aid, n: Math.max(1, Math.round(efcStackMax(aid) * k)) }));
   }
   if (efcRand(rng) < (elite ? 0.6 : 0.25)) add(efcItemNorm({ id: elite && efcRand(rng) < 0.4 ? 'med_kit' : 'med_bandage', n: 1 }));
   if (efcRand(rng) < (elite ? 0.5 : 0.12)) add(efcItemNorm({ id: elite ? (efcRand(rng) < 0.3 ? 'armor_t3' : 'armor_t2') : 'armor_t1', n: 1 }));

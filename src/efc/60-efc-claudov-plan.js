@@ -12,7 +12,7 @@ function clvLevel() {
   clvYard();
   clvWarehouseA();
   clvWarehouseB();
-  clvRail();
+  clvRailSpur();
   clvHousing();
   clvCheckpoint();
   clvSouth();
@@ -169,7 +169,7 @@ function clvWarehouseB() {
 }
 
 /* ---------- Rail spur (track x 37) with its loading dock (x 29..33) and the tunnel portal in the north ---------- */
-function clvRail() {
+function clvRailSpur() {
   const M = DECOR;
   trackBed(35, 39, -80, 74); railTrack(37, -80, 79.5);
   const W = (pf, z, rot, tint, shape, bogies) => { DECOR.place(pf, 37, RAIL.bed, z, rot, { tint, nocol: true }); colShape(37, RAIL.bed, z, rot, shape); for (const b of bogies) WORLD.col({ x0: 35.9, x1: 38.1, y0: RAIL.bed, y1: RAIL.bed + 0.85, z0: z + b - 1.35, z1: z + b + 1.35 }, 'metal'); };

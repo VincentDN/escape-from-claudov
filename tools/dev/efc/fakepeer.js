@@ -20,6 +20,7 @@
       super();
       Object.assign(this, { _p: peer, peer: remote, connectionId: cid, open: false, reliable: !!(opts && opts.reliable), serialization: (opts && opts.serialization) || 'json', metadata: opts && opts.metadata, label: cid, peerConnection: null });
     }
+    _ready() { if (this._closed || this._up) return; this._up = true; this.open = true; this.emit('open'); }
     send(d) {
       if (!this.open) return;
       if (window.FAKEPEER_DROP) return;
@@ -65,14 +66,15 @@
         this._conns.set(m.cid, c);
         this._post({ k: 'accept', to: m.from, from: this.id, cid: m.cid });
         this.emit('connection', c);
-        setTimeout(() => { if (!c._closed) { c.open = true; c.emit('open'); } }, 0);
+        setTimeout(() => c._ready(), 0);
       } else if (m.k === 'accept') {
         const c = this._wait.get(m.cid); if (!c) return;
         this._wait.delete(m.cid); clearTimeout(c._timer);
         this._conns.set(m.cid, c);
-        c.open = true; c.emit('open');
+        c._ready();
       } else if (m.k === 'data') {
-        const c = this._conns.get(m.cid); if (!c || !c.open) return;
+        const c = this._conns.get(m.cid); if (!c || c._closed) return;
+        c._ready(); // data can overtake the open timer: the channel opens first
         let d; try { d = JSON.parse(m.d); } catch (e) { return; }
         stats.recv++;
         c.emit('data', d);

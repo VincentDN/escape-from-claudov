@@ -117,6 +117,6 @@ efcOn('loot:give', (item, containerId) => {
   if (!item) return;
   if (efcInvOk(EFC.inv) && efcInvAdd(EFC.inv, item)) { efcEmit('inv:changed'); return; }
   efcCall('world:put', containerId === undefined ? null : containerId, efcItemNorm(item) || item);
-  if (typeof hudMsg === 'function') hudMsg('Too heavy: no room in your pack', 'none', 1.8);
+  if (typeof hudMsg === 'function') hudMsg('Too heavy, no room in your pack', 'none', 1.8);
   efcEmit('inv:changed');
 });

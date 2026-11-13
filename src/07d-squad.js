@@ -15,9 +15,9 @@
 const SQ = { at: [-99, -99], intel: [null, null], rev: 0 };
 function squadDirty() { SQ.at[0] = SQ.at[1] = -99; }
 /* Début de partie : le dernier signalement de la partie d'avant ne vaut plus (son heure, MATCH.time, passait pour récente : l'horloge repart de zéro) */
-function squadReset() { SQ.intel[0] = SQ.intel[1] = null; squadDirty(); }
+function squadReset() { SQ.intel[0] = SQ.intel[1] = null; squadDirty(); efcWardenReset(); } // (Escape From Claudov: Warden posts of a raid, src/efc/40-efc-wardens.js)
 /* Un bot qui repère un adversaire le signale à son équipe : position et instant (sans suivi : le plan s'en sert pour renforcer) */
-function squadIntel(b, foe, now) { SQ.intel[b.team] = { x: foe.pos.x, z: foe.pos.z, t: now }; }
+function squadIntel(b, foe, now) { if (efcRaidMode()) { efcWardenAlert(b, foe, now); return; } SQ.intel[b.team] = { x: foe.pos.x, z: foe.pos.z, t: now }; } // raid: the call goes to the Warden's post mates only
 function squadMaybe(t, now) { if (now < SQ.at[t] - 0.01 || now - SQ.at[t] >= 1.5) squadPlan(t, now); }
 
 function squadPlan(t, now) {

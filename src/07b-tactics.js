@@ -138,14 +138,14 @@ function initTactics(b) {
   b.aggr = clamp(b.weapon.ai.aggr + rand(-0.15, 0.15), 0.05, 0.95);
   const mates = entities.filter((o) => !o.isPlayer && o.team === b.team);
   b.lane = Math.random() < 0.35 ? pick(LANE_ROLES) : LANE_ROLES[Math.max(0, mates.indexOf(b)) % LANE_ROLES.length]; b.holdT = 0; // la route habituelle de son rang, ou, une vie sur trois, une autre
-  b.revenge = b.grudge && MATCH.mode !== 'dom' && MATCH.time - b.grudge.t < 90 && Math.random() < 0.4 * (0.5 + b.aggr) ? b.grudge : null; b.grudge = null; // revenir où l'on a été tué, parfois
+  b.revenge = b.grudge && MATCH.mode !== 'dom' && !efcRaidMode() && MATCH.time - b.grudge.t < 90 && Math.random() < 0.4 * (0.5 + b.aggr) ? b.grudge : null; b.grudge = null; // revenir où l'on a été tué, parfois
   b.tactic = 'roam'; b.decideT = 0; b.suppr = 0; b.fear = 0; b.lastHitT = -9; b.cover = null; b.inCoverT = 0; b.move = 'strafe'; b.moveT = 0; b.sprinting = false;
   b.chaseE = null; b.contactT = -99; b.lostWeak = false; b.searchP = null; b.sweepT = 0; b.startleT = 0; b.startleAt = -99;
 }
 
 function decideTactic(b, now) {
   if (mechaBotDecide(b, now)) return; // un mecha ennemi tout près : à l'abri à bonne distance, puis on lui tire dessus (08f-mecha.js)
-  const T = b.target, vis = b.visible && T && T.alive, def = b.weapon, D = botDiff(), dom = MATCH.mode === 'dom';
+  const T = b.target, vis = b.visible && T && T.alive, def = b.weapon, D = botDiff(b), dom = MATCH.mode === 'dom';
   // un adversaire combattu qui se met à couvert est poursuivi (botChasing : D.chase, de 8 à 18 s), une simple piste (bruit, impact) moins
   // longtemps ; en domination, on ne traque pas longtemps : les points attendent
   let hunting = botChasing(b, now, D) || now - b.lastSeenT < (dom ? 3 : D.mem + 3);
@@ -209,7 +209,9 @@ function updateBot(b, dt, now) {
   if (!b.alive) {
     releaseCover(b);
     animSoldier(b, dt);
-    if (MATCH.state === 'playing') { b.respawnT -= dt; if (b.respawnT <= 0) { spawnEntity(b); initTactics(b); } }
+    // raid: a Warden waits EFC.cfg.wardenRespawn, then comes back only where no human is near or watching (efcWardenCanRespawn retries every 5 s)
+    if (efcRaidMode() && b.efcDeaths !== b.deaths && isFinite(b.respawnT)) { b.efcDeaths = b.deaths; b.respawnT = EFC.cfg.wardenRespawn; }
+    if (MATCH.state === 'playing') { b.respawnT -= dt; if (b.respawnT <= 0) { if (efcRaidMode() && !efcWardenCanRespawn(b, MATCH.time)) b.respawnT = 5; else { spawnEntity(b); initTactics(b); } } }
     return;
   }
   if (b.aggr === undefined) initTactics(b);
@@ -217,7 +219,7 @@ function updateBot(b, dt, now) {
     const I = b.input; I.mx = 0; I.mz = 0; I.sprint = false; I.jump = false; I.fire = false; I.firePressed = false; I.ads = false;
     ctlMove(b, dt); animSoldier(b, dt); return;
   }
-  const D = botDiff(), def = b.weapon;
+  const D = botDiff(b), def = b.weapon;
   b.senseT -= dt; if (b.senseT <= 0) { b.senseT = rand(0.12, 0.22); botSense(b, now); }
   if (now - b.lastHitT > 5 && b.health < 100) b.health = Math.min(100, b.health + 30 * dt);
   b.suppr = Math.max(0, b.suppr - dt * 0.45); b.fear = Math.max(0, b.fear - dt * 0.3);
@@ -445,6 +447,7 @@ function updateBot(b, dt, now) {
       b.paceT -= dt;
       if (b.paceT <= 0) { b.paceT = rand(3, 8); const r = Math.random(), hot = now - b.lastSeenT < 12 || b.fear > 0.3 || now < b.warnT; b.pace = r < 0.45 + 0.35 * (1 - b.pers.scan) && !hot ? 2 : r < 0.88 ? 1 : 0; } // sprint, course arme levée, marche prudente
       sprint = b.pace === 2; speed = b.pace === 2 ? 5.4 : b.pace === 1 ? 3.9 : 2.6;
+      if (b.goal && b.goal.walk && now >= b.warnT && now - b.lastSeenT > 12) { sprint = false; speed = 2.6; } // a patrolling Warden walks (raid)
       if (!sprint) { // il regarde autour de lui, un coup d'œil de côté de temps en temps
         b.glanceT -= dt;
         if (b.glanceT <= 0) { if (b.glanceA !== 0) { b.glanceA = 0; b.glanceT = rand(1.2, 3.5); } else { b.glanceA = (Math.random() < 0.5 ? -1 : 1) * rand(0.5, 1.3); b.glanceT = rand(0.4, 1.0); } }

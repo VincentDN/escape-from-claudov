@@ -10,7 +10,8 @@
    (un impact, un bruit, son chemin), un peu plus vers un adversaire en vue ; startle = surprise (s) d'un bot touché par un tireur qu'il ne
    voit pas, avant qu'il se retourne (botHurt) */
 /* Difficulté des bots de la partie : en ligne, celle que l'hôte a choisie dans le salon (NET.cfg.diff), sinon celle du Solo */
-function botDiff() { return DIFF[MATCH.online ? NET.cfg.diff : Settings.difficulty] || DIFF[1]; }
+/* b (optional): in a raid, a Warden of an elite post plays at the hardest level whatever the chosen one (src/efc/40-efc-wardens.js) */
+function botDiff(b) { return b && b.efcElite && efcRaidMode() ? DIFF[DIFF.length - 1] : DIFF[MATCH.online ? NET.cfg.diff : Settings.difficulty] || DIFF[1]; }
 const DIFF = [
   { name: _t('Recrue'), react: [0.45, 0.8], err: 0.11, settle: 1.7, head: 0.03, turn: 3.2, dmg: 0.7, nade: 0.3, see: 0.6, lag: 0.34, flinch: 1.3, tokens: 1, mem: 2.5, flair: 0.3, chase: 8, spin: 3.4, startle: [0.45, 0.7] },
   { name: _t('Régulier'), react: [0.28, 0.5], err: 0.08, settle: 1.1, head: 0.07, turn: 4.8, dmg: 0.88, nade: 0.6, see: 0.85, lag: 0.2, flinch: 1.0, tokens: 2, mem: 4, flair: 0.7, chase: 13, spin: 4.6, startle: [0.32, 0.5] },
@@ -105,12 +106,14 @@ const SPAWNS = [[], []];
 /* Choix du point d'apparition : voir chooseSpawn (src/09i-modes.js), qui dépend du mode de jeu */
 function spawnEntity(e) {
   e.spawnAt = MATCH.time;
-  e.pos.copy(chooseSpawn(e)); e.vel.set(0, 0, 0); e.vy = 0; spawnNote(e);
-  e.yaw = spawnYaw(e, e.pos); e.pitch = 0; e.protT = modeDef().prot;
+  // Escape From Claudov: in a raid a Warden appears at its guard post, facing out (src/efc/40-efc-wardens.js)
+  const wsp = !e.isPlayer && !e.isRemote && efcRaidMode() ? efcWardenSpawn(e) : null;
+  e.pos.copy(wsp || chooseSpawn(e)); e.vel.set(0, 0, 0); e.vy = 0; spawnNote(e);
+  e.yaw = wsp ? spawnFace(e.pos, wsp.yaw) : spawnYaw(e, e.pos); e.pitch = 0; e.protT = modeDef().prot;
   e.alive = true; e.health = 100; e.streak = 0; e.comboN = 0; e.crouch = false; e.crouchAmt = 0; e.slideT = 0; e.slideCd = 0; e.slideBuf = 0; e.slideAmt = 0; e.dmgBy.clear(); e.voidDead = false;
   if (!e.isPlayer) {
     e.arms = makeArms([e.weapon.id], 60); e.input = makeInput(); e.onGround = true; e.vy = 0; e.eyeH = 1.62; e.sprinting = false; e.lastShots = 0; e.burstLeft = 0;
-    e.target = null; e.visible = false; e.lastSeenT = -99; e.path = null; e.goal = null; e.nades = NADE_COUNT; e.nadeType = botNadeType(); e.nadeCd = rand(8, 28); e.nadeOn = Math.random() < 0.8 * botDiff().nade; e.aw.clear(); e.aimT = null; e.lookAtT = 0; e.fear = 0; e.sq = null; e.lastHitT = -9;
+    e.target = null; e.visible = false; e.lastSeenT = -99; e.path = null; e.goal = null; e.nades = NADE_COUNT; e.nadeType = botNadeType(); e.nadeCd = rand(8, 28); e.nadeOn = Math.random() < 0.8 * botDiff(e).nade; e.aw.clear(); e.aimT = null; e.lookAtT = 0; e.fear = 0; e.sq = null; e.lastHitT = -9;
     e.lookYaw = e.yaw; e.lastForce = null; releaseCover(e); initTactics(e); e.atCover = false;
     // heures de la partie (MATCH.time) qui repartent de zéro à la suivante : un bot ébloui à 400 s restait aveugle 400 s de la partie
     // d'après (il titubait sur place sans tirer, surtout en ligne où l'hôte enchaîne les parties), sourd aux bruits, prompt à reculer
@@ -131,6 +134,8 @@ function botGuess(from, pos, base, perM) {
 function botLookAt(b, p, now, dur) { b.lookAtX = p.x; b.lookAtZ = p.z; b.lookAtT = now + dur; }
 const _gpick = new V3();
 function pickGoal(b, now) {
+  // Escape From Claudov: a Warden with no enemy guards its post and patrols to a neighbouring one (src/efc/40-efc-wardens.js)
+  if (efcRaidMode()) { const g = efcWardenGoal(b, now); if (g) return g; }
   const ffa = MATCH.mode === 'ffa', dom = MATCH.mode === 'dom', uav = !ffa && MATCH.uav[b.team] > 0; // chacun pour soi : l'UAV n'est qu'au joueur
   // domination : le plan d'équipe (07d-squad.js) donne à chacun son point, à prendre ou à défendre
   if (dom) { const g = squadGoal(b, now); if (g) return g; }
@@ -175,6 +180,7 @@ function pickGoal(b, now) {
 }
 function setPath(b, target) {
   b.path = findPath(b.pos, target, botNearNode(b)); b.pathI = 1; b.goal = target.clone(); b.goal.hold = !!target.hold; b.goal.dom = target.dom; b.repathT = 1.5;
+  if (target.efc) { b.goal.efc = target.efc; b.goal.holdFor = target.holdFor; b.goal.look = target.look; b.goal.walk = target.walk; } // Warden goals keep their hold time, look point and pace
   if (!b.path) { b.goal = null; return; }
   if (b.path.length > 1 && !navWalkable(b.pos, b.path[1])) b.pathI = 0; // pas de raccourci à travers une cloison au départ : d'abord le nœud le plus proche
 }
@@ -187,7 +193,7 @@ function setPath(b, target) {
    un bruit, un impact ou une balle qui passe donnent une direction approximative (botGuess), jamais la position exacte. */
 const SEE = { rate: 2.6, decay: 0.4, near: 3 };
 function botSense(b, now) {
-  const D = botDiff();
+  const D = botDiff(b);
   const sdt = clamp(now - (b.senseAt || now - 0.15), 0.05, 0.4); b.senseAt = now;
   const blind = now < (b.blindT || 0); // aveuglé par une flash : il ne voit rien (il entend encore)
   const eye = entEye(b, new V3());
@@ -231,6 +237,7 @@ function botSense(b, now) {
   if (best) {
     if (b.target !== best || now - b.lastSeenT > 1.2) {
       b.reactT = rand(D.react[0], D.react[1]) * (b.target === best ? 0.5 : 1);
+      if (efcRaidMode()) b.reactT += efcWardenReact(b, best, now); // a Warden caught unaware at long range does not snap-aim
       b.seenT = 0; b.aimHead = Math.random() < D.head && b.pos.distanceTo(best.pos) < 45;
       if (b.target !== best) squadIntel(b, best, now); // il le crie à l'équipe
     }
@@ -265,7 +272,7 @@ function botSense(b, now) {
    surpris : il ne se retourne qu'au bout de D.startle (b.startleT, une fois par surprise, les balles qui suivent ne le figent pas plus
    longtemps), puis à la vitesse d'un grand mouvement de tête (D.spin, updateBot). */
 function botHurt(b, attacker, dmg, dir, now) {
-  const D = botDiff();
+  const D = botDiff(b);
   b.lastHitT = now; b.fear = Math.min(2, b.fear + dmg / 70);
   let late = 0;
   if (!b.visible && attacker && !allied(attacker, b)) {
@@ -274,6 +281,7 @@ function botHurt(b, attacker, dmg, dir, now) {
   }
   b.decideT = Math.min(b.decideT, Math.max(late, rand(0.3, 0.55)));
   if (!attacker || allied(attacker, b)) return;
+  if (efcRaidMode()) efcWardenAlert(b, attacker, now); // a hurt Warden radios its post mates
   b.aw.set(attacker, Math.max(b.aw.get(attacker) || 0, 0.6));
   if (!b.visible) {
     let ax = dir ? -dir.x : attacker.pos.x - b.pos.x, az = dir ? -dir.z : attacker.pos.z - b.pos.z; const al = hyp(ax, az) || 1;
@@ -630,7 +638,7 @@ function flashBang(p, owner) {
     if (I * dur > (PL.flashI || 0) * (PL.flashT || 0)) { PL.flashT = dur; PL.flashD = dur; PL.flashI = I; }
   }
   sfxFlashBang(q, ear > FLASH.min ? ear * 0.85 : 0, 0.5 + FLASH.deaf * ear);
-  if (owner) { soundEvents.push({ pos: q.clone(), team: owner.team, who: owner, t: MATCH.time, loud: true }); while (soundEvents.length > 60) soundEvents.shift(); }
+  if (owner) { soundEvents.push({ pos: q.clone(), team: owner.team, squad: owner.squad, who: owner, t: MATCH.time, loud: true }); while (soundEvents.length > 60) soundEvents.shift(); }
   // les bots de cette partie (en ligne : chez l'hôte) ; un éblouissement léger ne les arrête pas. La flash du joueur qui éblouit un adversaire
   // lui donne la croix de touche, comme une balle (retour du propriétaire : les équipements doivent faire des hitmarkers) ; un adversaire
   // distant s'éblouit chez lui, sa part est estimée ici d'après sa position et son regard publiés
@@ -721,5 +729,5 @@ function explode(p, owner, weaponName, radius, maxDmg, life, roofK) {
     e.lastForce = { dir: rd, mag: 7 + 10 * (1 - d / radius), lift: 7 + 9 * (1 - d / radius), part: 'body', radial: true };
     applyDamage(e, dmg, owner, weaponName, false, ch.clone().sub(c).normalize(), undefined, life);
   }
-  soundEvents.push({ pos: p.clone(), team: owner.team, who: owner, t: MATCH.time, loud: true }); while (soundEvents.length > 60) soundEvents.shift();
+  soundEvents.push({ pos: p.clone(), team: owner.team, squad: owner.squad, who: owner, t: MATCH.time, loud: true }); while (soundEvents.length > 60) soundEvents.shift();
 }

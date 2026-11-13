@@ -12,6 +12,7 @@ const r = await page.evaluate(() => {
   MATCH.mode = 'raid';
   EFC.cfg.lootSeed = 1234;
   // fake ITEMS provider: two different items per container, counts from the seeded rng
+  EFC.hooks['loot:give'] = []; // this test checks WORLD alone: the real inventory listener would hand the fake items back
   efcProvide('loot:roll', (t, rng) => [{ id: 'it_' + t, n: 1 + Math.floor(rng() * 3) }, { id: 'scrap', n: 1 + Math.floor(rng() * 5) }]);
   efcOn('world:changed', (id) => changed.push(id));
   efcOn('loot:give', (it, id) => given.push({ it, id }));

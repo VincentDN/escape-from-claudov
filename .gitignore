@@ -29,3 +29,6 @@ audio-out/
 
 # build output (python3 build.py); deployed by .github/workflows/pages.yml
 /dist/
+
+# agent worktrees
+/.claude/worktrees/

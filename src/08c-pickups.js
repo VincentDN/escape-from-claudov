@@ -33,7 +33,7 @@ function clearDrops() { for (const d of DROP.list.slice()) removeDrop(d); DROP.m
 
 /* Pose une arme au sol : pos et q (position et orientation de départ), vel (lancer). Renvoie l'objet ou null. */
 function dropWeapon(def, mag, reserve, pos, q, vel) {
-  if (mag + reserve <= 0) return null;
+  if (mag + reserve <= 0 || dropOffRaid()) return null;
   const T = dropTemplate(def.key);
   const obj = T.group.clone(); obj.position.copy(pos); obj.quaternion.copy(q);
   scene.add(obj);
@@ -45,6 +45,7 @@ function dropWeapon(def, mag, reserve, pos, q, vel) {
 
 /* Arme lâchée par un soldat qui vient de mourir : elle quitte le corps (dont elle est retirée) et retombe */
 function dropKilledWeapon(v, dir) {
+  if (dropOffRaid()) return; // en raid, l'arme reste sur le corps (le butin est un conteneur de l'hôte, 30-efc-world.js)
   const A = v.arms, w = A && A.slots[A.cur]; if (!w) return;
   let mag = w.mag, reserve = w.reserve;
   // les bots ont une réserve quasi infinie : ils n'en laissent qu'une partie
@@ -94,7 +95,15 @@ function stepDrop(d, dt) {
   if (left < DROP.fade) { const k = Math.max(0, left / DROP.fade); o.scale.setScalar(k); if (left <= 0) d.dead = true; }
 }
 
+/* Mode raid (Escape From Claudov) : pas d'armes au sol locales, ni d'invite ; l'invite #pickup est laissée au butin de l'hôte */
+function dropOffRaid() { return typeof efcRaidMode === 'function' && efcRaidMode(); }
 function updateDrops(dt) {
+  if (dropOffRaid()) {
+    if (DROP.list.length) clearDrops();
+    DROP.cur = null;
+    if (DROP.txt) { DROP.txt = ''; const el = $('pickup'); el.innerHTML = ''; el.style.opacity = 0; }
+    return;
+  }
   const L = DROP.list;
   for (let i = L.length - 1; i >= 0; i--) { stepDrop(L[i], dt); if (L[i].dead) removeDrop(L[i]); }
   // niveau de détail : même seuil de taille apparente que les soldats (updateSoldierLods). Au loin, une arme couchée ne fait plus que quelques

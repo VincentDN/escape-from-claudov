@@ -77,6 +77,8 @@ try {
   ok(bg.remote && bg.rSquad === 0, '(b) guest sees the host as remote in squad 1', bg);
   ok(bh.bots > 0 && bh.botsW && bh.allBots, '(b) all host bots active, squad w', bh);
   ok(bg.bots > 0 && bg.botsW, '(b) guest copies of host bots carry squad w', bg);
+  const so = [await host.evaluate((gid) => [efcCall('squad:of', gid), efcCall('squad:of', NET.me)], gid), await guest.evaluate((hid) => [efcCall('squad:of', hid), efcCall('squad:of', NET.me)], h0.me)];
+  ok(JSON.stringify(so) === '[[1,0],[0,1]]', "(b) service 'squad:of' gives lobby squads on both machines", so);
 
   // (c) bus round trip
   await host.evaluate(() => {

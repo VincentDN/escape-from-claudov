@@ -136,7 +136,7 @@ const _gpick = new V3();
 function pickGoal(b, now) {
   // Escape From Claudov: a Warden with no enemy guards its post and patrols to a neighbouring one (src/efc/40-efc-wardens.js)
   if (efcRaidMode()) { const g = efcWardenGoal(b, now); if (g) return g; }
-  const ffa = MATCH.mode === 'ffa', dom = MATCH.mode === 'dom', uav = !ffa && MATCH.uav[b.team] > 0; // chacun pour soi : l'UAV n'est qu'au joueur
+  const ffa = MATCH.mode === 'ffa' || MATCH.mode === 'raid', dom = MATCH.mode === 'dom', uav = !ffa && MATCH.uav[b.team] > 0; // chacun pour soi : l'UAV n'est qu'au joueur
   // domination : le plan d'équipe (07d-squad.js) donne à chacun son point, à prendre ou à défendre
   if (dom) { const g = squadGoal(b, now); if (g) return g; }
   else {

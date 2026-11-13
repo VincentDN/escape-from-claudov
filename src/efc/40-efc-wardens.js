@@ -132,17 +132,20 @@ function efcGuardGoal(p, b, walk) {
 }
 function efcNeighbour(p) {
   let best = null, bd = 1e9;
-  for (const q of EFC.wd.posts) { if (q === p) continue; const d = hyp(q.x - p.x, q.z - p.z); if (d < bd) { bd = d; best = q; } }
+  for (const q of EFC.wd.posts) { // (a post whose area overlaps this one is not a patrol destination)
+    const d = hyp(q.x - p.x, q.z - p.z); if (q === p || d < p.r + q.r) continue; if (d < bd) { bd = d; best = q; }
+  }
   return best;
 }
-/* A patrol leaves now and then: one Warden, two from a post of three or more; at most one patrol per ten Wardens at a time */
+/* A patrol leaves now and then: one Warden, or two from a post of three or more when at least 14 Wardens are up; at most one patrol
+   per ten Wardens at a time, so most of them stay at their posts */
 function efcPatrolStart(p, b, now) {
   const W = EFC.wd, q = efcNeighbour(p); p.patrolT = now + rand(35, 70);
   if (!q || now - p.alertT < 30) return;
   const alive = entities.filter((o) => o.alive && o.squad === 'w'), out = new Set(alive.filter((o) => o.efcPatrol).map((o) => o.efcPatrol.id));
   if (out.size >= Math.max(1, Math.floor(alive.length / 10))) return;
   const id = now + Math.random(), mates = p.members.filter((o) => o !== b && o.alive && !o.visible && o.tactic === 'roam' && o.efcPost === p.i);
-  const group = [b].concat(mates.length >= 2 && Math.random() < 0.5 ? [mates[0]] : []);
+  const group = [b].concat(mates.length >= 2 && alive.length >= 14 && Math.random() < 0.5 ? [mates[0]] : []); // a pair only when enough Wardens stay home
   for (const o of group) { o.efcPatrol = { id, to: q.i, stage: 'out', fails: 0 }; if (o !== b) { o.goal = null; o.path = null; o.holdT = 0; } }
 }
 function efcWardenGoal(b, now) {

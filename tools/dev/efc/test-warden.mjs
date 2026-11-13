@@ -53,8 +53,15 @@ ok(a.bots.every((b) => b.d !== null && b.d <= b.r + 3), '(a) every Warden within
 ok(a.posts.every((p) => p.m >= 1) && a.bots.some((b) => b.elite) === a.posts.some((p) => p.elite), '(a) every post manned, elite flag follows the post');
 // (b) player parked far away, invulnerable, 60 s
 const park = await page.evaluate(() => {
-  const P = EFC.wd.posts; let best = -1, bd = -1;
-  for (let id = 0; id < NAV.count; id += 7) { if (NAV.comp[id] !== NAV.mainComp) continue; const d = Math.min(...P.map((p) => hyp(NAV.nx[id] - p.x, NAV.nz[id] - p.z))); if (d > bd) { bd = d; best = id; } }
+  // far from every post and out of sight of every post (a parked player in the open would be seen and hunted: that is (c), not (b))
+  const P = EFC.wd.posts, eye = new V3(), at = new V3(); let best = -1, bd = -1;
+  for (let id = 0; id < NAV.count; id += 3) {
+    if (NAV.comp[id] !== NAV.mainComp) continue;
+    const d = Math.min(...P.map((p) => hyp(NAV.nx[id] - p.x, NAV.nz[id] - p.z))); if (d <= bd) continue;
+    eye.set(NAV.nx[id], NAV.ny[id] + 1.6, NAV.nz[id]);
+    if (P.some((p) => hyp(NAV.nx[id] - p.x, NAV.nz[id] - p.z) < 100 && lineClear(eye, at.set(p.x, p.y + 1.6, p.z)))) continue;
+    bd = d; best = id;
+  }
   window.PARK = [NAV.nx[best], NAV.ny[best], NAV.nz[best]]; PL.ent.pos.set(...PARK);
   return { x: Math.round(PARK[0]), z: Math.round(PARK[2]), d: Math.round(bd) };
 });
@@ -85,7 +92,9 @@ const c0 = await page.evaluate(() => {
       eye.set(NAV.nx[id], NAV.ny[id] + 1.6, NAV.nz[id]);
       if (!lineClear(eye, at.set(p.x, p.y + 1.5, p.z)) || !ws.some((w) => lineClear(eye, entChest(w, at)))) continue;
       window.SPOT = [NAV.nx[id], NAV.ny[id], NAV.nz[id]]; window.CP = p.i; window.FAR = far.map((q) => q.i);
-      return { post: p.i, d: +d.toFixed(1), far: FAR };
+      // the Wardens of those posts that are at home (not off on a patrol or a chase near the spot)
+      window.FARW = entities.filter((e) => e.alive && FAR.includes(e.efcPost) && hyp(e.pos.x - P[e.efcPost].x, e.pos.z - P[e.efcPost].z) < P[e.efcPost].r + 5);
+      return { post: p.i, d: +d.toFixed(1), far: FAR, farWardens: FARW.length };
     }
   }
   return null;
@@ -95,7 +104,7 @@ if (c0) {
   await page.evaluate(() => { T.tFirst = -1; T.farT = 0; T.n = 0; });
   await simRun(page, 10, `PL.ent.pos.set(...SPOT); PL.ent.vel.set(0, 0, 0); T.n++;
     if (T.tFirst < 0 && entities.some((e) => e.alive && e.efcPost === CP && e.visible && e.target === PL.ent)) T.tFirst = T.n / 30;
-    T.farT += entities.filter((e) => e.alive && FAR.includes(e.efcPost) && e.visible && e.target === PL.ent).length;`);
+    T.farT += FARW.filter((e) => e.alive && e.visible && e.target === PL.ent).length;`);
   const c = await page.evaluate(() => ({ first: T.tFirst, far: T.farT, mates: entities.filter((e) => e.alive && e.efcPost === CP).map((e) => ({ t: e.tactic, sees: e.visible && e.target === PL.ent })) }));
   ok(c.first >= 0 && c.first <= 10, '(c) a Warden of that post targets the player within 10 s', c);
   ok(c.far === 0, '(c) Wardens of posts more than 80 m away do not target the player', c.far);

@@ -1,0 +1,9 @@
+[
+  {
+    "version": "0.1.0",
+    "date": "2026-11-13",
+    "changes": [
+      { "t": "new", "x": "Escape From Claudov : première tranche verticale du jeu d'extraction, sur le moteur de Riposte: Frontline 5.6.0.", "x_en": "Escape From Claudov: first vertical slice of the extraction shooter, on the Riposte: Frontline 5.6.0 engine." }
+    ]
+  }
+]

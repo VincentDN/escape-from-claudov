@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://vincentdn.github.io/escape-from-claudov/sitemap.xml

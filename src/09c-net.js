@@ -19,7 +19,7 @@ const NET_WSPECIAL = { nade: _t('Grenade'), tknife: _t('Couteau de lancer'), air
 const NET = {
   role: 'off', peer: null, hostConn: null, me: '', code: '', joined: false, t0: 0, hostSeen: 0, hbT: 0, lastSend: 0,
   relay: null, relayConn: null, relayTimer: 0, tx: { p2p: 'off', relay: 'off' }, // voies de connexion : pair à pair et relais (wait, idle, ok, fail, off)
-  players: new Map(), phase: 'lobby', cfg: { bots: 1, diff: 2, limit: 30, time: 10, map: 'sable', mode: 'tdm' },
+  players: new Map(), phase: 'lobby', cfg: { bots: 1, diff: 2, limit: 30, time: 10, map: 'sable', mode: 'raid' },
   on: false, team: 0, remotes: new Map(), seen: new Map(), seenT: new Map(), ak: new Map(), sent: [], held: [], hitQ: 0, rid: 0, lastPub: 0, shots: 0, nick: '', status: '',
   startT: 0, ldKey: '', ldT: 0, lobbyTimer: 0, // lancement : début de l'attente (hôte), dernière progression envoyée
   key: '', // clé de cette page, envoyée avec la présentation (voir netKey)
@@ -158,7 +158,7 @@ function netNick() {
   try { localStorage.setItem('cod_nick', n); } catch (e) { /* stockage indisponible */ }
   return n;
 }
-function netTeamCounts() { const c = [0, 0]; for (const p of NET.players.values()) c[p.t]++; return c; }
+function netTeamCounts() { return efcNetCounts(); } // par équipe, ou par escouade en raid (src/efc/35-efc-netlobby.js)
 
 /* ---------- Envois ---------- */
 function netSend(m) { const c = NET.hostConn; if (c && c.open) { try { c.send(m); NET.lastSend = performance.now(); } catch (e) { /* canal en cours de fermeture */ } } }
@@ -185,7 +185,7 @@ function netHost(o) {
   const code = o.code || netNewCode(), direct = netLib() && !netRelayOnly();
   Object.assign(NET, { role: 'host', peer: null, relay: null, relayConn: null, code, me: '', phase: 'lobby', joined: false, t0: performance.now(), tx: { p2p: direct ? 'wait' : 'off', relay: netrUrl() ? 'wait' : 'off' } });
   NET.players.clear();
-  NET.cfg = netCfg(o.cfg || { bots: o.quick ? 1 : NET.cfg.bots, diff: Settings.difficulty, map: Settings.map, mode: Settings.mode, limit: Settings[(MODES[Settings.mode] || MODES.tdm).key], time: Settings.minutes, pub: o.pub && netViaServer() ? 1 : 0 });
+  NET.cfg = netCfg(o.cfg || { bots: o.quick ? 1 : NET.cfg.bots, diff: Settings.difficulty, map: Settings.map, mode: 'raid', limit: 0, time: Settings.minutes, pub: o.pub && netViaServer() ? 1 : 0 }); // Escape From Claudov: a new lobby is a raid
   NET.pane = 'setup'; NET.srv = !!o.srv;
   netdReset('host', code); netdLog('salon ' + code + ' : ouverture');
   netStatus(_t('Création du salon...'));
@@ -228,7 +228,7 @@ function netHostRelay(code, key) {
     if (st === 'up') { NET.tx.relay = 'ok'; NETD.rel = 'ok'; netOldConnClose(); netMigDone(); if (NET.joined) netLobbyChanged(); else netHostUp(NET_PREFIX + code); } // (déjà dans le salon : partie reprise, ou retour après une coupure)
     else if (st === 'taken') { // code déjà pris : on en tire un autre (celui d'un salon du serveur vient du serveur) ; en partie, un autre joueur l'a reprise
       const o = NET.hostOpts, live = NET.on && !!o.srv;
-      netReset(live ? _t('Connexion perdue. La partie continue chez un autre joueur.') : undefined);
+      netReset(live ? _t('Connexion perdue. La partie continue chez un autre joueur.') : undefined, live);
       if (live) toMenu(); else if (!o.srv) netHost(o);
     } else if (st === 'fail') netTxFail('relay', netViaServer() ? _t('Le serveur de jeu est injoignable.') : _t('Le relais de secours est injoignable.'));
   }, key);
@@ -385,7 +385,8 @@ function netPeerError(peer, err) {
 }
 /* Ferme tout ce qui touche au salon ; msg : texte d'état à afficher ensuite. Dans un salon public (SRV.on), seul le salon de la
    partie se ferme : la discussion et les joueurs masqués du salon public restent */
-function netReset(msg) {
+function netReset(msg, viaMenu) {
+  if (NET.on && !viaMenu && MATCH.mode === 'raid' && MATCH.state !== 'menu') efcEmit('match:left'); // raid quitté sans passer par toMenu (coupure, salon fermé) : RAID solde le raid
   if (NET.on) netLeaveMatch(true);
   if (NET.srv && NET.role === 'host' && SRV.hostCode && SRV.hostCode === NET.code) srvRoomFailed(); // la partie que j'héberge se ferme avant sa fin
   const peer = NET.peer, relay = NET.relay, rc = NET.relayConn;
@@ -416,9 +417,9 @@ function netLeaveClose(quit) {
 /* Perte de l'hôte côté client : retour au menu si une partie était en cours */
 function netLost(msg) {
   if (NET.role !== 'client') return;
-  const wasPlaying = NET.on, launching = !!(UI.flow && UI.flow.online);
-  netReset(msg);
-  if (wasPlaying && MATCH.state !== 'menu' && !(SRV.on && MATCH.fin)) toMenu(); // salon public : une partie qui finit va à son terme (annonce, killcam finale, résultats)
+  const wasPlaying = NET.on, launching = !!(UI.flow && UI.flow.online), toM = wasPlaying && MATCH.state !== 'menu' && !(SRV.on && MATCH.fin);
+  netReset(msg, toM);
+  if (toM) toMenu(); // salon public : une partie qui finit va à son terme (annonce, killcam finale, résultats)
   else if (launching) uiOpen('multi', ['main']); // chargement ou choix de la classe en cours
   netStatus(msg);
 }
@@ -498,7 +499,7 @@ function netHostMsg(c, m) {
     if (k && NET.banned.has(k)) { try { c.send({ t: 'deny', why: 'kick' }); } catch (e) { /* ignoré */ } setTimeout(() => c.close(), 800); return; } // exclu par l'hôte
     if (NET.players.size >= NET_MAX) { try { c.send({ t: 'deny', why: 'full' }); } catch (e) { /* ignoré */ } setTimeout(() => c.close(), 800); return; }
     const cnt = netTeamCounts(), want = NET.srv && (m.tm === 0 || m.tm === 1) && (m.mig || (SRV.st && SRV.st.ps)) ? m.tm : -1; // l'équipe choisie dans un salon créé, ou celle de la partie reprise
-    pl = { id, k, n: netClean(m.n), lv: clamp(m.lv | 0, 0, 100), t: prev ? prev.t : want >= 0 ? want : cnt[1] < cnt[0] ? 1 : 0, conn: c, ig: !!m.mig && NET.on, seen: now, r: !!c.relay, ld: m.mig ? 100 : 0 }; // mig : déjà dans la partie que je viens de reprendre
+    pl = { id, k, n: netClean(m.n), lv: clamp(m.lv | 0, 0, 100), t: prev ? prev.t : want >= 0 ? want : efcNetIsRaid() ? efcNetFirstSquad(cnt) : cnt[1] < cnt[0] ? 1 : 0, conn: c, ig: !!m.mig && NET.on, seen: now, r: !!c.relay, ld: m.mig ? 100 : 0 }; // mig : déjà dans la partie que je viens de reprendre
     NET.players.set(id, pl);
     netStatus(prev ? `${_t('{0} a changé de connexion{1}.', pl.n, pl.r ? ' ' + _t('(relais)') : '')}` : `${_t('{0} a rejoint le salon.', pl.n)}`);
     netLobbyChanged();
@@ -515,7 +516,7 @@ function netHostMsg(c, m) {
     case 'nick': pl.n = netClean(m.n); netLobbyChanged(); break;
     case 'lv': pl.lv = clamp(m.lv | 0, 0, 100); netLobbyChanged(); break; // niveau monté depuis l'arrivée (netLevelSync)
     case 'chat': chatHostRelay(id, m.x); break;
-    case 'team': if (!pl.ig) { pl.t = 1 - pl.t; netLobbyChanged(); } break;
+    case 'team': if (!pl.ig) { pl.t = efcNetNextTeam(pl.t, pl.id); netLobbyChanged(); } break; // raid : escouade suivante qui a de la place
     case 'join': // arrivée en cours de partie (ou pendant le chargement : on ne l'attend pas)
       if (NET.phase !== 'lobby' && !pl.ig) {
         pl.ig = true; pl.late = NET.phase === 'loading'; netLobbyChanged();
@@ -645,6 +646,7 @@ function netMatchEnded() {
 /* ---------- Bots simulés par l'hôte ---------- */
 function netRebalanceBots() {
   if (NET.role !== 'host' || !NET.on) return;
+  if (efcNetIsRaid()) { for (const b of entities) if (!b.isPlayer && !b.isRemote && !b.netBot && !b.off) netBotOn(b); return; } // raid : tous les bots (Wardens) en jeu, sans équilibrage
   const hum = [0, 0];
   for (const pl of NET.players.values()) if (pl.ig) hum[pl.t]++;
   const ffa = NET.cfg.mode === 'ffa'; // chacun pour soi : un seul groupe, complété jusqu'à NET_MAX joueurs
@@ -658,6 +660,7 @@ function netRebalanceBots() {
 }
 function netBotOn(b) {
   b.netBot = true; b.netId = NET.me + '~b' + b.id; b.netQ = { seq: 0, list: [] };
+  if (efcNetIsRaid()) b.squad = 'w'; // raid : les bots de l'hôte sont des Wardens
   b.kills = b.deaths = b.score = b.assists = b.streak = 0;
   spawnEntity(b);
 }
@@ -678,7 +681,7 @@ function netTakeOver(code, key) {
   NET.relayConn = null; NET.hostConn = null; NET.oldConn = c; clearTimeout(NET.relayTimer);
   Object.assign(NET, { role: 'host', hostOpts: { srv: true, code }, tx: { p2p: 'off', relay: 'wait' }, phase: 'playing', hostId: NET.me });
   NET.players.clear();
-  NET.players.set(NET.me, { id: NET.me, n: NET.nick, lv: playerLevel(), t: PL.ent.team, conn: null, ig: true, seen: performance.now(), ld: 100 });
+  NET.players.set(NET.me, { id: NET.me, n: NET.nick, lv: playerLevel(), t: efcNetIsRaid() ? efcNetTeamOk(NET.squad) : PL.ent.team, conn: null, ig: true, seen: performance.now(), ld: 100 });
   netAdoptBots();
   const oe = NET.remotes.get(oldId); if (oe) { netHeliDrop(oe); netRemoveById(oldId); }
   netdLog('partie ' + code + ' : reprise comme hôte');
@@ -729,7 +732,7 @@ function netOldConnClose() { const c = NET.oldConn; NET.oldConn = null; if (c) {
 /* Les bots de l'ancien hôte (distants chez moi) deviennent les miens : un bot de ma réserve de la même équipe prend leur identifiant, leur
    nom, leurs compteurs et leur place ; la numérotation de leurs événements continue (les autres ignorent un numéro déjà vu) */
 function netAdoptBots() {
-  const pool = entities.filter((e) => !e.isPlayer && !e.isRemote && !e.netBot), ffa = MATCH.mode === 'ffa';
+  const pool = entities.filter((e) => !e.isPlayer && !e.isRemote && !e.netBot), ffa = MATCH.mode === 'ffa' || efcNetIsRaid();
   for (const r of [...NET.remotes.values()].filter((e) => e.remoteBot)) {
     const b = pool.find((x) => ffa || x.team === r.team), id = r.peer, seq = NET.seen.get(id) || 0, was = { alive: r.alive, pos: r.pos.clone(), yaw: r.yaw };
     netHeliDrop(r); netRemoveById(id, true);
@@ -758,7 +761,7 @@ function netClientMsg(m) {
       if (hid && NET.hostId && hid !== NET.hostId && NET.on) { netRemoveById(NET.hostId); hudMsg(_t('La partie continue avec un nouvel hôte.'), 'neutral', 2.5); } // partie reprise par un autre joueur
       if (hid) NET.hostId = hid;
       NET.players.clear();
-      for (const p of m.players) if (p && typeof p.id === 'string') NET.players.set(p.id, { id: p.id, n: netClean(p.n), lv: clamp(p.lv | 0, 0, 100), t: p.t === 1 ? 1 : 0, h: !!p.h, ig: !!p.ig, r: !!p.r, ld: clamp(p.ld | 0, 0, 100), late: !!p.la });
+      for (const p of m.players) if (p && typeof p.id === 'string') NET.players.set(p.id, { id: p.id, n: netClean(p.n), lv: clamp(p.lv | 0, 0, 100), t: efcNetTeamOk(p.t), h: !!p.h, ig: !!p.ig, r: !!p.r, ld: clamp(p.ld | 0, 0, 100), late: !!p.la });
       netRender(); netLoadReport();
       if (NET.quickJoin && (NET.phase === 'playing' || (NET.srv && NET.phase === 'loading'))) { NET.quickJoin = false; netJoinRunning(); } // « Jouer maintenant », salon public : on entre dans la partie en cours
       else if (NET.quickJoin && NET.phase === 'lobby' && !NET.srv) NET.quickJoin = false; // salon en attente : l'hôte lance quand il veut (celui d'un salon public, dès que tous sont là)
@@ -786,9 +789,10 @@ function netClientMsg(m) {
 function netPhase(ph) { return ph === 'playing' || ph === 'loading' ? ph : 'lobby'; }
 function netCfg(c) {
   c = c || {};
-  const map = mapById(c.map).id, mode = MODE_IDS.includes(c.mode) && (c.mode !== 'dom' || MAP_DEFS[map].dom) ? c.mode : 'tdm'; // la domination demande une carte à points
-  const L = MODES[mode].limits, limit = L.includes(+c.limit) ? +c.limit : L[1];
-  const time = [5, 10, 15].includes(+c.time) ? +c.time : 10;
+  const map = mapById(c.map).id, mode = c.mode === 'raid' || (MODE_IDS.includes(c.mode) && (c.mode !== 'dom' || MAP_DEFS[map].dom)) ? c.mode : 'tdm'; // la domination demande une carte à points
+  const raid = mode === 'raid' ? efcNetRaidCfg() : null; // raid (Escape From Claudov) : durée de EFC.cfg.raidMinutes, pas de limite d'éliminations
+  const L = raid ? null : MODES[mode].limits, limit = raid ? raid.limit : L.includes(+c.limit) ? +c.limit : L[1];
+  const time = raid ? raid.time : [5, 10, 15].includes(+c.time) ? +c.time : 10;
   const diff = [0, 1, 2].includes(+c.diff) ? +c.diff : 2;
   return { bots: +c.bots ? 1 : 0, diff, limit, time, map, mode, pub: +c.pub ? 1 : 0 };
 }
@@ -796,11 +800,11 @@ function netCfg(c) {
 /* ---------- Entrée et sortie de partie ---------- */
 /* Ordre de départ (hôte ou invité) : chargement de la carte, choix de la classe, puis netStartOnlineNow (voir 09e-menus.js) */
 function netStartOnline(m) {
-  NET.cfg = netCfg(m.cfg); NET.team = m.team === 1 ? 1 : 0; NET.quickJoin = false;
+  NET.cfg = netCfg(m.cfg); efcNetSquadSet(m.team); NET.team = efcNetIsRaid() ? 0 : m.team === 1 ? 1 : 0; NET.quickJoin = false; // raid : tous les humains en équipe 0, l'escouade à part
   menuLaunch({ online: true, map: NET.cfg.map, deploy: () => netStartOnlineNow(m) });
 }
 function netStartOnlineNow(m) {
-  NET.cfg = netCfg(m.cfg); NET.team = m.team === 1 ? 1 : 0;
+  NET.cfg = netCfg(m.cfg); efcNetSquadSet(m.team); NET.team = efcNetIsRaid() ? 0 : m.team === 1 ? 1 : 0;
   for (const e of NET.remotes.values()) netRemoveRemote(e);
   NET.remotes.clear(); NET.seen.clear(); NET.seenT.clear(); NET.ak.clear(); NET.sent.length = 0; NET.held.length = 0;
   NET.on = true; NET.shots = 0; NET.lastPub = 0; PL.ent.netQ = { seq: 0, list: [] }; NET.goneK = [0, 0];
@@ -808,6 +812,7 @@ function netStartOnlineNow(m) {
   startMatch({ online: true });
   if (typeof m.tl === 'number' && isFinite(m.tl)) MATCH.timeLeft = m.tl;
   if (NET.role === 'host') netRebalanceBots();
+  efcNetSquads();
   netRender();
 }
 function netJoinRunning() { if (NET.role === 'client' && NET.phase !== 'lobby' && !NET.on && !UI.flow) netSend({ t: 'join' }); }
@@ -923,10 +928,11 @@ function netApply(id, P) {
   if (P.mk) mechaNet(e, P.mk);
   if (alive && !e.alive) {
     if (e.pred && MATCH.time - e.predT < NET_PRED_HOLD) { /* mort prédite pas encore confirmée : cet état est parti avant la touche */ }
-    else if (e.pred) { e.pred = false; e.alive = true; e.model.rag = null; e.lastForce = null; e.model.root.visible = true; netSentDrop(e); } // la victime a survécu : elle se relève
+    else if (e.pred && efcNetMayRevive(e)) { e.pred = false; e.alive = true; e.model.rag = null; e.lastForce = null; e.model.root.visible = true; netSentDrop(e); } // la victime a survécu : elle se relève
+    else if (P.o || !efcNetMayRevive(e)) { /* raid : un humain mort ou sorti du raid ne revient pas */ }
     else { e.alive = true; e.health = 100; e.model.rag = null; e.lastForce = null; e.pos.copy(e.net.tgt); e.model.root.visible = true; netSentDrop(e); e.killBy = null; spawnNote(e); } // (son apparition : l'endroit est évité ici aussi)
   }
-  else if (!alive && e.alive) { e.alive = false; }
+  else if (!alive && e.alive) { e.alive = false; efcNetDied(e); }
   // tirs : effets visuels et sonores seulement (les touches arrivent comme événements)
   const f = P.f | 0;
   if (f > e.net.shots && e.alive) {
@@ -951,6 +957,7 @@ function netApply(id, P) {
   }
   if (mx > last) NET.seenT.set(id, performance.now());
   NET.seen.set(id, mx);
+  if (P.o || e.out) efcNetOut(e); // raid fini pour lui (extrait, mort, disparu) : retiré du jeu, partout
 }
 function netEventIn(e, ev) {
   if (!ev || typeof ev !== 'object') return;
@@ -972,6 +979,7 @@ function netEventIn(e, ev) {
     if (killer === PL.ent && !pred && !fall && ev.w !== 'zone') hitFeedback(!!ev.h, true);
     killEnt(e, killer, netWeaponName(ev.w, killer), !!ev.h, dir);
     if (pred && rag) e.model.rag = rag;
+    efcNetDied(e);
   } else if (ev.k === 'nade') {
     if (!e.isPlayer) e.throwT = 0.7; // geste de lancer visible sur le soldat distant
     const w = e.net.nadeW || (e.net.nadeW = { t: -9, n: 0 }); // 4 grenades par seconde au plus (un état peut en porter plusieurs après un ralentissement)
@@ -1172,6 +1180,7 @@ function netPresence(e, now) {
   const p = { ts: Math.round(now), n: me ? NET.nick : e.name, t: e.team, w: me ? curW().def.id : armsW(e).def.id, g: me ? curW().def.key : armsW(e).def.key, s, f: me ? NET.shots : e.arms.shots, k: e.kills, d: e.deaths, a: e.assists, sc: e.score, sk: skinOf(e), ev: netEvList(e, now) };
   const dr = fpvPub(e); if (dr) p.dr = dr; // drone kamikaze en vol (08e-fpv.js)
   const mk = mechaPub(e); if (mk) p.mk = mk; // mecha posé (08f-mecha.js)
+  if (e.out) p.o = 1; // raid fini pour ce soldat (RAID le pose) : les autres le retirent du jeu (efcNetOut)
   if (!me) p.b = 1;
   else { // accusé (netPredHealth, netTradeOpen) : dernier événement appliqué de chaque expéditeur des 3 dernières secondes, avant une touche en attente
     let ak = null;
@@ -1195,6 +1204,7 @@ function netUpdate(dt) {
     } else netSend({ t: 'p', p: netPresence(PL.ent, now) });
   }
   const live = MATCH.state === 'playing' || MATCH.state === 'paused';
+  if (efcNetIsRaid()) { efcNetSquads(); return; } // raid : escouades tenues à jour ; pas de score d'équipe, RAID décide de la fin
   if (MATCH.mode === 'ffa') { // chacun pour soi : le score est celui de modeUpdate (moi et le meilleur adversaire), le premier à la limite gagne
     if (NET.role === 'host' && live && ffaList().some((e) => e.kills >= MATCH.limit)) matchFinishSoon();
     return;
@@ -1248,11 +1258,14 @@ function netSetupSet(k, v) {
   if (NET.role !== 'host' || NET.phase !== 'lobby') return;
   const c = Object.assign({}, NET.cfg);
   if (k === 'bots') { c.bots = v === 'off' ? 0 : 1; if (v !== 'off') c.diff = v; }
-  else if (k === 'mode') { c.mode = v; c.limit = Settings[MODES[v].key]; }
+  else if (k === 'mode') { c.mode = v; c.limit = MODES[v] ? Settings[MODES[v].key] : 0; }
+  else if (efcNetIsRaid(c.mode) && (k === 'limit' || k === 'time')) return; // raid : durée fixe, pas de limite d'éliminations
   else c[k] = v;
   if (k === 'pub') { NETP.vis = v ? 1 : 0; try { localStorage.setItem('cod_salon_pub', String(NETP.vis)); } catch (e) { /* stockage indisponible */ } } // le prochain salon créé le sera de même
+  const was = NET.cfg.mode;
   NET.cfg = netCfg(c);
-  Settings.mode = NET.cfg.mode; Settings.minutes = NET.cfg.time; Settings[MODES[NET.cfg.mode].key] = NET.cfg.limit; if (NET.cfg.bots) Settings.difficulty = NET.cfg.diff;
+  if (NET.cfg.mode !== was) efcNetFixTeams(); // équipes (0, 1) ou escouades (0..3) : chacun reçoit une place valable
+  Settings.mode = NET.cfg.mode; if (MODES[NET.cfg.mode] && !efcNetIsRaid()) { Settings.minutes = NET.cfg.time; Settings[MODES[NET.cfg.mode].key] = NET.cfg.limit; } if (NET.cfg.bots) Settings.difficulty = NET.cfg.diff;
   saveSettings(); sfxUi('click'); netLobbyChanged();
 }
 /* La discussion du salon est-elle ouverte ? (les messages arrivent alors lus) */
@@ -1274,7 +1287,7 @@ function netPlayerRows(t, ffa) {
     rows.push({ k: 'player', key: p.id, label: p.n, lv: p.lv | 0, tags, me: !other, page: acts ? 'player' : null, params: p.id });
   }
   const free = (ffa ? NET_MAX : NET_TEAM) - rows.length, diff = (DIFF[NET.cfg.diff] || DIFF[1]).name;
-  if (NET.cfg.bots) for (let i = 0; i < free; i++) rows.push({ k: 'player', key: 'bot' + t + '-' + i, label: diff, bot: true });
+  if (NET.cfg.bots && !efcNetIsRaid()) for (let i = 0; i < free; i++) rows.push({ k: 'player', key: 'bot' + t + '-' + i, label: diff, bot: true }); // raid : les bots sont les Wardens, pas des coéquipiers
   if (!rows.length) rows.push({ k: 'note', text: _t('Personne') });
   return rows;
 }
@@ -1284,6 +1297,7 @@ function netStage() {
   const head = `<b>${esc(_t('Joueurs'))}</b><span>${NET.players.size}/${NET_MAX}</span>`;
   const foot = $('netDiagBtn'), note = NET.status && NET.status !== netHello() ? $('netStatus') : null; // l'état du salon (lien copié, connexion...) au-dessus des joueurs ; le rapport de connexion dessous
   if (ffa) return { head, note, foot, cols: [{ head: esc(_t('Chacun pour soi')), rows: netPlayerRows(0, true) }] };
+  if (efcNetIsRaid()) return efcNetStage(head, note, foot); // raid : une colonne par escouade
   return { head, note, foot, cols: [mine, 1 - mine].map((t) => ({ cls: t === mine ? 'ally' : 'enemy', head: esc(TEAM_NAMES[t]), rows: netPlayerRows(t, false) })) };
 }
 /* Scène de l'accueil : les parties publiques (serveur de jeu), une rangée par partie ; sans serveur de jeu, comment jouer entre amis */
@@ -1301,8 +1315,8 @@ function netPubStage() {
 function netTeamSwap(id) {
   if (id === NET.me) {
     if (NET.role === 'client') netSend({ t: 'team' });
-    else if (NET.role === 'host') { const me = NET.players.get(NET.me); if (me && !me.ig) { me.t = 1 - me.t; netLobbyChanged(); } }
-  } else { const q = NET.players.get(id); if (q && !q.ig && NET.role === 'host') { q.t = 1 - q.t; netLobbyChanged(); } }
+    else if (NET.role === 'host') { const me = NET.players.get(NET.me); if (me && !me.ig) { me.t = efcNetNextTeam(me.t, me.id); netLobbyChanged(); } }
+  } else { const q = NET.players.get(id); if (q && !q.ig && NET.role === 'host') { q.t = efcNetNextTeam(q.t, q.id); netLobbyChanged(); } }
 }
 const NET_PAGES = {
   home: () => {
@@ -1341,7 +1355,7 @@ const NET_PAGES = {
       { k: 'link', key: 'class', label: _t('Modifier la classe'), open: () => uiGo('classes') },
       { k: 'link', key: 'invite', label: _t('Inviter des amis'), page: 'invite' }, // le code en grand, à copier ou partager
       { k: 'link', key: 'chat', label: _t('Discussion'), value: CHAT.unread ? String(CHAT.unread) : '', page: 'chat' }); // (pas de rangée pour quitter le salon : c'est Retour, netLeaveAsk)
-    return { title: _t('Salon {0}', NET.code), sub: MD.name, rows, stage: netStage, preview: mapPreview(m, netMatchCfg()) };
+    return { title: _t('Salon {0}', NET.code), sub: efcNetIsRaid() && !MODES.raid ? 'Raid' : MD.name, rows, stage: netStage, preview: mapPreview(m, netMatchCfg()) };
   },
   map: () => ({
     head: _t('Carte'), grid: true,
@@ -1356,7 +1370,7 @@ const NET_PAGES = {
     const p = NET.players.get(id), host = NET.role === 'host', ffa = NET.cfg.mode === 'ffa', rows = [];
     if (!p) return { head: '', rows };
     const other = id !== NET.me, lobbyOk = NET.phase === 'lobby';
-    if (!ffa && lobbyOk && (!other || host)) rows.push({ k: 'btn', key: 'swap', label: _t('Changer d\u0027équipe'), sub: _t('Déplacer ce joueur dans l\u0027autre équipe'), run: () => { netTeamSwap(id); lmPop(LM.scr.multi); }, disabled: !NET.joined || !!p.ig || NET.on });
+    if (!ffa && lobbyOk && (!other || host)) rows.push({ k: 'btn', key: 'swap', label: efcNetIsRaid() ? 'Change squad' : _t('Changer d\u0027équipe'), sub: efcNetIsRaid() ? 'Move this player to the next squad with room' : _t('Déplacer ce joueur dans l\u0027autre équipe'), run: () => { netTeamSwap(id); lmPop(LM.scr.multi); }, disabled: !NET.joined || !!p.ig || NET.on });
     if (other) { // masquer ses messages (chez soi seulement) ; l'hôte peut l'exclure, en deux temps
       const muted = NET.muted.has(id);
       rows.push({ k: 'btn', key: 'mute', label: muted ? _t('Afficher') : _t('Masquer'), sub: muted ? _t('Afficher de nouveau les messages de ce joueur') : _t('Ne plus voir les messages de ce joueur'), run: () => { if (muted) NET.muted.delete(id); else NET.muted.add(id); sfxUi('click'); chatRender(); netRender(); } });

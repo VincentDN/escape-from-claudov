@@ -135,7 +135,7 @@ function srvSync() {
   const code = st.ph === 'partie' ? st.code : '', mine = NET.role === 'host' && NET.code === SRV.hostCode && (st.ph === 'lancement' || st.ph === 'partie');
   if (NET.role !== 'off' && NET.code !== code && !mine) {
     const live = NET.on && !MATCH.fin && (MATCH.state === 'playing' || MATCH.state === 'paused' || MATCH.state === 'killcam'); // (MATCH.fin : la partie finit, annonce, killcam finale et résultats vont à leur terme)
-    if (live) { netReset(_t('La partie a été interrompue, son hôte est parti.')); toMenu(); return; }
+    if (live) { netReset(_t('La partie a été interrompue, son hôte est parti.'), true); toMenu(); return; }
     if (MATCH.state === 'menu' && !UI.flow) netReset('');
   }
   if (code && NET.role === 'off' && !UI.flow && (SRV.tried !== code || performance.now() - SRV.triedT > 5000)) srvJoinRoom(code);
@@ -216,11 +216,12 @@ function srvSetupSet(k, v) {
   const st = SRV.st; if (!srvChief() || st.ph !== 'attente') return;
   const c = { map: st.m, mode: st.o, ...st.cfg };
   if (k === 'bots') { c.bots = v === 'off' ? 0 : 1; if (v !== 'off') c.diff = v; }
-  else if (k === 'mode') { c.mode = v; c.limit = Settings[MODES[v].key]; }
+  else if (k === 'mode') { c.mode = v; c.limit = MODES[v] ? Settings[MODES[v].key] : 0; }
+  else if (efcNetIsRaid(c.mode) && (k === 'limit' || k === 'time')) return; // raid : durée fixe, pas de limite d'éliminations
   else c[k] = v;
   const n = netCfg(c); // (mode et limite validés comme dans un salon)
   Object.assign(st, { m: n.map, o: n.mode }); Object.assign(st.cfg, { bots: n.bots, diff: n.diff, limit: n.limit, time: n.time, pub: c.pub ? 1 : 0 });
-  Settings.map = n.map; Settings.mode = n.mode; Settings.minutes = n.time; Settings[MODES[n.mode].key] = n.limit; if (n.bots) Settings.difficulty = n.diff;
+  Settings.map = n.map; Settings.mode = n.mode; if (MODES[n.mode] && !efcNetIsRaid(n.mode)) { Settings.minutes = n.time; Settings[MODES[n.mode].key] = n.limit; } if (n.bots) Settings.difficulty = n.diff;
   if (k === 'pub') { NETP.vis = v ? 1 : 0; try { localStorage.setItem('cod_salon_pub', String(NETP.vis)); } catch (e) { /* stockage indisponible */ } }
   saveSettings(); sfxUi('click');
   srvSend({ t: 'cfg', m: n.map, o: n.mode, b: n.bots, df: n.diff, lim: n.limit, min: n.time, pub: st.cfg.pub });

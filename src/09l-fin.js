@@ -45,6 +45,7 @@ function matchFinishSoon() {
 }
 /* La partie est décidée : annonce, ralenti, commandes coupées. Sans effet si elle est déjà annoncée ou finie. */
 function matchFinish() {
+  if (MATCH.mode === 'raid') { efcRaidTimeUp(); return; } // raid: no win or loss, everyone still inside is missing in action (src/efc/10-efc-raid.js)
   if (MATCH.fin || (MATCH.state !== 'playing' && MATCH.state !== 'paused')) return;
   kcAbort(); // en ligne, une relecture de mort en cours cède la place à l'annonce
   // en ligne, la partie est décidée par l'hôte : la dernière élimination (si c'est elle qui a atteint la limite) a sa killcam finale, comme en solo

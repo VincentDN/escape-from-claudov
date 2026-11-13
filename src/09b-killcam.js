@@ -192,7 +192,7 @@ function endKillcam() {
   clearHitmarker(); $('hud').classList.remove('hidden');
   if (KC.live) { KC.head = 0; KC.count = 0; KC.events.length = 0; KC.lastRec = -9; } // l'enregistrement était figé : il repart de zéro (pas de trou dans le tampon)
   else MATCH.state = 'playing';
-  respawnPlayer();
+  if (MATCH.mode !== 'raid') respawnPlayer(); // raid: one life (the killcam is off there anyway)
   VM.root.visible = true;
   lanePump(); // une annonce retenue pendant la relecture passe maintenant
 }
@@ -208,7 +208,7 @@ function kcAbort() {
 }
 function kcSkip() {
   if (KC.active) { endKillcam(); return; }
-  if (MATCH.state === 'playing' && !PL.ent.alive && PL.deathT > 0.35 && !MATCH.finalPending) { KC.pending = null; respawnPlayer(); }
+  if (MATCH.state === 'playing' && !PL.ent.alive && PL.deathT > 0.35 && !MATCH.finalPending && MATCH.mode !== 'raid') { KC.pending = null; respawnPlayer(); }
 }
 
 const _kf = new V3(), _kr = new V3(), _kd = new V3(), _kh = new V3();

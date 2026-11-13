@@ -27,6 +27,7 @@ function applyDamage(victim, dmg, attacker, weapon, head, dir, srcPos, life) { /
     }
     return;
   }
+  if (MATCH.mode === 'raid') dmg = efcFilter('damage', dmg, victim, attacker, weapon, head); // armour and the like (contract: victims simulated here)
   victim.health -= dmg;
   victim.dmgBy.set(attacker, MATCH.time);
   if (victim.isPlayer) {
@@ -77,16 +78,17 @@ function streakKill(a, weapon, life) { return a.alive && weapon !== NET_WSPECIAL
 function killEnt(v, a, weapon, head, dir, life) {
   v.alive = false; v.deaths++; v.streak = 0; v.health = 0; v.protT = 0; pfrEvent(2);
   noteDeath(v); botDeathNote(v, a);
-  dropKilledWeapon(v, dir);
+  const raid = MATCH.mode === 'raid'; // raid: no dropped weapon (the body holds the gear), no killcam, no killstreaks, no respawn screen
+  if (!raid) dropKilledWeapon(v, dir);
   const now = MATCH.time;
   // en ligne, chaque participant local (moi, ou un bot simulé par l'hôte) annonce sa propre mort
   if (MATCH.online && (v.isPlayer || v.netBot)) netEvent({ k: 'kill', by: netIdOf(a), h: head ? 1 : 0, w: netWeaponKey(weapon), x: +(dir ? dir.x : 0).toFixed(2), z: +(dir ? dir.z : 1).toFixed(2), q: NET.hitQ || undefined }, v); // q : la touche qui a tué (morts croisées, netHeldCheck)
   if (v.isPlayer) {
     if (PILOT.d) fpvLeave(); // la vue revient au corps ; le drone tombe (fpvStep)
     PL.deathT = 0; PL.killer = a !== v ? a : null; PL.reload = null; dropCookedNade(); PL.nadeState = null; PL.knifeT = 0; PL.knifeOut = false; PL.knifeHold = 0; PL.knifeBtn = null; vmClearHeld();
-      KC.pending = a && a !== v && a.model && weapon !== NET_WSPECIAL.heli && weapon !== NET_WSPECIAL.drone && weapon !== NET_WSPECIAL.mecha && weapon !== NET_WSPECIAL.fall && weapon !== NET_WSPECIAL.zone ? a : null; KC.deathT = MATCH.time; // (le nom traduit : en anglais, 'Hélicoptère' ne correspondait jamais)
+      KC.pending = !raid && a && a !== v && a.model && weapon !== NET_WSPECIAL.heli && weapon !== NET_WSPECIAL.drone && weapon !== NET_WSPECIAL.mecha && weapon !== NET_WSPECIAL.fall && weapon !== NET_WSPECIAL.zone ? a : null; KC.deathT = MATCH.time; // (le nom traduit : en anglais, 'Hélicoptère' ne correspondait jamais)
     if (KC.pending) KC.info = `<span class="enemy">${esc(a.name)}</span><i>${esc(weapon)}</i><i>${Math.round(a.pos.distanceTo(v.pos))} m</i>`;
-    showDeathScreen(a, weapon, head);
+    if (!raid) showDeathScreen(a, weapon, head); else PL.efcKiller = a !== v ? a.name : ''; // raid: the raid HUD says who (10-efc-raidhud.js)
   } else {
     v.respawnT = modeDef().botRespawn; v.target = null; v.path = null;
     if (!v.lastForce) v.lastForce = { dir: dir.clone().normalize(), mag: 2.5, part: head ? 'head' : 'body' };
@@ -115,18 +117,19 @@ function killEnt(v, a, weapon, head, dir, life) {
       const wid = WEAPON_ID_BY_NAME[weapon]; if (wid) arsNotify(arsKill(wid, head)); // XP de l'arme (06r-arsenal.js)
       defisKill(a, v, weapon, head); // défis des tenues (06s-defis.js)
       // série prête : son nom et, à l'ordinateur ou à la manette, la touche ou le bouton qui l'appelle (glyphe du mode d'entrée, 09x-invites.js)
-      if (up) for (const id of PL.ksSel) if (a.streak === KSDEF[id].n) {
+      if (up && !raid) for (const id of PL.ksSel) if (a.streak === KSDEF[id].n) {
         const g = actGlyph(ksAct(id)), name = KSDEF[id].name;
         PL.ks[id] = true; sfxAnnounce(id + '_ready', 'st_ready'); hudMsg(g ? _t('{0} disponible : {1}', name, g) : _t('{0} disponible', name), 'xp', 3, !!g);
       }
       updateStreakHud();
-    } else if (up) botStreak(a);
+    } else if (up && !raid) botStreak(a);
     for (const [ent, t] of v.dmgBy) {
       if (ent === a || allied(ent, v) || now - t > 8) continue;
       ent.assists++; ent.score += 20; if (ent.isPlayer) xpPopup('+20', _t('Aide'), 'small');
     }
   } else if (a === v) { a.score = Math.max(0, a.score - 50); }
   addKillfeed(a, v, weapon, head);
+  if (raid && !v.isRemote) efcEmit('died', v, a); // victim simulated on this machine (the local player, or a bot here offline or on the host)
   const nocam = weapon === NET_WSPECIAL.fall || weapon === NET_WSPECIAL.zone; // une chute ne se rejoue pas (le corps est tombé dans le vide), une mort dans le désert non plus (personne n'a tiré)
   if (MATCH.online && enemyKill) MATCH.lastKill = { killer: a, victim: v, t: now, info: killInfo(a, v, weapon), nocam }; // en ligne, l'hôte décide la fin : la killcam finale reprend cette dernière élimination (matchFinish)
   if (!MATCH.online && !MATCH.finalPending && !MATCH.fin && killLimitReached()) {
@@ -139,7 +142,7 @@ function killInfo(a, v, weapon) { return `<span class="${teamCls(a)}">${esc(a.na
 /* Séries d'un bot : trois au hasard, à trois seuils différents, tirées une fois pour toutes */
 function botKs(b) { if (!b.ks) b.ks = ksSort(ksPick(KS_IDS.slice().sort(() => Math.random() - 0.5))); return b.ks; }
 function botStreak(b) {
-  if (MATCH.mode === 'ffa' || ksJammed(b.team)) return; // chacun pour soi : les séries restent au joueur ; brouillé par une IEM : la série est perdue
+  if (modeFfa() || ksJammed(b.team)) return; // chacun pour soi : les séries restent au joueur ; brouillé par une IEM : la série est perdue
   for (const id of botKs(b)) if (b.streak === KSDEF[id].n) KSDEF[id].bot(b);
 }
 function botUav(b) {
@@ -209,6 +212,7 @@ function addKillfeed(a, v, weapon, head) {
 /* Les trois emplacements de séries (#ks1 à #ks3), avec l'icône et le nom de la série de la classe */
 function updateStreakHud() {
   HUD.mode = inputMode(); // updateHud la rappelle quand le mode d'entrée change (clavier, manette) : le glyphe suit
+  const ksOff = MATCH.mode === 'raid'; hudCls($('ks1').parentNode, 'hidden', ksOff); if (ksOff) PL.ks = {}; // raid: no killstreaks
   PL.ksSel.forEach((k, i) => {
     const el = $('ks' + (i + 1)), K = KSDEF[k];
     el.className = 'ks' + (PL.ks[k] ? ' ready' : '');
@@ -419,11 +423,11 @@ function boardList(t) { return entities.filter((x) => x.team === t && (!MATCH.on
    (trait jaune et gras), les morts estompés. Récrit quatre fois par seconde au plus (updateHud), et seulement si son contenu a changé (hudHtml) */
 function fillScoreboard() {
   HUD.boardT = 0.25;
-  const ffa = MATCH.mode === 'ffa'; hudCls($('board'), 'one', ffa);
+  const ffa = modeFfa(); hudCls($('board'), 'one', ffa);
   const head = `<thead><tr><th>${_t('Nom')}</th><th>${_t('Score')}</th><th>${_t('Élim.')}</th><th>${_t('Morts')}</th><th>${_t('Aides')}</th></tr></thead>`;
   const row = (x) => `<tr class="${x.isPlayer ? 'me' : ''}${x.alive ? '' : ' dead'}"><td>${esc(boardName(x))}</td><td>${x.score}</td><td>${x.kills}</td><td>${x.deaths}</td><td>${x.assists}</td></tr>`;
   if (ffa) { // un seul classement, tous les soldats
-    hudHtml($('board0'), `<caption class="ally"><span>${_t('Classement, premier à {0}', MATCH.limit)}</span></caption>${head}<tbody>${ffaList().sort(ffaCmp).map(row).join('')}</tbody>`);
+    hudHtml($('board0'), `<caption class="ally"><span>${MATCH.mode === 'raid' ? 'Raid' : _t('Classement, premier à {0}', MATCH.limit)}</span></caption>${head}<tbody>${ffaList().sort(ffaCmp).map(row).join('')}</tbody>`);
     return;
   }
   for (const t of [0, 1]) { // mon équipe à gauche, comme le score en haut de l'écran
@@ -444,7 +448,7 @@ function endRow(x, k, mvp) {
   return `<tr class="${x.isPlayer ? 'me' : ''}"><td>${k + 1}</td><td><span>${esc(boardName(x))}</span>${x === mvp ? ` <em class="mvp">MVP</em>` : ''}</td><td>${x.score}</td><td>${x.kills}</td><td>${x.deaths}</td><td>${ratio}</td><td>${x.assists}</td></tr>`;
 }
 function fillEnd() {
-  if (MATCH.mode === 'ffa') return fillEndFfa();
+  if (modeFfa()) return fillEndFfa();
   const me = PL.ent, all = [0, 1].flatMap(boardList).sort(boardCmp), mvp = all[0], rank = all.indexOf(me) + 1;
   [me.team, 1 - me.team].forEach((t, i) => {
     const mine = t === me.team, win = MATCH.winner === t;
@@ -489,7 +493,8 @@ function startMatch(opt = {}) {
   MATCH.online = !!opt.online; if (MATCH.online) hostBgInit(); // hôte en arrière-plan : la partie continue (hostBgTick)
   const want = MATCH.online ? NET.cfg.mode : Settings.mode, mode = !MODES[want] || !CURMAP.def || (want === 'dom' && !CURMAP.def.dom) ? 'tdm' : want; // en ligne, le mode est celui du salon
   MATCH.limit = MATCH.online ? NET.cfg.limit : Settings[MODES[mode].key];
-  SMOKES.length = 0; PL.flashT = 0; MATCH.score = [0, 0]; MATCH.time = 0; MATCH.timeLeft = (MATCH.online ? NET.cfg.time : Settings.minutes) * 60; MATCH.uav = [0, 0]; MATCH.uavPing = [null, null]; MATCH.sat = [0, 0]; MATCH.iem = [0, 0]; MATCH.events = []; MATCH.winner = -1;
+  if (mode === 'raid') MATCH.limit = Infinity; // raid: no kill limit, the raid length is EFC.cfg.raidMinutes
+  SMOKES.length = 0; PL.flashT = 0; MATCH.score = [0, 0]; MATCH.time = 0; MATCH.timeLeft = (mode === 'raid' ? EFC.cfg.raidMinutes : MATCH.online ? NET.cfg.time : Settings.minutes) * 60; MATCH.uav = [0, 0]; MATCH.uavPing = [null, null]; MATCH.sat = [0, 0]; MATCH.iem = [0, 0]; MATCH.events = []; MATCH.winner = -1;
   for (const n of NADES) scene.remove(n.mesh); NADES.length = 0; clearThrowKnives(); soundEvents.length = 0; clearAircraft(); clearDrops();
   FX.holes.clear(); FX.splats.clear(); FX.scorch.clear(); propsReset();
   for (const e of entities) { e.kills = e.deaths = e.score = e.assists = e.streak = e.comboN = 0; e.comboT = -99; e.alive = false; e.lastShotT = -9; }
@@ -505,7 +510,7 @@ function startMatch(opt = {}) {
   soldierLookAll(); // alliés en clair, ennemis en sombre, d'après l'équipe du joueur (en ligne, il peut jouer Bravo)
   // mon camp (classe a : à gauche du chrono, en vert) et l'adverse (b : à droite, en rouge) ; en ligne, on peut jouer Bravo. En match à mort, la première
   // ligne est toujours la mienne (« Vous »), quelle que soit l'équipe d'origine
-  const mine = MATCH.mode === 'ffa' ? 0 : PL.ent.team;
+  const mine = modeFfa() ? 0 : PL.ent.team;
   document.querySelectorAll('.score .row').forEach((r, t) => { r.classList.toggle('a', t === mine); r.classList.toggle('b', t !== mine); });
   HUD.rkT = 0;
   PL.held = false; PL.queued = false; PL.adsWant = false; PL.noFireT = performance.now() + 450; // aucun tir avant que le joueur ait relâché et rappuyé
@@ -523,6 +528,7 @@ function startMatch(opt = {}) {
   skinTrim(); // tenues de défi que personne ne porte : libérées (09u-tenues.js)
   pfrStart(); // enregistreur de performances, avec « Afficher les performances » (09zo-perfs.js)
   cdStart(); // « La partie commence dans 10 » : personne ne bouge avant le départ (09y-decompte.js)
+  if (MATCH.mode === 'raid') efcRaidBegun(); // event 'raid:begin', raid HUD (src/efc/10-efc-raid.js)
 }
 function endMatch() {
   if (MATCH.state === 'ended') return;
@@ -530,7 +536,7 @@ function endMatch() {
   if (KC.active) { KC.active = false; $('killcam').classList.remove('show'); KC.body.root.visible = false; }
   MATCH.state = 'ended'; arsShowClear(); cdClear();
   const me = PL.ent, o = MATCH.fin ? MATCH.fin.out : matchOutcome(); // figé par l'annonce : les deux disent la même chose
-  $('end').classList.toggle('one', MATCH.mode === 'ffa');
+  $('end').classList.toggle('one', modeFfa());
   MATCH.winner = o.winner;
   $('endKick').textContent = finKicker(); // ce qui a fini la partie : limite atteinte ou temps écoulé
   $('endTitle').textContent = FIN_TEXT[o.result];

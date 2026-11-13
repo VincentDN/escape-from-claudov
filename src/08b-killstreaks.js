@@ -11,7 +11,7 @@ const STREAK = {}; for (const id of KS_IDS) STREAK[id] = KSDEF[id].n;
 const KS_KEYS = ['Digit4', 'Digit5', 'Digit6'];
 /* Appelle la série de l'emplacement slot (0 à 2) de la classe du joueur */
 function useKs(slot) {
-  const id = PL.ksSel[slot]; if (!id) return;
+  const id = PL.ksSel[slot]; if (!id || MATCH.mode === 'raid') return; // raid: no killstreaks
   if (ksJammed(PL.ent.team) && PL.ks[id]) { hudMsg(_t('Séries brouillées par une IEM'), 'enemy', 1.8); return; }
   KSDEF[id].use();
 }

@@ -21,13 +21,26 @@ const MODES = {
   dom: { name: _t('Domination'), btn: _t('Domination'), sub: _t('Domination, trois points à tenir'), teams: _t('6 contre 6, trois points à tenir'), lim: _t('Score à atteindre'), unit: 'points',
     limits: [100, 150, 200, 250], key: 'limitDom', respawn: 4, botRespawn: 4.5, prot: 2,
     hint: _t('Restez dans la zone d\u0027un point pour le capturer. Chaque point tenu rapporte un point toutes les 4 secondes.') },
+  // Escape From Claudov raid (src/efc/10-efc-raid.js): one life for humans, no kill limit, squads instead of teams. Lengths read EFC.cfg at use.
+  raid: { name: 'Raid', btn: 'Raid', sub: 'Raid, one life, extract to keep your gear', teams: 'Squads against the Wardens and each other', lim: 'Raid length', unit: 'min',
+    limits: [0], key: 'limitRaid', respawn: Infinity, get botRespawn() { return EFC.cfg.wardenRespawn; }, prot: 0,
+    hint: 'One life. Loot what you can and reach an open extract before the timer runs out.' },
 };
-const MODE_IDS = ['tdm', 'ffa', 'dom'];
+const MODE_IDS = ['tdm', 'ffa', 'dom', 'raid'];
 function modeDef() { return MODES[MATCH.mode] || MODES.tdm; }
-/* Alliés : même équipe, sauf en match à mort où chacun joue pour soi */
-function allied(a, b) { return a === b || (MATCH.mode !== 'ffa' && a.team === b.team); }
-/* Un bruit (tir, explosion) est-il celui d'un adversaire de b ? */
-function soundFoe(s, b) { return MATCH.mode === 'ffa' ? s.who !== b : s.team !== b.team; }
+/* No two sides: free-for-all, and the raid (squads, see allied) */
+function modeFfa() { return MATCH.mode === 'ffa' || MATCH.mode === 'raid'; }
+/* Alliés : même équipe, sauf en match à mort où chacun joue pour soi ; en raid, même escouade (efcSquadOf, src/efc/11-efc-squad.js) */
+function allied(a, b) {
+  if (a === b) return true;
+  if (MATCH.mode === 'raid') { const s = efcSquadOf(a); return s !== undefined && s === efcSquadOf(b); }
+  return MATCH.mode !== 'ffa' && a.team === b.team;
+}
+/* Un bruit (tir, explosion) est-il celui d'un adversaire de b ? En raid, un bruit sans auteur connu (joueur distant) est hostile */
+function soundFoe(s, b) {
+  if (MATCH.mode === 'raid') return s.who ? !allied(s.who, b) : true;
+  return MATCH.mode === 'ffa' ? s.who !== b : s.team !== b.team;
+}
 /* Classement du match à mort : éliminations, puis moins de morts, puis score */
 const ffaCmp = (a, b) => b.kills - a.kills || a.deaths - b.deaths || b.score - a.score;
 
@@ -35,14 +48,16 @@ const ffaCmp = (a, b) => b.kills - a.kills || a.deaths - b.deaths || b.score - a
 function modeStart(mode) {
   MATCH.mode = MODES[mode] ? mode : 'tdm';
   SPAWN_LOG.length = 0; DEATH_LOG.length = 0; SPAWN_TRAP.length = 0; OPEN.on = true; // départ : chacun sa place (spawnOpening), jusqu'au « En avant ! »
-  for (const e of entities) { e.protT = 0; e.lastDeath = null; e.caps = 0; }
+  for (const e of entities) { e.protT = 0; e.lastDeath = null; e.caps = 0; e.out = false; }
   squadReset();
+  efcRaidModeEnd(); // a raid still open (a new match started without going through the menus) is closed first
+  if (MATCH.mode === 'raid') efcRaidModeStart(); // squads, raid kit, raid state (src/efc/10-efc-raid.js), before the roster picks outfit colours
   modeRoster();
   domClear();
   if (MATCH.mode === 'dom') domInit();
   MATCH.over = false;
   const D = modeDef();
-  document.querySelectorAll('.score .row span').forEach((s, i) => { s.textContent = MATCH.mode === 'ffa' ? [_t('Vous'), _t('Rival')][i] : TEAM_NAMES[i]; });
+  document.querySelectorAll('.score .row span').forEach((s, i) => { s.textContent = modeFfa() ? [_t('Vous'), _t('Rival')][i] : TEAM_NAMES[i]; });
   $('domRow').classList.toggle('hidden', MATCH.mode !== 'dom');
   document.querySelector('.score').classList.toggle('dom', MATCH.mode === 'dom'); // au doigt, les pastilles prennent la place de la limite (shell.html)
   $('domCap').className = '';
@@ -60,7 +75,7 @@ function modeRoster() {
     soldierLook(e.model, skinOf(e), skinRel(e));
   }
 }
-function modeEnd() { domClear(); }
+function modeEnd() { domClear(); efcRaidModeEnd(); }
 
 /* Mises à jour à chaque image : protection d'apparition, score du match à mort, points de la domination */
 function modeUpdate(dt) {
@@ -70,6 +85,7 @@ function modeUpdate(dt) {
   hudStyle($('prot'), 'opacity', PL.ent.alive && PL.ent.protT > 0 ? '1' : '0');
   if (MATCH.mode === 'ffa') ffaScore();
   else if (MATCH.mode === 'dom') domUpdate(dt);
+  else if (MATCH.mode === 'raid' && efcRaidLive()) { efcEmit('tick', dt); efcRaidUpdate(dt); } // raid rules and listeners (src/efc/10-efc-raid.js)
 }
 /* Match à mort : MATCH.score[0] = mes éliminations, MATCH.score[1] = celles du meilleur adversaire */
 function ffaScore() {
@@ -83,7 +99,7 @@ function ffaRank() { return ffaList().sort(ffaCmp).indexOf(PL.ent) + 1; }
 /* Limite atteinte par un tueur (éliminations) : la partie se joue sur une dernière killcam */
 function killLimitReached() {
   if (MATCH.mode === 'ffa') { ffaScore(); return ffaList().some((e) => e.kills >= MATCH.limit); }
-  if (MATCH.mode === 'dom') return false;
+  if (MATCH.mode === 'dom' || MATCH.mode === 'raid') return false; // raid: no kill limit, only the timer
   return MATCH.score[0] >= MATCH.limit || MATCH.score[1] >= MATCH.limit;
 }
 
@@ -139,16 +155,16 @@ function domSide(team) {
 /* Rang de départ d'un soldat dans son groupe (son camp, ou tous chacun pour soi). En solo : le joueur, puis les bots dans l'ordre. En ligne :
    les joueurs du groupe triés par identifiant (chacun calcule le même ordre chez lui, d'après l'état du salon), puis les bots de l'hôte. */
 function openRank(e) {
-  const mine = (o) => MATCH.mode === 'ffa' || o.team === e.team;
+  const mine = (o) => modeFfa() || o.team === e.team;
   if (!MATCH.online) return entities.filter((o) => !o.off && !o.isRemote && mine(o)).sort((a, b) => b.isPlayer - a.isPlayer).indexOf(e);
-  const hum = [...NET.players.values()].filter((p) => p.ig && (MATCH.mode === 'ffa' || p.t === e.team)).map((p) => p.id).sort();
+  const hum = [...NET.players.values()].filter((p) => p.ig && (modeFfa() || p.t === e.team)).map((p) => p.id).sort();
   if (e.isPlayer) { const i = hum.indexOf(NET.me); return i < 0 ? hum.length : i; }
   return hum.length + entities.filter((o) => o.netBot && mine(o)).indexOf(e);
 }
 /* Places de départ du groupe d'un soldat. En équipe : celles de sa base, du centre de la base vers ses bords (les deux bases étant en
    miroir, les deux camps ont la même formation) */
 function openSlots(e) {
-  if (MATCH.mode === 'ffa') { if (OPEN.key !== CURMAP.id) { OPEN.key = CURMAP.id; OPEN.ffa = ffaSlots(); } return OPEN.ffa; }
+  if (modeFfa()) { if (OPEN.key !== CURMAP.id) { OPEN.key = CURMAP.id; OPEN.ffa = ffaSlots(); } return OPEN.ffa; }
   const S = SPAWNS[spawnBase(e.team)], [cx, cz] = spawnMid(S);
   return S.map((s, i) => [s, i, hyp(s[0] - cx, s[1] - cz)]).sort((a, b) => a[2] - b[2] || a[1] - b[1]).map((a) => a[0]);
 }
@@ -184,7 +200,7 @@ function spawnOpening(e) {
 /* ---------- Réapparition ---------- */
 /* Candidats du mode, [x, z] ; wide : rien de sûr dans les candidats habituels, toute la carte s'ouvre (bascule) */
 function spawnPool(e, wide) {
-  if (MATCH.mode === 'ffa') return SPAWNS[0].concat(SPAWNS[1], spawnField());
+  if (modeFfa()) return SPAWNS[0].concat(SPAWNS[1], spawnField());
   const t = spawnBase(e.team), home = SPAWNS[t];
   if (wide) return home.concat(spawnField(), SPAWNS[1 - t]);
   if (MATCH.mode === 'tdm') { const side = Math.sign(spawnMid(home)[1]); return home.concat(spawnField().filter((p) => p[1] * side > 6)); } // sa moitié de carte
@@ -194,7 +210,7 @@ function spawnPool(e, wide) {
 function spawnCtx(e) {
   const foes = [], pals = [];
   for (const o of entities) if (o !== e && o.alive && !o.off) (allied(o, e) ? pals : foes).push(o);
-  return { foes, pals, front: MATCH.mode === 'ffa' ? null : spawnFront(e, foes, pals) };
+  return { foes, pals, front: modeFfa() ? null : spawnFront(e, foes, pals) };
 }
 /* Le front : la ligne à mi-chemin entre le milieu des adversaires en vie et celui des alliés (à défaut, leur base), normale (dx, dz)
    tournée vers son camp. (x - F.x) * F.dx + (z - F.z) * F.dz > 0 : de son côté. L'adversaire qui avance dans la base fait passer
@@ -208,7 +224,7 @@ function spawnFront(e, foes, pals) {
 }
 /* Note d'un candidat, et s'il est sûr (hors ligne de vue, vue à part : spawnSeen, plus coûteuse, ne se calcule que pour les mieux notés) */
 function spawnRate(e, C, x, z) {
-  const now = MATCH.time, ffa = MATCH.mode === 'ffa';
+  const now = MATCH.time, ffa = modeFfa();
   let md = 999, near = 0, look = 0, crowd = 0, pal = 0, safe = true;
   for (const o of C.foes) {
     const dx = x - o.pos.x, dz = z - o.pos.z, d = hyp(dx, dz);
@@ -272,9 +288,11 @@ function spawnPick(e, C, pool) {
   return { pick: top.length ? top[Math.floor(Math.random() * top.length)] : null, best: R[0] };
 }
 function chooseSpawn(e) {
+  e.efcYaw = undefined;
+  if (MATCH.mode === 'raid' && e.isPlayer) { const p = efcRaidInsert(e); if (p) return p; } // insertion point of the squad (src/efc/10-efc-raid.js)
   if (OPEN.on) { const p = spawnOpening(e); if (p) return p; }
   const C = spawnCtx(e), r = spawnPick(e, C, spawnPool(e, false));
-  const c = r.pick || (MATCH.mode !== 'ffa' && spawnPick(e, C, spawnPool(e, true)).pick) || r.best;
+  const c = r.pick || (!modeFfa() && spawnPick(e, C, spawnPool(e, true)).pick) || r.best;
   return spawnSpot(e, c.x, c.z, C);
 }
 /* Du point retenu à la place d'apparition : un nœud de navigation tiré au hasard à moins de SPAWN_JIT m du point, au même étage, en vue
@@ -302,6 +320,7 @@ function spawnSpot(e, x, z, C) {
    vers le milieu des adversaires en vie), vers le centre de la carte chacun pour soi, vers le point à prendre le plus proche en
    domination ; tourné au besoin pour ne pas regarder un mur (spawnFace) */
 function spawnYaw(e, p) {
+  if (e.efcYaw !== undefined) return spawnFace(p, e.efcYaw); // raid insertion: the heading of the insertion point
   let tx = 0, tz = 0;
   if (MATCH.mode === 'tdm') {
     if (OPEN.on) return e.team === 0 ? 0 : Math.PI;

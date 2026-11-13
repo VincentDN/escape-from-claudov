@@ -26,7 +26,9 @@ let mouseDX = 0, mouseDY = 0;
 function giveLoadout() {
   classFix(); // la classe choisie existe toujours (06r-arsenal.js)
   const C = CLASSES[PL.classIdx = Settings.loadout];
-  PL.ent.arms = makeArms(classWeapons(PL.classIdx));
+  const raidArms = MATCH.mode === 'raid' ? efcRaidArms() : null; // raid: weapons from the raid inventory (src/efc/10-efc-raid.js), else the class
+  PL.ent.arms = makeArms(raidArms || classWeapons(PL.classIdx));
+  if (raidArms) efcRaidArmsApplied();
   PL.ksSel = ESSAI ? essaiKs() : classKs(PL.classIdx); updateStreakHud(); // séries de la classe ; celles déjà prêtes d'une autre classe attendent qu'on la reprenne
   PL.nades = C.nades; PL.nadeType = NADE_TYPES[C.nade] ? C.nade : 'frag'; PL.flashT = 0; PL.knifeT = 0; PL.nadeState = null; PL.knifeOut = false; PL.knifeHold = 0; PL.knifeBtn = null;
   vmSetLook(skinOf(PL.ent), 0); vmEquip(PL.weapons[0].def); VM.action = null;
@@ -423,7 +425,7 @@ function updatePlayer(dt, now) {
   PL.holding = scoped && (KEYS.ShiftLeft || PAD.l3) && PL.breath > 0;
   PL.breath = clamp(PL.breath + (PL.holding ? -dt / 4 : dt / 5), 0, 1);
   // régénération
-  if (now - PL.lastDmgT > 4.5 && e.health < 100) e.health = Math.min(100, e.health + 45 * dt);
+  if (MATCH.mode !== 'raid' && now - PL.lastDmgT > 4.5 && e.health < 100) e.health = Math.min(100, e.health + 45 * dt);
   if (e.health < 40) { PL.heartT -= dt; if (PL.heartT <= 0) { sfxHeart(); PL.heartT = 0.9; } }
   PL.suppress = Math.max(0, PL.suppress - dt * 0.8);
   PL.ent.pitch = PL.pitch; PL.ent.yaw = PL.yaw;
@@ -534,7 +536,7 @@ function updateDeadPlayer(dt) {
   VM.holder.visible = false; vmClearHeld();
   if (e.model) e.model.root.visible = false;
   if (KC.pending && PL.deathT > 1.2 && MATCH.state === 'playing' && !MATCH.finalPending) { if (startKillcam({ killer: KC.pending, victim: PL.ent, tEnd: KC.deathT, info: KC.info })) return; KC.pending = null; $('death').classList.remove('kcnext'); } // (pas de relecture : la barre de réapparition revient)
-  if (PL.deathT > modeDef().respawn && MATCH.state === 'playing' && !KC.pending && !MATCH.finalPending) respawnPlayer();
+  if (PL.deathT > modeDef().respawn && MATCH.state === 'playing' && !KC.pending && !MATCH.finalPending && MATCH.mode !== 'raid') respawnPlayer(); // raid: one life
 }
 function respawnPlayer() {
   spawnEntity(PL.ent);

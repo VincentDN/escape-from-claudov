@@ -1718,3 +1718,48 @@ Sprinter, retenir son souffle en lunette ⇒ Sprint, hold your breath when scope
 pour avancer. Poussé au-delà du cercle, il fait sprinter. ⇒ to move. Pushed past the circle, it sprints.
 Se déplacer (analogique). L3 (appui sur le bâton) pour sprinter, en lunette pour retenir son souffle ⇒ Move (analog). L3 (press the stick) to sprint, in a scope to hold your breath
 Aucun salon public pour le moment. Créez le vôtre, il apparaîtra ici. ⇒ No public lobby right now. Create yours and it will show up here.
+
+# Escape From Claudov (shell.html): new texts are written in English
+Escape From Claudov ⇒ =
+Raid ⇒ =
+Solo raid against the Wardens ⇒ =
+Squad raid ⇒ =
+Online, up to 8 players in squads ⇒ =
+Hideout ⇒ =
+Stash and loadout ⇒ =
+Settings ⇒ =
+Game, audio, video, controls ⇒ =
+Credits ⇒ =
+Back ⇒ =
+Start raid ⇒ =
+Pick what you take into the raid. What you carry out is yours to keep. ⇒ =
+Stash ⇒ =
+Loadout ⇒ =
+Escape From Claudov and the work it is built on ⇒ =
+Engine ⇒ =
+Built on the source code of Riposte: Frontline 5.6.0 by its author, BenDBSS, released under the MIT License. Escape From Claudov is a separate game with its own name and setting. It is not the official Riposte: Frontline and is not endorsed by its author. ⇒ =
+three.js r147, MIT License. PeerJS for online lobbies, MIT License. ⇒ =
+Textures, skies and lighting ⇒ =
+Photo textures, skies and HDRI from Poly Haven and ambientCG, all CC0 (public domain). ⇒ =
+Sounds and voices ⇒ =
+Most sounds are CC0 recordings from freesound.org and other libraries. These ones ask to be credited: ⇒ =
+Woodpecker by Benboncan (freesound.org/s/66955), CC BY 3.0, cut and filtered ⇒ =
+Waterfall by Samuel Strågefors (straget, freesound.org/s/489073), CC BY, looped excerpt ⇒ =
+Grenade pin pull by CGEffex (freesound.org/s/93837), CC BY 4.0, cut and filtered ⇒ =
+English reference voice: LibriTTS-R excerpt 2803_154320_000003_000001 (Y. Koizumi et al., Google, 2023), LibriVox reading, CC BY 4.0. The voice model only copies its timbre. ⇒ =
+French reference voice: Multilingual LibriSpeech excerpt 9804_9061_000826 (V. Pratap et al., Facebook AI, 2020), LibriVox reading of Les Enfants du capitaine Grant by Jules Verne, CC BY 4.0. The voice model only copies its timbre. ⇒ =
+Radio voices generated with Chatterbox by Resemble AI (MIT License). ⇒ =
+Impulse responses from Conner's Impulse Response Library (itsmusician), Copyright (c) 2022 Conner, MIT License. ⇒ =
+Wood pigeon song by Oona Räisänen (Mysid), public domain. ⇒ =
+Source code ⇒ =
+github.com/VincentDN/escape-from-claudov ⇒ =
+Open the repository ⇒ =
+Inventory ⇒ =
+Tab or Esc to close ⇒ =
+Container ⇒ =
+Click, Enter or F to take. Tab or Esc to close ⇒ =
+Contents ⇒ =
+Take all ⇒ =
+Your bag ⇒ =
+Raid over ⇒ =
+Raid again ⇒ =

@@ -63,6 +63,7 @@ function uiRefresh(name, fresh) {
   else if (name === 'moderation') modScreen(); // modération (09v-moderation.js)
   else if (name === 'community') commScreen(); // Communauté (09z-communaute.js)
   else if (name === 'legal') legalRender();
+  efcEmit('ui:screen', name, fresh); // Escape From Claudov screens (Raid, Hideout, Credits): src/efc/50-efc-ui-*.js
   amisInviteCard(); // invitation reçue : l'encart suit l'écran (caché sur l'écran Amis)
 }
 function menuMainRefresh() {
@@ -529,6 +530,7 @@ function menuLaunch(F) {
     UI.busy = false;
     $('matchload').classList.add('hidden'); $('ui').classList.remove('hidden');
     $('depSub').textContent = `${mapById(F.map || Settings.map).name} · ${F.online ? _t('Match en ligne') : _t('Solo')}`;
+    $('scr-deploy').classList.toggle('raid', !!F.raid); // Escape From Claudov: a raid deploys with its Hideout loadout, not a class (50-efc-ui-menu.js)
     $('depBack').classList.toggle('hidden', !!F.online);
     UI.timer = F.online ? DEPLOY_AUTO : 0;
     uiGo('deploy');
@@ -587,6 +589,7 @@ function menuCancelFlow() {
   uiGo(UI.stack.pop() || 'main', false); sfxUi('back');
 }
 function renderDeploy() {
+  if (UI.flow && UI.flow.raid && efcEmit('ui:deploy', UI.flow)) return; // Escape From Claudov: raid deploy view (50-efc-ui-menu.js)
   const c = cls(Settings.loadout);
   $('depGo').textContent = _t('Déployer');
   $('depTimer').innerHTML = UI.timer > 0 ? `${_t('Déploiement automatique dans')} <b>${Math.ceil(UI.timer)} s</b>` : `${_t('Classe :')} <b>${esc(c.name)}</b>`;
@@ -739,4 +742,8 @@ function menuInit() {
   mbgInit(); // fond animé des menus (09w-fond.js)
   netInit();
   acctInit(); socInit();
+  // Escape From Claudov: no what's-new window and no energy-saving question; English unless the player chose French in Settings
+  newsMarkSeen(); Settings.ecoAsk = false;
+  if (LANG_PREF === 'auto' && LANG !== 'en') { Settings.lang = 'en'; saveSettings(); location.reload(); }
+  efcEmit('ui:init');
 }

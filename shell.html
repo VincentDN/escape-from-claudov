@@ -2513,6 +2513,76 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
   .pwa-card p { font-size: 16px; line-height: 1.25; }
   .pwa-card .btns { margin: 0; flex: none; flex-wrap: nowrap; gap: 8px; }
 }
+/* ---------- Escape From Claudov (src/efc/50-efc-ui-*.js): hidden engine features, Hideout, Credits, in-raid panels, raid summary ---------- */
+#scr-main .main-top, #pwaCard, #deckCard, .efc-off, #xpbox, #arsUp, #rankUp, #endXp, #endArs { display: none !important; }
+#scr-deploy.raid #cpDeploy { display: none; }
+#efcDepKit { display: none; }
+#scr-deploy.raid #efcDepKit { display: block; flex: 1 1 auto; min-height: 0; overflow-y: auto; max-width: 760px; }
+.efc-ho { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; flex: 1 1 auto; min-height: 0; max-width: 1280px; width: 100%; }
+.efc-ho .efc-col { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.efc-list { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; min-height: 0; flex: 1 1 auto; }
+.efc-gh { margin: 12px 0 4px; font-size: var(--fs-xs); font-weight: 700; color: var(--mute); letter-spacing: var(--track-w); text-transform: uppercase; }
+.efc-gh:first-child { margin-top: 0; }
+.efc-row { display: flex; align-items: stretch; gap: 2px; }
+.efc-it { flex: 1 1 auto; min-width: 0; display: grid; grid-template-columns: 6.5em minmax(0, 1fr) 3.2em 4.6em 5.4em; align-items: center; gap: 10px; min-height: 40px; padding: 6px 12px;
+  text-align: left; font: inherit; font-size: var(--fs-s); color: var(--paper); background: rgba(242,238,227,.04); border: 1px solid transparent; cursor: pointer; }
+.efc-it.noslot { grid-template-columns: minmax(0, 1fr) 3.2em 4.6em 5.4em; }
+.efc-it > * { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.efc-it .k { color: var(--dim); font-size: var(--fs-xs); letter-spacing: var(--track); text-transform: uppercase; }
+.efc-it .n, .efc-it .w, .efc-it .v { text-align: right; color: var(--dim); font-variant-numeric: tabular-nums; }
+.efc-it .v { color: var(--acc); }
+.efc-it.empty { color: var(--mute); cursor: default; }
+.efc-it.empty .nm { font-style: italic; }
+.efc-it:hover:not(.empty) { background: rgba(246,196,69,.12); }
+.efc-it:focus-visible, .efc-act:focus-visible, .efc-ov .btn:focus-visible { outline: 2px solid var(--paper); outline-offset: -2px; background: rgba(246,196,69,.16); }
+.efc-it.sel { border-color: var(--acc-line); background: var(--acc-soft); }
+.efc-act { flex: none; min-width: 64px; padding: 0 10px; font: inherit; font-size: var(--fs-xs); font-weight: 700; letter-spacing: var(--track); text-transform: uppercase; color: var(--paper);
+  background: rgba(242,238,227,.06); border: 1px solid var(--line); cursor: pointer; }
+.efc-act:hover { border-color: var(--acc-line); color: var(--acc); }
+.efc-act:disabled { opacity: .35; cursor: default; }
+.efc-tot { margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--dim); font-size: var(--fs-s); }
+.efc-tot b { color: var(--paper); font-weight: 700; }
+.efc-tot .over { color: var(--danger); }
+.efc-none { margin: 6px 0; color: var(--mute); font-size: var(--fs-s); }
+.efc-credits p { margin: 0 0 8px; line-height: 1.45; }
+.efc-cr { margin: 0; padding-left: 20px; color: var(--dim); line-height: 1.45; }
+.efc-cr li { margin: 0 0 6px; }
+.efc-stage { display: flex; flex-direction: column; gap: 6px; padding: 18px 22px; background: var(--panel); border: 1px solid var(--line); max-width: 620px; }
+.efc-stage .efc-it { cursor: default; }
+/* HUD: search prompt and heal progress */
+.efc-prompt { position: absolute; left: 50%; top: 60%; transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: 6px; padding: 8px 18px;
+  background: rgba(8,9,7,.72); border: 1px solid var(--line-2); color: var(--paper); font-family: var(--hud); font-size: 22px; letter-spacing: .04em; white-space: nowrap; }
+.efc-prompt.show { display: flex; }
+.efc-prompt b { color: var(--acc); margin-right: 10px; }
+.efc-pbar { display: block; width: 220px; height: 4px; background: rgba(242,238,227,.18); }
+.efc-pbar > i { display: block; height: 100%; width: 100%; background: var(--acc); transform-origin: left; transform: scaleX(0); }
+.efc-heal { top: auto; bottom: 22%; font-size: 19px; }
+.efc-heal .efc-pbar > i { background: var(--ally); }
+/* In-raid panels and the summary: over the running match, the cursor free */
+.efc-ov { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(6,7,5,.62); color: var(--paper); }
+.efc-box { display: flex; flex-direction: column; gap: 12px; width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 20px 24px; background: var(--panel-2); border: 1px solid var(--line-2); box-shadow: var(--shadow); }
+.efc-box.efc-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); width: min(1180px, calc(100vw - 32px)); height: min(640px, calc(100vh - 48px)); }
+.efc-two .efc-bh { grid-column: 1 / -1; }
+.efc-two .efc-col { display: flex; flex-direction: column; min-height: 0; gap: 8px; }
+.efc-two .efc-it { grid-template-columns: minmax(0, 1fr) 3.2em 4.6em 5.4em; }
+.efc-bh { display: flex; align-items: baseline; gap: 18px; }
+.efc-bh h2 { margin: 0; font-family: var(--stencil); font-weight: 400; font-size: 34px; line-height: 1; }
+.efc-bh span { color: var(--dim); font-size: var(--fs-s); }
+.efc-bh span > span { margin-right: 18px; }
+.efc-bh span b { color: var(--paper); }
+.efc-bh .efc-keys { margin-left: auto; color: var(--mute); font-size: var(--fs-xs); }
+.efc-ov .btns { display: flex; gap: 10px; justify-content: flex-end; }
+.efc-sum .efc-box { width: min(820px, calc(100vw - 32px)); }
+.efc-sum .title { font-size: clamp(40px, 7vh, 72px); }
+.efc-sum[data-res="extracted"] .title { color: var(--ally); }
+.efc-sum[data-res="dead"] .title { color: var(--danger); }
+.efc-sum[data-res="mia"] .title { color: var(--acc); }
+.efc-stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.efc-stats .st { display: flex; flex-direction: column; gap: 2px; padding: 8px 16px; background: rgba(242,238,227,.05); border: 1px solid var(--line); min-width: 120px; }
+.efc-stats .st span { color: var(--dim); font-size: var(--fs-xs); letter-spacing: var(--track); text-transform: uppercase; }
+.efc-stats .st b { font-family: var(--hud); font-size: 28px; }
+.efc-sum .efc-list { max-height: 34vh; }
+@media (max-width: 760px) { .efc-ho, .efc-box.efc-two { grid-template-columns: 1fr; } }
 </style>
 <!--SOCLE_UI-->
 </head>
@@ -2541,12 +2611,16 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
         <h1 class="logo" role="img" aria-label="Escape From Claudov"></h1>
       </header>
       <nav class="mlist" data-nav data-lm=".mbtn" aria-label="Menu principal">
-        <button class="mbtn" type="button" data-go="play"><b>Jouer</b><span id="mmPlay">Seul, entre amis ou en ligne</span></button>
+        <!-- Escape From Claudov: the extraction loop (src/efc/50-efc-ui-menu.js). The engine's entries stay below, hidden. -->
+        <button class="mbtn" type="button" id="efcMmRaid" data-go="raid"><b>Raid</b><span>Solo raid against the Wardens</span></button>
+        <button class="mbtn" type="button" id="efcMmSquad" data-go="multi"><b>Squad raid</b><span>Online, up to 8 players in squads</span></button>
         <div class="msep" aria-hidden="true"></div>
-        <button class="mbtn m2" type="button" data-go="classes"><b>Classes</b><span>Armes, accessoires et camouflages</span></button>
-        <button class="mbtn m2" type="button" data-go="skins"><b>Tenues</b><span>Dix tenues, dont six à débloquer</span></button>
-        <button class="mbtn m2" type="button" data-go="options"><b>Options</b><span>Jeu, audio, vidéo, commandes</span></button>
-        <button class="mbtn m2" type="button" data-go="news"><b>Nouveautés<i class="nb hidden" id="mmNewsBadge">Nouveau</i></b><span id="mmNews"></span></button>
+        <button class="mbtn m2" type="button" id="efcMmHideout" data-go="hideout"><b>Hideout</b><span id="efcMmStash">Stash and loadout</span></button>
+        <button class="mbtn m2" type="button" id="efcMmSettings" data-go="options"><b>Settings</b><span>Game, audio, video, controls</span></button>
+        <button class="mbtn hidden" type="button" data-go="play" tabindex="-1"><b>Jouer</b><span id="mmPlay">Seul, entre amis ou en ligne</span></button>
+        <button class="mbtn m2 hidden" type="button" data-go="classes" tabindex="-1"><b>Classes</b><span>Armes, accessoires et camouflages</span></button>
+        <button class="mbtn m2 hidden" type="button" data-go="skins" tabindex="-1"><b>Tenues</b><span>Dix tenues, dont six à débloquer</span></button>
+        <button class="mbtn m2 hidden" type="button" data-go="news" tabindex="-1"><b>Nouveautés<i class="nb hidden" id="mmNewsBadge">Nouveau</i></b><span id="mmNews"></span></button>
       </nav>
       <div class="pwa-card hidden" id="pwaCard"><p id="pwaTxt">Installez le jeu sur votre écran d'accueil. Plein écran, sans barre d'adresse.</p><div class="btns"><button id="pwaGo" class="btn primary" type="button">Installer</button></div></div>
       <!-- Steam Deck (src/09ra-deck.js) : installation dans Steam depuis le mode Bureau, ou disposition des commandes en mode Jeu -->
@@ -2564,11 +2638,12 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
     </div>
     <footer class="mfoot">
       <button class="link" id="fsBtn" type="button">Plein écran</button>
-      <button class="link" type="button" data-go="legal">Confidentialité et conditions</button>
-      <button class="link" id="srcBtn" type="button">Code source</button>
+      <button class="link" id="efcCreditsBtn" type="button" data-go="credits">Credits</button>
+      <button class="link efc-off" type="button" data-go="legal">Confidentialité et conditions</button>
+      <button class="link efc-off" id="srcBtn" type="button">Code source</button>
       <span id="verTag"></span>
-      <span class="lic"><span>Textures et ciels : Poly Haven et ambientCG. Éclairage : HDRI Poly Haven via @pmndrs/assets. Toutes sous licence CC0.</span></span>
-      <span class="credit">Vibe codé avec Claude Code par BenDBS</span>
+      <span class="lic efc-off"><span>Textures et ciels : Poly Haven et ambientCG. Éclairage : HDRI Poly Haven via @pmndrs/assets. Toutes sous licence CC0.</span></span>
+      <span class="credit efc-off">Vibe codé avec Claude Code par BenDBS</span>
     </footer>
   </section>
 
@@ -2702,10 +2777,53 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
     <div id="newsList" class="newslist"></div>
   </section>
 
+  <!-- Escape From Claudov: Raid (choose a map, then the engine's loading and deploy flow), Hideout, Credits (src/efc/50-efc-ui-*.js) -->
+  <section class="scr fit launch" id="scr-raid">
+    <header class="shead"><button class="back" type="button" data-back>Back</button><div><h2>Raid</h2><p id="efcRaidSub">Solo raid against the Wardens</p></div></header>
+    <div class="lbx">
+      <div class="lb-left"><div class="lm-col" id="efcRaidList"></div><div class="lb-prev" id="efcRaidPrev" hidden></div><div class="lm-foot"><button class="deploy" id="efcRaidGo" type="button" data-lm-extra>Start raid</button></div></div>
+      <div class="lb-stage"><div class="lb-base"><div class="lb-prev pv2" id="efcRaidPrev2" hidden></div><div class="lb-scene" id="efcRaidStage"></div></div><div class="lb-panel" id="efcRaidPanel" hidden></div></div>
+    </div>
+  </section>
+  <section class="scr" id="scr-hideout">
+    <header class="shead"><button class="back" type="button" data-back>Back</button><div><h2>Hideout</h2><p id="efcHoSub">Pick what you take into the raid. What you carry out is yours to keep.</p></div></header>
+    <div class="efc-ho">
+      <div class="efc-col card"><p class="lbl">Stash</p><div class="efc-list" id="efcHoStash" role="list" aria-label="Stash"></div></div>
+      <div class="efc-col card"><p class="lbl">Loadout</p><div class="efc-list" id="efcHoLoad" role="list" aria-label="Loadout"></div><div class="efc-tot" id="efcHoTot"></div></div>
+    </div>
+    <footer class="sfoot"><span class="chip" id="efcHoNote" role="status"></span><button class="deploy" id="efcHoGo" type="button">Start raid</button></footer>
+  </section>
+  <section class="scr" id="scr-credits">
+    <header class="shead"><button class="back" type="button" data-back>Back</button><div><h2>Credits</h2><p>Escape From Claudov and the work it is built on</p></div></header>
+    <div class="ac-wrap efc-credits">
+      <div class="card"><p class="lbl">Engine</p>
+        <p>Built on the source code of Riposte: Frontline 5.6.0 by its author, BenDBSS, released under the MIT License. Escape From Claudov is a separate game with its own name and setting. It is not the official Riposte: Frontline and is not endorsed by its author.</p>
+        <p>three.js r147, MIT License. PeerJS for online lobbies, MIT License.</p></div>
+      <div class="card"><p class="lbl">Textures, skies and lighting</p>
+        <p>Photo textures, skies and HDRI from Poly Haven and ambientCG, all CC0 (public domain).</p></div>
+      <div class="card"><p class="lbl">Sounds and voices</p>
+        <p>Most sounds are CC0 recordings from freesound.org and other libraries. These ones ask to be credited:</p>
+        <ul class="efc-cr" id="efcCrList">
+          <li data-src="amb-benboncan">Woodpecker by Benboncan (freesound.org/s/66955), CC BY 3.0, cut and filtered</li>
+          <li data-src="amb-straget-cascade">Waterfall by Samuel Strågefors (straget, freesound.org/s/489073), CC BY, looped excerpt</li>
+          <li data-src="cgeffex">Grenade pin pull by CGEffex (freesound.org/s/93837), CC BY 4.0, cut and filtered</li>
+          <li data-src="ref-en">English reference voice: LibriTTS-R excerpt 2803_154320_000003_000001 (Y. Koizumi et al., Google, 2023), LibriVox reading, CC BY 4.0. The voice model only copies its timbre.</li>
+          <li data-src="ref-fr">French reference voice: Multilingual LibriSpeech excerpt 9804_9061_000826 (V. Pratap et al., Facebook AI, 2020), LibriVox reading of Les Enfants du capitaine Grant by Jules Verne, CC BY 4.0. The voice model only copies its timbre.</li>
+          <li data-src="chatterbox">Radio voices generated with Chatterbox by Resemble AI (MIT License).</li>
+          <li data-src="conner_ir">Impulse responses from Conner's Impulse Response Library (itsmusician), Copyright (c) 2022 Conner, MIT License.</li>
+          <li data-src="amb-mysid">Wood pigeon song by Oona Räisänen (Mysid), public domain.</li>
+        </ul></div>
+      <div class="card"><p class="lbl">Source code</p>
+        <p>github.com/VincentDN/escape-from-claudov</p>
+        <div class="btns"><button class="btn" id="efcCrSrc" type="button">Open the repository</button></div></div>
+    </div>
+  </section>
+
   <!-- Déploiement : choix de la classe avant d'apparaître -->
   <section class="scr fit" id="scr-deploy">
     <header class="shead"><button class="back" id="depBack" type="button">Annuler</button><div><h2>Choisissez votre classe</h2><p id="depSub"></p></div></header>
     <div id="cpDeploy"></div>
+    <div id="efcDepKit" class="efc-kit card"></div>
     <footer class="sfoot"><span class="chip" id="depTimer"></span><button class="deploy" id="depGo" type="button" data-lm-extra>Déployer</button></footer>
   </section>
 </div>
@@ -2810,10 +2928,37 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
   <div id="xpbox"></div>
   <div id="arsUp" class="ars-up" aria-live="polite"></div>
   <div id="rankUp" class="ru" aria-hidden="true"></div>
+  <div id="efcPrompt" class="efc-prompt" aria-live="polite"><span id="efcPromptT"></span><i class="efc-pbar"><i id="efcPromptBar"></i></i></div>
+  <div id="efcHeal" class="efc-prompt efc-heal" aria-live="polite"><span id="efcHealT"></span><i class="efc-pbar"><i id="efcHealBar"></i></i></div>
   <div id="hp"><b id="hpN">100</b><div class="hpbar"><div id="hpFill"></div></div></div>
 </div>
 
 <div id="padHints" class="hidden" aria-hidden="true"></div>
+<!-- Escape From Claudov, in raid (src/efc/50-efc-ui-raid.js): inventory (Tab) and loot panel (hold F at a container). The match goes on behind them. -->
+<div id="efcInv" class="efc-ov hidden" role="dialog" aria-modal="true" aria-labelledby="efcInvTitle">
+  <div class="efc-box">
+    <header class="efc-bh"><h2 id="efcInvTitle">Inventory</h2><span id="efcInvW"></span><span class="efc-keys">Tab or Esc to close</span></header>
+    <div class="efc-list" id="efcInvList"></div>
+  </div>
+</div>
+<div id="efcLoot" class="efc-ov hidden" role="dialog" aria-modal="true" aria-labelledby="efcLootTitle">
+  <div class="efc-box efc-two">
+    <header class="efc-bh"><h2 id="efcLootTitle">Container</h2><span id="efcLootW"></span><span class="efc-keys">Click, Enter or F to take. Tab or Esc to close</span></header>
+    <div class="efc-col"><p class="lbl" id="efcLootName">Contents</p><div class="efc-list" id="efcLootList"></div><div class="btns"><button class="btn primary" id="efcLootAll" type="button">Take all</button></div></div>
+    <div class="efc-col"><p class="lbl">Your bag</p><div class="efc-list" id="efcLootBag"></div></div>
+  </div>
+</div>
+<!-- Escape From Claudov: raid summary on event raid:over (src/efc/50-efc-ui-summary.js) -->
+<div id="efcSum" class="efc-ov efc-sum hidden" role="dialog" aria-modal="true" aria-labelledby="efcSumTitle">
+  <div class="efc-box">
+    <p class="lbl" id="efcSumKick">Raid over</p>
+    <h2 id="efcSumTitle" class="title"></h2>
+    <div class="efc-stats" id="efcSumStats"></div>
+    <div class="efc-list" id="efcSumItems"></div>
+    <p class="efc-tot" id="efcSumTot"></p>
+    <div class="btns"><button class="btn" id="efcSumHide" type="button">Hideout</button><button class="btn primary" id="efcSumAgain" type="button">Raid again</button></div>
+  </div>
+</div>
 <div id="death" class="overlay"><div class="box"><div id="deathBy"></div><div id="deathWeap"></div><p class="skip"></p><i class="dbar"><i></i></i></div></div>
 <div id="killcam" class="kc" aria-live="polite">
   <div class="kc-top"><b id="kcTitle">Killcam</b><span id="kcInfo"></span></div>

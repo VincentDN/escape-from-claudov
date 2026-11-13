@@ -98,7 +98,7 @@ const CLV_RAID = {
     // housing block
     ['locker', 'locker', 52, 0, 48.6], ['locker', 'locker', 68, 0, 48.6], ['locker', 'locker', 66, 3.2, 41.4], ['bag', 'bag', 51.5, 3.2, 47.5], ['crate', 'medical', 64, 0, 44],
     // checkpoint
-    ['locker', 'locker', 65, 0, -44.6], ['crate', 'crate', 70, 0, -42.5],
+    ['locker', 'locker', 65.5, 0, -44.2], ['crate', 'crate', 70, 0, -42.5],
     // container yard
     ['crate', 'crate', -26, 0, 4.5], ['crate', 'crate', -33.3, 0, 26], ['bag', 'bag', -36.3, 2.6, 15], ['crate', 'crate', -11, 2.6, 36], ['crate', 'crate', -16.3, 0, 50],
     // quay, crane platform, dry dock
@@ -112,7 +112,7 @@ const CLV_RAID = {
     { x: -25, z: 30, r: 14, n: 2, elite: false }, // container yard
     { x: 60, z: 36, r: 12, n: 2, elite: false }, // housing
     { x: 64, z: -54, r: 10, n: 2, elite: false }, // checkpoint
-    { x: 31, z: -4, r: 12, n: 2, elite: false }, // rail loading dock
+    { x: 27, z: -2, r: 12, n: 2, elite: false }, // rail loading dock
   ],
 };
 

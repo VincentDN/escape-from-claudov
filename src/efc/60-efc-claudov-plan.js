@@ -239,11 +239,11 @@ function clvCheckpoint() {
   const w = { tint: [0.78, 0.76, 0.7], frameTint: [0.3, 0.32, 0.3] };
   wallOpen('plaster', 'x', -45.9, 0.2, 64, 68, 0, 2.8, [{ a0: 65, a1: 67, b0: 1.0, b1: 2.0 }], w);
   wallOpen('plaster', 'x', -42.1, 0.2, 64, 68, 0, 2.8, [{ a0: 65, a1: 67, b0: 1.0, b1: 2.0 }], w);
-  wallOpen('plaster', 'z', 64.1, 0.2, -45.8, -42.2, 0, 2.8, [{ a0: -44.6, a1: -43.4, b0: 0, b1: 2.2 }], w);
+  wallOpen('plaster', 'z', 64.1, 0.2, -45.8, -42.2, 0, 2.8, [{ a0: -45, a1: -43, b0: 0, b1: 2.2 }], w);
   wallOpen('plaster', 'z', 67.9, 0.2, -45.8, -42.2, 0, 2.8, [{ a0: -44.8, a1: -43.2, b0: 1.0, b1: 2.0 }], w);
   box('concrete', 63.7, 68.3, 2.8, 3.0, -46.3, -41.7, { tint: [0.5, 0.5, 0.5] });
   M.lamp(66, 2.4, -44, [1.0, 0.9, 0.75], 1.0, 4, 0.5);
-  clvLockers(66, -45.5, 0, 2); clvBench(66.5, -42.7, Math.PI);
+  clvLockers(66.5, -45.5, 0, 2);
   // barrier arm, jersey chicane, sandbag nests, a parked army truck
   for (const [x, z] of [[70, -54.5], [66, -50], [72, -48.5]]) { M.place(PF.jersey(4), x, 0, z, Math.PI / 2, { nocol: true }); WORLD.col({ x0: x - 1.95, x1: x + 1.95, y0: 0, y1: 0.87, z0: z - 0.3, z1: z + 0.3 }, 'concrete'); }
   box('concrete', 77.2, 77.8, 0, 1.0, -47.4, -46.8, { tint: [0.6, 0.6, 0.58] });

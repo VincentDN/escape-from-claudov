@@ -789,7 +789,7 @@ function netClientMsg(m) {
 function netPhase(ph) { return ph === 'playing' || ph === 'loading' ? ph : 'lobby'; }
 function netCfg(c) {
   c = c || {};
-  const map = mapById(c.map).id, mode = c.mode === 'raid' || (MODE_IDS.includes(c.mode) && (c.mode !== 'dom' || MAP_DEFS[map].dom)) ? c.mode : 'tdm'; // la domination demande une carte à points
+  const map0 = mapById(c.map).id, map = c.mode === 'raid' && efcCall('map:raidable', map0) === false ? mapById(EFC.cfg.raidMap).id : map0, mode = c.mode === 'raid' || (MODE_IDS.includes(c.mode) && (c.mode !== 'dom' || MAP_DEFS[map].dom)) ? c.mode : 'tdm'; // la domination demande une carte à points
   const raid = mode === 'raid' ? efcNetRaidCfg() : null; // raid (Escape From Claudov) : durée de EFC.cfg.raidMinutes, pas de limite d'éliminations
   const L = raid ? null : MODES[mode].limits, limit = raid ? raid.limit : L.includes(+c.limit) ? +c.limit : L[1];
   const time = raid ? raid.time : [5, 10, 15].includes(+c.time) ? +c.time : 10;
@@ -1363,7 +1363,7 @@ const NET_PAGES = {
       NET.cfg = netCfg(Object.assign({}, NET.cfg, { map: id })); Settings.map = NET.cfg.map; saveSettings();
       for (const q of NET.players.values()) q.ld = 0; // chacun annonce de nouveau où il en est pour cette carte
       sfxUi('click'); lmPop(LM.scr.multi); netLobbyChanged();
-    } : null),
+    } : null).filter((r) => !efcNetIsRaid() || efcCall('map:raidable', r.key) !== false), // raid: only maps with hidden inserts (src/efc/00-efc-core.js)
   }),
   setup: () => ({ head: _t('Paramètres de partie'), rows: matchRows(netMatchCfg()) }),
   player: (id) => {

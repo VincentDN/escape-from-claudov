@@ -4,7 +4,8 @@ An extraction shooter played in the browser, on desktop. Pick a loadout from you
 Claudov alone or as a squad of up to three, fight the Wardens and other squads, loot bodies and containers, and reach an extraction
 point before the raid timer runs out. What you carry out is yours. If you die, it stays on your body for someone else.
 
-Status: vertical slice in progress. See [docs/PLAN.md](docs/PLAN.md).
+Status: vertical slice built and covered by automated tests, not yet play-tested by a person. See section 0 of
+[docs/PLAN.md](docs/PLAN.md) for what works and what is not verified.
 
 ## Build and play
 
@@ -20,10 +21,11 @@ Open `dist/index.html` in a recent desktop browser (Chrome, Edge, Firefox). `dis
 ## Tests
 
 ```bash
-node tools/dev/efc/smoke.mjs
+bash tools/dev/efc/run-all.sh
 ```
 
-Other checks are `tools/dev/efc/test-*.mjs`. They open the built game in headless Chromium (Playwright) and step the game logic.
+It builds the game and runs every check (`tools/dev/efc/test-*.mjs`): each opens the built game in headless Chromium (Playwright)
+and steps the game logic. `test-e2e.mjs` plays a whole solo raid; `test-e2e-net.mjs` plays one with two clients.
 
 ## Code
 

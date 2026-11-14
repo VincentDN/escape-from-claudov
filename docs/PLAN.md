@@ -10,6 +10,35 @@ with no hit validation are accepted for the slice; slot inventory; desktop only,
 `docs/contracts/CONTRACT.md` is authoritative), waves 1 and 2 run as one wave of seven packages against that contract, and the
 engine's unused features are hidden rather than deleted.
 
+## 0. Where the build stands (14 November 2026)
+
+All seven work packages are merged on `claude/trusting-franklin-zp9ch5`. `bash tools/dev/efc/run-all.sh` builds the game and runs
+every check; the results of the last run are in the lead's report to the owner.
+
+**Works, covered by automated tests on the merged branch**
+
+- Solo raid end to end on Simoun and Claudov: hideout stash and loadout, insertion, searching a container with F, taking loot,
+  killing a Warden and finding its body, extraction, summary, loot in the stash; and a death run where the kit stays on the body.
+- Two clients in one raid: lobby with squads, hostile squads, the same containers on both machines, a take granted exactly once, a
+  dead player's body looted by the other, a real extraction seen by the other machine, the host ending the raid.
+- Wardens hold posts, patrol, alert their post mates, reinforce only away from players, and drop loot.
+- The Claudov map: raid data reachable on the nav grid, a 90-second bot match with nobody stuck.
+
+**Not done or not verified**
+
+- Nobody has played it. Every check steps the game logic in a headless browser; rendered frames are too slow in the build
+  container to play. Feel, pacing, difficulty and loot balance are untested by a person.
+- Frame rate on real hardware is not measured. Claudov's triangle and draw-call counts are at or below Simoun's.
+- The network tests use a stand-in for PeerJS inside one browser. A raid over the real internet (WebRTC, different machines) is
+  untested, and so is host migration during a raid.
+- Soldier animations: none ship. The owner rebakes them from his own Mixamo account (`tools/dev/anim/cuire.mjs`); until then the
+  soldiers use the engine's procedural poses.
+- Crates and lockers have no collision (the engine cannot remove a collision box once added).
+- The public-server lobbies of the engine still assume two teams; only private lobbies (code or link) support squads.
+- Deployment: the Pages workflow runs on pushes to `main`, which does not exist yet. Phones are out of scope.
+- Known engine quirk: a dead soldier's ragdoll can become unstable. It used to freeze the game; the collision search is now
+  clamped to the map, so the worst case is a body that flies off.
+
 ## 1. What the slice is
 
 One complete raid, playable in a browser, solo or with friends:

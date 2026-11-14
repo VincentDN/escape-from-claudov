@@ -72,7 +72,7 @@ function efcWorldHostBegin() {
   const rng = efcRng(EFC_W.seed), list = [];
   for (const m of (md && md.containers) || []) {
     if (!m || !EFC_W.kinds.includes(m.kind) || typeof m.x !== 'number' || typeof m.z !== 'number') continue;
-    const y = groundHeight(m.x, m.z, gy0(m.x, m.z) + 0.3);
+    const y = typeof m.y === 'number' && isFinite(m.y) ? groundHeight(m.x, m.z, m.y + 0.3) : groundHeight(m.x, m.z, gy0(m.x, m.z) + 0.3); // m.y: raised spots (mezzanine, upper floor)
     const p = efcWorldPos({ x: m.x, y, z: m.z }); if (!p) continue;
     const items = efcWorldItems(efcCall('loot:roll', m.table || m.kind, rng) || []) || [];
     list.push({ id: (EFC_W.next++).toString(36), kind: m.kind, x: p.x, y: p.y, z: p.z, yaw: +m.yaw || 0, name: '', items });

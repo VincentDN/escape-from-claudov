@@ -17,6 +17,7 @@ function clvLevel() {
   clvCheckpoint();
   clvSouth();
   clvPerimeter();
+  clvInserts(); // raid insertion shelters (60-efc-claudov.js)
   clvBackdrop();
   clvGround();
 }

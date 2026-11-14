@@ -93,7 +93,9 @@ function efcUiNav(root, code) {
 function efcUiOverlayOpen() { return !!document.querySelector('.efc-ov:not(.hidden)'); }
 
 /* ---------- Raid screen: map, Hideout link, loadout on the right, then the engine's loading and deploy flow ---------- */
-function efcUiRaidMap() { return mapById(EFC_UI.map || (EFC.cfg && EFC.cfg.raidMap) || 'simoun'); }
+/* Maps offered for raids: those that can host one (service 'map:raidable': hidden inserts exist) */
+function efcUiRaidable(id) { return efcCall('map:raidable', id) !== false; }
+function efcUiRaidMap() { const id = EFC_UI.map || (EFC.cfg && EFC.cfg.raidMap) || 'simoun'; return mapById(efcUiRaidable(id) ? id : (EFC.cfg && EFC.cfg.raidMap) || 'simoun'); }
 function efcUiKitNode() {
   const st = efcCall('stash:get'), el = document.createElement('div'); el.className = 'efc-stage';
   el.innerHTML = '<p class="lbl">Your loadout</p>' + efcUiKitHtml(st);
@@ -121,7 +123,7 @@ const EFC_RAID_PAGES = {
       stage: efcUiKitNode, preview: efcUiRaidPreview(m),
     };
   },
-  map: () => ({ head: 'Map', grid: true, rows: mapCards(efcUiRaidMap().id, (id) => { EFC_UI.map = id; sfxUi('click'); lmPop(EFC_UI.raidL); }) }),
+  map: () => ({ head: 'Map', grid: true, rows: mapCards(efcUiRaidMap().id, (id) => { EFC_UI.map = id; sfxUi('click'); lmPop(EFC_UI.raidL); }).filter((r) => efcUiRaidable(r.key)) }),
 };
 /* Starts a solo raid on a map: the engine's loading screen, then the deploy screen in its raid view */
 function efcUiRaidLaunch(mapId) {

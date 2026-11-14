@@ -82,8 +82,23 @@ for (let i = 0; i < 8; i++) CLV_SPAWNS.push([i * 3, 66]);
 for (let i = 0; i < 7; i++) CLV_SPAWNS.push([1.5 + i * 3, 70]);
 
 /* ---------- Raid data (docs/contracts/CONTRACT.md, MapData) ---------- */
+/* Hidden inserts: inside an insertion shelter (clvShelter, built by clvInserts) whose doors face the perimeter wall, the quay edge or
+   the open south end, at least EFC.cfg.insertPost m from every guard post centre and EFC.cfg.insertExtract m from every extract; nothing
+   inside can see a post area or another insert (tools/dev/efc/test-map.mjs checks it). [x, z, door direction x, z]: the insert point is
+   1.2 m inside the doors, the squad lines up behind it, facing out. */
+const CLV_INSERTS = [
+  [-21, 76.2, 0, 1], // north road, against the perimeter wall
+  [76.3, 8, 1, 0], // landward, against the east wall
+  [76.3, 38, 1, 0], // housing yard, against the east wall
+  [-58, -76.3, 0, -1], // south end of the quay
+  [-60.3, -54.5, -1, 0], // quay, south of the dry dock, doors to the sea
+  [-41.5, -76.3, 0, -1], // fuel depot, against the south wall
+];
+function clvInserts() {
+  CLV_INSERTS.forEach(([x, z, dx, dz], i) => clvShelter(x - dx * 1.83, z - dz * 1.83, dx, dz, CLV_TINT.boxes[(i * 3 + 1) % CLV_TINT.boxes.length]));
+}
 const CLV_RAID = {
-  inserts: [[-56, -74], [20, -76], [76, 10], [-20, 76]].map(([x, z]) => ({ x, z, yaw: Math.atan2(-x, -z) })),
+  inserts: CLV_INSERTS.map(([x, z, dx, dz]) => ({ x, z, yaw: Math.atan2(dx, dz), line: [-dx, -dz] })),
   extracts: [
     { id: 'x0', name: 'Pilot boat', x: -60, z: 52, r: 4.5, openAt: 0 },
     { id: 'x1', name: 'Checkpoint gate', x: 75, z: -52, r: 4.5, openAt: 0 },
@@ -106,13 +121,13 @@ const CLV_RAID = {
     // rail, south sheds
     ['crate', 'crate', 31, 1.1, 2], ['bag', 'bag', 33.5, 0, 46], ['bag', 'bag', -18, 0, -64],
   ].map(([kind, table, x, y, z], i) => ({ kind, table, x, y, z, yaw: (i * 2.39996) % 6.283 })),
+  // guard posts, inland of the inserts (n: the most Wardens it fields; the raid's Warden number decides, efcWardenNumber)
   guards: [
     { x: 12, z: -34, r: 10, n: 3, elite: true }, // Warehouse A
-    { x: -50, z: -40, r: 12, n: 2, elite: false }, // dry dock
-    { x: -25, z: 30, r: 14, n: 2, elite: false }, // container yard
-    { x: 60, z: 36, r: 12, n: 2, elite: false }, // housing
-    { x: 64, z: -54, r: 10, n: 2, elite: false }, // checkpoint
-    { x: 27, z: -2, r: 12, n: 2, elite: false }, // rail loading dock
+    { x: -24, z: 20, r: 12, n: 2, elite: false }, // container yard
+    { x: 22, z: -2, r: 10, n: 2, elite: false }, // yard road by the loading dock
+    { x: 10, z: 30, r: 10, n: 2, elite: false }, // Warehouse B
+    { x: 62, z: -58, r: 10, n: 2, elite: false }, // checkpoint
   ],
 };
 

@@ -70,7 +70,7 @@ function modeRoster() {
   // on retire des bots répartis sur les deux camps d'origine (un sur trois, puis les derniers)
   const off = new Set(ffa && cut > 0 ? bots.filter((e, i) => i % 3 === 1).concat(bots.slice().reverse()).filter((e, i, a) => a.indexOf(e) === i).slice(0, cut) : []);
   for (const e of bots) {
-    e.off = off.has(e);
+    e.off = off.has(e) || (MATCH.mode === 'raid' && !!e.efcOff); // raid: bots beyond the Warden number stay out (src/efc/40-efc-wardens.js)
     if (e.off) { e.alive = false; e.respawnT = Infinity; e.target = null; e.model.rag = null; e.model.root.visible = false; }
     soldierLook(e.model, skinOf(e), skinRel(e));
   }

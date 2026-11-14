@@ -1,4 +1,4 @@
-// MAP package test: Claudov's raid data sits on walkable ground inside the bounds and is reachable on the nav grid from insert 0,
+// MAP package test: Claudov's raid data sits on walkable ground inside the bounds and is reachable on the nav grid from insert 0, the six hidden inserts obey the P1 rules,
 // containers are spread out, inserts cannot see each other, then a bot-only team deathmatch runs 90 game seconds of logic:
 // bots move, nobody is stuck more than 10 s, nobody leaves the map, no page error. Exits non-zero on failure.
 // node tools/dev/efc/test-map.mjs [seconds=90]
@@ -42,18 +42,29 @@ const data = await page.evaluate(() => {
   for (const [w, p] of all) { const e = check(w, p) || reach(w, p); if (e) out.fails.push(e); }
   // shapes from the brief
   const d2 = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
-  if (D.inserts.length !== 4) out.fails.push('4 inserts expected');
+  if (D.inserts.length !== 6) out.fails.push('6 inserts expected');
   if (D.extracts.length !== 3 || D.extracts.filter((e) => e.openAt === 0).length !== 2 || !D.extracts.some((e) => e.openAt === 600)) out.fails.push('extract opening times');
   for (const e of D.extracts) if (e.r < 4 || e.r > 5) out.fails.push('extract radius ' + e.name);
   if (D.containers.length < 28 || D.containers.length > 36) out.fails.push('container count ' + D.containers.length);
-  if (D.guards.length !== 6 || D.guards.filter((g) => g.elite && g.n === 3).length !== 1) out.fails.push('guard posts');
-  for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
-    const a = D.inserts[i], b = D.inserts[j];
-    if (d2(a, b) < 60) out.fails.push(`inserts ${i} and ${j} only ${d2(a, b).toFixed(1)} m apart`);
-    const ya = groundHeight(a.x, a.z, 0.5) + 1.6, yb = groundHeight(b.x, b.z, 0.5) + 1.6;
-    if (lineClear(new V3(a.x, ya, a.z), new V3(b.x, yb, b.z))) out.fails.push(`inserts ${i} and ${j} see each other`);
+  if (D.guards.length < 3 || D.guards.filter((g) => g.elite && g.n === 3).length !== 1) out.fails.push('guard posts');
+  // hidden inserts (P1): at the edge, 55 m from every post centre, 45 m from every extract, out of sight (eye height) of every point of a
+  // post area sampled on a grid and of every other insert, next to a tall structure (the insertion shelters)
+  const C = EFC.cfg, E = { x0: 1e9, x1: -1e9, z0: 1e9, z1: -1e9 };
+  for (let i = 0; i < NAV.count; i++) if (NAV.comp[i] === NAV.mainComp) { E.x0 = Math.min(E.x0, NAV.nx[i]); E.x1 = Math.max(E.x1, NAV.nx[i]); E.z0 = Math.min(E.z0, NAV.nz[i]); E.z1 = Math.max(E.z1, NAV.nz[i]); }
+  out.info.insertRules = { post: C.insertPost, extract: C.insertExtract, grid: C.insertGrid, postEyes: D.guards.map((g) => efcPostEyes(g).length) };
+  for (const [i, a] of D.inserts.entries()) {
+    for (const g of D.guards) if (d2(a, g) < C.insertPost) out.fails.push(`insert ${i} only ${d2(a, g).toFixed(1)} m from a post`);
+    for (const e of D.extracts) if (d2(a, e) < C.insertExtract) out.fails.push(`insert ${i} within ${C.insertExtract} m of ${e.name}`);
+    const eye = efcEyeAt(a.x, a.z);
+    D.guards.forEach((g, k) => { const seen = efcPostEyes(g).filter((p) => lineClear(eye, p)); if (seen.length) out.fails.push(`insert ${i} sees post ${k} (${seen.length} grid points)`); });
+    if (Math.min(a.x - E.x0, E.x1 - a.x, a.z - E.z0, E.z1 - a.z) > 12) out.fails.push(`insert ${i} not at the map edge`);
+    if (!queryBoxes(a.x - 3, a.z - 3, a.x + 3, a.z + 3).some((b) => !b.ray && !b.noRay && b.y1 > 1.8 && b.x0 < a.x + 3 && b.x1 > a.x - 3 && b.z0 < a.z + 3 && b.z1 > a.z - 3)) out.fails.push(`insert ${i} has no structure around it`);
   }
-  for (const [i, a] of D.inserts.entries()) for (const e of D.extracts) if (d2(a, e) < 45) out.fails.push(`insert ${i} within 45 m of ${e.name}`);
+  for (let i = 0; i < D.inserts.length; i++) for (let j = i + 1; j < D.inserts.length; j++) {
+    const a = D.inserts[i], b = D.inserts[j];
+    if (d2(a, b) < 15) out.fails.push(`inserts ${i} and ${j} only ${d2(a, b).toFixed(1)} m apart`);
+    if (lineClear(efcEyeAt(a.x, a.z), efcEyeAt(b.x, b.z))) out.fails.push(`inserts ${i} and ${j} see each other`);
+  }
   let minC = 1e9;
   for (let i = 0; i < D.containers.length; i++) for (let j = i + 1; j < D.containers.length; j++) {
     const a = D.containers[i], b = D.containers[j], d = Math.hypot(a.x - b.x, (a.y || 0) - (b.y || 0), a.z - b.z); minC = Math.min(minC, d);

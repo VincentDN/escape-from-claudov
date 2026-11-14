@@ -24,14 +24,14 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'tools' / 'sfx'))
 import common  # noqa: E402
 
-FAMILLES = ['armes', 'maniement', 'impacts', 'series', 'ambiances', 'interface', 'mecha']
+FAMILLES = ['armes', 'maniement', 'impacts', 'series', 'ambiances', 'interface', 'mecha', 'partisan']
 OUT = ROOT / 'assets' / 'sfx'
 
 # Encodage par paquet : (fréquence du MP3, qualité VBR de LAME : 0 meilleure, 9 plus légère). Les masters restent à 48 kHz ;
 # le jeu décode à la fréquence de son contexte audio.
 ENC = {
     'armes': (48000, 3), 'impacts': (48000, 5), 'foley': (48000, 5), 'ui': (48000, 5), 'series': (44100, 5), 'mecha': (44100, 5),
-    'voix_fr': (24000, 6), 'voix_en': (24000, 6),
+    'voix_fr': (24000, 6), 'voix_en': (24000, 6), 'handling': (48000, 5), 'ballistics': (48000, 4),
 }
 ENC_AMB = (32000, 6)  # paquets d'ambiance des cartes (amb_<carte>)
 

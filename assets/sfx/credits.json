@@ -496,12 +496,61 @@
    "url": "https://freesound.org/people/6polnic/sounds/231438/",
    "preuve": "licence donnée par l'API de Freesound (apiv2/sounds/231438) : creativecommons.org/publicdomain/zero/1.0"
   },
+  "fs-30932": {
+   "nom": "« bullet ricochet.wav » (freesound 30932)",
+   "auteur": "aust_paul",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/30932/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry ricochet/ricochet-1.mp3 (id 30932, author aust_paul)"
+  },
+  "fs-345413": {
+   "nom": "« Bullet_Ricochet_01 » (freesound 345413)",
+   "auteur": "Artmasterrich",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/345413/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry ricochet/ricochet-3.mp3 (id 345413, author Artmasterrich)"
+  },
+  "fs-370805": {
+   "nom": "« Bullet Shell Thrown On Table.wav » (freesound 370805)",
+   "auteur": "LilMati",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/370805/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry shells/shells-1.mp3 (id 370805, author LilMati)"
+  },
+  "fs-371199": {
+   "nom": "« Bullet Shells Thrown In Basket.wav » (freesound 371199)",
+   "auteur": "LilMati",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/371199/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry shells/shells-2.mp3 (id 371199, author LilMati)"
+  },
+  "fs-386854": {
+   "nom": "« Bullet Crack.wav » (freesound 386854)",
+   "auteur": "morganpurkis",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/386854/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry flyby/flyby-2.mp3 (id 386854, author morganpurkis)"
+  },
+  "fs-392975": {
+   "nom": "« Ricochet 2.wav » (freesound 392975)",
+   "auteur": "morganpurkis",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/392975/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry ricochet/ricochet-2.mp3 (id 392975, author morganpurkis)"
+  },
   "fs-415608": {
    "nom": "« Mud Volcano Field - Salton Sea » (freesound 415608)",
    "auteur": "RTB45",
    "licence": "CC0 1.0",
    "url": "https://freesound.org/people/RTB45/sounds/415608/",
    "preuve": "licence donnée par l'API de Freesound (apiv2/sounds/415608) : creativecommons.org/publicdomain/zero/1.0"
+  },
+  "fs-433858": {
+   "nom": "« Rifle Gun Shot 01.wav » (freesound 433858)",
+   "auteur": "LilMati",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/433858/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry shot-sniper/shot-sniper-1.mp3 (id 433858, author LilMati)"
   },
   "fs-457956": {
    "nom": "« Waves lapping on rocks » (freesound 457956)",
@@ -516,6 +565,27 @@
    "licence": "CC0 1.0",
    "url": "https://freesound.org/people/Soojay/sounds/462462/",
    "preuve": "licence donnée par l'API de Freesound (apiv2/sounds/462462) : creativecommons.org/publicdomain/zero/1.0"
+  },
+  "fs-484036": {
+   "nom": "« Rifle Gun Shot 02.wav » (freesound 484036)",
+   "auteur": "LilMati",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/484036/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry shot-sniper/shot-sniper-2.mp3 (id 484036, author LilMati)"
+  },
+  "fs-505238": {
+   "nom": "« Whizzby » (freesound 505238)",
+   "auteur": "Daleonfire",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/505238/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry flyby/flyby-3.mp3 (id 505238, author Daleonfire)"
+  },
+  "fs-563015": {
+   "nom": "« a loud gunshot in the woods » (freesound 563015)",
+   "auteur": "florianreichelt",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/563015/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry shot-sniper/shot-sniper-4.mp3 (id 563015, author florianreichelt)"
   },
   "fs-648430": {
    "nom": "« Two buzzards in a windy forest.wav » (freesound 648430)",
@@ -551,6 +621,13 @@
    "licence": "CC0 1.0",
    "url": "https://freesound.org/people/Nox_Sound/sounds/829623/",
    "preuve": "licence donnée par l'API de Freesound (apiv2/sounds/829623) : creativecommons.org/publicdomain/zero/1.0"
+  },
+  "fs-855248": {
+   "nom": "« Real Bullet Flyby Sound » (freesound 855248)",
+   "auteur": "qubodup",
+   "licence": "CC0 1.0",
+   "url": "https://freesound.org/s/855248/",
+   "preuve": "Partisan Project assets/audio/shooter/manifest.json: « source: Freesound, CC0 only », entry flyby/flyby-1.mp3 (id 855248, author qubodup)"
   },
   "g_lamont": {
    "nom": "« Whip Cracks » (freesound 118068)",
@@ -677,6 +754,13 @@
    "licence": "CC0 1.0",
    "url": "https://github.com/1993velezpadilla-source/config-old-3/tree/main/assets/audio/cc0_horror_library/household_foley_owlishmedia",
    "preuve": "SOURCE.txt du dossier : « Title: 202 More Sound Effects ; Creator: OwlishMedia ; License: CC0 / Public Domain dedication ; Source: https://opengameart.org/content/202-more-sound-effects » ; même pack déclaré CC0-1.0 par novincode/atomcut-library"
+  },
+  "partisan-foley": {
+   "nom": "Partisan Project handling bank (assets/audio/foley/, 42 takes: click, clunk, ratchet, slide, hit, handle, long)",
+   "auteur": "Supplied by the project owner (Vincent De Nil)",
+   "licence": "Cleared by the owner for this public repository",
+   "url": "https://vincentdn.github.io/partisan-project/assets/audio/foley/manifest.json",
+   "preuve": "Partisan Project shared/mech.js and docs/adr/0009-foley-restored.md: « checked and cleared by the owner »; owner decision D1 (docs/plans/2026-11-14-polish-pass.md): « D1 foley: cleared for the public repo »"
   },
   "philraco": {
    "nom": "« Hard Stomp Sound » (freesound 512483), largethud.ogg de Space Station 14",
@@ -5672,6 +5756,377 @@
    "source": "brunoboselli",
    "fichier": "imp/pressure_release.ogg",
    "detail": "superposés"
+  },
+  {
+   "id": "hf_click-1",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/click/bolt-0042_94s.wav",
+   "detail": "start 6 ms before the peak, at most 0.25 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_click-2",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/click/bolt-0065_15s.wav",
+   "detail": "start 6 ms before the peak, at most 0.25 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_click-3",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/click/revolver-0435_23s.wav",
+   "detail": "start 6 ms before the peak, at most 0.25 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_click-4",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/click/bolt-0039_83s.wav",
+   "detail": "start 6 ms before the peak, at most 0.25 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_click-5",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/click/pump-0164_97s.wav",
+   "detail": "start 6 ms before the peak, at most 0.25 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_click-6",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/click/sar-0500_12s.wav",
+   "detail": "start 6 ms before the peak, at most 0.25 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_clunk-1",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/clunk/bolt-0125_61s.wav",
+   "detail": "start 6 ms before the peak, at most 0.3 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_clunk-2",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/clunk/bolt-0076_36s.wav",
+   "detail": "start 6 ms before the peak, at most 0.3 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_clunk-3",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/clunk/pump-0157_58s.wav",
+   "detail": "start 6 ms before the peak, at most 0.3 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_clunk-4",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/clunk/revolver-0413_02s.wav",
+   "detail": "start 6 ms before the peak, at most 0.3 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_clunk-5",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/clunk/revolver-0398_20s.wav",
+   "detail": "start 6 ms before the peak, at most 0.3 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_clunk-6",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/clunk/bolt-0129_86s.wav",
+   "detail": "start 6 ms before the peak, at most 0.3 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_ratchet-1",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/ratchet/pump-0138_38s.wav",
+   "detail": "start at the onset, at most 0.6 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_ratchet-2",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/ratchet/bow-0232_15s.wav",
+   "detail": "start at the onset, at most 0.6 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_ratchet-3",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/ratchet/bow-0208_12s.wav",
+   "detail": "start at the onset, at most 0.6 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_ratchet-4",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/ratchet/bolt-0058_78s.wav",
+   "detail": "start at the onset, at most 0.6 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_ratchet-5",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/ratchet/bolt-0060_64s.wav",
+   "detail": "start at the onset, at most 0.6 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_ratchet-6",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/ratchet/sar-0532_41s.wav",
+   "detail": "start at the onset, at most 0.6 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_slide-1",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/slide/bolt-0083_05s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_slide-2",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/slide/bolt-0068_16s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_slide-3",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/slide/bolt-0074_49s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_slide-4",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/slide/bolt-0025_12s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_slide-5",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/slide/pump-0167_72s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_slide-6",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/slide/sar-0494_73s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_hit-1",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/bolt-0075_79s.wav",
+   "detail": "start 6 ms before the peak, at most 0.35 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_hit-2",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/bolt-0039_37s.wav",
+   "detail": "start 6 ms before the peak, at most 0.35 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_hit-3",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/bolt-0043_31s.wav",
+   "detail": "start 6 ms before the peak, at most 0.35 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_hit-4",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/bolt-0029_02s.wav",
+   "detail": "start 6 ms before the peak, at most 0.35 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_hit-5",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/sapistol-0280_34s.wav",
+   "detail": "start 6 ms before the peak, at most 0.35 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_hit-6",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/pump-0142_41s.wav",
+   "detail": "start 6 ms before the peak, at most 0.35 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_handle-1",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0494_00s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_handle-2",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0505_05s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_handle-3",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0504_10s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_handle-4",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0499_49s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_handle-5",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0527_74s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_handle-6",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0554_24s.wav",
+   "detail": "start at the onset, at most 0.4 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_long-1",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/long/bolt-0034_58s.wav",
+   "detail": "start at the onset, at most 0.8 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_long-2",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/long/bolt-0069_49s.wav",
+   "detail": "start at the onset, at most 0.8 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_long-3",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/long/bolt-0019_58s.wav",
+   "detail": "start at the onset, at most 0.8 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_long-4",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/long/bolt-0052_26s.wav",
+   "detail": "start at the onset, at most 0.8 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_long-5",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/long/sar-0495_80s.wav",
+   "detail": "start at the onset, at most 0.8 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "hf_long-6",
+   "pack": "handling",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/long/sar-0552_84s.wav",
+   "detail": "start at the onset, at most 0.8 s, high-pass 50 Hz, level matched to the bank (active RMS), limiter at -1 dBFS"
+  },
+  {
+   "id": "pt_ric-1",
+   "pack": "ballistics",
+   "source": "fs-30932",
+   "fichier": "Partisan Project assets/audio/shooter/ricochet/ricochet-1.mp3",
+   "detail": "start at the onset, at most 1.0 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "pt_ric-2",
+   "pack": "ballistics",
+   "source": "fs-392975",
+   "fichier": "Partisan Project assets/audio/shooter/ricochet/ricochet-2.mp3",
+   "detail": "start at the onset, at most 0.8 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "pt_ric-3",
+   "pack": "ballistics",
+   "source": "fs-345413",
+   "fichier": "Partisan Project assets/audio/shooter/ricochet/ricochet-3.mp3",
+   "detail": "start at the onset, at most 0.7 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "pt_flyby-1",
+   "pack": "ballistics",
+   "source": "fs-855248",
+   "fichier": "Partisan Project assets/audio/shooter/flyby/flyby-1.mp3",
+   "detail": "start at the onset, at most 0.2 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "pt_flyby-2",
+   "pack": "ballistics",
+   "source": "fs-386854",
+   "fichier": "Partisan Project assets/audio/shooter/flyby/flyby-2.mp3",
+   "detail": "start at the onset, at most 0.4 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "pt_flyby-3",
+   "pack": "ballistics",
+   "source": "fs-505238",
+   "fichier": "Partisan Project assets/audio/shooter/flyby/flyby-3.mp3",
+   "detail": "start at the onset, at most 0.9 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "g_pt_sniper_pov-1",
+   "pack": "ballistics",
+   "source": "fs-433858",
+   "fichier": "Partisan Project assets/audio/shooter/shot-sniper/shot-sniper-1.mp3",
+   "detail": "start at the onset, at most 1.6 s, high-pass 35 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "g_pt_sniper_pov-2",
+   "pack": "ballistics",
+   "source": "fs-484036",
+   "fichier": "Partisan Project assets/audio/shooter/shot-sniper/shot-sniper-2.mp3",
+   "detail": "start at the onset, at most 1.6 s, high-pass 35 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "g_pt_sniper_pov-3",
+   "pack": "ballistics",
+   "source": "fs-563015",
+   "fichier": "Partisan Project assets/audio/shooter/shot-sniper/shot-sniper-4.mp3",
+   "detail": "start at the onset, at most 1.8 s, high-pass 35 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "f_casing_wood-1",
+   "pack": "handling",
+   "source": "fs-370805",
+   "fichier": "Partisan Project assets/audio/shooter/shells/shells-1.mp3",
+   "detail": "start at the onset, at most 0.45 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "f_casing_wood-2",
+   "pack": "handling",
+   "source": "fs-371199",
+   "fichier": "Partisan Project assets/audio/shooter/shells/shells-2.mp3",
+   "detail": "start at the onset, at most 0.35 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
   }
  ]
 }

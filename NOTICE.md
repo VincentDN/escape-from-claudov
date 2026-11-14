@@ -11,6 +11,9 @@ What remains under its own terms:
 
 1. **Sounds and voices** (`assets/sfx/`): each source keeps its license, listed in `assets/sfx/credits.json`. Most are CC0; the CC BY
    ones require crediting their author, as that file does.
+   - Weapon handling bank (`assets/sfx/handling/hf_*`, 42 takes from Partisan Project): supplied by the owner, checked and cleared by
+     the owner for this public repository. The other Partisan sounds (`f_casing_wood`, `assets/sfx/ballistics/`) are Freesound CC0,
+     authors and source pages in `assets/sfx/credits.json`.
 2. **Textures, skies and HDRI** (`assets/tex/`, `assets/sky/`, `assets/vendor/hdri/`): Poly Haven and ambientCG, CC0 (`assets/tex/credits.json`).
 3. **Libraries**: three.js r147 (MIT, notice at the top of `assets/vendor/three-r147.js`); PeerJS (MIT), loaded from jsDelivr for online lobbies.
 4. **Soldier animations**: none are shipped. The game runs on the engine's procedural poses. To add baked clips, bake them from your own

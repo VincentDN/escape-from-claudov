@@ -204,6 +204,10 @@ const GUN_HEAVY = {
   pistol50: { drive: 1.6, low: 2, sub: [100, 42, 0.18, 0.04] },
 };
 for (const [k, h] of Object.entries(GUN_HEAVY)) GUNSND[k].heavy = h;
+/* P2 (docs/audio-events.md): the L96's own first-person shot was the thinnest of the heavy class (6 % of its first 250 ms under 200 Hz,
+   against 21 % for the SVD and 41 % for the Barrett); Partisan's recorded rifle shots (pack ballistics) replace it when loaded. They carry
+   their own rolling tail, so the far roll is not added; povGain matches their first 60 ms to the old take (8 dB lower). */
+GUNSND.sniper.pov2 = 'g_pt_sniper_pov'; GUNSND.sniper.pov2Gain = 0.39;
 /* Espace autour des tirs : envois vers la réverbération (vue subjective, monde) et vers les échos de rue (multiplie S.echo). Le navigateur
    normalise la réponse impulsionnelle très bas : à 0,12, la réverbération arrivait 26 dB sous la queue enregistrée du tir, inaudible (retour du
    propriétaire en 2.32.3 : « les armes manquent de réverbération, de présence »). Réverbération et échos reviennent par le bus des armes : l'écrêtage
@@ -331,22 +335,24 @@ function sfxGun(kind, pos, who) {
   if (d > S.maxD) return;
   const id = S.sup ? (pos ? (d < GUN_NEAR ? 'g_sup_near' : 'g_sup_far') : (S.cls === 'pistol' || S.cls === 'smg' ? 'g_sup_pistol_pov' : 'g_sup_rifle_pov'))
     : pos ? (d < GUN_NEAR ? 'g_' + S.bank + '_near' : 'g_far_' + S.cls) : 'g_' + S.bank + '_pov';
-  if (!sfxHas(id)) return sfxGunSynth(kind, pos, d);
+  const alt = !pos && S.pov2 && !(typeof EFC_SND !== 'undefined' && !EFC_SND.on) && sfxHas(S.pov2) ? S.pov2 : null; // replacement first-person bank
+  if (!sfxHas(id) && !alt) return sfxGunSynth(kind, pos, d);
   if (!auAfford(pos ? 5 : 7, pos ? d : 0)) return;
   const ctx = AU.ctx, t = ctx.currentTime + (pos ? Math.min(d / 343, 0.5) : 0), far = clamp(d / 80, 0, 1);
   // à l'intérieur (peu de ciel au-dessus du joueur) : la queue extérieure enregistrée s'éteint plus tôt et la salle prend le relais
   const inside = 1 - clamp(VM.sky === undefined ? 1 : VM.sky, 0, 1);
   const H = (!pos || d < GUN_NEAR) && !S.sup ? S.heavy : null; // poids des armes lourdes (GUN_HEAVY)
   const g0 = ctx.createGain(); g0.gain.value = (pos ? S.world * (d < GUN_NEAR ? GUN_SMP.near : GUN_SMP.far) : S.fp * GUN_SMP.pov) * (S.smp || 1) * (GUN_CLS_GAIN[S.cls] || 1) * (H ? H.drive : 1) * rand(0.93, 1.0);
-  const v = sfxPlay(id, g0, t, { rate: rand(0.97, 1.03) * (S.rate || 1) }); if (!v) return;
+  const v = sfxPlay(alt || id, g0, t, { rate: rand(0.97, 1.03) * (S.rate || 1), gain: alt ? S.pov2Gain : 1 }); if (!v) return;
   let out = g0;
   if (H) {
     out = ctx.createBiquadFilter(); out.type = 'lowshelf'; out.frequency.value = 150; out.gain.value = H.low; g0.connect(out);
     const [f0, f1, du, gs] = H.sub; tn(g0, t, du, f0 * rand(0.95, 1.05), f1, 'sine', gs, 0.003);
   }
   const vk = H && H.verb || 1;
-  if (H && H.roll && !pos && sfxHas('g_far_' + S.cls)) sfxPlay('g_far_' + S.cls, g0, t + H.roll[1], { gain: H.roll[0], rate: rand(0.97, 1.03) });
+  if (H && H.roll && !pos && !alt && sfxHas('g_far_' + S.cls)) sfxPlay('g_far_' + S.cls, g0, t + H.roll[1], { gain: H.roll[0], rate: rand(0.97, 1.03) });
   if (pos) out.connect(auOut(pos, lerp(GUN_VERB.world, GUN_VERB.inside, inside) * vk, 1, 0.8, 5, AU.wpn));
+  if (pos && S.brass && d < 10 && Math.random() < 0.35 && CURMAP.def) { const sf = surfaceAt(pos); if (sf !== 'water') sfxCasing(sf, pos, t + rand(0.35, 0.5)); } // a shooter close by: his casings
   else { out.connect(AU.fpBus); const vb = ctx.createGain(); vb.gain.value = lerp(GUN_VERB.pov, GUN_VERB.inside, inside) * vk; g0.connect(vb); vb.connect(AU.verb); }
   const e = ctx.createGain(); e.gain.value = S.echo * GUN_VERB.echo * vk * (pos ? 0.5 + far * 0.8 : 1) * (1 - inside * 0.7); g0.connect(e); e.connect(AU.echo);
   if (inside > 0.35) { v.g.gain.setValueAtTime(1, t + 0.16); v.g.gain.setTargetAtTime(0, t + 0.16, 0.06 + 0.2 * (1 - inside)); }
@@ -357,11 +363,27 @@ function sfxGun(kind, pos, who) {
     // fusils de précision : l'oreille siffle (un seul sifflement à la fois)
     if (H && H.ring && sfxHas('p_ring')) { sfxFadeOut(AU.ringV, t + 0.02, 0.12); AU.ringV = sfxPlay('p_ring', uiOut(H.ring), t + 0.06, { rate: rand(0.98, 1.02) }); }
     // vue subjective : douilles qui retombent (une fois sur deux en rafale), étuis du fusil à pompe, mix dégagé
-    const sf = PL.ent && CURMAP.def ? surfaceAt(PL.ent.pos) : 'concrete', soft = sf === 'dirt' || sf === 'grass' || sf === 'snow'; // sans carte (menus, banc audio) : sol dur
-    if (S.brass && sf !== 'water' && (AU.brassN = (AU.brassN || 0) + 1) % 2) sfxPlay(soft ? 'f_brass_soft' : 'f_brass', uiOut(soft ? 0.1 : 0.07), t + rand(0.3, 0.45), { rate: rand(0.9, 1.1) });
+    const sf = PL.ent && CURMAP.def ? surfaceAt(PL.ent.pos) : 'concrete'; // sans carte (menus, banc audio) : sol dur
+    if (S.brass && sf !== 'water' && (AU.brassN = (AU.brassN || 0) + 1) % 2) sfxCasing(sf, null, t + rand(0.3, 0.45));
     if (S.shells) sfxPlay('f_shells', uiOut(0.12), t + 0.5 + rand(0, 0.08), { rate: rand(0.95, 1.05) });
     duckMix(t, S);
   }
+}
+/* Casings landing, by surface (P2): soft ground f_brass_soft, wood the recorded casings on boards (f_casing_wood, pack handling),
+   metal the hard take a little higher, the rest f_brass. pos: a shooter close by (null: the player). Returns the bank played. */
+const CASING_SURF = { dirt: 'soft', grass: 'soft', snow: 'soft', sand: 'soft', crushedice: 'soft', wood: 'wood', paintwood: 'wood', boards: 'wood',
+  metal: 'metal', hull: 'metal', rust: 'metal', grating: 'metal' };
+function sfxCasingId(sf) {
+  const k = CASING_SURF[sf], neu = !(typeof EFC_SND !== 'undefined' && !EFC_SND.on);
+  if (k === 'soft' || (!neu && (sf === 'dirt' || sf === 'grass' || sf === 'snow'))) return 'f_brass_soft';
+  if (neu && k === 'wood' && sfxHas('f_casing_wood')) return 'f_casing_wood';
+  return 'f_brass';
+}
+function sfxCasing(sf, pos, t) {
+  const id = sfxCasingId(sf), soft = id === 'f_brass_soft', metal = CASING_SURF[sf] === 'metal' && !(typeof EFC_SND !== 'undefined' && !EFC_SND.on);
+  const o = pos ? auOut(pos, 0.05, 0.5, 1.4, 2) : uiOut(soft ? 0.1 : id === 'f_casing_wood' ? 0.06 : 0.07);
+  sfxPlay(id, o, t, { rate: rand(0.9, 1.1) * (metal ? 1.12 : 1) });
+  return id;
 }
 /* Dosage des échantillons de tir (banc audio, README « Son et ressenti des armes ») : les enregistrements ont des crêtes bien plus
    marquées que la synthèse (17 dB entre crête et niveau efficace au lieu de 7) ; on les monte de 10 dB en vue subjective (6 dB
@@ -546,7 +568,9 @@ function mechId(kind, fam) {
   return null;
 }
 function sfxMech(kind, delay = 0, pos = null, fam = null) {
-  if (!AU.ready) return; const t = AU.ctx.currentTime + delay;
+  if (!AU.ready) return;
+  if (typeof efcHandlingPlay === 'function' && efcHandlingPlay(kind, delay, pos, fam)) return; // Partisan handling foley (src/efc/45-efc-sounds.js), else as before
+  const t = AU.ctx.currentTime + delay;
   const id = mechId(kind, fam);
   if (id && sfxHas(id)) {
     let rate = rand(0.96, 1.04);
@@ -680,7 +704,7 @@ function sfxImpact(pos, m) {
     const t = AU.ctx.currentTime + Math.min(d / 343, 0.4), o = auOut(pos, 0.12, 0.75, 0.9, 5);
     sfxPlay(id, o, t, { rate: rand(0.93, 1.07) });
     // de temps en temps, la balle ricoche sur une matière dure
-    if ((id === 'i_concrete' || id === 'i_metal') && d < 30 && Math.random() < 0.1) sfxPlay('i_ric', o, t + rand(0.005, 0.02), { gain: 0.45, rate: rand(0.9, 1.1) });
+    if ((id === 'i_concrete' || id === 'i_metal') && d < 30 && Math.random() < 0.1) sfxPlay(sfxRicId(), o, t + rand(0.005, 0.02), { gain: 0.45, rate: rand(0.9, 1.1) });
     return;
   }
   const t = AU.ctx.currentTime + Math.min(d / 343, 0.4), o = auOut(pos, 0.12, 0.9, 0.9, 5);
@@ -741,9 +765,12 @@ function sfxHurt(dmg = 30) {
   const f = AU.duck.frequency; f.cancelScheduledValues(t); f.setValueAtTime(f.value, t); f.linearRampToValueAtTime(1400, t + 0.015); f.exponentialRampToValueAtTime(20000, t + 0.45);
 }
 /* Balle qui passe près de l'oreille : claquement net puis sifflement qui s'éloigne */
+/* P2: Partisan's ricochets and fly-bys (pack ballistics) join the engine's takes, one time in two and one in three */
+function sfxRicId() { return sfxHas('pt_ric') && Math.random() < 0.5 && !(typeof EFC_SND !== 'undefined' && !EFC_SND.on) ? 'pt_ric' : 'i_ric'; }
+function sfxWhizId() { return sfxHas('pt_flyby') && Math.random() < 0.34 && !(typeof EFC_SND !== 'undefined' && !EFC_SND.on) ? 'pt_flyby' : 'i_whiz'; }
 function sfxWhiz(pos) {
   if (!AU.ready) return; const t = AU.ctx.currentTime, o = auOut(pos, 0.05, 1.8);
-  if (sfxPlay('i_whiz', o, t, { gain: 0.6, rate: rand(0.92, 1.08) })) return;
+  if (sfxPlay(sfxWhizId(), o, t, { gain: 0.6, rate: rand(0.92, 1.08) }) || sfxPlay('i_whiz', o, t, { gain: 0.6, rate: rand(0.92, 1.08) })) return;
   nz(o, t, 0.012, 'bandpass', 1800, 1200, 1, 0.5);
   nz(o, t, 0.16, 'bandpass', 2800, 700, 2, 0.6, 0.012); tn(o, t, 0.13, 900, 300, 'sine', 0.2, 0.01);
 }

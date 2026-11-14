@@ -26,19 +26,64 @@ function efcRaidModeStart() {
   Object.assign(R, { state: 'live', len: EFC.cfg.raidMinutes * 60, hold: 0, holdId: '', extract: '', overAt: -1, overSent: false, ended: false, summary: null, killer: '', secT: 0, done: {} });
   efcRaidKitReset();
   efcSquadAssign();
+  efcRaidPlan(true); // players are placed first: the inserts in use are fixed now, then the Wardens are placed around them
+  efcEmit('raid:placed');
   for (const e of entities) e.out = false;
   const kit = efcCall('raid:kit');
   EFC.inv = kit && kit.slots ? kit : null; // null without the items package: the engine class loadout is used
 }
 function efcRaidBegun() { PL.efcKiller = ''; efcEmit('raid:begin'); }
 
-/* Insertion point of the player's squad, members spread around it; null falls back to the engine's free-for-all spawn */
+/* ---------- Insert plan: which insert each player squad uses, decided at raid start before any Warden is placed ----------
+   Every machine of a lobby derives the same plan without messages: the squads are those of the lobby list, the seed comes from the
+   lobby code and the map. The first squad gets a seeded insert (EFC.cfg.insertForce forces it, for tests); each next squad, in squad
+   order, the unused insert farthest from those already taken. Offline the seed is random (EFC.cfg.insertSeed fixes it). */
+const EFC_INS = { key: '', seed: 0, squads: [], by: {}, used: [] };
+function efcRaidSquadList() {
+  const S = new Set([0]);
+  if (MATCH.online && NET.players) { S.clear(); for (const id of NET.players.keys()) { const s = efcCall('squad:of', id); if (typeof s === 'number') S.add(s); } if (!S.size) S.add(0); }
+  return [...S].sort((a, b) => a - b);
+}
+function efcStrHash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return h >>> 0; }
+function efcRaidPlan(fresh) {
+  const md = efcCall('map:data'), L = md && Array.isArray(md.inserts) ? md.inserts : [];
+  const P = EFC_INS, map = typeof MAPL !== 'undefined' ? MAPL.id : '';
+  if (fresh || P.key !== map) {
+    P.key = map; P.by = {}; P.used = [];
+    P.seed = MATCH.online ? efcStrHash((NET.code || '') + '|' + map) : typeof EFC.cfg.insertSeed === 'number' ? EFC.cfg.insertSeed >>> 0 : (Math.random() * 4294967296) >>> 0;
+    P.squads = [];
+    for (const s of efcRaidSquadList()) efcRaidPlanAdd(s, L);
+  }
+  return P;
+}
+function efcRaidPlanAdd(s, L) {
+  const P = EFC_INS; if (P.by[s] !== undefined || !L.length) return;
+  let idx;
+  if (!P.used.length) idx = typeof EFC.cfg.insertForce === 'number' ? ((EFC.cfg.insertForce % L.length) + L.length) % L.length : Math.floor(efcRng(P.seed)() * L.length);
+  else {
+    let bd = -1; const free = L.map((p, i) => i).filter((i) => !P.used.includes(i)), pool = free.length ? free : L.map((p, i) => i);
+    for (const i of pool) { const d = Math.min(...P.used.map((j) => Math.hypot(L[i].x - L[j].x, L[i].z - L[j].z))); if (d > bd) { bd = d; idx = i; } }
+  }
+  P.by[s] = idx; P.squads.push(s); if (!P.used.includes(idx)) P.used.push(idx);
+}
+/* Service 'raid:inserts': the inserts in use this raid ({ x, z, y, i, squad }) and the squad count; Wardens are placed from it */
+efcProvide('raid:inserts', () => {
+  if (!efcRaidMode()) return { used: [], squads: 0 };
+  const P = efcRaidPlan(false), md = efcCall('map:data'), L = (md && md.inserts) || [];
+  return { used: P.squads.map((s) => ({ ...L[P.by[s]], i: P.by[s], squad: s })).filter((p) => p.x !== undefined), squads: P.squads.length };
+});
+
+/* Insertion point of the player's squad; members line up behind the leader (inside the shelter: ins.line), else spread around it.
+   null falls back to the engine's free-for-all spawn */
 function efcRaidInsert(e) {
   const md = efcCall('map:data'), L = md && Array.isArray(md.inserts) ? md.inserts : null;
   if (!L || !L.length) return null;
-  const sq = efcSquadOf(e), ins = L[(typeof sq === 'number' ? sq : 0) % L.length];
+  const sq = efcSquadOf(e), s = typeof sq === 'number' ? sq : 0;
+  efcRaidPlan(false); efcRaidPlanAdd(s, L); // a squad that joined after the start takes the next insert
+  const ins = L[EFC_INS.by[s]];
   const k = Math.max(0, efcSquadMembers(sq).indexOf(e)), a = k * 2.1 + (ins.yaw || 0), r = k ? 1.6 : 0;
-  const x = ins.x + Math.sin(a) * r, z = ins.z + Math.cos(a) * r, y = gy0(x, z), id = navNode(x, y, z);
+  const x = ins.line ? ins.x + ins.line[0] * 1.2 * k : ins.x + Math.sin(a) * r, z = ins.line ? ins.z + ins.line[1] * 1.2 * k : ins.z + Math.cos(a) * r;
+  const y = gy0(x, z), id = navNode(x, y, z);
   e.efcYaw = ins.yaw || 0;
   return id >= 0 && Math.hypot(NAV.nx[id] - x, NAV.nz[id] - z) < 4 ? new V3(NAV.nx[id], NAV.ny[id], NAV.nz[id]) : new V3(x, y, z);
 }

@@ -201,6 +201,7 @@ function botSense(b, now) {
   let best = null, bd = 1e9, glance = null, gw = 0;
   for (const e of entities) {
     if (!e.alive || e.off || e.inMecha || allied(e, b)) continue; // (un pilote à bord ne se voit pas : on tire sur le mecha, mechaBotsShoot)
+    if (efcRaidMode() && efcWardenGrace(e)) { b.aw.delete(e); continue; } // raid: insertion grace, a Warden neither sees nor hears it (src/efc/40-efc-wardens.js)
     const dx = e.pos.x - b.pos.x, dz = e.pos.z - b.pos.z, d = hyp(dx, dz);
     let aw = b.aw.get(e) || 0;
     if (d > 100) { if (aw > 0) b.aw.set(e, Math.max(0, aw - D.see * sdt)); continue; }
@@ -259,7 +260,7 @@ function botSense(b, now) {
       for (let i = soundEvents.length - 1; i >= 0; i--) {
         const s = soundEvents[i]; if (now - s.t > 0.6 || s.t <= b.heardT) break;
         const ds = s.pos.distanceTo(b.pos);
-        if (soundFoe(s, b) && ds < (s.quiet ? 9 : s.loud ? 60 : 34)) {
+        if (soundFoe(s, b) && ds < (s.quiet ? 9 : s.loud ? 60 : 34) && !(efcRaidMode() && s.who && efcWardenGrace(s.who))) {
           b.heardT = s.t; b.lastKnown.copy(botGuess(b.pos, s.pos, 2.5, 0.14)); b.lastSeenT = now - 2.5; b.target = null; botLookAt(b, b.lastKnown, now, 1.1); break;
         }
       }

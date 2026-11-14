@@ -13,7 +13,7 @@ function efcSumShow(S) {
   const st = (label, v) => `<div class="st"><span>${label}</span><b>${esc(v)}</b></div>`;
   $('efcSumStats').innerHTML = st('Raid time', fmtTime(S.time || 0)) + st('Kills', S.kills || 0) + (res === 'extracted' ? st('Extract', S.extract || 'Unknown') : '');
   const items = (res === 'extracted' && S.items) || [];
-  $('efcSumItems').innerHTML = items.length ? `<p class="efc-gh">Brought out</p>` + items.map((it, i) => efcUiRow(it, { key: 'sum-' + i })).join('') : '';
+  $('efcSumItems').innerHTML = items.length ? `<p class="efc-gh">Brought out</p>` + items.map((it, i) => efcThumbRow(it, { key: 'sum-' + i })).join('') : '';
   const total = S.value != null ? S.value : items.reduce((s, it) => s + efcUiItemV(it), 0);
   $('efcSumTot').innerHTML = items.length ? `<span>Total value <b>${efcUiVal(total)}</b></span>` : res === 'extracted' ? '<span>You came out with nothing.</span>' : '<span>Everything you carried is lost.</span>';
   $('efcSumAgain').textContent = EFC_SUM.online ? 'Back to the squad' : 'Raid again';

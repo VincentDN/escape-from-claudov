@@ -19,7 +19,7 @@ run node tools/dev/efc/test-sounds.mjs
 run node tools/dev/efc/test-bench.mjs
 run node tools/dev/efc/test-map.mjs
 run node tools/dev/efc/test-spawns.mjs
-run node tools/dev/efc/test-e2e.mjs
+run env MAP=sable node tools/dev/efc/test-e2e.mjs
 run env MAP=claudov node tools/dev/efc/test-e2e.mjs
 run node tools/dev/efc/test-net.mjs
 run node tools/dev/efc/test-e2e-net.mjs

@@ -2,7 +2,7 @@
 // summary -> hideout has the loot; then a second raid: die -> body holds the kit -> gear is gone from the stash.
 // node tools/dev/efc/test-e2e.mjs ; MAP=claudov
 import { openGame, simRun } from './harness.mjs';
-const MAP = process.env.MAP || 'simoun', KEEP = 'PL.ent.health = 100; PL.ent.protT = 1;'; // spawn protection: a single lethal hit cannot end the looting part
+const MAP = process.env.MAP || 'claudov', KEEP = 'PL.ent.health = 100; PL.ent.protT = 1;'; // spawn protection: a single lethal hit cannot end the looting part
 let fails = 0;
 const check = (c, name, info) => { console.log((c ? 'ok   ' : 'FAIL ') + name + (info === undefined ? '' : ' ' + JSON.stringify(info).slice(0, 500))); if (!c) fails++; };
 const { browser, page, errors } = await openGame({ w: 960, h: 540, settings: { map: MAP, mode: 'raid' }, init: 'try{localStorage.removeItem("efc_stash_v1")}catch(e){}' });

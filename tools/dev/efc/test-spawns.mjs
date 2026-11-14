@@ -54,11 +54,13 @@ for (const id of maps) {
       raidable, table: def.efc ? true : !!EFC.raidable[id], hand: !!def.efc, offered: efcCall('map:raidable', id), why: md ? md.why || 'hand-made raid data' : 'no map data', bad, rule: md && md.rule };
   }, id);
   ok(st.loaded === id, `${id}: map loaded`, st.loaded);
-  ok(st.raidable === st.table, `${id}: EFC.raidable table matches the derived data (${st.raidable})`, { table: st.table });
+  // the table may be stricter than the derived data (a map can have hidden inserts and still fail the play checks below), never looser
+  ok(!st.table || st.raidable, `${id}: a map offered for raids has hidden inserts`, { table: st.table, derived: st.raidable });
   ok(st.bad.length === 0, `${id}: inserts obey the hidden-insert rules`, st.bad);
-  if (st.hand || ['claudov', 'simoun'].includes(id)) ok(st.raidable, `${id}: must be raidable`);
+  if (st.hand) ok(st.raidable, `${id}: must be raidable`);
   const line = { map: id, wardens: st.n, with4squads: st.n4, posts: st.posts, inserts: st.inserts, raidable: st.raidable, why: st.why };
-  if (!st.raidable) { summary.push(line); console.log('SUMMARY ' + JSON.stringify(line)); continue; }
+  line.offered = st.table;
+  if (!st.raidable || (!st.table && !process.env.ALL)) { summary.push(line); console.log('SUMMARY ' + JSON.stringify(line)); continue; } // ALL=1 also plays the maps that are not offered
   const forces = id === 'claudov' ? [...Array(st.inserts).keys()].flatMap((i) => Array(STARTS).fill(i)) : Array(STARTS).fill(null);
   const res = { starts: 0, minNear: 999, hurt: 0, over: 0, used: {} };
   for (const f of forces) {

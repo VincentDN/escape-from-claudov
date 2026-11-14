@@ -2,7 +2,7 @@
 // node tools/dev/efc/test-net.mjs   (needs a build: python3 build.py). Exits non-zero on failure.
 import { openPair, createLobby, joinLobby, launch, waitInMatch, stepBoth, settle } from './net2.mjs';
 
-const MAP = process.env.MAP || 'simoun', KEEP = 'PL.ent.health = 100;', EFC_HOLD = 7;
+const MAP = process.env.MAP || 'claudov', KEEP = 'PL.ent.health = 100;', EFC_HOLD = 7;
 // MODES.raid comes from the RAID package; when it is missing in this worktree, a minimal stand-in (test page only)
 const RAID_STANDIN = `window.EFC_RAID_STANDIN = () => { if (!MODES.raid) { MODES.raid = Object.assign({}, MODES.tdm, { name: 'Raid', btn: 'Raid', sub: 'Raid', key: 'limit' }); return true; } return false; };`;
 let fails = 0;
@@ -75,7 +75,9 @@ try {
   ok(bh.myTeam === 0 && bg.myTeam === 0 && bh.rTeam === 0 && bg.rTeam === 0, '(b) every human keeps team 0');
   ok(bh.remote && bh.rSquad === 1, '(b) host sees the guest as remote in squad 2', bh);
   ok(bg.remote && bg.rSquad === 0, '(b) guest sees the host as remote in squad 1', bg);
-  ok(bh.bots > 0 && bh.botsW && bh.allBots, '(b) all host bots active, squad w', bh);
+  // since P1 the raid fields the map's Warden number (plus one per extra squad), not every bot
+  const want = await host.evaluate(() => (typeof efcWardenNumber === 'function' ? efcWardenNumber(2) : null));
+  ok(bh.bots > 0 && bh.botsW && (want == null ? bh.allBots : bh.bots === want), '(b) the host fields the raid\'s Warden number, squad w', { ...bh, want });
   ok(bg.bots > 0 && bg.botsW, '(b) guest copies of host bots carry squad w', bg);
   const so = [await host.evaluate((gid) => [efcCall('squad:of', gid), efcCall('squad:of', NET.me)], gid), await guest.evaluate((hid) => [efcCall('squad:of', hid), efcCall('squad:of', NET.me)], h0.me)];
   ok(JSON.stringify(so) === '[[1,0],[0,1]]', "(b) service 'squad:of' gives lobby squads on both machines", so);

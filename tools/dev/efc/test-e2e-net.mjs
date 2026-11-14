@@ -1,7 +1,7 @@
 // Two-client raid with the real packages: shared loot, a looted body, squads. Build first (python3 build.py).
 // node tools/dev/efc/test-e2e-net.mjs
 import { openPair, createLobby, joinLobby, launch, waitInMatch, stepBoth, settle } from './net2.mjs';
-const MAP = process.env.MAP || 'simoun', KEEP = 'PL.ent.health = 100; PL.ent.protT = 1;';
+const MAP = process.env.MAP || 'claudov', KEEP = 'PL.ent.health = 100; PL.ent.protT = 1;';
 let fails = 0;
 const ok = (c, name, info) => { console.log((c ? 'ok   ' : 'FAIL ') + name + (info === undefined ? '' : ' ' + JSON.stringify(info).slice(0, 400))); if (!c) fails++; };
 const count = (l) => l.reduce((s, it) => s + (it.n || 1), 0);

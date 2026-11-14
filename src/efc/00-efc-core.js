@@ -223,11 +223,12 @@ efcProvide('map:data', () => {
 /* Can the map host a raid (offered in the Raid map list and the raid lobby)? Maps with hand-made raid data can; the loaded map answers
    from its derived data; the others from EFC.raidable, the result of tools/dev/efc/test-spawns.mjs for every map (that test fails when
    this table is out of date). */
-EFC.raidable = { claudov: true, simoun: true };
+// 14 November 2026 run: Simoun has no hidden spot at its edge (open desert); Givre, Meltem and Tephra are too small for a Warden to be
+// reinforced away from the player, and Givre starts one within 40 m. They are not offered.
+EFC.raidable = { claudov: true, sable: true, embruns: true, floreal: true, stratus: true, lotissement: true };
 efcProvide('map:raidable', (id) => {
   if (!id || typeof MAP_DEFS === 'undefined' || !MAP_DEFS[id]) return false;
   if (MAP_DEFS[id].efc) return true;
-  if (typeof MAPL !== 'undefined' && MAPL.id === id && MAPL.state === 'ready') { const d = efcCall('map:data'); if (d) return d.raidable !== false && d.inserts.length > 0; }
   return !!EFC.raidable[id];
 });
 

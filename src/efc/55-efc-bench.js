@@ -71,7 +71,8 @@ function efcBenchDraw(dt) {
 }
 /* Draws the bench scene to the screen with its own render state, then puts the engine's back */
 function efcBenchRender(B) {
-  if (!B.env) { try { efcBenchEnv(B); } catch (e) { B.env = 'none'; } }
+  // the light probe is built on the second frame, so the first one is not held up by its conversion
+  if (!B.env && B.firstAt !== null) { try { efcBenchEnv(B); } catch (e) { B.env = 'none'; } B.drawn = ''; }
   const r = renderer, prev = {
     tm: r.toneMapping, tme: r.toneMappingExposure, enc: r.outputEncoding, pcl: r.physicallyCorrectLights, sm: r.shadowMap.needsUpdate,
     rt: r.getRenderTarget(), ca: r.getClearAlpha(), info: { calls: r.info.render.calls, tri: r.info.render.triangles },

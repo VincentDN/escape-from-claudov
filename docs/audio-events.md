@@ -90,3 +90,7 @@ weapon per family (normal and empty, the L96 bolt, the shotgun shell cycle) play
 times, inventory sounds follow their events, and with both packs removed the match runs and the engine's own sounds play.
 
 Audition by ear: build, then open `dist/index.html#sounds` (see the panel's buttons: old and new for every event, per family).
+
+Pending outside P2 (UI files): the in-game credits screen in `shell.html` lists every non-CC0 sound source with a `data-src` line, and
+`tools/dev/efc/test-ui.mjs` checks it. The owner-cleared bank needs one, for example
+`<li data-src="partisan-foley">Weapon handling takes from Partisan Project, supplied and cleared by the owner</li>`.

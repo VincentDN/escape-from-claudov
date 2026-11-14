@@ -79,7 +79,7 @@ function efcHandlingLayers(key, out, t, o) {
   const rate = o.rate * rand(0.96, 1.04), g = base * (o.gain || 1) * Math.pow(10, rand(-1.5, 1.5) / 20);
   for (const [id, off, lg, lr] of L) {
     const v = sfxPlay(id, out, t + off / rate, { gain: g * lg, rate: rate * lr });
-    if (v && EFC_SND.log) EFC_SND.log.push({ kind: key, id, t: t + off / rate, pk: v.e.pk, rate: rate * lr });
+    if (v && EFC_SND.log) EFC_SND.log.push({ kind: key, id, t: t + off / rate, e: v.e, rate: rate * lr });
   }
 }
 /* Called first by the engine's sfxMech. True when it played the event. */

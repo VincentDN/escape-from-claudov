@@ -112,9 +112,9 @@ def active_rms(x):
 
 def limit(y, ceil_db):
     lim = 10 ** ((ceil_db - 0.3) / 20)
-    pad = np.zeros(int(0.01 * SR))  # the limiter's look-ahead delays the signal: pad, then drop the delay
+    pad = np.zeros(int(0.01 * SR))  # the limiter's look-ahead (its attack, 0.5 ms) delays the signal: pad, then drop the delay
     z = C.ff(np.concatenate([y * 0.5, pad]), f'alimiter=limit={lim * 0.5:.5f}:attack=0.5:release=40:level=disabled:asc=1')
-    return z[int(0.005 * SR):][:len(y)] * 2.0
+    return z[int(0.0005 * SR):][:len(y)] * 2.0
 
 
 def level(x, target_db, ceil_db=-1.0):

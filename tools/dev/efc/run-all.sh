@@ -15,6 +15,8 @@ run node tools/dev/efc/test-raid.mjs
 run node tools/dev/efc/test-warden.mjs
 run node tools/dev/efc/test-ui.mjs
 run node tools/dev/efc/test-thumbs.mjs
+run node tools/dev/efc/test-sounds.mjs
+run node tools/dev/efc/test-bench.mjs
 run node tools/dev/efc/test-map.mjs
 run node tools/dev/efc/test-e2e.mjs
 run env MAP=claudov node tools/dev/efc/test-e2e.mjs

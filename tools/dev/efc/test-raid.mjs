@@ -28,10 +28,10 @@ check('(a) map has extracts', r.ext > 0, r.ext);
 await simRun(page, 2, KEEP);
 
 // (e) allied: player vs bot false, bot vs bot true
-r = await ev(() => { const b = entities.filter((e) => !e.isPlayer && !e.off); return { pb: allied(PL.ent, b[0]), bb: allied(b[0], b[1]), n: b.length, sq: b[0].squad, total: entities.filter((e) => !e.isPlayer).length }; });
+r = await ev(() => { const b = entities.filter((e) => !e.isPlayer && !e.off); return { pb: allied(PL.ent, b[0]), bb: allied(b[0], b[1]), n: b.length, sq: b[0].squad, total: entities.filter((e) => !e.isPlayer).length, want: EFC.wd.n }; });
 check('(e) player and bot are hostile', r.pb === false, r);
 check('(e) two bots are allied (Wardens)', r.bb === true && r.sq === 'w', r);
-check('(e) all bots in play in raid', r.n === r.total, r);
+check('(e) the raid\'s Warden number of bots in play (P1: the rest are out)', r.n === r.want && r.want === 7, r); // Simoun: 7
 
 // (b) kill the player through the engine damage path: no respawn, state dead, raid:over 'dead'
 r = await ev(() => { const b = entities.find((e) => !e.isPlayer && e.alive); applyDamage(PL.ent, 500, b, 'test', false); return { alive: PL.ent.alive, state: efcCall('raid:state').state }; });

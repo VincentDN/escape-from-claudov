@@ -71,6 +71,32 @@ the Warden count within the map's number for the whole raid.
 **Proof**: I cannot hear. I can check that every event has a sample, levels, clipping and timing against the animation. An
 audition page (`dev/sounds.html`: every event, old and new, with play buttons) lets the owner judge by ear.
 
+## P2b. Warden pace and posture (owner, 14 November)
+
+Owner's report: Wardens move weirdly fast; they should move slower, and much slower when idle, in a relaxed low-ready pose.
+
+1. Three paces, set in `EFC.cfg`: **idle** (guarding, patrolling, returning to post) a slow walk of about 1.3 m/s with the
+   weapon at low ready (muzzle down, off the shoulder, head scanning); **alert** (heard something, searching) a careful walk of
+   about 2.2 m/s, weapon up; **combat** the engine's speeds reduced by about 20 percent, sprinting only to cover or to flank.
+2. A low-ready pose and a relaxed walk cycle in the soldier animation (`src/06b-soldier.js`, `src/06ac-loco.js`); a visible
+   raise of the weapon when a Warden goes from idle to alert, which also gives the player a moment to react.
+3. Turn speed and reaction follow the state: an idle Warden turns its head first, then its body.
+
+**Proof**: measured speed per state in a scripted run; screenshots of an idle and an alert Warden side by side; the Warden test
+still passes (patrol distances and timings adjusted to the new pace).
+
+## P2c. Leaning (owner, 14 November)
+
+1. Lean left and right on Q and E (rebinding E's current weapon-swap use to F-hold or the interact key, to be settled in the
+   brief): the camera and weapon roll about 15 degrees and shift about 0.35 m sideways, held or toggled per a setting, blocked
+   by walls so the head cannot pass through them.
+2. The third-person soldier leans too, so others see it, and it is replicated online in the published state.
+3. Hit boxes follow the lean; Wardens can see and shoot a leaning head but not the hidden body.
+4. Works while standing, crouched and aiming; cancelled by sprinting.
+
+**Proof**: a test that the eye point moves and collides correctly, that the remote copy leans in the two-client rig, and that a
+shot at the pre-lean head position misses.
+
 ## P3. Item thumbnails
 
 1. **Guns**: a clean side render of each of the 18 weapons, made from the engine's own gun models (`buildWorldGun`) in an
@@ -143,8 +169,10 @@ link. When the bench menu (P4) lands, the line moves with the logo. Ten minutes 
 | --- | --- | --- | --- |
 | 1 | P7 fork line (lead) and P1 spawns | 1 Opus | Small, touches map and Warden files only; deploy as soon as it passes |
 | 2 | P2 sounds, P3 thumbnails, P6 SKS | 3 Opus in parallel | Disjoint files (audio; UI and items; weapon model and stash) |
+| 2b | P2b Warden pace and posture, P2c leaning | 2 Opus, after P1 is merged | P2b touches the Warden files P1 is changing; P2c touches player and net files |
 | 3 | P4 bench menu | 1 Opus | Touches the same UI files as P3, so after it |
 | 4 | P5 music | 1 Opus, can overlap P4 | Audio files only |
+| 5 | P8 omnimovement | 2 Opus (movement and stances; weapon and body poses) | After P7 and after leaning, which it builds on |
 
 The lead reviews and merges each step, runs `tools/dev/efc/run-all.sh`, and redeploys. Workers commit as they go; the account's
 usage limit stopped the first build three times, so steps run in sequence rather than all at once.
@@ -171,6 +199,24 @@ usage limit stopped the first build three times, so steps run in sequence rather
 | D5 | Stop regular Wardens killing a full-health player with one body shot? | Yes |
 | D7 | Offer raids on the small classic maps at all? | Yes where the insert rules can be met, with 3 or 4 Wardens; otherwise Claudov and Simoun only |
 | D6 | Deploys: make `main` the default branch and allow it in the Pages environment? | Yes; until then I deploy from the `claude/` branch |
+
+## P8. Omnimovement (owner, 14 November; after P7)
+
+Full omnidirectional movement in the manner of recent Call of Duty and Battlefield 6.
+
+1. **Movement**: sprint, slide and dive in any direction (forward, sideways, backward) with momentum carried between them;
+   mantle and vault; tactical sprint as a short burst.
+2. **Prone in every direction**: go prone and roll onto the back or either side; turn through 360 degrees while prone without
+   the body spinning under the camera; crawl, and shoot while lying on the back.
+3. **The weapon follows the body**: the first-person weapon cants as the body's orientation demands (on the back the rifle is
+   held across the chest and canted, on a side it is rolled toward the ground arm), with believable transitions, and the aim
+   limits follow (no aiming through your own legs). The third-person soldier matches, and it is replicated online.
+4. **Wardens and hit boxes** follow the new stances; Wardens themselves stay on their current movement set in this step.
+5. The engine already has slide and crouch (`src/08-player.js`, `src/07e-humain.js`); prone, dive, roll and the canted
+   first-person poses are new, and are the bulk of the work (`src/06f-hands.js`, `src/06b-soldier.js`).
+
+**Proof**: a state-machine test for every transition and direction; collision checks so no stance clips through walls or the
+floor; contact sheets of each stance in first and third person for the owner; the two-client rig shows the same stance remotely.
 
 # Pass 2 (owner, 14 November 2026): starts when everything above is merged and deployed
 

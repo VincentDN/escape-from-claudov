@@ -49,15 +49,17 @@ function efcTpAmmo(g, fam) {
 /* Armour by tier: quilted work vest, plate carrier with pouches, steel cuirass with gorget */
 function efcTpArmor(g, tier) {
   if (tier <= 1) {
-    const cloth = efcTpMat(0x8a7350, 0.9), seam = efcTpMat(0x5a4a32, 0.9);
+    // quilted work vest: two front panels with a V neck and an open zip, armholes, shoulder straps, quilting seams
+    const cloth = efcTpMat(0x8f7a52, 0.9), seam = efcTpMat(0x5e4c30, 0.9), zip = efcTpMat(0x2a2a26, 0.6);
+    efcTpBox(g, 0.86, 1.0, 0.06, efcTpMat(0x6e5c3c, 0.9), 0, 0.02, -0.22); // back, seen through the neck and armholes
     for (const s of [-1, 1]) {
-      efcTpBox(g, 0.36, 0.9, 0.1, cloth, s * 0.2, 0, 0.06, 0, -s * 0.12, 0);
-      efcTpBox(g, 0.14, 0.26, 0.1, cloth, s * 0.27, 0.56, 0.0); // shoulder
-      for (const y of [-0.25, 0, 0.25]) efcTpBox(g, 0.36, 0.015, 0.012, seam, s * 0.2, y, 0.115, 0, -s * 0.12, 0);
-      efcTpBox(g, 0.18, 0.15, 0.03, seam, s * 0.21, -0.28, 0.13, 0, -s * 0.12, 0); // pocket
+      efcTpBox(g, 0.4, 0.66, 0.08, cloth, s * 0.215, -0.15, 0.02);
+      efcTpBox(g, 0.17, 0.42, 0.08, cloth, s * 0.31, 0.38, 0.0, 0, 0, s * 0.32); // upper panel narrowing to the shoulder: V neck
+      efcTpBox(g, 0.15, 0.06, 0.26, cloth, s * 0.36, 0.56, -0.1); // over the shoulder to the back
+      for (const y of [-0.36, -0.15, 0.06]) efcTpBox(g, 0.4, 0.018, 0.01, seam, s * 0.215, y, 0.065);
+      efcTpBox(g, 0.2, 0.16, 0.03, seam, s * 0.22, -0.3, 0.075); // pocket
     }
-    efcTpBox(g, 0.8, 0.95, 0.08, cloth, 0, 0.02, -0.25);
-    efcTpBox(g, 0.82, 0.1, 0.36, seam, 0, -0.4, -0.09); // hem band round the sides
+    efcTpBox(g, 0.02, 0.66, 0.02, zip, 0, -0.15, 0.065);
   } else if (tier === 2) {
     const nyl = efcTpMat(0x4f5634, 0.85), dark = efcTpMat(0x2c3020, 0.8), tag = efcTpMat(0xc89a2a, 0.6);
     efcTpBox(g, 0.7, 0.8, 0.12, nyl, 0, 0.05, 0.08);
@@ -147,13 +149,13 @@ function efcTpLoot(g, id) {
     }
     case 'loot_bearing': {
       const ring = (r0, r1, h, y, mat) => {
-        efcTpCyl(g, r1, r1, h, 24, mat, 0, y, 0, 0, 0, 0, true);
-        efcTpCyl(g, r0, r0, h, 24, mat, 0, y, 0, 0, 0, 0, true);
-        efcTpAdd(g, new THREE.RingGeometry(r0, r1, 24, 1), mat, 0, y + h / 2, 0, -EFC_TP_HALF, 0, 0);
+        efcTpCyl(g, r1, r1, h, 18, mat, 0, y, 0, 0, 0, 0, true);
+        efcTpCyl(g, r0, r0, h, 18, mat, 0, y, 0, 0, 0, 0, true);
+        efcTpAdd(g, new THREE.RingGeometry(r0, r1, 18, 1), mat, 0, y + h / 2, 0, -EFC_TP_HALF, 0, 0);
       };
       ring(0.58, 0.8, 0.2, 0.1, efcTpMat(0x9aa2a8, 0.3, 0.8, true));
       ring(0.38, 0.56, 0.24, 0.12, efcTpMat(0x6e767c, 0.4, 0.75, true));
-      for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; efcTpCyl(g, 0.035, 0.035, 0.04, 6, iron, Math.cos(a) * 0.69, 0.22, Math.sin(a) * 0.69); }
+      for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + 0.4; efcTpCyl(g, 0.035, 0.035, 0.04, 5, iron, Math.cos(a) * 0.69, 0.22, Math.sin(a) * 0.69); }
       break;
     }
     case 'loot_gauge':
@@ -191,7 +193,7 @@ function efcTpLoot(g, id) {
       break;
     }
     case 'loot_ledger': {
-      const cov = efcTpMat(0x5a1e1a, 0.6);
+      const cov = efcTpMat(0x3e1410, 0.55);
       efcTpBox(g, 0.78, 0.03, 1.0, cov, 0, 0.015, 0); efcTpBox(g, 0.78, 0.03, 1.0, cov, 0, 0.245, 0);
       efcTpBox(g, 0.05, 0.26, 1.0, cov, -0.39, 0.13, 0);
       efcTpBox(g, 0.74, 0.2, 0.96, paper, 0.0, 0.13, 0);

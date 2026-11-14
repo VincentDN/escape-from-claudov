@@ -216,7 +216,7 @@ function efcThumbInvHtml(inv, o = {}) {
   const st = document.createElement('style'); st.id = 'efcThumbCss';
   st.textContent = `
 .efc-it.efc-thr.noslot { grid-template-columns: 72px minmax(0, 1fr) 3.2em 4.6em 5.4em; }
-.efc-it.efc-thr:not(.noslot) { grid-template-columns: 112px 5.4em minmax(0, 1fr) 3.2em 4.6em 5.4em; }
+.efc-it.efc-thr:not(.noslot) { grid-template-columns: 112px 5.6em minmax(0, 1fr) 0 4.4em 5em; column-gap: 8px; }
 .efc-it.efc-thr { padding-left: 6px; }
 .efc-it.efc-thr > .efc-th { display: block; width: 72px; height: 27px; overflow: visible; border-radius: 2px;
   background: radial-gradient(ellipse at 50% 55%, rgba(242,238,227,.13), rgba(242,238,227,.03) 70%); }

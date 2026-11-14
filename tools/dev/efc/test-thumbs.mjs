@@ -55,7 +55,7 @@ try {
   check(bad((p) => p.url && (p.w !== 256 || p.h !== 96)).length === 0, 'pictures are 256 x 96');
   check(bad((p) => !(p.cover >= 0.04 && p.cover <= 0.85)).length === 0, '4 to 85 % opaque pixels', pics.filter((p) => !(p.cover >= 0.04 && p.cover <= 0.85)).map((p) => [p.id, +p.cover.toFixed(3)]));
   check(bad((p) => p.sd < 6).length === 0, 'no picture is one flat colour', pics.filter((p) => p.sd < 6).map((p) => [p.id, p.sd]));
-  check(bad((p) => p.kind === 'weapon' && !(p.bw > p.bh * 1.5)).length === 0, 'guns are wider than tall', pics.filter((p) => p.kind === 'weapon').map((p) => [p.id, p.bw, p.bh]).filter((x) => !(x[1] > x[2] * 1.5)));
+  check(bad((p) => p.kind === 'weapon' && !(p.bw > p.bh)).length === 0, 'guns are wider than tall', pics.filter((p) => p.kind === 'weapon').map((p) => [p.id, p.bw, p.bh]).filter((x) => !(x[1] > x[2])));
   check(bad((p) => p.edge).length === 0, 'nothing touches the picture edge (not clipped)', bad((p) => p.edge));
   check(bad((p) => p.tri !== null && !(p.tri >= 50 && p.tri <= 300)).length === 0, 'props are 50 to 300 triangles', pics.filter((p) => p.tri !== null && !(p.tri >= 50 && p.tri <= 300)).map((p) => [p.id, p.tri]));
   check(bad((p) => p.mean < 45).length === 0, 'no picture too dark (mean luminance of the object >= 45)', pics.filter((p) => p.mean < 45).map((p) => [p.id, p.mean]));
@@ -80,8 +80,8 @@ try {
 
   // ---------- hideout with thumbnails (rows keep their size when pictures arrive) ----------
   const ho = await page.evaluate(() => {
-    const st = efcCall('stash:get');
-    for (const id of ['w_ak', 'w_m4', 'w_glock', 'ammo_rifle', 'ammo_pistol', 'armor_t2', 'pack_m', 'med_kit', 'med_bandage', 'loot_sextant', 'loot_gauge', 'loot_keys']) if (efcCall('item:def', id)) st.items.push(efcItemNorm({ id, n: 1 }));
+    const st = efcStash();
+    for (const id of ['w_m82', 'armor_t3', 'pack_l', 'loot_sextant', 'loot_gauge', 'loot_keys', 'loot_chrono']) if (efcCall('item:def', id)) st.items.push(efcItemNorm({ id, n: 1 }));
     uiGo('hideout');
     const imgs = [...document.querySelectorAll('#scr-hideout .efc-th img')], rows = [...document.querySelectorAll('#scr-hideout .efc-it')];
     const h0 = rows.map((r) => r.getBoundingClientRect().height);

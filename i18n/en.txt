@@ -1764,3 +1764,4 @@ Your bag ⇒ =
 Raid over ⇒ =
 Raid again ⇒ =
 a fork of Riposte ⇒ =
+Weapon handling takes from Partisan Project, supplied and cleared by the owner. ⇒ =

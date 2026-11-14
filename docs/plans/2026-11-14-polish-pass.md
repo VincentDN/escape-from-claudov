@@ -205,8 +205,9 @@ game but not publishing the model files, and a public repo publishes them. Optio
 | B | Models stay out of the repo: fetched at build time from a private store, or the repo goes private |
 | C | Only models that are original or openly licensed ship; the rest are rebuilt by code in this engine's style |
 
-Until the owner chooses, nothing whose register entry lacks a redistribution licence is copied. Each file brought over is listed
-in `NOTICE.md` with its source and licence.
+**Owner's answer, 14 November 2026: all Partisan weapons are rights cleared; port them all over.** Option A applies to every
+weapon and weapon-mod model. Each file brought over is listed in `NOTICE.md` as "from Partisan Project, rights cleared by the
+owner", with the register's licence text where it has one (the two CC BY 4.0 models keep their author credit).
 
 ## Q3. More enemy variety, better AI
 

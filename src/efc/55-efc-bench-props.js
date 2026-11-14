@@ -14,14 +14,15 @@ function efcBenchFlagCanvas() {
   g.translate(W, H); g.rotate(Math.PI);
   g.fillStyle = '#16181b'; g.fillRect(0, 0, W, H);
   g.fillStyle = 'rgba(246,196,69,.9)'; g.fillRect(0, 10, W, 6); g.fillRect(0, H - 16, W, 6); // amber hems
+  // The camera sees the hoist end (canvas left) beside the rifle's stock: the word across the top, the emblem under it.
   // emblem: a ring, a peak inside it and two waves under the peak
-  const ex = 120, ey = 112, r = 60;
-  g.strokeStyle = '#f6c445'; g.lineWidth = 9; g.beginPath(); g.arc(ex, ey, r, 0, Math.PI * 2); g.stroke();
-  g.lineJoin = 'round'; g.lineWidth = 8;
-  g.beginPath(); g.moveTo(ex - 36, ey + 8); g.lineTo(ex - 8, ey - 32); g.lineTo(ex + 6, ey - 14); g.lineTo(ex + 16, ey - 26); g.lineTo(ex + 38, ey + 8); g.stroke();
-  for (const dy of [22, 38]) { g.beginPath(); for (let i = 0; i <= 8; i++) { const x = ex - 40 + i * 10, y = ey + dy + (i % 2 ? -4 : 4); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
-  g.fillStyle = '#f6c445'; g.textBaseline = 'middle'; g.font = '700 74px Impact, "Arial Narrow", sans-serif';
-  g.fillText('CLAUDE', 205, ey + 2);
+  const ex = 175, ey = 112, r = 34;
+  g.strokeStyle = '#f6c445'; g.lineWidth = 6; g.beginPath(); g.arc(ex, ey, r, 0, Math.PI * 2); g.stroke();
+  g.lineJoin = 'round'; g.lineWidth = 5;
+  g.beginPath(); g.moveTo(ex - 21, ey + 4); g.lineTo(ex - 5, ey - 19); g.lineTo(ex + 3, ey - 8); g.lineTo(ex + 9, ey - 15); g.lineTo(ex + 22, ey + 4); g.stroke();
+  for (const dy of [13, 23]) { g.beginPath(); for (let i = 0; i <= 8; i++) { const x = ex - 24 + i * 6, y = ey + dy + (i % 2 ? -2 : 2); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+  g.fillStyle = '#f6c445'; g.textBaseline = 'middle'; g.textAlign = 'left'; g.font = '700 46px Impact, "Arial Narrow", sans-serif';
+  g.fillText('CLAUDE', 140, 40);
   // light wear: a few darker blotches so the cloth does not look printed
   let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   for (let i = 0; i < 26; i++) { g.fillStyle = `rgba(0,0,0,${rnd() * 0.12})`; g.beginPath(); g.ellipse(rnd() * W, rnd() * H, 8 + rnd() * 40, 4 + rnd() * 14, rnd() * 3, 0, Math.PI * 2); g.fill(); }
@@ -65,7 +66,10 @@ function efcBenchRifle(B) {
   for (const m of g.children.slice()) {
     if (m.userData.gunLod !== 'hi') { g.remove(m); continue; }
     m.visible = true; m.layers.set(0); m.castShadow = m.receiveShadow = true; m.userData.efcBench = true;
-    m.material = m.material.clone(); m.material.envMapIntensity = 0.28; B.ownMats.push(m.material);
+    m.material = m.material.clone(); m.material.envMapIntensity = 0.28;
+    // its flat low-poly faces sit in the lamp's mirror direction and the specular lobe washes them out to beige: matte here, so the rifle
+    // reads as dark steel and red-brown wood, as in a match
+    m.material.roughness = 0.8; m.material.metalness *= 0.5; m.material.color.multiplyScalar(0.8); B.ownMats.push(m.material);
   }
   const inner = new THREE.Group(); inner.add(g);
   inner.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new V3(0, -1, 0), new V3(0, 0, 1), new V3(-1, 0, 0)));

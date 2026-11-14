@@ -171,3 +171,56 @@ usage limit stopped the first build three times, so steps run in sequence rather
 | D5 | Stop regular Wardens killing a full-health player with one body shot? | Yes |
 | D7 | Offer raids on the small classic maps at all? | Yes where the insert rules can be met, with 3 or 4 Wardens; otherwise Claudov and Simoun only |
 | D6 | Deploys: make `main` the default branch and allow it in the Pages environment? | Yes; until then I deploy from the `claude/` branch |
+
+# Pass 2 (owner, 14 November 2026): starts when everything above is merged and deployed
+
+The scheduled wakes continue into this pass. Order as the owner gave it.
+
+## Q1. The weapon modder from Partisan Project
+
+The full Workbench module (`workbench/` in Partisan: rifle instances, rails, attachment mounts, fitting and clearance, finishes,
+stats panel, export) with the lighting and studio set-up of the new StG 44 bench (`workbench/stg44/`). In Claudov it becomes the
+place where you modify a weapon from your stash; the modded weapon is what you take into a raid.
+
+- Port from three.js r169 modules to this engine's r147 global script, or load the modder as its own module page inside the game
+  and pass the result back as data (decide after reading the code; the second is cheaper and keeps Partisan's code intact).
+- An item gains `mods` (attachment ids per mount) and `finish`; stats change with mods; thumbnails (P3) show the modded gun.
+- In a raid the first-person and world models show the mods.
+
+## Q2. All new weapons and weapon mods from Partisan, also as loot
+
+- Every Partisan rifle and attachment becomes an item with stats, sounds, a thumbnail and a place in the loot tables (attachments
+  as their own loot; Wardens carry some).
+- Each new weapon needs first-person handling in this engine: grips, sights, reload choreography, recoil. That is the bulk of the
+  work.
+
+**Rights gate, to settle before any Partisan model file enters this public repo.** Partisan's `assets/register.json` lists 47
+model entries with no licence recorded, two CC BY 4.0, and one "Purchased asset (commercial licence), terms to be confirmed by
+the owner". Partisan is a hidden test project; this repo is public. Commercial model licences usually allow use in a shipped
+game but not publishing the model files, and a public repo publishes them. Options:
+
+| Option | What it means |
+| --- | --- |
+| A | The owner confirms, per model, a licence that allows public redistribution: those models ship |
+| B | Models stay out of the repo: fetched at build time from a private store, or the repo goes private |
+| C | Only models that are original or openly licensed ship; the rest are rebuilt by code in this engine's style |
+
+Until the owner chooses, nothing whose register entry lacks a redistribution licence is copied. Each file brought over is listed
+in `NOTICE.md` with its source and licence.
+
+## Q3. More enemy variety, better AI
+
+- Types beyond the Warden: a lone marksman on high ground, a shotgun rusher indoors, a heavy with armour and a machine gun,
+  unarmed scavengers who flee and call Wardens, and rival AI raiders who loot and head for extracts like players.
+- Behaviour: squads that flank and suppress, use of cover while reloading, grenades to flush a player out of cover, searching
+  where a shot came from, retreating when outnumbered, reacting to open containers and bodies.
+- Proof: scripted scenarios per behaviour, and survival and time-to-kill tables per enemy type and difficulty.
+
+## Q4. Optimisation pass
+
+- Measure first, on a real GPU: the build container only has software rendering, so frame times need the owner's machine or a
+  capture from the deployed game (the engine has a performance recorder, `src/09zo-perfs.js`).
+- Targets: Claudov at 60 frames a second on a mid-range laptop with 8 players and the raid's Wardens; first load under the
+  engine's current time; host tick cost with every bot awake.
+- Likely work: merge static map geometry, level-of-detail for containers and props, sleep Wardens far from every player, trim
+  shadow passes, defer thumbnails and packs, check memory over a 20-minute raid.

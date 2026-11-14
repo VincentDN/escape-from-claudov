@@ -33,7 +33,8 @@ ok(ha.left === tgt.n - 1, 'the host sees the container with one item less', ha.l
 
 // the guest dies: its body, with its kit, exists on the host, and the host can loot it
 const gd = await guest.evaluate(() => { const carried = efcCall('inv:all', EFC.inv).length, p = { x: PL.ent.pos.x, z: PL.ent.pos.z }; PL.ent.protT = 0; applyDamage(PL.ent, 999, entities.find((e) => !e.isPlayer), 'M4A1', false, new V3(1, 0, 0)); return { carried, p, alive: PL.ent.alive }; });
-await settle(300); await stepBoth(both, 1, ''); await settle(300); await stepBoth(both, 3, ''); await settle(300);
+const LIVE = 'if (PL.ent.alive) { PL.ent.health = 100; PL.ent.protT = 1; }'; // the host must survive to loot the body
+await settle(300); await stepBoth(both, 1, LIVE); await settle(300); await stepBoth(both, 3, LIVE); await settle(300);
 const hb = await host.evaluate((p) => { const b = (efcCall('world:list') || []).find((c) => c.kind === 'body' && Math.hypot(c.x - p.x, c.z - p.z) < 3); if (!b) return null; PL.ent.pos.set(b.x + 0.8, b.y, b.z); PL.ent.vel.set(0, 0, 0); return { id: b.id, items: b.items.length, name: b.name }; }, gd.p);
 ok(!gd.alive && hb && hb.items === gd.carried, 'the dead guest left a body with its whole kit on the host', { hb, carried: gd.carried });
 const gs = await guest.evaluate(() => ({ state: efcCall('raid:state').state, alive: PL.ent.alive }));

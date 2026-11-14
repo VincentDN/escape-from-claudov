@@ -88,7 +88,7 @@ try {
   // ---------- Raid: map choice, loading, deploy ----------
   await page.evaluate(() => { uiOpen('main'); uiGo('raid'); });
   const rs = await page.evaluate(() => ({ prev: $('efcRaidPrev').textContent, rows: [...$('efcRaidList').querySelectorAll('.lrow')].map((r) => r.textContent.replace(/\s+/g, ' ').trim()), kit: $('efcRaidStage').textContent.includes('Plate vest') || $('efcRaidStage').textContent.includes('Service pistol') }));
-  check(/Simoun/.test(rs.prev) && rs.rows.some((r) => /Map/.test(r)) && rs.kit, 'raid screen shows the map and the loadout', rs);
+  check(/Simoun|Claudov/.test(rs.prev) && rs.rows.some((r) => /Map/.test(r)) && rs.kit, 'raid screen shows the map and the loadout', rs);
   await page.evaluate(() => { LOCK.fallback = true; $('efcRaidGo').click(); });
   await page.waitForFunction(() => UI.screen === 'deploy' && !UI.busy, null, { timeout: 120000, polling: 200 });
   const dp = await page.evaluate(() => ({ raid: $('scr-deploy').classList.contains('raid'), mode: Settings.mode, kit: $('efcDepKit').getClientRects().length > 0, picker: $('cpDeploy').getClientRects().length > 0, h2: $('scr-deploy').querySelector('h2').textContent }));

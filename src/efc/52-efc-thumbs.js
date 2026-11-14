@@ -236,19 +236,19 @@ function efcThumbInvHtml(inv, o = {}) {
 }
 
 /* Row layout: fixed boxes, so nothing moves when a picture arrives. Rows: weapons 128 x 48, other items 64 x 64 (centred in the same
-   128 px column, so names line up); slots 220 x 84 with the slot name above the item name */
+   128 px column, so names line up); slots 220 x 84 with the slot name above the item name and the weight above the value */
 (function efcThumbCss() {
   if (typeof document === 'undefined' || document.getElementById('efcThumbCss')) return;
   const st = document.createElement('style'); st.id = 'efcThumbCss';
   st.textContent = `
 .efc-it.efc-thr.noslot { grid-template-columns: 128px minmax(0, 1fr) 3.2em 4.6em 5.4em; padding: 4px 12px 4px 6px; }
-.efc-it.efc-thr:not(.noslot) { grid-template-columns: 220px minmax(0, 1fr) 2.4em 4.6em 5.4em; grid-template-rows: auto auto; column-gap: 12px; row-gap: 2px; padding: 4px 12px 4px 4px; }
+.efc-it.efc-thr:not(.noslot) { grid-template-columns: 220px minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 14px; row-gap: 2px; padding: 4px 14px 4px 4px; }
 .efc-it.efc-thr:not(.noslot) > .efc-th { grid-column: 1; grid-row: 1 / span 2; }
 .efc-it.efc-thr:not(.noslot) > .k { grid-column: 2; grid-row: 1; align-self: end; }
 .efc-it.efc-thr:not(.noslot) > .nm { grid-column: 2; grid-row: 2; align-self: start; }
-.efc-it.efc-thr:not(.noslot) > .n { grid-column: 3; grid-row: 1 / span 2; }
-.efc-it.efc-thr:not(.noslot) > .w { grid-column: 4; grid-row: 1 / span 2; }
-.efc-it.efc-thr:not(.noslot) > .v { grid-column: 5; grid-row: 1 / span 2; }
+.efc-it.efc-thr:not(.noslot) > .n { display: none; }
+.efc-it.efc-thr:not(.noslot) > .w { grid-column: 3; grid-row: 1; align-self: end; }
+.efc-it.efc-thr:not(.noslot) > .v { grid-column: 3; grid-row: 2; align-self: start; }
 .efc-it.efc-thr > .efc-th { display: block; overflow: visible; border-radius: 2px; justify-self: center;
   background: radial-gradient(ellipse at 50% 55%, rgba(242,238,227,.12), rgba(242,238,227,.02) 72%); }
 .efc-th.gun { width: 128px; height: 48px; }

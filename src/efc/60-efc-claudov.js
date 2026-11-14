@@ -57,7 +57,7 @@ const ATMO_CLAUDOV = Object.assign({}, ATMO_DEFAULT, {
     ridge: [0, 0, 0], ridgeSnow: [1, 1, 1], ridgeRock: [0.5, 0.5, 0.5],
   },
   envGround: 0x40464c, hdri: null, lit: true, lamps: 1.0, winLit: 0.25,
-  bounce: [0.9, 0.95, 1.0], dust: [0.6, 0.62, 0.64], motes: [0.9, 0.95, 1.0],
+  bounce: [0.9, 0.95, 1.0], dust: [0.36, 0.37, 0.38], motes: [0.9, 0.95, 1.0],
   grade: { lo: [0.95, 1.0, 1.08], hi: [0.98, 1.0, 1.04], exp: 1.0, sat: 0.78, con: 1.05 }, rays: [0.55, 0.6, 0.65],
   impact: [0.5, 0.5, 0.5], wind: [300, 0.08],
   bloom: [0.3, 0.5, 0.95], aoFloor: 0.3, raysThr: 2.5, raysCap: 4, satExp: 0.9,

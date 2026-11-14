@@ -108,6 +108,17 @@ shot at the pre-lean head position misses.
 
 **Proof**: a test that every item definition yields a non-empty thumbnail, and one contact sheet of all 44 for the owner.
 
+## P3b. Larger thumbnails (owner, 14 November; around P2)
+
+The row thumbnails are 72 by 27 pixels and the slot ones 112 by 42. Make weapons and items read at a glance:
+
+1. Rows: about 128 by 48 for weapons and 64 by 64 for other items, with the row height raised to fit; slots about 220 by 84.
+2. A large preview (about 420 by 160, re-rendered at that size, not scaled up) for the selected or hovered item, with its name,
+   weight, value and, for weapons, calibre, magazine and loaded rounds.
+3. Guns lit brighter with a light rim so dark guns stand out on the dark panels.
+
+**Proof**: the thumbnail test at the new sizes; screenshots of the hideout and the loot panel.
+
 ## P4. Main screen: Partisan's workbench opener
 
 **Reading of the request** (D2): Partisan's index, `menu/`: a close-up of a phone lying on the workbench, its screen real HTML laid
@@ -172,6 +183,7 @@ link. When the bench menu (P4) lands, the line moves with the logo. Ten minutes 
 | 2b | P2b Warden pace and posture, P2c leaning | 2 Opus, after P1 is merged | P2b touches the Warden files P1 is changing; P2c touches player and net files |
 | 3 | P4 bench menu | 1 Opus | Touches the same UI files as P3, so after it |
 | 4 | P5 music | 1 Opus, can overlap P4 | Audio files only |
+| 4b | P6b grid inventory with operator view | 2 Opus (data and rules; screen and operator render) | After P6, P3b and P4; the largest UI item |
 | 5 | P9 raid-start weapon check | 1 Opus | After P2 (foley), P6 (SKS) and P7 |
 | 6 | P8 omnimovement | 2 Opus (movement and stances; weapon and body poses) | After P7 and after leaning, which it builds on |
 
@@ -200,6 +212,29 @@ usage limit stopped the first build three times, so steps run in sequence rather
 | D5 | Stop regular Wardens killing a full-health player with one body shot? | Yes |
 | D7 | Offer raids on the small classic maps at all? | Yes where the insert rules can be met, with 3 or 4 Wardens; otherwise Claudov and Simoun only |
 | D6 | Deploys: make `main` the default branch and allow it in the Pages environment? | Yes; until then I deploy from the `claude/` branch |
+
+## P6b. Inventory rework: grid, with the operator in the middle (owner, 14 November; after P6)
+
+Reference from the owner: a DayZ-style screen with the surroundings on the left, the character standing in the middle, and
+equipment with its containers on the right. This replaces the slot-and-list inventory chosen for the first slice.
+
+1. **Grid**: every item has a size in cells (a pistol 2 by 1, a rifle 5 by 2, a bandage 1 by 1) and can be rotated. Each carried
+   container (vest or rig, backpack, pockets) is its own grid whose size comes from the item. Weight still limits movement.
+2. **Layout**: left, what is nearby (the open container or body, and items on the ground within reach); centre, your operator
+   in full gear in a relaxed idle pose, slowly turnable with the mouse, wearing and holding exactly what is equipped; right,
+   equipment slots (head, armour, rig, pack, primary, secondary, sidearm) and each container's grid beneath its name and fill
+   count. A hands bar and quick slots along the bottom.
+3. **Handling**: drag and drop with the mouse, rotate with R, double-click to equip or move, shift-click to move a stack,
+   split a stack, drop by dragging out. Keyboard navigation stays possible. Invalid placements are shown before the drop.
+4. **Data**: `Inventory` gains containers with cells and item positions; the stash becomes a large grid; a one-time migration
+   places existing stash and loadout items automatically. Host-owned containers in the world get grids too, so two players
+   see the same layout in a body or crate, and a take still succeeds exactly once.
+5. **The operator view** uses the engine's soldier model and outfit, rendered into the panel by the game's renderer (as the
+   thumbnails are), with the equipped weapon in hand and the mods from the weapon modder when that lands.
+6. Original presentation: the layout follows the genre; no artwork, icons or text are copied from DayZ, Tarkov or any other game.
+
+**Proof**: logic tests for placement, rotation, overflow, stack rules and migration; the two-client rig for a shared grid;
+screenshots of the hideout and the in-raid screen; the end-to-end raid test rewritten for the grid.
 
 ## P8. Omnimovement (owner, 14 November; after P7)
 

@@ -110,17 +110,24 @@ def active_rms(x):
     return float(np.sqrt(np.mean(act ** 2))) if len(act) else 0.0
 
 
+def limit(y, ceil_db):
+    lim = 10 ** ((ceil_db - 0.3) / 20)
+    pad = np.zeros(int(0.01 * SR))  # the limiter's look-ahead delays the signal: pad, then drop the delay
+    z = C.ff(np.concatenate([y * 0.5, pad]), f'alimiter=limit={lim * 0.5:.5f}:attack=0.5:release=40:level=disabled:asc=1')
+    return z[int(0.005 * SR):][:len(y)] * 2.0
+
+
 def level(x, target_db, ceil_db=-1.0):
-    """Active RMS to target_db, then a look-ahead limiter holds the peak at ceil_db (only when needed)"""
-    r = active_rms(x)
-    y = x * (10 ** (target_db / 20) / r) if r > 0 else x
-    if C.peak(y) > 10 ** (ceil_db / 20):
-        lim = 10 ** ((ceil_db - 0.3) / 20)
-        pad = np.zeros(int(0.01 * SR))  # the limiter's look-ahead delays the signal: pad, then drop the delay
-        y = C.ff(np.concatenate([y * 0.5, pad]), f'alimiter=limit={lim * 0.5:.5f}:attack=0.5:release=40:level=disabled:asc=1')
-        y = y[int(0.005 * SR):][:len(x)] * 2.0
-        y = C.norm(y, ceil_db) if C.peak(y) > 10 ** (ceil_db / 20) else y
-    return y
+    """Active RMS to target_db, then a look-ahead limiter holds the peak at ceil_db (only when needed); repeated a few times
+    because limiting lowers the RMS again"""
+    y = x
+    for _ in range(5):
+        r = active_rms(y)
+        if r > 0: y = y * (10 ** (target_db / 20) / r)
+        if C.peak(y) <= 10 ** (ceil_db / 20): break
+        y = limit(y, ceil_db)
+        if abs(C.db(active_rms(y)) - target_db) < 1.0: break
+    return C.norm(y, ceil_db) if C.peak(y) > 10 ** (ceil_db / 20) else y
 
 
 def shape(x, transient, maxlen, hp=50):

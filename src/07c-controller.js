@@ -264,7 +264,7 @@ function ctlShoot(ent, now) {
   if (d.pump && w.mag > 0) { A.boltT = 0.6; ctlAction(ent, 'pump', 0.55); } // pompe : le garde-main recule et revient avant le coup suivant
   if (d.bolt && w.mag > 0) { A.boltT = 1.05; MATCH.events.push({ t: now + 0.12, fn: () => { if (ent.alive && armsW(ent).def === d) ctlAction(ent, 'bolt', 0.93); } }); }
   if (w.mag === 0 && w.reserve > 0) A.autoReload = 0.3;
-  soundEvents.push({ pos: ent.pos.clone(), team: ent.team, who: ent, t: now, loud: !!d.loud, quiet: !!d.silent }); if (soundEvents.length > 60) soundEvents.shift();
+  soundEvents.push({ pos: ent.pos.clone(), team: ent.team, squad: ent.squad, who: ent, t: now, loud: !!d.loud, quiet: !!d.silent }); if (soundEvents.length > 60) soundEvents.shift();
   ent.lastShotT = now;
   kcEvent('shot', { m: muzzle.clone(), d: f.clone(), kind: d.sound, sid: ent.kcI });
   if (ent.isPlayer) playerShotFx(d, ads, f, muzzle, kv, kh, hitAny);

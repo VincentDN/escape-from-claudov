@@ -127,7 +127,7 @@ function botPers() {
 /* Goût d'un mouvement ('slide') compte tenu de l'arme tenue */
 function botFlair(b, k) {
   const ai = b.weapon.ai, m = ai.sniper ? 0.25 : ai.shotgun ? 1.25 : ai.rush ? 1.15 : 1;
-  return b.pers[k] * m * botDiff().flair;
+  return b.pers[k] * m * botDiff(b).flair;
 }
 /* Glissade dans la direction de la course, s'il y a la place (4,6 m libres, ni mur, ni vide, ni chute) et si le bot court assez vite ;
    un bot ne glisse pas plus d'une fois toutes les 5 s. Renvoie vrai si la demande est faite (le contrôleur la prend au sprint). */

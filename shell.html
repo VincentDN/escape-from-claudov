@@ -142,6 +142,9 @@ body.sk-live #ui[data-screen="skins"] .ui-shade { background: none; } /* écran 
 #scr-main { justify-content: center; }
 .main-col { display: flex; flex-direction: column; gap: clamp(18px, 3.6vh, 36px); }
 .brand .logo { width: min(472px, 36vw, 90vw); min-width: 240px; }
+/* Escape From Claudov: quiet credit line under the logo, a link to the engine this game is forked from */
+.efc-fork { display: inline-block; margin: 2px 0 0 3px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); text-decoration: none; opacity: .75; }
+.efc-fork:hover, .efc-fork:focus-visible { color: var(--txt, #ece8dc); opacity: 1; text-decoration: underline; }
 .mlist { display: flex; flex-direction: column; gap: 2px; max-width: 540px; }
 .msep { height: 1px; margin: 8px 0 8px 24px; width: min(320px, 70%); background: linear-gradient(90deg, var(--line-2), transparent); }
 .mbtn { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; background: none; border: 0; padding: 10px 28px 10px 24px; transition: background var(--t2) var(--ease); }
@@ -2609,6 +2612,7 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
     <div class="main-col">
       <header class="brand">
         <h1 class="logo" role="img" aria-label="Escape From Claudov"></h1>
+        <a class="efc-fork" href="https://github.com/BenDBSS/Riposte-Frontline-Source" target="_blank" rel="noopener">a fork of Riposte</a>
       </header>
       <nav class="mlist" data-nav data-lm=".mbtn" aria-label="Menu principal">
         <!-- Escape From Claudov: the extraction loop (src/efc/50-efc-ui-menu.js). The engine's entries stay below, hidden. -->

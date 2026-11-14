@@ -149,6 +149,17 @@ link. When the bench menu (P4) lands, the line moves with the logo. Ten minutes 
 The lead reviews and merges each step, runs `tools/dev/efc/run-all.sh`, and redeploys. Workers commit as they go; the account's
 usage limit stopped the first build three times, so steps run in sequence rather than all at once.
 
+## Owner's answers (14 November 2026)
+
+- D1 foley: cleared for the public repo.
+- D2 workbench opener: the first screen of https://vincentdn.github.io/partisan-project/, the over-the-shoulder view of an AK
+  on the workbench (Partisan's `intro/`), not the phone index.
+- D3 flag on the bench: a Claude flag.
+- D4 music: archive tracks.
+- D5 one-shot kills: approved (no single body shot from a regular Warden kills from full health).
+- D6 deploys: approved; until `main` is the default branch and allowed in the Pages environment, deploys run from the `claude/` branch.
+- D7 small maps: not answered; the lead's recommendation applies.
+
 ## Decisions for the owner
 
 | ID | Question | Recommendation |

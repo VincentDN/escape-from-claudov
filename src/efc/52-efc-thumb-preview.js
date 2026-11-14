@@ -52,7 +52,7 @@ function efcPvStats(it, d) {
   return out;
 }
 function efcPvShow(row) {
-  const it = row && efcPvItem(row); if (!it) { efcPvHide(); return; }
+  const it = row && row.getClientRects().length && efcPvItem(row); if (!it) { efcPvHide(); return; }
   const el = efcPvEl(), d = efcUiDef(it.id), img = el.querySelector('img');
   EFC_PV.row = row;
   const url = efcCall('thumb:get', it.id, 'big', true);
@@ -85,11 +85,13 @@ function efcPvRefresh() {
   if (row && row.getClientRects().length) efcPvShow(row); else efcPvHide();
 }
 function efcPvRowOf(t) { return t && t.closest ? t.closest('.efc-it[data-efc-id]') : null; }
+/* The row under the pointer, if it is on screen (a row of a hidden screen keeps :hover) */
+function efcPvHovered() { return [...document.querySelectorAll('.efc-it[data-efc-id]:hover')].find((r) => r.getClientRects().length) || null; }
 addEventListener('mouseover', (e) => { const r = efcPvRowOf(e.target); if (r && r !== EFC_PV.row) efcPvShow(r); }, { passive: true });
 addEventListener('mouseout', (e) => { const r = efcPvRowOf(e.target); if (r && r === EFC_PV.row && efcPvRowOf(e.relatedTarget) !== r) setTimeout(efcPvRefreshOut, 0); }, { passive: true });
-function efcPvRefreshOut() { const h = document.querySelector('.efc-it[data-efc-id]:hover'); if (h) efcPvShow(h); else { EFC_PV.row = null; efcPvRefresh(); } }
+function efcPvRefreshOut() { const h = efcPvHovered(); if (h) efcPvShow(h); else { EFC_PV.row = null; efcPvRefresh(); } }
 addEventListener('focusin', (e) => { const r = efcPvRowOf(e.target); if (r) efcPvShow(r); });
-addEventListener('focusout', () => setTimeout(() => { if (!document.querySelector('.efc-it[data-efc-id]:hover')) { EFC_PV.row = null; efcPvRefresh(); } }, 0));
+addEventListener('focusout', () => setTimeout(() => { if (!efcPvHovered()) { EFC_PV.row = null; efcPvRefresh(); } }, 0));
 addEventListener('scroll', () => efcPvPlace(), { capture: true, passive: true });
 addEventListener('resize', () => efcPvPlace());
 efcOn('thumb:ready', (id, v) => {

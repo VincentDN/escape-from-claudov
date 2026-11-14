@@ -52,7 +52,7 @@ function efcThumbGunMat(m) {
   let c = EFC_TH.gunMats.get(m);
   if (!c) {
     c = m.clone(); c.metalness = Math.min(m.metalness || 0, 0.2); c.roughness = Math.max(m.roughness == null ? 0.6 : m.roughness, 0.45);
-    if (c.color) { const hsl = c.color.getHSL({}); c.color.multiplyScalar(hsl.l < 0.05 ? 2.6 : 1.7); }
+    if (c.color) { const hsl = c.color.getHSL({}); c.color.multiplyScalar(hsl.s > 0.3 ? 1.3 : hsl.l < 0.05 ? 2.4 : 1.6); } // coloured parts (wood) keep their tint
     EFC_TH.gunMats.set(m, c);
   }
   return c;
@@ -157,7 +157,7 @@ function efcThumbRender(id, v) {
     const S = efcThumbStudio(), [W, H] = efcThumbSize(def.kind, v), V = EFC_TH_VAR[v] || EFC_TH_VAR.row;
     S.scene.add(o.obj);
     const mirror = efcThumbFrame(o, W / H);
-    EFC_TH.url[key] = efcThumbDraw(W, H, V.ss, mirror, o.gun, o.gun ? 1.35 : 1.1);
+    EFC_TH.url[key] = efcThumbDraw(W, H, V.ss, mirror, o.gun, o.gun ? 1.25 : 1.1);
     S.scene.remove(o.obj);
   } catch (e) {
     EFC_TH.fail[key] = (EFC_TH.fail[key] || 0) + 1;
@@ -216,7 +216,7 @@ function efcThumbRow(it, o = {}) {
   if (end < 0) return h;
   const d = efcUiDef(it.id), th = efcThumbImg(it.id, d.kind, o.slot ? 'slot' : 'row');
   const da = ` data-efc-id="${esc(it.id)}" data-efc-n="${+it.n || 1}"` + (it.mag != null ? ` data-efc-mag="${+it.mag}"` : '') + (it.res != null ? ` data-efc-res="${+it.res}"` : '');
-  return h.slice(0, at) + `<button class="efc-it efc-thr ${d.kind === 'weapon' ? 'efc-gun' : 'efc-sq'}"` + da + h.slice(at + 21, end + 1) + th + h.slice(end + 1);
+  return h.slice(0, at) + `<button class="efc-it efc-thr ${d.kind === 'weapon' ? 'efc-gun' : 'efc-sq'}` + h.slice(at + 21, end) + da + '>' + th + h.slice(end + 1);
 }
 const EFC_TH_SLOTKIND = { primary: 'weapon', sidearm: 'weapon', armor: 'armor', pack: 'pack' };
 function efcThumbEmptySlot(slot, label) {

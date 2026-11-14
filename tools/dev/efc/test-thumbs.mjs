@@ -103,12 +103,15 @@ try {
     const box = (sel) => { const e = document.querySelector('#scr-hideout ' + sel); if (!e) return null; const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
     const imgs = [...document.querySelectorAll('#scr-hideout .efc-th img')], rows = [...document.querySelectorAll('#scr-hideout .efc-it')];
     const fit = rows.every((r) => { const t = r.querySelector('.efc-th'); if (!t) return false; const a = r.getBoundingClientRect(), b = t.getBoundingClientRect(); return b.top >= a.top && b.bottom <= a.bottom + 0.5; });
-    return { imgs: imgs.length, rows: rows.length, fit, gun: box('#efcHoStash .efc-th.gun'), sq: box('#efcHoStash .efc-th.sq'), slot: box('#efcHoLoad .efc-th.slot'),
+    const line = rows.filter((r) => r.classList.contains('noslot')).every((r) => { const a = r.querySelector('.nm').getBoundingClientRect(), b = r.querySelector('.w').getBoundingClientRect(); return Math.abs((a.top + a.bottom) / 2 - (b.top + b.bottom) / 2) < 4; });
+    const named = rows.filter((r) => !r.classList.contains('empty')).every((r) => { const n = r.querySelector('.nm'); return n.scrollWidth <= n.clientWidth + 1 || n.clientWidth > 120; });
+    return { imgs: imgs.length, rows: rows.length, fit, line, named, gun: box('#efcHoStash .efc-th.gun'), sq: box('#efcHoStash .efc-th.sq'), slot: box('#efcHoLoad .efc-th.slot'),
       pend: imgs.filter((i) => i.dataset.pend !== undefined).length };
   });
   check(ho.imgs > 0 && ho.imgs === ho.rows, 'every hideout row has a thumbnail', ho);
   check(String(ho.gun) === '128,48' && String(ho.sq) === '64,64' && String(ho.slot) === '220,84', 'row boxes 128x48 (weapons), 64x64 (items), slots 220x84', ho);
   check(ho.fit, 'every thumbnail fits inside its row (row height raised)');
+  check(ho.line && ho.named, 'item rows keep name, weight and value on one line, names readable', ho);
   check(ho.pend === 0, 'pictures already rendered show at once');
   const row = page.locator('#efcHoStash .efc-it[data-efc-id="w_m82"]');
   await row.hover();

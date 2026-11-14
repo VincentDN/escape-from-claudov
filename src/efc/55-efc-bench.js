@@ -51,7 +51,7 @@ function efcBenchDraw(dt) {
   const main = UI.screen === 'main', move = efcBenchMotion();
   renderer.getDrawingBufferSize(_ebV2);
   const key = _ebV2.x + 'x' + _ebV2.y, live = main && move;
-  if (!live && B.drawn === key) return; // paused or reduced motion: the still frame stays on the canvas
+  if (!live && B.drawn === key && B.env) return; // paused or reduced motion: the still frame stays on the canvas (once the light probe is in)
   const t0 = performance.now(), d = Math.min(dt || 0, 0.05);
   if (live) B.t += d;
   // look: the mouse moves the view a little, eased (Partisan's 1 - exp(-4 dt))
@@ -72,7 +72,7 @@ function efcBenchDraw(dt) {
 /* Draws the bench scene to the screen with its own render state, then puts the engine's back */
 function efcBenchRender(B) {
   // the light probe is built on the second frame, so the first one is not held up by its conversion
-  if (!B.env && B.firstAt !== null) { try { efcBenchEnv(B); } catch (e) { B.env = 'none'; } B.drawn = ''; }
+  if (!B.env && B.firstAt !== null) { try { efcBenchEnv(B); } catch (e) { B.env = 'none'; } }
   const r = renderer, prev = {
     tm: r.toneMapping, tme: r.toneMappingExposure, enc: r.outputEncoding, pcl: r.physicallyCorrectLights, sm: r.shadowMap.needsUpdate,
     rt: r.getRenderTarget(), ca: r.getClearAlpha(), info: { calls: r.info.render.calls, tri: r.info.render.triangles },
@@ -108,5 +108,7 @@ function efcBenchFree(all) {
 }
 /* Lost context (from mbgFail): stop, and let the CSS key art show */
 function efcBenchFail() { EFC_BENCH.failed = true; const bg = $('menuBg'); if (bg) bg.classList.remove('bench'); }
-efcOn('tick', () => { if (EFC_BENCH.lamp && EFC_BENCH.lamp.shadow.map) efcBenchFree(false); });
+/* Out of the menus (any match, raid or not) the lamp's shadow map is released within a second */
+function efcBenchIdle() { const B = EFC_BENCH; if (B.lamp && B.lamp.shadow.map && typeof MATCH !== 'undefined' && MATCH.state !== 'menu') efcBenchFree(false); }
+setInterval(efcBenchIdle, 1000);
 efcOn('raid:begin', () => efcBenchFree(false));

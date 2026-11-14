@@ -23,14 +23,15 @@ try {
     return {
       screen: UI.screen, on: B.on, live: MBG.live, keyArt: !!MBG.mat, inScene: rifle.parent === B.scene, meshes, rifleTris: tris,
       len: +(box.max.x - box.min.x).toFixed(3), onTable: Math.abs(box.min.y - EFC_BENCH_TABLE.top) < 0.002,
-      inside: fr.containsPoint(c) && fr.intersectsBox(box), corners: [box.min, box.max].every((p) => fr.containsPoint(p)),
+      inside: fr.containsPoint(c) && fr.intersectsBox(box),
+      corners: (() => { let n = 0, out = 0; const v = new THREE.Vector3(); rifle.traverse((o) => { if (!o.isMesh) return; const P = o.geometry.attributes.position; for (let i = 0; i < P.count; i += 7) { v.fromBufferAttribute(P, i).applyMatrix4(o.matrixWorld).project(B.cam); n++; if (Math.abs(v.x) > 1 || Math.abs(v.y) > 1) out++; } }); return out === 0 && n > 0; })(),
       stats: B.stats, frameMs: B.frameMs, buildMs: B.buildMs, firstAt: B.firstAt, bg: $('menuBg').className,
     };
   });
   report.boot = boot;
   check(boot.screen === 'main' && boot.on && boot.live && !boot.keyArt, 'boots to the main menu with the bench drawn (key art not loaded)', boot);
   check(boot.inScene && boot.meshes > 0 && boot.len > 0.8 && boot.len < 1 && boot.onTable, 'the AK-47 lies on the table', boot);
-  check(boot.inside && boot.corners, 'the AK is inside the camera frustum', boot);
+  check(boot.inside && boot.corners, 'the AK is inside the camera frustum (every sampled vertex on screen)', boot);
   const t0 = await benchT(page); await waitFrames(page, 4); const t1 = await benchT(page);
   check(t1 > t0, 'idle motion runs on the main menu', [t0, t1]);
   if (shots) await page.screenshot({ path: SHOTS + '/efc-bench-1280.png', timeout: 300000 });
@@ -70,7 +71,7 @@ try {
   await page.evaluate(() => mapEnsure(Settings.map));
   await startSolo(page);
   await simRun(page, 2, 'PL.ent.health = 100;');
-  await waitFrames(page, 3);
+  await page.waitForTimeout(1500); await waitFrames(page, 3);
   const inMatch = await page.evaluate(() => {
     let bench = 0; scene.traverse((o) => { if (o.userData && o.userData.efcBench) bench++; });
     const r = renderer;

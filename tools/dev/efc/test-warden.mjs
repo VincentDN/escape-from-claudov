@@ -30,7 +30,7 @@ const stand = await page.evaluate((RESPAWN) => {
   const ke0 = killEnt;
   killEnt = function (v, a, ...r) { T.kills.push({ v: v.name, vs: v.squad, as: a && a.squad, self: a === v }); ke0(v, a, ...r); if (!hasDied && efcRaidMode()) efcEmit('died', v, a); };
   if (!hasFilter) used.push('damage filter'); if (!hasDied) used.push('died event');
-  if (!efcHas('world:body')) { efcProvide('world:body', (p, items, name) => T.bodies.push({ p, items, name })); used.push('world:body'); }
+  { const real = EFC.services['world:body']; efcProvide('world:body', (p, items, name) => { T.bodies.push({ p, items, name }); if (real) real(p, items, name); }); if (!real) used.push('world:body'); } // records, and passes on to the real WORLD service when it is loaded
   if (!efcHas('loot:roll')) { efcProvide('loot:roll', (t) => [{ id: 'test_' + t, n: 1 }]); used.push('loot:roll'); }
   EFC.cfg.wardenRespawn = RESPAWN;
   return used;

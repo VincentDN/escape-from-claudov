@@ -116,6 +116,9 @@ function ragBounds(R, span) {
   for (let i = 0; i < R.n; i++) { const p = P[i]; if (p.x < x0) x0 = p.x; if (p.x > x1) x1 = p.x; if (p.y < y0) y0 = p.y; if (p.y > y1) y1 = p.y; if (p.z < z0) z0 = p.z; if (p.z > z1) z1 = p.z; }
   const m = 0.35 + RAG.vMax * span;
   R.boxes.length = 0; R.ramps.length = 0;
+  // Escape From Claudov : un ragdoll dont les points partent très loin (instabilité numérique) faisait parcourir à queryBoxes des milliards de
+  // cases et figeait le jeu ; la recherche reste dans la carte
+  x0 = Math.max(x0, MAP.x0 - 30); x1 = Math.min(x1, MAP.x1 + 30); z0 = Math.max(z0, MAP.z0 - 30); z1 = Math.min(z1, MAP.z1 + 30);
   for (const c of queryBoxes(x0 - m, z0 - m, x1 + m, z1 + m)) if (!c.ray && c.y1 > y0 - m && c.y0 < y1 + m) R.boxes.push(c);
   for (const rp of RAMPS) if (rp.x1 > x0 - m && rp.x0 < x1 + m && rp.z1 > z0 - m && rp.z0 < z1 + m) R.ramps.push(rp);
 }

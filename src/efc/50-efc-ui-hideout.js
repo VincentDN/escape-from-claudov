@@ -8,7 +8,7 @@ function efcHoRender() {
   const mark = efcUiFocusMark(root), st = efcCall('stash:get');
   if (!st) {
     $('efcHoStash').innerHTML = '<p class="efc-none">The stash is not available.</p>';
-    $('efcHoLoad').innerHTML = efcUiInvHtml(null); $('efcHoTot').innerHTML = efcUiTotHtml(null);
+    $('efcHoLoad').innerHTML = efcThumbInvHtml(null); $('efcHoTot').innerHTML = efcUiTotHtml(null);
   } else {
     // stash: grouped by kind, each row keeps its index in the stash list
     const items = (st.items || []).map((it, i) => ({ it, i, d: efcUiDef(it.id) }));
@@ -17,11 +17,11 @@ function efcHoRender() {
       const g = items.filter((x) => (EFC_UI_KINDS.some((k) => k[0] === x.d.kind) ? x.d.kind : 'loot') === kind);
       if (!g.length) continue;
       g.sort((a, b) => String(a.d.name).localeCompare(String(b.d.name)));
-      h += `<p class="efc-gh">${label}</p>` + g.map((x) => efcUiRow(x.it, { key: 'st-' + x.it.id + '-' + x.i, data: { stash: x.i }, title: 'Move to the loadout' })).join('');
+      h += `<p class="efc-gh">${label}</p>` + g.map((x) => efcThumbRow(x.it, { key: 'st-' + x.it.id + '-' + x.i, data: { stash: x.i }, title: 'Move to the loadout' })).join('');
     }
     $('efcHoStash').innerHTML = h || '<p class="efc-none">The stash is empty.</p>';
     const lo = st.loadout;
-    $('efcHoLoad').innerHTML = efcUiInvHtml(lo, {
+    $('efcHoLoad').innerHTML = efcThumbInvHtml(lo, {
       bagActs: (i, it) => (EFC_UI_EQUIP[efcUiDef(it.id).kind] ? [['equip', 'Equip']] : []),
     });
     $('efcHoTot').innerHTML = efcUiTotHtml(lo);

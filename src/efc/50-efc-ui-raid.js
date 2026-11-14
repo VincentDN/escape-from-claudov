@@ -40,7 +40,7 @@ function efcUirRender() {
 function efcUirRenderInv() {
   const root = $('efcInv'), mark = efcUiFocusMark(root), inv = EFC.inv;
   const canDrop = efcHas('world:put'), canUse = efcHas('med:use');
-  $('efcInvList').innerHTML = efcUiInvHtml(inv, {
+  $('efcInvList').innerHTML = efcThumbInvHtml(inv, {
     slotActs: () => [['unequip', 'Unequip'], ['drop', 'Drop', !canDrop]],
     bagActs: (i, it) => {
       const k = efcUiDef(it.id).kind, a = [];
@@ -58,10 +58,10 @@ function efcUirRenderLoot() {
   EFC_UIR.sel = Math.min(Math.max(EFC_UIR.sel, 0), Math.max(items.length - 1, 0));
   $('efcLootTitle').textContent = efcUirName(c);
   $('efcLootName').textContent = items.length ? `Contents (${items.length})` : 'Contents';
-  $('efcLootList').innerHTML = items.length ? items.map((it, i) => efcUiRow(it, { key: 'c-' + i, data: { take: i }, sel: i === EFC_UIR.sel, title: 'Take' })).join('') : '<p class="efc-none">Nothing left.</p>';
+  $('efcLootList').innerHTML = items.length ? items.map((it, i) => efcThumbRow(it, { key: 'c-' + i, data: { take: i }, sel: i === EFC_UIR.sel, title: 'Take' })).join('') : '<p class="efc-none">Nothing left.</p>';
   $('efcLootAll').disabled = !items.length;
   const bag = (EFC.inv && EFC.inv.bag) || [];
-  $('efcLootBag').innerHTML = bag.length ? bag.map((it, i) => efcUiRow(it, { key: 'b-' + i, data: { put: i }, title: 'Put in the container' })).join('') : '<p class="efc-none">The bag is empty.</p>';
+  $('efcLootBag').innerHTML = bag.length ? bag.map((it, i) => efcThumbRow(it, { key: 'b-' + i, data: { put: i }, title: 'Put in the container' })).join('') : '<p class="efc-none">The bag is empty.</p>';
   $('efcLootW').innerHTML = efcUiTotHtml(EFC.inv);
   efcUiFocusBack(root, mark);
 }

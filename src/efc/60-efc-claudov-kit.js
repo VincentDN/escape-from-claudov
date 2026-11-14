@@ -52,6 +52,16 @@ function clvContainer(cx, y, cz, axis, tint, open = false) {
   }
   WORLD.col({ x0: cx - w / 2, x1: cx + w / 2, y0: y, y1: y + 2.6, z0: cz - d / 2, z1: cz + d / 2 }, 'metal');
 }
+/* Insertion shelter: an open container (three walls and a roof) whose doors face [dx, dz] (one of the four axes), the doors a short
+   step from a wall or the quay edge, so nobody inside can be seen and the squad steps out along the wall (raid inserts, 60-efc-claudov.js) */
+function clvShelter(cx, cz, dx, dz, tint) {
+  const L = 6.06, W = 2.44, t = 0.12, h = 2.6, alongX = dx !== 0, hl = (alongX ? L : W) / 2, hd = (alongX ? W : L) / 2;
+  DECOR.place(PF.container(true), cx, 0, cz, Math.atan2(dx, dz), { tint, nocol: true });
+  const x0 = cx - hl, x1 = cx + hl, z0 = cz - hd, z1 = cz + hd, col = (a, b, c, d) => WORLD.col({ x0: a, x1: b, y0: 0, y1: h, z0: c, z1: d }, 'metal');
+  if (alongX) { col(x0, x1, z0, z0 + t); col(x0, x1, z1 - t, z1); if (dx > 0) col(x0, x0 + t, z0, z1); else col(x1 - t, x1, z0, z1); }
+  else { col(x0, x0 + t, z0, z1); col(x1 - t, x1, z0, z1); if (dz > 0) col(x0, x1, z0, z0 + t); else col(x0, x1, z1 - t, z1); }
+  WORLD.col({ x0, x1, y0: h - 0.15, y1: h, z0, z1 }, 'metal');
+}
 /* Container stack block: nx side by side (across), nl end to end, tiers per slot from `tiers` (array of nx*nl heights 0..2) */
 function clvStack(x0, z0, axis, nx, nl, tiers, R) {
   const W = 2.44, L = 6.06, gap = 0.06;

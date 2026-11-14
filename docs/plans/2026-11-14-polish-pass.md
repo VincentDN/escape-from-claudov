@@ -104,12 +104,32 @@ Tarkov's own soundtrack, or anything taken from it, cannot ship. What can: origi
 **Proof**: tracks load, loop without a click, obey the music volume setting; a rights table in the credits. Anything whose terms
 are unclear goes to a review sheet and does not ship.
 
+## P6. Free loadout: the SKS (added by the owner after the first draft)
+
+The engine has 18 weapons and no SKS, so this is a new, nineteenth weapon plus a menu option.
+
+1. **The rifle**: an SKS built by code like the other guns: wooden stock, fixed ten-round magazine, folded bayonet, semi-automatic.
+   Deliberately poor: slow follow-up shots, heavy recoil, loose iron sights, reloaded round by round (the engine's tube-reload
+   path, standing in for a stripper clip). Its own shot sound from the P2 audit, and its own thumbnail from P3.
+2. **The option**: on the Raid screen, "Free loadout" beside "Your loadout". It gives the SKS with 30 rounds and nothing else. The
+   SKS is never banked on extraction; everything you loot is. It replaces today's silent fallback (a free M9 when the stash has no
+   weapon), and is offered automatically when the stash is empty.
+3. Wardens never carry the SKS and it is not in any loot table, so it stays the mark of a free run.
+
+**Proof**: item and raid tests extended (free kit never banked, loot kept); the gun appears in the weapon contact sheet.
+
+## P7. "A fork of Riposte" under the logo (added by the owner)
+
+A small, quiet line under the logo on the main menu: "a fork of Riposte: Frontline", linking to
+https://github.com/BenDBSS/Riposte-Frontline-Source in a new tab. Text in the page, not baked into the logo image, so it is a real
+link. When the bench menu (P4) lands, the line moves with the logo. Ten minutes of work: done first, with P1.
+
 ## Order and workers
 
 | Step | Work | Workers | Why this order |
 | --- | --- | --- | --- |
-| 1 | P1 spawns | 1 Opus | Small, touches map and Warden files only; deploy as soon as it passes |
-| 2 | P2 sounds and P3 thumbnails | 2 Opus in parallel | Disjoint files (audio against UI and items) |
+| 1 | P7 fork line (lead) and P1 spawns | 1 Opus | Small, touches map and Warden files only; deploy as soon as it passes |
+| 2 | P2 sounds, P3 thumbnails, P6 SKS | 3 Opus in parallel | Disjoint files (audio; UI and items; weapon model and stash) |
 | 3 | P4 bench menu | 1 Opus | Touches the same UI files as P3, so after it |
 | 4 | P5 music | 1 Opus, can overlap P4 | Audio files only |
 

@@ -101,6 +101,7 @@ function mbgLoad(url) { return new Promise((ok, ko) => { const im = new Image();
 function mbgMotion() { return !(typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches); }
 async function mbgInit() {
   if (MBG.scene || MBG.failed) return;
+  if (efcBenchInit()) return; // Escape From Claudov: the workbench scene replaces the key art (src/efc/55-efc-bench.js)
   if (Settings.gfxSafe || !MENU_DEPTH) { MBG.failed = true; return; }
   const m = /url\(["']?(.*?)["']?\)/.exec(getComputedStyle($('menuBg')).backgroundImage || '');
   if (!m) { MBG.failed = true; return; }
@@ -127,11 +128,12 @@ async function mbgInit() {
     MBG.ready = true;
   } catch (e) { MBG.failed = true; }
 }
-function mbgFail() { MBG.failed = true; MBG.live = false; const el = $('menuBg'); if (el) el.classList.remove('gl'); }
+function mbgFail() { if (EFC_BENCH.on) efcBenchFail(); MBG.failed = true; MBG.live = false; const el = $('menuBg'); if (el) el.classList.remove('gl'); }
 /* Dessine le fond (appelée par frame tant qu'un menu est affiché) ; rend la main sans rien faire si le fond n'est pas prêt ou n'a pas lieu d'être */
 const _mbgV = new THREE.Vector4(), _mbgS = new THREE.Vector2();
 /* Dessine le fond (vrai s'il a été dessiné à cette image : l'aperçu de l'écran Tenues se dessine alors par-dessus, 09u-tenues.js) */
 function mbgDraw(dt) {
+  if (EFC_BENCH.on) { if (MAPL.state === 'loading' || UI.busy || gpuLostNow()) return; return efcBenchDraw(dt); } // Escape From Claudov bench
   if (!MBG.ready || MBG.failed) return;
   if (MAPL.state === 'loading' || UI.busy || gpuLostNow()) return; // chargement d'une carte : le GPU est à elle (barrières, compilation)
   const main = UI.screen === 'main', U = MBG.mat.uniforms, move = mbgMotion();
@@ -170,4 +172,4 @@ function mbgDraw(dt) {
   return true;
 }
 /* Retour aux menus (menuBgShow) : la toile montre encore la dernière image du jeu, le fond est à redessiner tout de suite */
-function mbgShown() { MBG.drawn = ''; MBG.acc = 1; }
+function mbgShown() { MBG.drawn = ''; MBG.acc = 1; EFC_BENCH.drawn = ''; }

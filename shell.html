@@ -84,6 +84,7 @@ img { -webkit-user-drag: none; }
    le fond animé (src/09w-fond.js) la lit ici, la dessine dans la toile du jeu avec sa profondeur, puis l'efface en fondu (classe gl). */
 #menuBg { position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); z-index: 19; display: none; background: #050505 var(--key-art) 71% center / cover no-repeat; transition: opacity .6s; }
 #menuBg.gl { opacity: 0; }
+#menuBg.bench { background: #07090a; } /* Escape From Claudov: the workbench scene (src/efc/55-efc-bench.js) replaces the key art; dark until its first frame */
 .hidden { display: none !important; }
 /* mesures de performance (Options, Vidéo) : en haut à droite, coin libre du HUD ; au doigt, en bas à gauche (les boutons tiennent le haut à droite, le score le haut au centre) */
 #perf { position: fixed; top: max(8px, 2.4vh); right: max(16px, 3vh); z-index: 60; padding: 4px 10px; border-radius: 4px; background: rgba(8, 10, 9, 0.62); color: #cfe9d2; font: 600 12px/1.35 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; white-space: pre; text-align: center; pointer-events: none; }

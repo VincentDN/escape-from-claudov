@@ -172,7 +172,8 @@ link. When the bench menu (P4) lands, the line moves with the logo. Ten minutes 
 | 2b | P2b Warden pace and posture, P2c leaning | 2 Opus, after P1 is merged | P2b touches the Warden files P1 is changing; P2c touches player and net files |
 | 3 | P4 bench menu | 1 Opus | Touches the same UI files as P3, so after it |
 | 4 | P5 music | 1 Opus, can overlap P4 | Audio files only |
-| 5 | P8 omnimovement | 2 Opus (movement and stances; weapon and body poses) | After P7 and after leaning, which it builds on |
+| 5 | P9 raid-start weapon check | 1 Opus | After P2 (foley), P6 (SKS) and P7 |
+| 6 | P8 omnimovement | 2 Opus (movement and stances; weapon and body poses) | After P7 and after leaning, which it builds on |
 
 The lead reviews and merges each step, runs `tools/dev/efc/run-all.sh`, and redeploys. Workers commit as they go; the account's
 usage limit stopped the first build three times, so steps run in sequence rather than all at once.
@@ -217,6 +218,22 @@ Full omnidirectional movement in the manner of recent Call of Duty and Battlefie
 
 **Proof**: a state-machine test for every transition and direction; collision checks so no stance clips through walls or the
 floor; contact sheets of each stance in first and third person for the owner; the two-client rig shows the same stance remotely.
+
+## P9. Raid-start weapon check (owner, 14 November; a flourish, after P7)
+
+For the first few steps of every raid the player checks their weapon: tilts it, pulls the magazine to look at it, seats it
+again, a press check of the chamber, then brings it up.
+
+1. Built on the engine's inspect choreography (`src/06d-reload.js` has reload and inspect sequences per weapon family), so each
+   family gets its own version: magazine out and back for rifles, SMGs and pistols; bolt cracked open for bolt actions; a shell
+   check for pump shotguns; the SKS shows its fixed magazine by opening the bolt.
+2. It plays while the player walks during the insertion grace (P1), with the handling foley from P2.
+3. It never costs control: firing, aiming, sprinting or switching weapon cancels it at once, and the weapon is always loaded
+   and ready (the magazine count does not change).
+4. Other players see the third-person version; a setting turns it off.
+
+**Proof**: a test that it starts at insertion, cancels on each input within one frame, and leaves ammunition unchanged; one
+contact sheet per weapon family.
 
 # Pass 2 (owner, 14 November 2026): starts when everything above is merged and deployed
 

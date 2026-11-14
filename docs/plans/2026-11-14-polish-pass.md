@@ -17,8 +17,20 @@ Status: proposal, 14 November 2026. Nothing below is built. Priority order is th
 - The reinforcement rule (no respawn within 45 m or in sight of a player) does not apply to the first placement.
 - The engine's spawn protection lasts 2 seconds. A Warden can kill a full-health player with one shot.
 
+**Too many Wardens (owner, after playing other maps)**
+
+- Every raid fields all 11 bot soldiers, whatever the map. The classic maps are about 70 by 100 m, a quarter of Claudov's area, so
+  11 Wardens fill them.
+- Only Claudov has hand-placed raid data. The other maps get inserts and posts derived from bot waypoints by
+  `efcMapFallback` in the core, which keeps inserts away from extracts but not from guard posts.
+
 **Changes**
 
+0. Fewer Wardens, scaled to the map: about one per 3,500 m² of play area, between 3 and 7 at the start (Claudov and Simoun 7, the
+   classic maps 3 or 4), plus one per extra player squad. Reinforcements only replace losses up to that number; the raid never
+   holds more. Posts shrink to match: one or two Wardens each, the elite post keeps its three on the large maps only.
+   The derived data for other maps obeys the same insert rules as Claudov (distance and sight from posts), and a map that
+   cannot satisfy them is not offered for raids (D7).
 1. Move the four inserts to hidden spots and add two (six in all): inside or behind a structure at the map edge, at least 55 m from
    every post centre, with no line of sight to any post area or to another insert. Where the edge has no cover, add a small
    structure (a shed, a container pair, a wall return).
@@ -29,8 +41,9 @@ Status: proposal, 14 November 2026. Nothing below is built. Priority order is th
 4. Squads are spread: each squad gets the insert farthest from the squads already placed.
 5. Lethality (owner decision D5): no single body shot from a regular Warden kills from full health; headshots and elites unchanged.
 
-**Proof**: `test-map.mjs` asserts the distance and sight rules; a new check runs 60 raid starts (10 per insert) with the player
-idle for 30 seconds and requires zero damage and no Warden within 40 m at the start.
+**Proof**: `test-map.mjs` asserts the distance and sight rules; a new check runs 60 raid starts (10 per insert) on Claudov, and 10
+on every other map offered for raids, with the player idle for 30 seconds: zero damage, no Warden within 40 m at the start, and
+the Warden count within the map's number for the whole raid.
 
 ## P2. Weapon handling and firing sounds from Partisan Project
 
@@ -145,4 +158,5 @@ usage limit stopped the first build three times, so steps run in sequence rather
 | D3 | Keep the FIA flag on the bench, or replace it? | Replace with a plain Claudov harbour-authority flag drawn by code |
 | D4 | Music: openly licensed archive tracks, or generated with your Magnific account? | Archive tracks first |
 | D5 | Stop regular Wardens killing a full-health player with one body shot? | Yes |
+| D7 | Offer raids on the small classic maps at all? | Yes where the insert rules can be met, with 3 or 4 Wardens; otherwise Claudov and Simoun only |
 | D6 | Deploys: make `main` the default branch and allow it in the Pages environment? | Yes; until then I deploy from the `claude/` branch |

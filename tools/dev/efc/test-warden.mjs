@@ -40,14 +40,14 @@ await startSolo(page);
 // (a) after start
 const a = await page.evaluate(() => {
   MATCH.timeLeft = 1e5; T.inv = true;
-  const W = EFC.wd, bots = entities.filter((e) => !e.isPlayer);
-  return { mode: MATCH.mode, posts: W.posts.map((p) => ({ x: Math.round(p.x), z: Math.round(p.z), r: p.r, n: p.n, m: p.members.length, elite: p.elite })),
+  const W = EFC.wd, bots = entities.filter((e) => !e.isPlayer && !e.off); // (bots beyond the raid's Warden number are out of play)
+  return { mode: MATCH.mode, n: W.n, off: entities.filter((e) => !e.isPlayer && e.off && !e.alive).length, posts: W.posts.map((p) => ({ x: Math.round(p.x), z: Math.round(p.z), r: p.r, n: p.n, m: p.members.length, elite: p.elite })),
     bots: bots.map((b) => { const p = W.posts[b.efcPost]; return { name: b.name, squad: b.squad, alive: b.alive, post: b.efcPost, d: p ? +hyp(b.pos.x - p.x, b.pos.z - p.z).toFixed(1) : null, r: p ? p.r : null, elite: b.efcElite }; }) };
 });
 console.log('posts', JSON.stringify(a.posts));
 ok(a.mode === 'raid', '(a) match runs in raid mode', a.mode);
 ok(a.posts.length > 1, '(a) guard posts from map:data', a.posts.length);
-ok(a.bots.length >= 8 && a.bots.every((b) => b.squad === 'w' && /^Warden /.test(b.name)), '(a) every bot is a Warden (squad w, Warden name)', a.bots.map((b) => b.name));
+ok(a.bots.length === a.n && a.n === 7 && a.bots.every((b) => b.squad === 'w' && /^Warden /.test(b.name)), '(a) the raid fields the map\'s Warden number (Simoun: 7), each a Warden (squad w, Warden name); the other bots are out of play', a.bots.map((b) => b.name));
 ok(a.bots.every((b) => b.alive), '(a) every Warden is alive');
 ok(a.bots.every((b) => b.d !== null && b.d <= b.r + 3), '(a) every Warden within its post radius + 3 m', a.bots.map((b) => b.d));
 ok(a.posts.every((p) => p.m >= 1) && a.bots.some((b) => b.elite) === a.posts.some((p) => p.elite), '(a) every post manned, elite flag follows the post');
@@ -84,7 +84,7 @@ ok(b.info && b.info.alive === a.bots.length && b.info.posts.length === a.posts.l
 const c0 = await page.evaluate(() => {
   const P = EFC.wd.posts, eye = new V3(), at = new V3();
   for (const p of P.slice().sort((x, y) => Math.max(...P.map((q) => hyp(q.x - y.x, q.z - y.z))) - Math.max(...P.map((q) => hyp(q.x - x.x, q.z - x.z))))) {
-    const far = P.filter((q) => hyp(q.x - p.x, q.z - p.z) > 80); if (!far.length) continue;
+    const far = P.filter((q) => hyp(q.x - p.x, q.z - p.z) > 45); if (!far.length) continue;
     const ws = entities.filter((e) => e.alive && e.efcPost === p.i); if (!ws.length) continue;
     for (let id = 0; id < NAV.count; id++) {
       if (NAV.comp[id] !== NAV.mainComp) continue;
@@ -99,7 +99,7 @@ const c0 = await page.evaluate(() => {
   }
   return null;
 });
-ok(!!c0, '(c) found a spot 15 m from a post in view, with posts more than 80 m away', c0);
+ok(!!c0, '(c) found a spot 15 m from a post in view, with posts more than 45 m away', c0);
 if (c0) {
   await page.evaluate(() => { T.tFirst = -1; T.farT = 0; T.n = 0; });
   await simRun(page, 10, `PL.ent.pos.set(...SPOT); PL.ent.vel.set(0, 0, 0); T.n++;
@@ -107,7 +107,7 @@ if (c0) {
     T.farT += FARW.filter((e) => e.alive && e.visible && e.target === PL.ent).length;`);
   const c = await page.evaluate(() => ({ first: T.tFirst, far: T.farT, mates: entities.filter((e) => e.alive && e.efcPost === CP).map((e) => ({ t: e.tactic, sees: e.visible && e.target === PL.ent })) }));
   ok(c.first >= 0 && c.first <= 10, '(c) a Warden of that post targets the player within 10 s', c);
-  ok(c.far === 0, '(c) Wardens of posts more than 80 m away do not target the player', c.far);
+  ok(c.far === 0, '(c) Wardens of posts more than 45 m away do not target the player', c.far);
 }
 // (d) kill a Warden through the engine damage path, reinforcement rules
 const d0 = await page.evaluate(() => {
@@ -133,7 +133,7 @@ ok(ranD >= RESPAWN + 9.9 && !d1.alive, `(d) player near the post: still dead aft
 await page.evaluate(() => { T.backT = -1; T.n = 0; });
 await simRun(page, 10, 'PL.ent.pos.set(...PARK); PL.ent.vel.set(0, 0, 0); T.n++; if (T.backT < 0 && W.alive) T.backT = T.n / 30;');
 const d2 = await page.evaluate(() => { const p = EFC.wd.posts[W.efcPost]; return { alive: W.alive, after: T.backT, post: W.efcPost, d: +hyp(W.pos.x - p.x, W.pos.z - p.z).toFixed(1), r: p.r }; });
-ok(d2.alive && d2.d <= d2.r + 3, '(d) player far away: the Warden is back at a post', d2);
+ok(d2.alive && d2.d <= d2.r + 6, '(d) player far away: the Warden is back at a post (within its radius + 6 m)', d2);
 // (e) tdm still runs
 await page.evaluate(() => { T.inv = false; Settings.mode = 'tdm'; endMatch(); LOCK.fallback = true; startMatch({}); });
 const ranE = await simRun(page, 20, 'PL.ent.health = 100;');

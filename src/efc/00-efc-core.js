@@ -189,7 +189,8 @@ function efcMapFallback() {
   const extracts = ext.map((p, i) => ({ id: 'x' + i, name: names[i], x: p[0], z: p[1], r: 4, openAt: i === 2 ? 600 : 0 }));
   // guard posts: as many as the Warden number needs (one or two each, three at the elite post), central ones first, spread out
   const N = efcWardenNumber(1), elite = N >= C.wardenElite3, P = elite ? 1 + Math.ceil((N - 3) / 2) : Math.ceil(N / 2), posts = [];
-  for (const sep of [24, 16, 10]) for (const p of byFar.slice().reverse()) {
+  const side = Math.min(MAP.x1 - MAP.x0, MAP.z1 - MAP.z0);
+  for (const sep of [Math.max(24, side / 4), 24, 16, 10]) for (const p of byFar.slice().reverse()) {
     if (posts.length >= P) break;
     if (!posts.includes(p) && !ext.some((q) => dist(p, q) < 20) && !posts.some((q) => dist(p, q) < sep)) posts.push(p);
   }

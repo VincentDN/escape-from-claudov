@@ -1767,3 +1767,7 @@ a fork of Riposte ⇒ =
 Weapon handling takes from Partisan Project, supplied and cleared by the owner. ⇒ =
 Carabine ⇒ Carbine
 Vieille carabine semi-automatique à dix coups, chargée cartouche par cartouche. Lente et rude, mais elle ne coûte rien. ⇒ An old ten-round semi-automatic carbine, loaded one round at a time. Slow and rough, but it costs nothing.
+Se pencher ⇒ Leaning
+Se pencher à gauche ⇒ Lean left
+Se pencher à droite ⇒ Lean right
+Se pencher en bascule (un appui penche, un autre redresse, sinon tenir la touche) ⇒ Toggle lean (one press leans, another straightens up, otherwise hold the key)

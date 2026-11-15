@@ -920,6 +920,7 @@ function netApply(id, P) {
   e.net.yaw = clamp(numOr(s[3]), -1e4, 1e4); e.net.pitch = clamp(numOr(s[4]), -1.5, 1.5);
   netTrack(e, P.ts, !!s[9]);
   e.crouch = !!s[7]; e.slide = s[7] === 2; e.sprinting = !!s[8]; e.arms.adsW = s[10] ? 1 : 0; // 2 : accroupi et en glissade
+  e.net.lean = clamp(numOr(s[12]), -0.4, 0.4); // penché (lissé par updateRemote)
   const alive = !!s[9];
   e.health = clamp(numOr(s[11]), 0, 100);
   if (P.ak && typeof P.ak === 'object') NET.ak.set(id, P.ak); // événements appliqués par cet expéditeur, par expéditeur (netAckOf) : lu avant ses événements, qui le suivent dans le même état
@@ -1062,6 +1063,7 @@ function updateRemote(e, dt) {
     e.yaw += angDiff(e.yaw, N.yaw) * k; e.lookYaw = e.yaw; e.pitch += (N.pitch - e.pitch) * k;
     e.crouchAmt = damp(e.crouchAmt, e.crouch ? 1 : 0, 10, dt);
     e.slideAmt = damp(e.slideAmt || 0, e.slide ? 1 : 0, e.slide ? 12 : 7, dt); // comme ctlMove
+    efcLeanRemote(e, dt); // penché, lissé vers l'état publié (src/efc/42-efc-lean.js)
     e.visible = true; e.target = null;
     // pas d'un joueur distant, comme ceux des bots (07b-tactics.js)
     const v = hyp(e.vel.x, e.vel.z), run = v > 6;
@@ -1178,6 +1180,7 @@ function netPresence(e, now) {
   const r = (v, n = 2) => Math.round(v * 10 ** n) / 10 ** n, me = e === PL.ent;
   const s = [r(e.pos.x), r(e.pos.y), r(e.pos.z), r(me ? (PILOT.d ? PILOT.yaw : PL.yaw) : e.yaw, 3), r(me ? (PILOT.d ? PILOT.pitch : PL.pitch) : e.pitch, 3), r(e.vel.x, 1), r(e.vel.z, 1),
     e.crouch ? ((e.slideT || 0) > 0 ? 2 : 1) : 0, e.sprinting ? 1 : 0, e.alive ? 1 : 0, (me ? VM.ads : e.arms.adsW) > 0.5 ? 1 : 0, Math.max(0, Math.round(e.health))];
+  if (e.leanX) s.push(r(e.leanX)); // s[12] : penché, décalage de l'œil en mètres (src/efc/42-efc-lean.js) ; absent debout
   const p = { ts: Math.round(now), n: me ? NET.nick : e.name, t: e.team, w: me ? curW().def.id : armsW(e).def.id, g: me ? curW().def.key : armsW(e).def.key, s, f: me ? NET.shots : e.arms.shots, k: e.kills, d: e.deaths, a: e.assists, sc: e.score, sk: skinOf(e), ev: netEvList(e, now) };
   const dr = fpvPub(e); if (dr) p.dr = dr; // drone kamikaze en vol (08e-fpv.js)
   const mk = mechaPub(e); if (mk) p.mk = mk; // mecha posé (08f-mecha.js)

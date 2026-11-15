@@ -66,6 +66,8 @@ function onKey(e, down) {
   else if (c === 'Digit5') useKs(1);
   else if (c === 'Digit6') useKs(2);
   else if (c === 'KeyI') inspectWeapon();
+  else if (c === 'LeanL') efcLeanPress(-1); // se pencher (src/efc/42-efc-lean.js)
+  else if (c === 'LeanR') efcLeanPress(1);
 }
 /* Vitesse du regard en visée par rapport à la hanche : mul = 1 ne change rien, 0,6 donne 60 % de la vitesse sans zoom. Le facteur suit la visée (VM.ads, 0 à 1) pour
    que le passage de l'une à l'autre soit progressif. S'ajoute à la réduction due au champ de vision (0,35 + 0,65 x zoom), commune à la souris et à la manette. */
@@ -296,7 +298,7 @@ function playerShotFx(d, ads, f, muzzle, kv, kh, hitAny) {
 /* ---------- Mise à jour ---------- */
 function updatePlayer(dt, now) {
   const e = PL.ent;
-  if (!e.alive) { updateDeadPlayer(dt); return; }
+  if (!e.alive) { if (e.leanX) efcLeanReset(); updateDeadPlayer(dt); return; }
   const w = curW(), d = w.def;
   // regard
   if (KS.map.open) { ksMapMouse(mouseDX, mouseDY); mouseDX = 0; mouseDY = 0; }
@@ -310,6 +312,7 @@ function updatePlayer(dt, now) {
   if (PAD.drive) padLook(dt); // manette (09qc-manette.js)
   recoilTick(dt, now, PL.pitch - pitch0); // retour de la visée après un tir ; ce que le joueur vient de reprendre à la main compte (07ca-recul.js)
   PL.pitch = clamp(PL.pitch, -1.5, 1.5);
+  if ((MECHA_P.me || PILOT.d) && e.leanX) efcLeanReset();
   if (MECHA_P.me) { mechaPilot(dt, now); return; } // à bord du mecha (08g-mecha-pilote.js)
   if (PILOT.d) { fpvPlayer(dt, now); return; } // drone kamikaze : le regard et les déplacements le pilotent, le corps reste sur place (08e-fpv.js)
 
@@ -429,6 +432,7 @@ function updatePlayer(dt, now) {
   if (e.health < 40) { PL.heartT -= dt; if (PL.heartT <= 0) { sfxHeart(); PL.heartT = 0.9; } }
   PL.suppress = Math.max(0, PL.suppress - dt * 0.8);
   PL.ent.pitch = PL.pitch; PL.ent.yaw = PL.yaw;
+  efcLeanTick(dt); // se pencher : décalage de l'œil arrêté par les murs (src/efc/42-efc-lean.js)
   applyCamera(dt, now, scoped);
   // soleil sur l'arme : visible si le rayon vers le soleil est libre
   if ((PL.sunTick = (PL.sunTick || 0) + 1) % 6 === 0) {
@@ -512,6 +516,7 @@ function applyCamera(dt, now, scoped) {
   camera.position.x += Math.cos(PL.yaw) * Math.cos(PL.bobT) * 0.007 * bob; camera.position.z -= Math.sin(PL.yaw) * Math.cos(PL.bobT) * 0.007 * bob;
   camera.position.x -= Math.sin(PL.yaw) * PL.lunge; camera.position.z -= Math.cos(PL.yaw) * PL.lunge;
   camera.rotation.set(PL.pitch + PL.punchP + sy + (Math.random() - 0.5) * sh + Math.sin(PL.bobT * 2) * 0.004 * sw * bob, PL.yaw + PL.punchY + sx + (Math.random() - 0.5) * sh, Math.cos(PL.bobT) * (0.003 + 0.005 * sw) * bob + VM.swayX * -0.02 + PL.rollP + (e.slideAmt || 0) * 0.045);
+  efcLeanCam(); // se pencher : l'œil se décale et la vue roule (src/efc/42-efc-lean.js)
   PL.yawReal = PL.yaw;
   PL.fovK = damp(PL.fovK || 0, 0, 7, dt);
   const fovT = Settings.fov * lerp(1, d.adsFov, smoothstep(0, 1, VM.ads)) * (1 + 0.085 * sw + (e.slideAmt || 0) * 0.09) + PL.fovK * lerp(1, 0.35, VM.ads);

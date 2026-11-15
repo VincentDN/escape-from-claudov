@@ -17,6 +17,10 @@ run node tools/dev/efc/test-ui.mjs
 run node tools/dev/efc/test-thumbs.mjs
 run node tools/dev/efc/test-sounds.mjs
 run node tools/dev/efc/test-bench.mjs
+run node tools/dev/efc/test-sks.mjs
+run node tools/dev/efc/test-warden-pace.mjs
+run node tools/dev/efc/test-lean.mjs
+run node tools/dev/efc/test-music.mjs
 run node tools/dev/efc/test-map.mjs
 run node tools/dev/efc/test-spawns.mjs
 run env MAP=sable node tools/dev/efc/test-e2e.mjs

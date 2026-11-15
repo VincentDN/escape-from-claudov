@@ -1,6 +1,15 @@
 # Polish pass 1: plan
 
-Status: proposal, 14 November 2026. Nothing below is built. Priority order is the owner's.
+Status at the pause of 15 November 2026 (owner asked for a wrap-up; workers paused, the five-hourly wake is disabled).
+
+**Merged and deployed**: P1 spawns and Warden numbers, P2 weapon sounds, P2b Warden pace and posture, P2c leaning, P3 and P3b
+thumbnails, P4 workbench main screen, P5 music and harbour ambience, P6 free SKS loadout, P7 fork line.
+**Not started**: P6b grid inventory, P8 omnimovement, P9 raid-start weapon check, and all of Pass 2.
+**Known gaps in what is merged**: the workers of P2b, P2c, P5 and P6 were stopped by the usage limit before writing their
+final reports, so the lead merged their committed work and ran their tests instead of reviewing a report; nobody has played
+any of it; music was chosen by description, not by ear.
+
+Priority order is the owner's.
 
 ## P1. Spawns on Claudov (first, alone)
 

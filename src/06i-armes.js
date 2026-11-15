@@ -103,6 +103,13 @@ const WEAPONS = {
     reload: 2.0, reloadEmpty: 2.3, spread: [0.03, 0.0035], moveSpread: 0.012, recoil: { v: 0.036, h: 0.012, kick: 0.095, rot: 0.16 }, adsTime: 0.17, adsFov: 0.85, move: 1.0, pattern: 'rand', loud: true, shell: 'pistol50',
     ai: { ideal: 14, aggr: 0.35 }, stats: { dmg: 0.85, acc: 0.5, rng: 0.45, rof: 0.28, mob: 0.85 }, unlock: { from: 'usp', level: 8 },
     desc: _t('Le .50 Action Express. Deux balles au torse, une à la tête, mais sept coups seulement.') },
+  /* SKS (P6, la tenue gratuite d'Escape From Claudov) : semi-automatique à boîte fixe de dix coups, rechargée cartouche par
+     cartouche (le tube tient lieu de lame-chargeur). Volontairement le pire fusil : coup suivant lent, recul lourd qui se pose
+     lentement, dispersion large, visée lente, aucun accessoire. Jamais dans le butin ni aux mains des Gardiens. */
+  sks: { id: 'sks', name: 'SKS', type: _t('Carabine'), cat: 'ar', fam: 'rifle', model: 'sks', sound: 'ak', auto: false, rpm: 150, dmg: [34, 24], range: [15, 40], head: 1.5, legs: 0.85, mag: 10, reserve: 30,
+    tube: true, shellTime: 0.42, spread: [0.062, 0.0065], moveSpread: 0.045, recoil: { v: 0.032, h: 0.012, kick: 0.075, rot: 0.11 }, adsTime: 0.36, adsFov: 0.74, move: 0.92, pattern: 'rand', loud: true,
+    ai: { ideal: 18, aggr: 0.35 }, stats: { dmg: 0.66, acc: 0.42, rng: 0.55, rof: 0.18, mob: 0.6 }, slots: [],
+    desc: _t('Vieille carabine semi-automatique à dix coups, chargée cartouche par cartouche. Lente et rude, mais elle ne coûte rien.') },
 };
 /* Ressenti : recul du modèle (kick, rot, roll), secousse caméra (shake) et choc de la vue à chaque tir (punch), à-coup de
    champ de vision, taille du flash, raideur et amortissement du retour, fumée et étincelles de bouche.
@@ -126,6 +133,7 @@ const FEEL = {
   glock18: { kick: 0.9, rot: 0.9, roll: 0.5, shake: 0.2, fov: 1.2, flash: 1.0, spring: [380, 26], smoke: 0.15, punch: 1.4, spark: 4 },
   deagle: { kick: 2.5, rot: 2.4, roll: 0.5, shake: 0.9, fov: 4.2, flash: 2.4, spring: [260, 18], smoke: 0.6, punch: 2.2, spark: 12 },
   m9: { kick: 1.5, rot: 1.5, roll: 0.3, shake: 0.5, fov: 2.6, flash: 1.6, spring: [360, 24], smoke: 0.25, punch: 1.8, spark: 8 },
+  sks: { kick: 2.0, rot: 1.8, roll: 0.6, shake: 0.5, fov: 2.6, flash: 1.5, spring: [130, 10], smoke: 0.45, punch: 1.45, spark: 6 }, // recul lourd, retour lent
 };
 /* Grenades au choix (demande du propriétaire, après la 5.0) : chaque classe en porte un seul type, deux à chaque vie (NADE_COUNT). fuse : mèche,
    à partir de la cuillère (s) ; name : nom court (atelier, HUD) ; long : nom entier ; icon : tracé SVG 24 x 24 ; desc : l'effet en une ou deux

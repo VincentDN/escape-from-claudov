@@ -4,7 +4,7 @@
 const EFC_PV = { el: null, row: null };
 /* Real-world calibre of each engine weapon (the game itself only knows five ammunition families) */
 const EFC_PV_CAL = {
-  m4: '5.56×45 mm', famas: '5.56×45 mm', ak47: '7.62×39 mm', scarh: '7.62×51 mm', l96: '7.62×51 mm', svd: '7.62×54 mmR', m82: '.50 BMG',
+  m4: '5.56×45 mm', famas: '5.56×45 mm', ak47: '7.62×39 mm', sks: '7.62×39 mm', scarh: '7.62×51 mm', l96: '7.62×51 mm', svd: '7.62×54 mmR', m82: '.50 BMG',
   mp5: '9×19 mm', m9: '9×19 mm', glock18: '9×19 mm', mp7: '4.6×30 mm', ump45: '.45 ACP', vector: '.45 ACP', usp: '.45 ACP', deagle: '.50 AE',
   m1014: '12 gauge', rem870: '12 gauge', aa12: '12 gauge',
 };

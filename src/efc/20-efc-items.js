@@ -41,6 +41,9 @@ const EFC_ITEM_LIST = [
   { id: 'loot_dispatch', name: 'Sealed admiralty dispatch', kind: 'loot', w: 0.3, value: 16000 },
 ];
 
+/* Weapons of the free loadout only (P6): their own weight and low value, never in a loot table nor on a Warden (noLoot) */
+const EFC_FREE_ONLY = { sks: { w: 3.9, value: 600 } };
+
 /* Builds the weapon items from the engine table (called once at load; WEAPONS is defined by the engine before src/efc) */
 function efcWeaponItems() {
   const out = [];
@@ -49,10 +52,12 @@ function efcWeaponItems() {
     const W = WEAPONS[wkey], cat = EFC_AMMO_BY_CAT[W.cat] ? W.cat : 'ar', base = EFC_WEAPON_BASE[cat];
     const dmg = W.stats && Number.isFinite(W.stats.dmg) ? W.stats.dmg : 0.5;
     const w = wkey === 'm82' ? 12.9 : base[0];
-    out.push({
+    const d = {
       id: 'w_' + wkey, name: W.name || wkey, kind: 'weapon', w, value: Math.round((base[1] * (0.7 + dmg * 0.6)) / 50) * 50,
       weapon: { wkey, fam: EFC_AMMO_BY_CAT[cat], slot: cat === 'pistol' ? 'sidearm' : 'primary' },
-    });
+    };
+    if (EFC_FREE_ONLY[wkey]) Object.assign(d, EFC_FREE_ONLY[wkey], { noLoot: true });
+    out.push(d);
   }
   return out;
 }

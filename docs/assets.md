@@ -2,7 +2,7 @@
 
 Produite à partir du code par `python3 tools/dev/assets.py`, que `build.py` lance à chaque construction : ne pas la modifier à la main. Tout le jeu est construit par le code (README, « Direction artistique : tout en code ») ; seules les textures photo, les ciels et les HDRI viennent de fichiers, tous en CC0. La description d'un asset est le commentaire écrit au-dessus de sa définition : pour la changer, changer le commentaire.
 
-221 prefabs, 39 props physiques, 47 surfaces photo, 62 surfaces procédurales, 14 atlas dessinés au chargement, 8 ciels photographiés, 3 HDRI, 18 armes, 18 accessoires.
+221 prefabs, 39 props physiques, 47 surfaces photo, 62 surfaces procédurales, 14 atlas dessinés au chargement, 8 ciels photographiés, 3 HDRI, 19 armes, 18 accessoires.
 
 ## Cartes
 
@@ -718,6 +718,7 @@ Modèles construits par le code (`src/06c-models.js`), statistiques dans `src/06
 | `usp` | USP .45 | Pistolet |
 | `glock18` | Glock 18 | Pistolet |
 | `deagle` | Desert Eagle | Pistolet |
+| `sks` | SKS | Carabine |
 
 ## Accessoires
 

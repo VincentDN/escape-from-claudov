@@ -1765,3 +1765,5 @@ Raid over ⇒ =
 Raid again ⇒ =
 a fork of Riposte ⇒ =
 Weapon handling takes from Partisan Project, supplied and cleared by the owner. ⇒ =
+Carabine ⇒ Carbine
+Vieille carabine semi-automatique à dix coups, chargée cartouche par cartouche. Lente et rude, mais elle ne coûte rien. ⇒ An old ten-round semi-automatic carbine, loaded one round at a time. Slow and rough, but it costs nothing.

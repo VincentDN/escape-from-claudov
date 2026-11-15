@@ -12,7 +12,7 @@ const EFC_SND = {
 
 /* Weapon mass (kg, roughly the real weapon unloaded) by engine weapon id; bots only give their family */
 const EFC_SND_KG = { m4: 3.1, mp5: 2.5, l96: 6.5, m1014: 3.8, m9: 0.95, ak47: 3.5, scarh: 3.6, famas: 3.6, mp7: 1.9, ump45: 2.3, vector: 2.7,
-  svd: 4.3, m82: 13, rem870: 3.6, aa12: 5.2, usp: 0.75, glock18: 0.65, deagle: 1.8 };
+  svd: 4.3, m82: 13, rem870: 3.6, aa12: 5.2, usp: 0.75, glock18: 0.65, deagle: 1.8, sks: 3.9 };
 const EFC_SND_FAM_KG = { pistol: 0.9, smg: 2.4, rifle: 3.4, shotgun: 3.7, sniper: 5.8 };
 /* Playback rate from mass: 1 kg plays at 1.08, an M4 at about 0.98, an L96 at 0.91, the Barrett at 0.86 */
 function efcSndWeightRate(kg) { return Math.min(1.12, Math.max(0.82, 1.08 * Math.pow(Math.max(0.3, kg || 3.4), -0.09))); }

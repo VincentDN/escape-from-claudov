@@ -17,7 +17,7 @@ function makeCtx(store) {
     console, JSON, Math, Object, Array, Number, Set, Map,
     localStorage: { getItem: (k) => (ls.has(k) ? ls.get(k) : null), setItem: (k, v) => ls.set(k, String(v)), removeItem: (k) => ls.delete(k) },
     WEAPONS: { m4: W('ar', 30, 150, 'M4A1'), mp5: W('smg', 30, 180, 'MP5'), l96: W('sniper', 5, 25, 'L96A1'), m1014: W('shotgun', 8, 32, 'M1014'),
-      m9: W('pistol', 15, 60, 'M9'), ak47: W('ar', 30, 120, 'AK-47'), usp: W('pistol', 12, 60, 'USP .45'), aa12: Object.assign(W('shotgun', 8, 48, 'AA-12'), { fam: 'rifle' }) },
+      m9: W('pistol', 15, 60, 'M9'), ak47: W('ar', 30, 120, 'AK-47'), usp: W('pistol', 12, 60, 'USP .45'), sks: W('ar', 10, 30, 'SKS'), aa12: Object.assign(W('shotgun', 8, 48, 'AA-12'), { fam: 'rifle' }) },
     MATCH: { mode: 'raid', state: 'playing', online: false },
     PL: { ent: { health: 100, alive: true } },
     msgs: [], puts: [],
@@ -132,15 +132,38 @@ function makeCtx(store) {
   ok(kit2.slots.primary.id === 'w_ak47', 'kit carries the chosen rifle');
   C('raid:commit', 'dead', kit2);
   ok(C('stash:get').items.length === n2 && !C('stash:get').items.some((i) => i.id === 'w_ak47'), 'dead: kit lost');
-  // free pistol: stash with no weapon
+  // free kit (P6), forced: stash and loadout hold no weapon
+  const isFreeKit = (k, C2) => k.slots.primary && k.slots.primary.id === 'w_sks' && k.slots.primary.free === true && k.slots.primary.mag === 10
+    && k.slots.primary.res === 30 && !k.slots.sidearm && !k.slots.armor && !k.slots.pack && k.bag.length === 0 && C2('inv:all', k).every((i) => i.free === true);
   const empty = new Map([['efc_stash_v1', JSON.stringify({ v: 1, items: [{ id: 'loot_wrench', n: 1 }], loadout: { slots: {}, bag: [] } })]]);
   const B = makeCtx(empty).ctx;
-  ok(B.call('stash:get').fallback === true, 'fallback flagged when no weapon is owned');
+  ok(B.call('stash:get').fallback === true && B.call('stash:get').freeNext === true, 'fallback flagged when no weapon is owned, free kit next');
   const fk = B.call('raid:kit');
-  ok(fk.slots.sidearm && fk.slots.sidearm.free === true && B.call('inv:weapons', fk).length === 1, 'free pistol added to an unarmed kit');
+  ok(isFreeKit(fk, B.call) && B.call('inv:weapons', fk).length === 1, 'auto-switch: an unarmed player gets the free kit (SKS, 10 + 30 rounds, all free)');
+  B.call('inv:add', fk, { id: 'loot_dispatch', n: 1 }); B.call('inv:add', fk, { id: 'w_mp5', n: 1 });
   B.call('raid:commit', 'extracted', fk);
-  ok(!B.call('stash:get').items.some((i) => i.free || i.id.startsWith('w_')), 'free pistol never banked');
-  ok(B.call('raid:kit').slots.sidearm.free === true, 'player can still play again');
+  const Bs = B.call('stash:get');
+  ok(!Bs.items.some((i) => i.free || i.id === 'w_sks'), 'free kit never banked');
+  ok(Bs.items.some((i) => i.id === 'loot_dispatch') && Bs.items.some((i) => i.id === 'w_mp5' && !i.free), 'loot of a free raid banked');
+  // free kit by choice: the stored loadout stays untouched, extracted or dead
+  {
+    const F = makeCtx().ctx, Cf = F.call, lo0 = JSON.stringify(Cf('stash:get').loadout), n0 = Cf('stash:get').items.length;
+    ok(Cf('stash:get').freeKit === false && Cf('stash:get').freeNext === false, 'own loadout by default');
+    ok(Cf('stash:setFreeKit', true) && Cf('stash:get').freeKit === true && Cf('stash:get').freeNext === true, 'choice stored');
+    ok(makeCtx(new Map([['efc_stash_v1', F.localStorage.getItem('efc_stash_v1')]])).ctx.call('stash:get').freeKit === true, 'choice remembered across loads');
+    const k1 = Cf('raid:kit');
+    ok(isFreeKit(k1, Cf), 'stored flag: raid:kit gives the free kit');
+    ok(JSON.stringify(Cf('stash:get').loadout) === lo0, 'loadout untouched while the free kit is out');
+    Cf('raid:commit', 'dead', k1);
+    ok(JSON.stringify(Cf('stash:get').loadout) === lo0 && Cf('stash:get').items.length === n0, 'dead with the free kit: loadout and stash untouched');
+    const k2 = Cf('raid:kit'); Cf('inv:add', k2, { id: 'loot_chrono', n: 1 }); Cf('raid:commit', 'extracted', k2);
+    const s2 = Cf('stash:get');
+    ok(JSON.stringify(s2.loadout) === lo0 && s2.items.some((i) => i.id === 'loot_chrono') && !s2.items.some((i) => i.id === 'w_sks'), 'extracted with the free kit: loot kept, SKS not banked, loadout untouched');
+    const k3 = Cf('raid:kit', { free: false });
+    ok(k3.slots.primary && k3.slots.primary.id === 'w_mp5' && !k3.slots.primary.free && Cf('inv:all', Cf('stash:get').loadout).length === 0, 'option free: false overrides the flag: own loadout taken out');
+    Cf('raid:commit', 'dead', k3);
+    ok(isFreeKit(Cf('raid:kit', true), Cf), 'bare boolean option');
+  }
   // a bag weapon is equipped rather than adding the free pistol
   const bagW = new Map([['efc_stash_v1', JSON.stringify({ v: 1, items: [], loadout: { slots: {}, bag: [{ id: 'w_mp5', n: 1 }] } })]]);
   const bk = makeCtx(bagW).ctx.call('raid:kit');
@@ -172,6 +195,8 @@ function makeCtx(store) {
     if (t.startsWith('warden')) ok(items.some((i) => i.id.startsWith('w_')), t + ' carries a weapon');
   }
   ok(allValid && n > 1000, 'loot rolls give valid items (' + n + ')');
+  ok(!counts.w_sks, 'the SKS is in no loot table and on no Warden');
+  ok(C('item:def', 'w_sks') && C('item:def', 'w_sks').noLoot && C('item:def', 'w_sks').value <= 1000, 'w_sks: low value, noLoot');
   ok(JSON.stringify(C('loot:roll', 'crate', ctx.rngOf(42))) === JSON.stringify(C('loot:roll', 'crate', ctx.rngOf(42))), 'deterministic for a seeded rng');
   ok(JSON.stringify(C('loot:roll', 'warden_elite', ctx.rngOf(7))) === JSON.stringify(C('loot:roll', 'warden_elite', ctx.rngOf(7))), 'warden deterministic');
   ok((counts.ammo_rifle || 0) > armourT3 * 5 && (counts.med_bandage || 0) > (counts.loot_dispatch || 0) * 5, 'common ammo and bandages, rare tier 3 and top valuables');

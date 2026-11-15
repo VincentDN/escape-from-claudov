@@ -98,13 +98,28 @@ function efcUiRaidable(id) { return efcCall('map:raidable', id) !== false; }
 function efcUiRaidMap() { const id = EFC_UI.map || (EFC.cfg && EFC.cfg.raidMap) || 'simoun'; return mapById(efcUiRaidable(id) ? id : (EFC.cfg && EFC.cfg.raidMap) || 'simoun'); }
 function efcUiKitNode() {
   const st = efcCall('stash:get'), el = document.createElement('div'); el.className = 'efc-stage';
-  el.innerHTML = '<p class="lbl">Your loadout</p>' + efcUiKitHtml(st);
+  el.innerHTML = efcUiKitLbl(st) + efcUiKitHtml(st);
   return el;
 }
+/* The kit the next raid takes (P6): the free kit when chosen, or when the loadout holds no weapon (stash:get freeNext) */
+function efcUiKitFree(st) { return !st || !st.loadout || st.freeNext === true; }
+function efcUiKitLbl(st) { return `<p class="lbl">${efcUiKitFree(st) ? 'Free loadout' : 'Your loadout'}</p>`; }
 function efcUiKitHtml(st) {
-  if (!st || !st.loadout) return '<p class="hint">No stash yet. You go in with the free fallback pistol.</p>';
-  return `<div class="efc-list">${efcUiInvHtml(st.loadout)}</div><div class="efc-tot">${efcUiTotHtml(st.loadout)}</div>`
+  if (efcUiKitFree(st)) {
+    const kit = efcCall('raid:freeKit');
+    const why = st && st.loadout && !st.freeKit ? '<p class="hint efc-auto">Your loadout holds no weapon, so you go in with the free loadout.</p>' : '';
+    return why + (kit ? `<div class="efc-list">${efcThumbInvHtml(kit)}</div><div class="efc-tot">${efcUiTotHtml(kit)}</div>` : '')
+      + '<p class="hint">The SKS and its 30 rounds are free: nothing to lose, and they are never banked. Everything you loot is yours if you extract. Your own loadout stays in the stash.</p>';
+  }
+  return `<div class="efc-list">${efcThumbInvHtml(st.loadout)}</div><div class="efc-tot">${efcUiTotHtml(st.loadout)}</div>`
     + '<p class="hint">Everything you take in is at risk. Reach an extraction point to keep what you carry.</p>';
+}
+/* Raid screen option: own loadout or the free kit, remembered in the stash (stash:setFreeKit); forced to the free kit when unarmed */
+function efcUiKitRow() {
+  const st = efcCall('stash:get') || {}, forced = !!st.loadout && !st.freeKit && st.freeNext === true;
+  return { k: 'seg', full: true, wide: true, key: 'kit', label: 'Loadout', items: [['own', 'Your loadout'], ['free', 'Free loadout: SKS and 30 rounds, nothing to lose']],
+    get: () => (efcUiKitFree(efcCall('stash:get')) ? 'free' : 'own'), set: (v) => { efcCall('stash:setFreeKit', v === 'free'); },
+    disabled: forced };
 }
 function efcUiRaidPreview(m) {
   const art = m.ok && MAP_ART[m.id];
@@ -118,8 +133,9 @@ const EFC_RAID_PAGES = {
       title: 'Raid', sub: 'Solo raid against the Wardens',
       rows: [
         { k: 'link', key: 'map', label: 'Map', value: m.name, page: 'map' },
+        efcUiKitRow(),
         { k: 'link', key: 'hideout', label: 'Hideout', value: 'Change your loadout', open: () => uiGo('hideout') },
-      ],
+      ].concat(efcUiKitRow().disabled ? [{ k: 'note', text: 'Your loadout holds no weapon: the free loadout is chosen for you.' }] : []),
       stage: efcUiKitNode, preview: efcUiRaidPreview(m),
     };
   },
@@ -136,7 +152,7 @@ efcOn('ui:deploy', () => {
   $('scr-deploy').querySelector('h2').textContent = 'Ready to deploy';
   $('depGo').textContent = 'Deploy';
   $('depTimer').innerHTML = `Raid, <b>${EFC.cfg.raidMinutes} min</b>, one life`;
-  $('efcDepKit').innerHTML = '<p class="lbl">Your loadout</p>' + efcUiKitHtml(efcCall('stash:get'));
+  const st = efcCall('stash:get'); $('efcDepKit').innerHTML = efcUiKitLbl(st) + efcUiKitHtml(st);
   return true;
 });
 function efcUiStashLine() {

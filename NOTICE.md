@@ -18,3 +18,13 @@ What remains under its own terms:
 3. **Libraries**: three.js r147 (MIT, notice at the top of `assets/vendor/three-r147.js`); PeerJS (MIT), loaded from jsDelivr for online lobbies.
 4. **Soldier animations**: none are shipped. The game runs on the engine's procedural poses. To add baked clips, bake them from your own
    Mixamo account with `tools/dev/anim/cuire.mjs`; Mixamo's terms allow use in a game, not redistribution of the clips on their own.
+5. **Music and harbour layer** (`assets/music/`, P5): every file is CC0 1.0 from OpenGameArt, each page fetched and its licence read
+   on 15 November 2026; title, author, source page and processing per file in `assets/music/credits.json`. CC0 needs no attribution,
+   the authors are credited anyway:
+   - Menu theme: *Tension* by Tsorthan Grove, https://opengameart.org/content/tension-0
+   - Raid beds: *Dark Ambient Drone*, *Machines* and *Wastelands* by Tsorthan Grove, https://opengameart.org/content/dark-ambient-drone,
+     https://opengameart.org/content/machines, https://opengameart.org/content/wastelands
+   - Stings: *Dark Stinger 1* by Kresiek The Furry (https://opengameart.org/content/dark-stinger-1); *String and piano horror stings*
+     by congusbongus (https://opengameart.org/content/string-and-piano-horror-stings); *Light Through a Pale Window* from
+     *Background Drones Vol 1* by Tsorthan Grove (https://opengameart.org/content/background-drones-vol-1)
+   - Claudov harbour chains: *Chain winch sounds* by bart (https://opengameart.org/content/chain-winch-sounds)

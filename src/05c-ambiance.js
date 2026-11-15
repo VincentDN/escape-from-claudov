@@ -94,6 +94,7 @@ function ambStart() {
     }
   }
   AMB.next = (S.spots || []).map((sp) => rand(sp.every[0] * 0.2, sp.every[1] * 0.7));
+  if (typeof efcHarbourStart === 'function') efcHarbourStart(AMB.out); // couche du port de Claudov (src/efc/46-efc-music.js)
 }
 function ambStop(now) {
   if (!AMB.out) return;
@@ -105,6 +106,7 @@ function ambStop(now) {
     o.disconnect();
   }, tau * 6000 + 100);
   AMB.out = null; AMB.lp = null; AMB.bed = null; AMB.loops = []; AMB.next = [];
+  if (typeof efcHarbourStop === 'function') efcHarbourStop();
 }
 /* À chaque image (sfxTick) : intérieur/extérieur, ponctuels */
 function ambTick(dt) {
@@ -114,6 +116,7 @@ function ambTick(dt) {
   const far = S.water ? smoothstep(3, 35, S.water(camera.position.x, camera.position.z)) : 0;
   AMB.lp.frequency.setTargetAtTime(Math.min(lerp(18000, 1100, ins), lerp(18000, 2500, far)), t, 0.25);
   if (AMB.bed) AMB.bed.g.gain.setTargetAtTime((S.bed || 0.5) * (1 - 0.45 * ins) * (1 - 0.85 * far), t, 0.25);
+  if (typeof efcHarbourTick === 'function') efcHarbourTick(dt);
   const spots = S.spots || [];
   for (let i = 0; i < spots.length; i++) {
     if ((AMB.next[i] -= dt) > 0) continue;

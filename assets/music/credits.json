@@ -35,6 +35,33 @@
    "preuve": "OpenGameArt page, License(s): CC0; Copyright/Attribution Notice: \"CC0 / Public Domain. No Rights Reserved. Free to use, no attribution required.\"",
    "attribution": "Wastelands by Tsorthan Grove (opengameart.org/content/wastelands), CC0",
    "fetched": "2026-11-15"
+  },
+  "ktf-dark-stinger": {
+   "nom": "Dark Stinger 1",
+   "auteur": "Kresiek The Furry",
+   "licence": "CC0 1.0",
+   "url": "https://opengameart.org/content/dark-stinger-1",
+   "preuve": "OpenGameArt page, Author: Kresiek The Furry, License(s): CC0 (no further notice on the page)",
+   "attribution": "Dark Stinger 1 by Kresiek The Furry (opengameart.org/content/dark-stinger-1), CC0",
+   "fetched": "2026-11-15"
+  },
+  "cb-horror-stings": {
+   "nom": "String and piano horror stings",
+   "auteur": "congusbongus",
+   "licence": "CC0 1.0",
+   "url": "https://opengameart.org/content/string-and-piano-horror-stings",
+   "preuve": "OpenGameArt page, Author: congusbongus, License(s): CC0 (\"Two stings for horror games ... Made for an unfinished jam game\")",
+   "attribution": "String and piano horror stings by congusbongus (opengameart.org/content/string-and-piano-horror-stings), CC0",
+   "fetched": "2026-11-15"
+  },
+  "tg-background-drones-1": {
+   "nom": "Background Drones Vol 1 (Light Through a Pale Window)",
+   "auteur": "Tsorthan Grove",
+   "licence": "CC0 1.0",
+   "url": "https://opengameart.org/content/background-drones-vol-1",
+   "preuve": "OpenGameArt page, License(s): CC0; Copyright/Attribution Notice: \"CC0 / Public Domain. No Rights Reserved. Free to use, no attribution required.\"",
+   "attribution": "Light Through a Pale Window, from Background Drones Vol 1 by Tsorthan Grove (opengameart.org/content/background-drones-vol-1), CC0",
+   "fetched": "2026-11-15"
   }
  },
  "sons": [
@@ -65,6 +92,34 @@
    "source": "tg-wastelands",
    "fichier": "wastelands_loop.flac",
    "detail": "raid bed: the author's seamless loop (1 min 50 s), fixed gain to -26 LUFS (no compression), Ogg Vorbis q2, 48 kHz stereo"
+  },
+  {
+   "id": "sting-extract-start",
+   "pack": "music",
+   "source": "ktf-dark-stinger",
+   "fichier": "dark_stinger_0.wav",
+   "detail": "sting, extraction started: first 12 s (the rest is silence and tail), 3 s fade-out, fixed gain to -20 LUFS, Ogg Vorbis q3"
+  },
+  {
+   "id": "sting-extracted",
+   "pack": "music",
+   "source": "tg-background-drones-1",
+   "fichier": "light_through_a_pale_window.flac",
+   "detail": "sting, extracted: first 10 s, 0.6 s fade-in, 5 s fade-out, fixed gain to -20 LUFS, Ogg Vorbis q3"
+  },
+  {
+   "id": "sting-killed",
+   "pack": "music",
+   "source": "cb-horror-stings",
+   "fichier": "abyss.ogg",
+   "detail": "sting, killed: whole take (7.5 s), 1.5 s fade-out, fixed gain to -20 LUFS, Ogg Vorbis q3"
+  },
+  {
+   "id": "sting-late-extract",
+   "pack": "music",
+   "source": "cb-horror-stings",
+   "fichier": "piano_sting.mp3",
+   "detail": "sting, late extract opening: first 10 s, 4 s fade-out, fixed gain to -20 LUFS, Ogg Vorbis q3"
   }
  ]
 }

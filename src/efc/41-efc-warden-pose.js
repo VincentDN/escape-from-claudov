@@ -27,7 +27,7 @@ function efcWardenStateOf(b, now, vis) {
   const C = EFC.cfg;
   if (vis) b.efcSawT = now;
   if (vis || EFC_COMBAT_TACTICS.has(b.tactic) || now - (b.efcSawT ?? -99) < C.wardenSawHold || now < (b.blindT || 0)) return 'combat';
-  if (b.tactic === 'hunt' || b.tactic === 'search' || now < b.warnT || now < b.lookAtT || now - b.lastSeenT < C.wardenAlertHold || now - b.lastHitT < C.wardenAlertHold) return 'alert';
+  if (b.tactic === 'hunt' || b.tactic === 'search' || now < b.warnT || now < b.lookAtT || now - b.lastSeenT < C.wardenAlertHold || (b.lastHitT >= 0 && now - b.lastHitT < C.wardenAlertHold)) return 'alert';
   return 'idle';
 }
 /* updateBot seam, once the tactic has set the wish: updates the state, starts the raise, and returns the sprint flag (idle and alert never

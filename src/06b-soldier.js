@@ -199,6 +199,7 @@ function poseSoldier(e, dt) {
   S.ampV = damp(S.ampV || 0, clamp(v / 2.2, 0, 1) * (1 - airW), 6, dt);
   const kc = clipOK ? 1 - airW : 0, ampV = Math.min(S.ampV, amp), ka = kc * ampV, ampP = amp - ka;
   const wf = amp > 1e-3 ? ka / amp : kc;
+  const ampS = lr > 0 ? lerp(ampV, Math.sqrt(ampV), lr) : ampV; // stride share; raid low ready: longer, slower strides at a slow walk
   // ---- posture de combat au repos : genoux fléchis au-dessus des pointes, bassin bas et en arrière, buste en avant
   //      (plus marquée en visée) ; st vaut 1 à l'arrêt, debout
   const st = (1 - amp) * (1 - c) * (1 - airW);
@@ -234,7 +235,7 @@ function poseSoldier(e, dt) {
   let rate = v > 0.25 ? (D * v) / Math.max(0.06, 2 * A) : (S.turn > 0.05 ? 1.3 : 0);
   // clips : la foulée est celle du clip (réduite avec l'amplitude), la cadence suit la vitesse
   const useC = ka > 1e-3;
-  if (useC) { locoSel(v, S.lth || 0, sw, c, isP); rate = lerp(rate, v / (LOCO.L * LOCO.k * Math.max(ampV, 0.15)), wf); }
+  if (useC) { locoSel(v, S.lth || 0, sw, c, isP); rate = lerp(rate, v / (LOCO.L * LOCO.k * Math.max(ampS, 0.15)), wf); }
   S.cyc = (S.cyc + Math.min(rate, 2.7) * dt * (1 - airW)) % 1;
   const LM = useC ? locoPose(S.cyc, LOCO.m) : null;
   // saut : pose du clip en l'air (part kA), creux et flexion de la réception (REC) ; glissade (S.slT, temps depuis son début ; le
@@ -441,7 +442,7 @@ function poseSoldier(e, dt) {
       // pied du clip, posé sur le sol réel, qui s'écarte de sa place à l'arrêt avec l'amplitude du cycle (la levée du pied, elle, reste
       // entière dès les petites vitesses : il ne frotte pas le sol)
       const yl = Math.min(1, ampV * 1.5);
-      _tmpG.set(lerp(_tl[i].x, LM.ft[i].x, ampV), lerp(_tl[i].y, LM.ft[i].y + gy, yl), lerp(_tl[i].z, LM.ft[i].z, ampV)); _gl[i].lerp(_tmpG, wf);
+      _tmpG.set(lerp(_tl[i].x, LM.ft[i].x, ampS), lerp(_tl[i].y, LM.ft[i].y + gy, yl), lerp(_tl[i].z, LM.ft[i].z, ampS)); _gl[i].lerp(_tmpG, wf);
       _fpG[i] = lerp(_fpG[i], LM.fp[i] * ampV, wf); _fyW[i] = lerp(S.fyG[i], LM.fy[i], ka);
     }
     if (OV) { _gl[i].lerp(_vA.copy(OV.ft[i]), kO); _fpG[i] = lerp(_fpG[i], OV.fp[i], kO); _fyW[i] = lerp(_fyW[i], OV.fy[i], kO); }

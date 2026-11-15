@@ -91,6 +91,7 @@ const t2 = await turnRun(false, 1);
 await simRun(page, 2.5, turnEach);
 const tOff = await page.evaluate(() => ({ ...TR, left: Math.abs(angDiff(TW.lookYaw, TR.a)) }));
 await page.evaluate(() => { EFC.cfg.wardenPace = true; });
+await simRun(page, 0.5, each); // (states back with the pace on)
 ok(!!t1 && !!t2, '(1) two idle Wardens for the turning runs', [t1, t2]);
 if (t1 && t2) {
   ok(tOn.at02.head > 0.4 && tOn.at02.body < 0.15, '(1) after 0.2 s the head has turned toward the noise, the body hardly', tOn.at02);
@@ -100,13 +101,16 @@ if (t1 && t2) {
 
 // (2) idle patrol leg: walking to the neighbouring post
 const idleSet = await page.evaluate(() => {
-  const W = idleW().find((e) => e !== TW) || idleW()[0]; window.W = W; if (!W) return null;
-  const p = EFC.wd.posts[W.efcPost], q = efcNeighbour(p); if (!q) return null;
+  const all = entities.filter((e) => e.squad === 'w' && e.alive && !e.isPlayer);
+  const W = idleW().find((e) => e !== TW && efcNeighbour(EFC.wd.posts[e.efcPost])); window.W = W;
+  if (!W) return { none: all.map((e) => [e.name, e.efcState, e.tactic, !!e.efcPatrol, !!efcNeighbour(EFC.wd.posts[e.efcPost])]) };
+  const p = EFC.wd.posts[W.efcPost], q = efcNeighbour(p);
   W.efcPatrol = { id: 1, to: q.i, stage: 'out', fails: 0 }; W.goal = null; W.path = null; W.holdT = 0;
   recStart(W, 'idle');
   return { name: W.name, to: q.i, d: Math.round(hyp(q.x - W.pos.x, q.z - W.pos.z)) };
 });
-ok(!!idleSet, '(2) an idle Warden sent on a patrol leg', idleSet);
+ok(!!idleSet && !idleSet.none, '(2) an idle Warden sent on a patrol leg', idleSet);
+if (!idleSet || idleSet.none) { await browser.close(); process.exit(1); }
 await simRun(page, 25, each);
 const sIdle = await page.evaluate(() => recEnd());
 ok(sIdle.n > 150 && near(sIdle.v, cfg.idle), `(2) idle patrol ground speed within 15 % of ${cfg.idle} m/s (median of walking steps)`, sIdle);
@@ -147,8 +151,8 @@ const r0 = await page.evaluate(() => {
       const d = hyp(NAV.nx[id] - w.pos.x, NAV.nz[id] - w.pos.z); if (d < 9 || d > 13) continue;
       eye.set(NAV.nx[id], NAV.ny[id] + 1.6, NAV.nz[id]); if (!lineClear(eye, entChest(w, at))) continue;
       const fwd = angDiff(w.yaw, Math.atan2(-(NAV.nx[id] - w.pos.x), -(NAV.nz[id] - w.pos.z))); if (Math.abs(fwd) > 0.6) continue;
-      window.RW = w; window.HOLD = [NAV.nx[id], NAV.ny[id], NAV.nz[id]];
-      window.RS = { n: 0, trans: -1, raiseT: -1, shot: -1, s0: w.arms.shots, mid: null };
+      window.PRW = w; window.HOLD = [NAV.nx[id], NAV.ny[id], NAV.nz[id]];
+      window.PRS = { n: 0, trans: -1, raiseT: -1, shot: -1, s0: w.arms.shots, mid: null };
       return { name: w.name, d: +d.toFixed(1), state: w.efcState };
     }
   }
@@ -156,11 +160,11 @@ const r0 = await page.evaluate(() => {
 });
 ok(!!r0, '(6) an idle Warden with the player put 9 to 13 m in front of it, in view', r0);
 if (r0) {
-  await simRun(page, 6, each + ` RS.n++; const t = RS.n / 30;
-    if (RS.trans < 0 && RW.efcState !== 'idle') { RS.trans = t; RS.raiseT = RW.efcRaiseT - MATCH.time + t; RS.st = RW.efcState; }
-    if (RS.trans >= 0 && RS.mid === null && t >= RS.trans + 0.2) RS.mid = RW.model.efcRaise;
-    if (RS.shot < 0 && RW.arms.shots > RS.s0) RS.shot = t;`);
-  const r = await page.evaluate(() => ({ ...RS, raiseFire: PM.raiseFire }));
+  await simRun(page, 6, each + ` PRS.n++; const t = PRS.n / 30;
+    if (PRS.trans < 0 && PRW.efcState !== 'idle') { PRS.trans = t; PRS.raiseT = PRW.efcRaiseT - MATCH.time + t; PRS.st = PRW.efcState; }
+    if (PRS.trans >= 0 && PRS.mid === null && t >= PRS.trans + 0.2) PRS.mid = PRW.model.efcRaise;
+    if (PRS.shot < 0 && PRW.arms.shots > PRS.s0) PRS.shot = t;`);
+  const r = await page.evaluate(() => ({ ...PRS, raiseFire: PM.raiseFire }));
   ok(r.trans >= 0 && r.shot > 0, '(6) the Warden leaves idle and fires within 6 s', r);
   ok(r.shot >= r.raiseT - 1e-6 && r.shot - r.trans >= cfg.raise - 1e-6, `(6) its first shot comes after the ${cfg.raise} s raise`, { trans: r.trans, raiseEnds: r.raiseT, shot: r.shot });
   ok(r.mid > 0.2 && r.mid < 0.8, '(6) the weapon is half way up 0.2 s into the raise (visible raise)', r.mid);

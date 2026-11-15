@@ -199,7 +199,7 @@ function poseSoldier(e, dt) {
   S.ampV = damp(S.ampV || 0, clamp(v / 2.2, 0, 1) * (1 - airW), 6, dt);
   const kc = clipOK ? 1 - airW : 0, ampV = Math.min(S.ampV, amp), ka = kc * ampV, ampP = amp - ka;
   const wf = amp > 1e-3 ? ka / amp : kc;
-  const ampS = lr > 0 ? lerp(ampV, Math.sqrt(ampV), lr) : ampV; // stride share; raid low ready: longer, slower strides at a slow walk
+  const ampS = lr > 0 ? lerp(ampV, Math.min(1, ampV * 1.6), lr) : ampV; // stride share; raid low ready: full strides from 1.4 m/s, so a slow walk takes longer, slower steps
   // ---- posture de combat au repos : genoux fléchis au-dessus des pointes, bassin bas et en arrière, buste en avant
   //      (plus marquée en visée) ; st vaut 1 à l'arrêt, debout
   const st = (1 - amp) * (1 - c) * (1 - airW);
@@ -230,7 +230,7 @@ function poseSoldier(e, dt) {
   if (v > 0.25) { dx = lvx / v; dz = lvz / v; S.lth = Math.atan2(-lvx, -lvz); } else if (S.turn > 0.05) { dx = Math.sign(dyaw) * -1; dz = 0; }
   const fwdc = -dz, back = smoothstep(-0.2, -0.6, fwdc);
   // foulée et cadence : le pied au sol recule exactement à la vitesse du corps
-  const A = (lerp(0.17, 0.33, clamp(v / 4.5, 0, 1)) + run * 0.06) * (1 - c * 0.3) * (1 - back * 0.25) * Math.max(amp, 0.001);
+  const A = (lerp(0.17, 0.33, clamp(v / 4.5, 0, 1)) + run * 0.06) * (1 - c * 0.3) * (1 - back * 0.25) * Math.max(lr > 0 ? lerp(amp, Math.min(1, amp * 1.6), lr) : amp, 0.001); // (raid low ready: as ampS)
   const D = lerp(lerp(0.62, 0.44, clamp(v / 5, 0, 1)), 0.36, run);
   let rate = v > 0.25 ? (D * v) / Math.max(0.06, 2 * A) : (S.turn > 0.05 ? 1.3 : 0);
   // clips : la foulée est celle du clip (réduite avec l'amplitude), la cadence suit la vitesse

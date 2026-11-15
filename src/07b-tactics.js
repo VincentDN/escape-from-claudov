@@ -430,6 +430,7 @@ function updateBot(b, dt, now) {
         b.holdT -= dt; speed = 0; canShoot = vis;
         const L = b.holdLookP, tz = b.team === 0 ? -40 : 40, dx = (L ? L.x : b.holdLookX ?? b.pos.x) - b.pos.x, dz = (L ? L.z : tz) - b.pos.z;
         faceYaw = Math.atan2(-dx, -dz) + Math.sin(now * 0.4 + b.id) * 0.35;
+        if (efcRaidMode() && now < b.lookAtT) faceYaw = Math.atan2(-(b.lookAtX - b.pos.x), -(b.lookAtZ - b.pos.z)); // raid: a Warden at its spot turns to a noise
         b.wantCrouch = b.holdCrouch; b.holdAds = true;
         if (vis) { b.forceDecide = true; b.holdT = 0; }
         break;

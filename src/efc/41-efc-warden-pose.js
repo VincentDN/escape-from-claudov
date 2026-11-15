@@ -13,6 +13,7 @@ EFC.cfg.wardenCombatMul = 0.8;   // combat: share of the engine's speed
 EFC.cfg.wardenRaise = 0.4;       // s, idle to alert or combat: the weapon comes up, no shot meanwhile
 EFC.cfg.wardenCalmTurn = 0.5;    // share of the engine's turn rate of an idle (or just raised) Warden's body
 EFC.cfg.wardenHeadLead = 0.3;    // s the head leads before an idle Warden's body starts a large turn
+EFC.cfg.wardenCalmFor = 1.5;     // s a Warden just out of idle still turns calmly when alert (in combat: only during the raise and head lead)
 EFC.cfg.wardenSawHold = 8;       // s a Warden stays in combat after it last saw an enemy itself
 EFC.cfg.wardenAlertHold = 15;    // s a Warden stays alert after the last thing it heard, was told or saw
 const EFC_POSE = { idle: 1, alert: 2, combat: 3 };
@@ -34,7 +35,7 @@ function efcWardenStateOf(b, now, vis) {
 function efcWardenPace(b, now, vis, sprint) {
   if (!efcWardenPaced(b)) { if (b.efcState) { b.efcState = null; b.efcPose = 0; b.efcHead = 0; } return sprint; }
   const was = b.efcState || 'idle', st = efcWardenStateOf(b, now, vis), C = EFC.cfg;
-  if (was === 'idle' && st !== 'idle') { b.efcRaiseT = now + C.wardenRaise; b.efcCalmT = now + C.wardenRaise + C.wardenHeadLead; }
+  if (was === 'idle' && st !== 'idle') { b.efcRaiseT = now + C.wardenRaise; b.efcCalmT = now + C.wardenCalmFor; }
   b.efcState = st; b.efcPose = EFC_POSE[st]; b.efcSprint0 = sprint;
   if (st !== 'combat') return false;
   return sprint && (b.tactic === 'flank' || (b.tactic === 'cover' && !b.atCover));
@@ -50,17 +51,19 @@ function efcWardenSpeed(b, gs) {
   if (b.efcState === 'alert') return Math.min(gs, C.wardenAlertSpeed);
   return gs * C.wardenCombatMul;
 }
-/* updateBot seam: an idle Warden does not shoulder its weapon (low ready, even holding its spot) */
-function efcWardenAds(b, ads) { return b.efcState === 'idle' ? false : ads; }
+/* updateBot seam: an idle Warden does not shoulder its weapon (low ready, even holding its spot); an alert one carries it at high ready
+   (the pose), not aimed down the sights, so it walks at its alert pace */
+function efcWardenAds(b, ads) { return b.efcState === 'idle' || b.efcState === 'alert' ? false : ads; }
 /* updateBot seam, before the turn: true when the body turns calmly (idle, or just out of idle). Sets b.efcHead (the head's yaw in the body,
    which leads toward the wanted direction) and returns in b.efcFace the yaw the body turns to: it waits EFC.cfg.wardenHeadLead s on a large
    turn, so the head moves first. */
 function efcWardenTurn(b, faceYaw, now, dt) {
-  const calm = !!b.efcState && (b.efcState === 'idle' || now < b.efcCalmT);
+  const st = b.efcState, C = EFC.cfg;
+  const calm = !!st && (st === 'idle' || (now < b.efcCalmT && (st === 'alert' || now < b.efcRaiseT + C.wardenHeadLead)));
   b.efcFace = faceYaw;
   if (!calm) { b.efcHead = damp(b.efcHead || 0, 0, 8, dt); b.efcTurnT = 0; return false; }
   const want = angDiff(b.lookYaw, faceYaw), a = Math.abs(want);
-  if (a < 0.25) b.efcTurnT = 0; else if (!b.efcTurnT) b.efcTurnT = now + EFC.cfg.wardenHeadLead;
+  if (a < 0.25) b.efcTurnT = 0; else if (!b.efcTurnT) b.efcTurnT = now + C.wardenHeadLead;
   b.efcHead = damp(b.efcHead || 0, clamp(want, -1.2, 1.2), 9, dt);
   if (b.efcTurnT && now < b.efcTurnT) b.efcFace = b.lookYaw;
   return true;

@@ -926,6 +926,7 @@ function netApply(id, P) {
   e.kills = P.k | 0; e.deaths = P.d | 0; e.assists = P.a | 0; e.score = P.sc | 0;
   if (P.dr) fpvNet(e, P.dr);
   if (P.mk) mechaNet(e, P.mk);
+  efcWardenNet(e, P.wp); // raid: a Warden's posture (41-efc-warden-pose.js)
   if (alive && !e.alive) {
     if (e.pred && MATCH.time - e.predT < NET_PRED_HOLD) { /* mort prédite pas encore confirmée : cet état est parti avant la touche */ }
     else if (e.pred && efcNetMayRevive(e)) { e.pred = false; e.alive = true; e.model.rag = null; e.lastForce = null; e.model.root.visible = true; netSentDrop(e); } // la victime a survécu : elle se relève
@@ -1181,6 +1182,7 @@ function netPresence(e, now) {
   const dr = fpvPub(e); if (dr) p.dr = dr; // drone kamikaze en vol (08e-fpv.js)
   const mk = mechaPub(e); if (mk) p.mk = mk; // mecha posé (08f-mecha.js)
   if (e.out) p.o = 1; // raid fini pour ce soldat (RAID le pose) : les autres le retirent du jeu (efcNetOut)
+  { const wp = efcWardenPub(e); if (wp) p.wp = wp; } // raid: a Warden's posture and head yaw (41-efc-warden-pose.js)
   if (!me) p.b = 1;
   else { // accusé (netPredHealth, netTradeOpen) : dernier événement appliqué de chaque expéditeur des 3 dernières secondes, avant une touche en attente
     let ak = null;

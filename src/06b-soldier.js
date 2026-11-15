@@ -313,6 +313,7 @@ function poseSoldier(e, dt) {
       _qD.copy(G.qT).multiply(_qI.copy(LOCO.x0.qT).invert()); _qT.premultiply(_qE.identity().slerp(_qD, w));
     }
   }
+  const leanQ = efcLeanTorso(e, _qT, L[J_PEL]); // se pencher : buste roulé, tête à e.leanX de côté (src/efc/42-efc-lean.js)
   L[J_CHE].set(0, SD.trunk + breath, 0).applyQuaternion(_qT).add(L[J_PEL]);
   const hunch = 0.02 + 0.03 * run + 0.02 * amp;
   const shc = _tmpA.set(0, SD.shY, -hunch).applyQuaternion(_qT).add(L[J_CHE]);
@@ -325,6 +326,7 @@ function poseSoldier(e, dt) {
     tY * lerp(0.3, 0, aw) + look - hr * hx * (S.hitHead ? 0.6 : 0.2), -roll * 0.7 - 0.22 * aw * (isP ? 0.2 : 1) + hr * hx * 0.25); _qH.setFromEuler(_eu);
   // (la tête du clip part de 30 degrés en arrière : réduite, le ressort d'impact la secoue déjà, et un second tir doit rester possible)
   if (HIT) _qH.premultiply(hitDelta(HIT.qH, LOCO.hit0.qH, S.hK * (S.hitHead ? 0.6 : 0.35)));
+  if (leanQ) _qH.premultiply(leanQ); // la tête suit le buste penché
   L[J_HEAD].set(0.05 * aw * (isP ? 0 : 1), SD.head[1] - 0.035 * aw * (isP ? 0.3 : 1), SD.head[2] - hunch * 0.4 - 0.025 * aw).applyQuaternion(_qH).add(L[J_CHE]);
   // ---- arme : trois postures fondues
   const gunBobY = (S.gbyV = sprV(S.gby, S.gbyV, -bob * lerp(0.8, 0.25, aw), 220, 18, dt), S.gby += S.gbyV * dt), gunBobYaw = (S.gbwV = sprV(S.gbw, S.gbwV, (pYaw + twist - blade) * 0.35 * steady, 200, 18, dt), S.gbw += S.gbwV * dt);
@@ -504,7 +506,7 @@ const HS = []; for (let i = 0; i < 11; i++) HS.push({ c: new V3(), r: 0, part: '
 function hitSpheres(e) {
   if (!e.model || e.isPlayer) {
     const k = 1 - (e.crouchAmt || 0) * 0.33;
-    for (let i = 0; i < HB.length; i++) { HS[i].c.set(e.pos.x, e.pos.y + HB[i].y * k, e.pos.z); HS[i].r = HB[i].r; HS[i].part = HB[i].part; }
+    for (let i = 0; i < HB.length; i++) { HS[i].c.set(e.pos.x, e.pos.y + HB[i].y * k, e.pos.z); efcLeanApply(e, HS[i].c, HB[i].y * k); HS[i].r = HB[i].r; HS[i].part = HB[i].part; } // penché : les volumes suivent (42-efc-lean.js)
     return HB.length;
   }
   const J = e.model.J; let n = 0;
@@ -519,17 +521,18 @@ function hitSpheres(e) {
   return n;
 }
 function entEye(e, out) {
-  if (e.isPlayer) return out.set(e.pos.x, e.pos.y + PL.eyeH, e.pos.z);
+  if (e.isPlayer) return efcLeanApply(e, out.set(e.pos.x, e.pos.y + PL.eyeH, e.pos.z), PL.eyeH);
   if (e.model && e.alive) return out.copy(e.model.J[J_HEAD]).add(_tmpB.set(0, 0.03, 0));
   return out.set(e.pos.x, e.pos.y + lerp(1.62, 1.12, e.crouchAmt || 0), e.pos.z);
 }
 function entChest(e, out) {
-  if (!e.isPlayer && e.model) return out.lerpVectors(e.model.J[J_PEL], e.model.J[J_CHE], 0.62);
-  const k = 1 - (e.crouchAmt || 0) * 0.33; return out.set(e.pos.x, e.pos.y + 1.2 * k, e.pos.z);
+  // penché : l'épaule exposée plutôt que le buste resté à couvert (ce que visent et voient les bots, 42-efc-lean.js)
+  if (!e.isPlayer && e.model) { const J = e.model.J; out.lerpVectors(J[J_PEL], J[J_CHE], 0.62); return e.leanX ? efcLeanChest(e, out, J[e.leanX > 0 ? J_SHR : J_SHL]) : out; }
+  const k = 1 - (e.crouchAmt || 0) * 0.33; out.set(e.pos.x, e.pos.y + 1.2 * k, e.pos.z); return e.leanX ? efcLeanChest(e, out) : out;
 }
 function entHead(e, out) {
   if (!e.isPlayer && e.model) return out.copy(e.model.J[J_HEAD]);
-  const k = 1 - (e.crouchAmt || 0) * 0.33; return out.set(e.pos.x, e.pos.y + 1.63 * k, e.pos.z);
+  const k = 1 - (e.crouchAmt || 0) * 0.33; return efcLeanApply(e, out.set(e.pos.x, e.pos.y + 1.63 * k, e.pos.z), 1.63 * k);
 }
 function rayEntities(o, d, maxT, shooter) {
   let best = null, bt = maxT, bp = null;

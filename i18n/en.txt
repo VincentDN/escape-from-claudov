@@ -1765,3 +1765,7 @@ Raid over ⇒ =
 Raid again ⇒ =
 a fork of Riposte ⇒ =
 Weapon handling takes from Partisan Project, supplied and cleared by the owner. ⇒ =
+Se pencher ⇒ Leaning
+Se pencher à gauche ⇒ Lean left
+Se pencher à droite ⇒ Lean right
+Se pencher en bascule (un appui penche, un autre redresse, sinon tenir la touche) ⇒ Toggle lean (one press leans, another straightens up, otherwise hold the key)

@@ -314,6 +314,10 @@ const OPT_TABS = [
   ]],
   [_t('Commandes'), null],
 ];
+const CTRL_ROWS = [ // réglages de l'onglet Commandes (clavier et souris), au-dessus de l'éditeur des touches
+  ['head', _t('Se pencher')],
+  ['check', 'leanToggle', _t('Se pencher en bascule (un appui penche, un autre redresse, sinon tenir la touche)'), null, null, 'desk'],
+];
 const KEYS_HELP = [ // ce qui ne se change pas : les touches des actions sont dans l'éditeur (08a-binds.js)
   [_t('Souris'), _t('Viser, clic gauche pour tirer, clic droit pour épauler')], [_t('Molette'), _t('Changer d\u0027arme')], [_t('Échap'), _t('Menu pause : classe, options, quitter')],
 ];
@@ -358,19 +362,8 @@ function mountOptions(root) {
     if (!row || row.contains(a) || (a && a.tagName === 'INPUT' && a.type === 'text')) return;
     row.focus({ preventScroll: true });
   });
-  let cur = 0;
-  const show = (t) => {
-    cur = t; O.syncs = []; body.innerHTML = '';
-    [...tabs.children].forEach((b, i) => b.setAttribute('aria-selected', String(i === t)));
-    const rows = OPT_TABS[t][1];
-    if (!rows) {
-      if (!TOUCH.on) { const hb = document.createElement('h4'); hb.className = 'keys-h'; hb.textContent = _t('Touches du clavier'); body.appendChild(hb); bindEditor(body); } // touches du clavier modifiables (08a-binds.js)
-      const hk = document.createElement('h4'); hk.className = 'keys-h'; hk.textContent = TOUCH.on ? _t('Écran tactile') : _t('Souris et touches fixes'); body.appendChild(hk);
-      const dl = document.createElement('dl'); dl.className = 'keys'; dl.innerHTML = (TOUCH.on ? TOUCH_HELP : trackpadOn() ? TRACKPAD_HELP : KEYS_HELP).map(([k, d]) => `<dt>${k}</dt><dd>${d}</dd>`).join(''); body.appendChild(dl);
-      if (!PAD.seen && !PAD.drive) return; // la manette n'apparaît qu'une fois qu'une manette s'est manifestée (09qc-manette.js)
-      const h = document.createElement('h4'); h.className = 'keys-h'; h.textContent = _t('Manette (Xbox, PlayStation, 8BitDo...)'); body.appendChild(h);
-      const dp = document.createElement('dl'); dp.className = 'keys'; dp.innerHTML = PAD_HELP.map(([k, d]) => `<dt>${padHelpKey(k)}</dt><dd>${d}</dd>`).join(''); body.appendChild(dp); return;
-    }
+  // une rangée par réglage (Jeu, Audio, Vidéo ; les réglages de Commandes, CTRL_ROWS, au-dessus des touches)
+  const addRows = (rows) => {
     let head = null; // titre du groupe en attente : posé avant la première rangée affichée du groupe
     for (const r of rows) {
       if (r[0] === 'head') { head = r[1]; continue; }
@@ -426,6 +419,22 @@ function mountOptions(root) {
       }
       body.appendChild(row);
     }
+  };
+  let cur = 0;
+  const show = (t) => {
+    cur = t; O.syncs = []; body.innerHTML = '';
+    [...tabs.children].forEach((b, i) => b.setAttribute('aria-selected', String(i === t)));
+    const rows = OPT_TABS[t][1];
+    if (!rows) {
+      if (!TOUCH.on) addRows(CTRL_ROWS); // se pencher : maintenu ou en bascule (src/efc/42-efc-lean.js)
+      if (!TOUCH.on) { const hb = document.createElement('h4'); hb.className = 'keys-h'; hb.textContent = _t('Touches du clavier'); body.appendChild(hb); bindEditor(body); } // touches du clavier modifiables (08a-binds.js)
+      const hk = document.createElement('h4'); hk.className = 'keys-h'; hk.textContent = TOUCH.on ? _t('Écran tactile') : _t('Souris et touches fixes'); body.appendChild(hk);
+      const dl = document.createElement('dl'); dl.className = 'keys'; dl.innerHTML = (TOUCH.on ? TOUCH_HELP : trackpadOn() ? TRACKPAD_HELP : KEYS_HELP).map(([k, d]) => `<dt>${k}</dt><dd>${d}</dd>`).join(''); body.appendChild(dl);
+      if (!PAD.seen && !PAD.drive) return; // la manette n'apparaît qu'une fois qu'une manette s'est manifestée (09qc-manette.js)
+      const h = document.createElement('h4'); h.className = 'keys-h'; h.textContent = _t('Manette (Xbox, PlayStation, 8BitDo...)'); body.appendChild(h);
+      const dp = document.createElement('dl'); dp.className = 'keys'; dp.innerHTML = PAD_HELP.map(([k, d]) => `<dt>${padHelpKey(k)}</dt><dd>${d}</dd>`).join(''); body.appendChild(dp); return;
+    }
+    addRows(rows);
   };
   OPT_TABS.forEach(([name], i) => {
     const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.textContent = name;

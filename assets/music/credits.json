@@ -8,6 +8,33 @@
    "preuve": "OpenGameArt page, License(s): CC0; Copyright/Attribution Notice: \"CC0 / Public Domain. No Rights Reserved. Free to use, no attribution required.\"",
    "attribution": "Tension by Tsorthan Grove (opengameart.org/content/tension-0), CC0",
    "fetched": "2026-11-15"
+  },
+  "tg-dark-ambient-drone": {
+   "nom": "Dark Ambient Drone",
+   "auteur": "Tsorthan Grove",
+   "licence": "CC0 1.0",
+   "url": "https://opengameart.org/content/dark-ambient-drone",
+   "preuve": "OpenGameArt page, License(s): CC0; Copyright/Attribution Notice: \"CC0 / Public Domain. No Rights Reserved. Free to use, no attribution required.\"",
+   "attribution": "Dark Ambient Drone by Tsorthan Grove (opengameart.org/content/dark-ambient-drone), CC0",
+   "fetched": "2026-11-15"
+  },
+  "tg-machines": {
+   "nom": "Machines",
+   "auteur": "Tsorthan Grove",
+   "licence": "CC0 1.0",
+   "url": "https://opengameart.org/content/machines",
+   "preuve": "OpenGameArt page, License(s): CC0; Copyright/Attribution Notice: \"CC0 / Public Domain. No Rights Reserved. Free to use, no attribution required.\"",
+   "attribution": "Machines by Tsorthan Grove (opengameart.org/content/machines), CC0",
+   "fetched": "2026-11-15"
+  },
+  "tg-wastelands": {
+   "nom": "Wastelands",
+   "auteur": "Tsorthan Grove",
+   "licence": "CC0 1.0",
+   "url": "https://opengameart.org/content/wastelands",
+   "preuve": "OpenGameArt page, License(s): CC0; Copyright/Attribution Notice: \"CC0 / Public Domain. No Rights Reserved. Free to use, no attribution required.\"",
+   "attribution": "Wastelands by Tsorthan Grove (opengameart.org/content/wastelands), CC0",
+   "fetched": "2026-11-15"
   }
  },
  "sons": [
@@ -17,6 +44,27 @@
    "source": "tg-tension",
    "fichier": "tension_loop.flac",
    "detail": "menu theme: the author's seamless loop played twice (2 min 34 s), fixed gain to -18 LUFS (no compression), Ogg Vorbis q2, 48 kHz stereo"
+  },
+  {
+   "id": "bed-drone",
+   "pack": "music",
+   "source": "tg-dark-ambient-drone",
+   "fichier": "dark_ambient_drone_loop.flac",
+   "detail": "raid bed: the author's seamless loop (5 min 7 s), fixed gain to -26 LUFS (no compression), Ogg Vorbis q2, 48 kHz stereo"
+  },
+  {
+   "id": "bed-machines",
+   "pack": "music",
+   "source": "tg-machines",
+   "fichier": "machines_loop.flac",
+   "detail": "raid bed: the author's seamless loop (1 min 17 s), fixed gain to -26 LUFS (no compression), Ogg Vorbis q2, 48 kHz stereo"
+  },
+  {
+   "id": "bed-wastelands",
+   "pack": "music",
+   "source": "tg-wastelands",
+   "fichier": "wastelands_loop.flac",
+   "detail": "raid bed: the author's seamless loop (1 min 50 s), fixed gain to -26 LUFS (no compression), Ogg Vorbis q2, 48 kHz stereo"
   }
  ]
 }

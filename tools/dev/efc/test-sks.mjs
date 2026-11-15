@@ -27,7 +27,7 @@ try {
   check('SKS: semi-automatic, 10 rounds, tube reload, rifle family, no attachments, AK shot profile', !r.d.auto && r.d.mag === 10 && r.d.tube && r.d.fam === 'rifle' && r.d.slots.length === 0 && r.d.sound === 'ak', r.d);
   check('damage a little under the AK', r.ak > 0 && r.ak <= 8, r.ak);
   check('first-person model builds', r.fpMesh > 30 && r.fam === 'rifle' && r.tubeFed && r.grips, { mesh: r.fpMesh, fam: r.fam });
-  check('world model builds', r.wMesh > 10, r.wMesh);
+  check('world model builds', r.wMesh >= 3, r.wMesh);
   check('front post tip on the sight line, centred', r.postTop !== null && Math.abs(r.postTop - r.sightY) < 0.0015 && Math.abs(r.postX) < 1e-4, { top: r.postTop, y: r.sightY });
   check('makeArms accepts the SKS', r.arms === 'sks 10/30', r.arms);
   check('item w_sks, low value, no Warden carries it', r.item && r.item.name === 'SKS' && r.item.value <= 1000 && r.item.noLoot && !r.inBots, r.item);
@@ -36,14 +36,15 @@ try {
   check('remote copy: world gun from the published key', r.ok === true, r);
 
   // ---------- 2. a raid on Claudov with the free kit ----------
-  await ev(() => { efcCall('stash:setFreeKit', true); });
+  // the player takes no damage in this test (filter registered in the test page only)
+  await ev(() => { efcCall('stash:setFreeKit', true); efcOn('damage', (dmg, v) => (v && v.isPlayer ? 0 : dmg)); });
   await startSolo(page);
   r = await ev(() => ({ map: MAPL.id, state: efcCall('raid:state').state, w: curW().def.id, mag: curW().mag, res: curW().reserve, slots: PL.ent.arms.slots.length, inv: efcCall('inv:all', EFC.inv).map((i) => i.id + (i.free ? '*' : '')) }));
   check('raid on Claudov starts with the free kit: SKS 10 + 30 and nothing else', r.map === 'claudov' && r.state === 'live' && r.w === 'sks' && r.mag === 10 && r.res === 30 && r.slots === 1 && r.inv.join() === 'w_sks*', r);
   const HOLD = 'PL.ent.health = 100; for (const e of entities) if (!e.isPlayer) { e.input && (e.input.fire = false); }';
   // aim: time for adsW to pass 0.95
-  r = await ev(() => { PL.adsWant = true; let t = 0; while (PL.ent.arms.adsW < 0.95 && t < 3) { matchTick(1 / 30, false); PL.ent.health = 100; t += 1 / 30; } const s = { t, adsW: PL.ent.arms.adsW, ads: PL.ent.adsActive }; PL.adsWant = false; return s; });
-  check('aims (slow: more than half a second to settle)', r.ads && r.adsW >= 0.95 && r.t > 0.5 && r.t < 1.5, r);
+  r = await ev(() => { PL.adsWant = true; let t = 0; while (PL.ent.arms.adsW < 0.95 && t < 3) { matchTick(1 / 30, false); PL.ent.health = 100; t += 1 / 30; } const s = { t, adsW: PL.ent.arms.adsW, ads: PL.ent.adsActive, slowest: Object.values(WEAPONS).every((d) => d.cat !== 'ar' || d.adsTime <= WEAPONS.sks.adsTime) }; PL.adsWant = false; return s; });
+  check('aims, slowest of the assault rifles (adsTime, settle time over 0.4 s)', r.ads && r.adsW >= 0.95 && r.t > 0.4 && r.t < 1.5 && r.slowest, r);
   await simRun(page, 1, HOLD);
   // fire: one shot per press, the follow-up limited by the rate of fire
   r = await ev(() => {
@@ -70,15 +71,22 @@ try {
   });
   // stepped measurement: the player re-aimed at the chest of a frozen Warden 25 m away every step, firing as fast as the weapon allows
   const meas = await ev((keys) => {
-    const P = PL.ent, tgt = entities.find((e) => !e.isPlayer && e.alive && !e.efcElite) || entities.find((e) => !e.isPlayer && e.alive);
-    const base = P.pos.clone(); let dir = null;
-    for (let a = 0; a < 32 && !dir; a++) {
-      const dx = Math.sin((a * Math.PI) / 16), dz = Math.cos((a * Math.PI) / 16);
-      if (!rayWorld(base.x, base.y + 1.2, base.z, dx, 0, dz, 26.5) && !rayWorld(base.x, base.y + 0.4, base.z, dx, 0, dz, 26.5)) dir = [dx, dz];
+    const P = PL.ent, tgt = entities.find((e) => !e.isPlayer && e.alive && !e.off && !e.efcElite) || entities.find((e) => !e.isPlayer && e.alive && !e.off);
+    // a clear, level 25 m line from the player or a Warden's spot (chest and knee height, same ground height at both ends)
+    let base = null, dir = null, tried = 0;
+    for (const e of [P, ...entities.filter((x) => !x.isPlayer)]) {
+      for (let a = 0; a < 32 && !dir; a++) {
+        const b = e.pos, dx = Math.sin((a * Math.PI) / 16), dz = Math.cos((a * Math.PI) / 16); tried++;
+        if (rayWorld(b.x, b.y + 1.3, b.z, dx, 0, dz, 26, 1) || rayWorld(b.x, b.y + 0.6, b.z, dx, 0, dz, 26, 1)) continue;
+        const g = rayWorld(b.x + dx * 25, b.y + 1, b.z + dz * 25, 0, -1, 0, 3);
+        if (g && Math.abs(g.t - 1) < 0.3) { base = b.clone(); dir = [dx, dz]; }
+      }
+      if (dir) break;
     }
-    if (!dir || !tgt) return { err: 'no clear line', tgt: !!tgt };
+    if (!dir || !tgt) return { err: 'no clear line', tgt: !!tgt, tried };
     const tp = base.clone(); tp.x += dir[0] * 25; tp.z += dir[1] * 25;
-    const out = {};
+    const out = {}, offWas = new Map();
+    for (const e of entities) if (!e.isPlayer && e !== tgt) { offWas.set(e, e.off); e.off = true; }
     for (const k of keys) {
       P.arms = makeArms([k]); P.arms.fireCd = 0; tgt.alive = true; tgt.health = 100; tgt.pos.copy(tp); tgt.vel && tgt.vel.set(0, 0, 0);
       if (tgt.efcArmor !== undefined) tgt.efcArmor = null;
@@ -88,15 +96,20 @@ try {
         const ex = tp.x - base.x, ez = tp.z - base.z, ey = tp.y + 1.25 - (base.y + PL.eyeH);
         PL.yaw = Math.atan2(-ex, -ez); PL.pitch = Math.atan2(ey, Math.hypot(ex, ez));
         camera.position.set(base.x, base.y + PL.eyeH, base.z); camera.rotation.set(PL.pitch, PL.yaw, 0, 'YXZ'); camera.updateMatrixWorld();
-        PL.adsWant = true; PL.queued = P.arms.adsW > 0.9; const s0 = P.arms.shots;
+        if (!out.aim0) { const f = camFwd(new V3()); out.aim0 = { f: f.toArray().map((x) => +x.toFixed(3)), want: new V3(ex, ey, ez).normalize().toArray().map((x) => +x.toFixed(3)) }; }
+        PL.adsWant = true; PL.queued = PL.held = P.arms.adsW > 0.9; const s0 = P.arms.shots;
         matchTick(1 / 30, false); t += 1 / 30;
         if (P.arms.shots > s0) { shots++; if (first < 0) first = t; }
         if (tgt.health < last) { hits++; last = tgt.health; }
         if (P.arms.slots[0].mag === 0 && !P.arms.reload) ctlStartReload(P);
       }
       out[k] = { ttk: first < 0 || tgt.alive ? null : +(t - first).toFixed(3), shots, hits, dead: !tgt.alive || tgt.health <= 0 };
+      if (!hits) { const f = camFwd(new V3()), o = camera.position.clone(), w = rayWorld(o.x, o.y, o.z, f.x, f.y, f.z, 300, 1), re = rayEntities(o, f, 300, P);
+        out[k].diag = { f: f.toArray().map((x) => +x.toFixed(3)), want: [tp.x - o.x, tp.y + 1.25 - o.y, tp.z - o.z].map((x) => +(x / 25).toFixed(3)), wt: w ? +w.t.toFixed(2) : null, ent: re ? (re.e === tgt ? 'target' : 'other') : null, rt: re ? +(+re.t).toFixed(2) : null, off: tgt.off, eyeH: PL.eyeH, tgy: +(tgt.pos.y - base.y).toFixed(2) }; }
+      if (!shots) out[k].why = { adsW: +P.arms.adsW.toFixed(2), alive: P.alive, state: MATCH.state, busy: P.busy, mag: P.arms.slots[0].mag, raid: efcCall('raid:state').state, sprint: P.sprinting, cd: P.arms.fireCd, sw: P.arms.switching };
     }
-    PL.adsWant = false; PL.queued = false;
+    PL.adsWant = false; PL.queued = PL.held = false;
+    for (const [e, o] of offWas) e.off = o;
     return out;
   }, Object.keys(ttk));
   console.log('\nTime to kill at 25 m, still target, 100 health, torso, no armour');

@@ -78,7 +78,7 @@ check('(b) the menu theme is silent during the raid', r.vol < 0.01, r);
 
 // (c) harbour layer on Claudov: chains, rigging and bell scheduled into the ambience output (the map's sound pack loads asynchronously)
 await page.waitForFunction(() => !!EFCM.hb, null, { timeout: 60000, polling: 200 }).catch(() => {});
-await simRun(page, 45, KEEP);
+await simRun(page, 45, KEEP + ' ambTick(1 / 30);'); // ambTick runs in the frame loop (sfxTick), which simRun does not step
 r = await ev(() => ({ hb: !!EFCM.hb, chains: EFCM.hb ? EFCM.hb.chains.length : 0, rig: sfxHas('a_rigging'), bell: sfxHas('a_buoybell') }));
 let c = await calls();
 const hb = c.filter((x) => x.what === 'harbour').map((x) => x.id);

@@ -29,9 +29,9 @@ function efcPickW(rng, entries) {
   for (const e of entries) { r -= e[0]; if (r < 0) return e; }
   return entries[entries.length - 1];
 }
-/* Weapon item ids of the engine categories given ('ar', 'smg', ...) */
+/* Weapon item ids of the engine categories given ('ar', 'smg', ...), free-loadout-only weapons (noLoot: the SKS) left out */
 function efcWeaponIds(cats) {
-  return Object.values(EFC_ITEMS).filter((d) => d.kind === 'weapon' && typeof WEAPONS !== 'undefined' && WEAPONS[d.weapon.wkey] && cats.includes(WEAPONS[d.weapon.wkey].cat)).map((d) => d.id);
+  return Object.values(EFC_ITEMS).filter((d) => d.kind === 'weapon' && !d.noLoot && typeof WEAPONS !== 'undefined' && WEAPONS[d.weapon.wkey] && cats.includes(WEAPONS[d.weapon.wkey].cat)).map((d) => d.id);
 }
 /* A weapon item with part of its magazine and reserve (share: 0..1 of the full magazine / half reserve) */
 function efcLootWeapon(rng, id, lo, hi) {

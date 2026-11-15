@@ -124,6 +124,7 @@ function efcWardenStartSpot(b) {
 /* spawnEntity seam: where a Warden appears (null: the engine's spawn) */
 function efcWardenSpawn(e) {
   efcWardenEnsure();
+  if (efcWardenPaced(e)) efcPaceReset(e); // a new life starts idle, weapon at low ready (41-efc-warden-pose.js)
   const s = e.efcSpot; e.efcSpot = null; e.efcPatrol = null;
   if (s) return s;
   const p = efcWardenPost(e); if (!p) return null;

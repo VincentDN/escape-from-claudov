@@ -173,7 +173,8 @@ function poseSoldier(e, dt) {
   const dyaw = dt > 0 ? angDiff(S.lastYaw, e.yaw) / dt : 0; S.lastYaw = e.yaw;
   S.turn = damp(S.turn, v < 0.8 ? clamp(Math.abs(dyaw) / 2.5, 0, 1) : 0, 8, dt);
   const sprinting = !!e.sprinting && v > 2.5;
-  const aiming = e.isPlayer ? !PL.sprinting : !sprinting && ((e.visible && e.target && e.target.alive) || MATCH.time - e.lastShotT < 1.2 || MATCH.time - e.lastSeenT < 3 || (e.arms && e.arms.adsW > 0.5));
+  efcPoseStep(e, S, dt); const lr = S.efcLR || 0; // raid Warden posture (41-efc-warden-pose.js): lr, low ready; the raise; high ready
+  const aiming = efcPoseAiming(e, e.isPlayer ? !PL.sprinting : !sprinting && ((e.visible && e.target && e.target.alive) || MATCH.time - e.lastShotT < 1.2 || MATCH.time - e.lastSeenT < 3 || (e.arms && e.arms.adsW > 0.5)));
   // épauler : ressort vif et à peine sous-amorti (l'arme arrive sur la cible et se pose), redescente plus lente
   S.aimWV = sprV(S.aimW, S.aimWV, aiming ? 1 : 0, aiming ? 120 : 34, aiming ? 17 : 11, dt); S.aimW += S.aimWV * dt; S.aimW = clamp(S.aimW, -0.05, 1.05);
   S.sprW = damp(S.sprW, sprinting ? 1 : 0, sprinting ? 6 : 8, dt);
@@ -186,7 +187,7 @@ function poseSoldier(e, dt) {
   if (clipOK) locoAirT(S, air, landed, e.vy || 0, S.airVy || 0, dt);
   S.wasAir = air; S.airVy = e.vy || 0;
   const land = (S.ldV = sprV(S.ld, S.ldV, 0, 170, 13, dt), S.ld += S.ldV * dt);
-  const run = S.runW, aw = smoothstep(0, 1, clamp(S.aimW, 0, 1)), sw = smoothstep(0, 1, S.sprW) * (1 - aw), airW = S.airW;
+  const run = S.runW, aw = efcPoseAw(S, smoothstep(0, 1, clamp(S.aimW, 0, 1))), sw = smoothstep(0, 1, S.sprW) * (1 - aw), airW = S.airW;
   const acc = dt > 0 ? (v - S.lastV) / dt : 0; S.lastV = v;
   // amplitude globale du cycle (0 à l'arrêt, 1 en marche), lissée pour des départs et arrêts souples
   // (pivot sur place : debout, ce sont les pieds plantés qui font de vrais pas, voir footPlant ; accroupi, le cycle piétine)
@@ -209,7 +210,7 @@ function poseSoldier(e, dt) {
     if (!aiming && Math.random() < 0.35) S.rgV = (S.rgV || 0) + 3.2; // réajuste l'arme en main
   }
   const wt = (S.wtV = sprV(S.wt, S.wtV, (S.wtT || 0) * idle * (1 - 0.5 * clamp(S.aimW, 0, 1)), 13, 7.2, dt), S.wt += S.wtV * dt);
-  const look = (S.lkV = sprV(S.lk, S.lkV, (S.lkT || 0) * idle * (1 - clamp(S.aimW, 0, 1)), 26, 9.5, dt), S.lk += S.lkV * dt), lookP = (S.lkpV = sprV(S.lkp, S.lkpV, (S.lkP || 0) * idle * (1 - clamp(S.aimW, 0, 1)), 26, 9.5, dt), S.lkp += S.lkpV * dt);
+  const look = (S.lkV = sprV(S.lk, S.lkV, (S.lkT || 0) * Math.max(idle, lr) * (1 - clamp(S.aimW, 0, 1)), 26, 9.5, dt), S.lk += S.lkV * dt), lookP = (S.lkpV = sprV(S.lkp, S.lkpV, (S.lkP || 0) * idle * (1 - clamp(S.aimW, 0, 1)), 26, 9.5, dt), S.lkp += S.lkpV * dt);
   const regrip = (S.rgV = sprV(S.rg, S.rgV, 0, 95, 9, dt), S.rg += S.rgV * dt);
   // ---- impact : le corps encaisse dans le sens du tir (impulsion amortie : il part, dépasse un peu, revient)
   const kick = S.hitKick || 0;
@@ -261,7 +262,7 @@ function poseSoldier(e, dt) {
   // buste : penché selon l'effort et l'accélération, plié pour viser haut ou bas, épaules en contre-rotation, profil en visée
   const gp = clamp(e.pitch, -1.1, 1.1);
   const leanT = 0.05 + 0.08 * ampP + (0.26 * run + 0.04 * sw) * (1 - kc) + 0.22 * c * (1 - ka) - 0.12 * back * ampP + clamp(acc * 0.045, -0.15, 0.18) - hr * hz * 0.5 - gp * 0.38 * aw + 0.18 * airW * (1 - kA)
-    + st * (0.07 + 0.07 * aw) - rec * 2.2 + lookP * 0.3;
+    + st * (0.07 + 0.07 * aw) - rec * 2.2 + lookP * 0.3 - 0.03 * lr;
   const lean = (S.leanV = sprV(S.lean, S.leanV, leanT, 150, 19, dt), S.lean += S.leanV * dt);
   const strafeRoll = (S.srollV = sprV(S.sroll, S.srollV, -dx * 0.14 * clamp(v / 3, 0, 1) * (1 - run * 0.4) * (1 - kc) - hr * hx * 0.4, 140, 18, dt), S.sroll += S.srollV * dt);
   const blade = (S.bladeV = sprV(S.blade, S.bladeV, (isP ? -0.15 : -0.62) * aw + -0.12 * (1 - aw) * (1 - sw), 90, 16, dt), S.blade += S.bladeV * dt); // buste de profil en visée
@@ -316,20 +317,20 @@ function poseSoldier(e, dt) {
   L[J_CHE].set(0, SD.trunk + breath, 0).applyQuaternion(_qT).add(L[J_PEL]);
   const hunch = 0.02 + 0.03 * run + 0.02 * amp;
   const shc = _tmpA.set(0, SD.shY, -hunch).applyQuaternion(_qT).add(L[J_CHE]);
-  L[J_SHL].set(-SD.shX, breath * 0.6, SD.shZ).applyQuaternion(_qT).add(shc); L[J_SHR].set(SD.shX, breath * 0.6 + 0.03 * aw * (isP ? 0 : 1), SD.shZ + rec * (isP ? 0.2 : 0.5)).applyQuaternion(_qT).add(shc);
+  L[J_SHL].set(-SD.shX, breath * 0.6 - 0.02 * lr, SD.shZ).applyQuaternion(_qT).add(shc); L[J_SHR].set(SD.shX, breath * 0.6 - 0.02 * lr + 0.03 * aw * (isP ? 0 : 1), SD.shZ + rec * (isP ? 0.2 : 0.5)).applyQuaternion(_qT).add(shc);
   // tête : compense le buste pour garder le regard sur la cible ; en visée, joue posée sur la crosse (tête avancée, baissée, inclinée).
   // _qH est l'orientation de la tête dans le repère du corps (pas du buste) : son lacet ne garde qu'une part de celui du buste (en
   // visée, aucune : le regard suit l'arme ; avant, -tY le comptait deux fois et la tête regardait 30 degrés à gauche de l'arme)
   const tY = pYaw + twist;
   _eu.set(clamp(gp * 0.55, -0.45, 0.5) + lean * -0.62 - bob * 0.8 + 0.1 * aw * (isP ? 0 : 1) + lookP - hr * hz * (S.hitHead ? 0.9 : 0.35) + rec * 0.8,
-    tY * lerp(0.3, 0, aw) + look - hr * hx * (S.hitHead ? 0.6 : 0.2), -roll * 0.7 - 0.22 * aw * (isP ? 0.2 : 1) + hr * hx * 0.25); _qH.setFromEuler(_eu);
+    tY * lerp(0.3, 0, aw) + clamp(look + (e.efcHead || 0), -1.3, 1.3) - hr * hx * (S.hitHead ? 0.6 : 0.2), -roll * 0.7 - 0.22 * aw * (isP ? 0.2 : 1) + hr * hx * 0.25); _qH.setFromEuler(_eu);
   // (la tête du clip part de 30 degrés en arrière : réduite, le ressort d'impact la secoue déjà, et un second tir doit rester possible)
   if (HIT) _qH.premultiply(hitDelta(HIT.qH, LOCO.hit0.qH, S.hK * (S.hitHead ? 0.6 : 0.35)));
   L[J_HEAD].set(0.05 * aw * (isP ? 0 : 1), SD.head[1] - 0.035 * aw * (isP ? 0.3 : 1), SD.head[2] - hunch * 0.4 - 0.025 * aw).applyQuaternion(_qH).add(L[J_CHE]);
   // ---- arme : trois postures fondues
   const gunBobY = (S.gbyV = sprV(S.gby, S.gbyV, -bob * lerp(0.8, 0.25, aw), 220, 18, dt), S.gby += S.gbyV * dt), gunBobYaw = (S.gbwV = sprV(S.gbw, S.gbwV, (pYaw + twist - blade) * 0.35 * steady, 200, 18, dt), S.gbw += S.gbwV * dt);
   // visée : orientation du regard ; la crosse au creux de l'épaule droite (fusils) ou le pistolet bras tendus
-  _eu.set(gp + gunBobY * 0.3 + hr * 0.22 + rec * 1.2, gunBobYaw * 0.45 - hr * hx * 0.18, roll * 0.25 - 0.04); _qA.setFromEuler(_eu);
+  _eu.set(gp - 0.22 * (S.efcHR || 0) + gunBobY * 0.3 + hr * 0.22 + rec * 1.2, gunBobYaw * 0.45 - hr * hx * 0.18, roll * 0.25 - 0.04); _qA.setFromEuler(_eu);
   const aimP = _tmpB;
   if (!isP) {
     const bt = S.grips.butt;
@@ -342,6 +343,7 @@ function poseSoldier(e, dt) {
   _eu.set(-0.55 - run * 0.1 + gunBobY * 2.5 + pump * 0.06 + regrip * 0.22 - st * 0.08, (isP ? 0.2 : 0.5) + pump * 0.1, (isP ? 0.1 : 0.3) + roll * 1.2 - regrip * 0.12); _qB.setFromEuler(_eu); _qB.premultiply(_qT);
   const lowP = _tmpE.set(isP ? 0.02 : 0.03, isP ? -0.1 : -0.17, isP ? -0.3 : -0.27).applyQuaternion(_qT).add(shc);
   lowP.y += gunBobY + regrip * 0.025;
+  efcPoseLowReady(S, _qB, lowP, _qT, shc, lr, TW, amp); // raid: an idle Warden's low ready
   // sprint : en travers de la poitrine, canon vers le haut à gauche, qui pompe avec les foulées
   const sp2 = Math.sin(TW) * sw, sp1 = Math.cos(2 * TW) * sw;
   _eu.set(isP ? -0.9 : 0.42 + sp1 * 0.08, isP ? 0.25 : 1.05 + sp2 * 0.12, isP ? 0.2 : -0.35 + sp2 * 0.18); _qS.setFromEuler(_eu); _qS.premultiply(_qT);

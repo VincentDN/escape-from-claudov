@@ -475,6 +475,8 @@ function updateBot(b, dt, now) {
     if (lp.jump && b.jumpT <= 0 && b.pathI > 0 && b.tactic !== 'fight' && botLeapNow(b, b.path[b.pathI - 1], lp)) b.jumpT = 0.12; // en combat, le chemin d'avant reste mais n'est plus suivi
     else if (lp.drop && lp.y < b.pos.y - 0.9) { sprint = false; speed = Math.min(speed, 3.2); }
   }
+  // raid: a Warden's pace follows its state (idle, alert, combat: 41-efc-warden-pose.js); no shot while its weapon comes up
+  sprint = efcWardenPace(b, now, vis, sprint); if (efcWardenRaising(b, now)) canShoot = false;
   // glissade : pour entrer en couvert, pour aborder un adversaire, pour fuir une grenade, et rarement pour le plaisir (botTrySlide : place, délai)
   if (sprint && b.slideT <= 0) {
     let pS = 0;
@@ -492,6 +494,7 @@ function updateBot(b, dt, now) {
   b.pauseT = (b.pauseT || 0) - dt; b.tapCd = (b.tapCd || 0) - dt;
   I.ads = (vis && !sprint && canShoot && (!def.ai.shotgun || dist > 7)) || (b.holdT > 0 && !def.ai.shotgun);
   if ((b.tactic === 'hunt' && b.lastKnown.distanceTo(b.pos) < 15) || b.tactic === 'search') I.ads = !sprint;
+  I.ads = efcWardenAds(b, I.ads);
   if (canShoot && vis && !sprint) {
     const aimErr = hyp(angDiff(b.lookYaw, faceYaw), facePitch - b.pitch);
     if (b.reactT > 0) b.reactT -= dt;
@@ -507,8 +510,10 @@ function updateBot(b, dt, now) {
   // retourner vers un impact, un bruit, un adversaire entrevu sur le côté) va à la vitesse d'un joueur (D.spin, un peu plus vers un
   // adversaire en vue) et prend son élan ; le suivi fin d'une cible ne change pas. Jusqu'à la 4.15, un bot touché dans le dos faisait
   // demi-tour en 0,3 s, dès l'impact (jusqu'à 14 rad/s au niveau Vétéran).
-  const kk = D.turn * D.turn * 3.2 * (b.sprinting ? 1.3 : 1), cd = 2 * Math.sqrt(kk) * 0.85, yv = b.yawV || 0, vmax = Math.min(D.turn * 2, D.spin * (vis ? 1.3 : 1));
-  let ya = angDiff(b.lookYaw, faceYaw) * kk - yv * cd;
+  // raid: an idle Warden turns its head first, then its body, calmer (efcWardenTurn: b.efcFace, the body's aim; CT, share of the turn rate)
+  const calm = efcWardenTurn(b, faceYaw, now, dt), CT = calm ? EFC.cfg.wardenCalmTurn : 1;
+  const kk = D.turn * D.turn * 3.2 * (b.sprinting ? 1.3 : 1) * CT * CT, cd = 2 * Math.sqrt(kk) * 0.85, yv = b.yawV || 0, vmax = Math.min(D.turn * 2, D.spin * (vis ? 1.3 : 1)) * CT;
+  let ya = angDiff(b.lookYaw, b.efcFace) * kk - yv * cd;
   if (ya * yv >= 0) ya = clamp(ya, -D.spin * 6, D.spin * 6); // l'élan se prend peu à peu, le freinage reste libre
   b.yawV = clamp(yv + ya * dt, -vmax, vmax);
   b.lookYaw += b.yawV * dt;
@@ -527,8 +532,10 @@ function updateBot(b, dt, now) {
   if (b.jumpT > 0) { b.jumpT -= dt; if (b.onGround && !b.crouch) { I.jump = true; b.wantCrouch = false; } }
   I.sprint = sprint; I.crouch = !!b.wantCrouch;
   const NERVE = 1.05; // allure des soldats (1,1 avant la 3.6.0 : ralentis avec le joueur ; 0,96 jusqu'à la 4.18, trop mous à l'œil)
-  const base = MOVE_SPEED * def.move * (sprint ? SPRINT_MUL : (I.ads ? (def.scope ? 0.4 : 0.58) : 1)) * (b.wantCrouch ? 0.6 : 1);
-  const amt = speed > 0 ? clamp(speed * NERVE / base, 0, 1) : 0, ll = hyp(lx, lz);
+  const baseOf = (sp) => MOVE_SPEED * def.move * (sp ? SPRINT_MUL : (I.ads ? (def.scope ? 0.4 : 0.58) : 1)) * (b.wantCrouch ? 0.6 : 1), base = baseOf(sprint);
+  // ground speed asked; raid: a Warden's pace (efcWardenSpeed, from the engine's own speed with the sprint it would have had)
+  const gs = b.efcState ? efcWardenSpeed(b, Math.min(speed * NERVE, baseOf(b.efcSprint0))) : speed * NERVE;
+  const amt = speed > 0 ? clamp(gs / base, 0, 1) : 0, ll = hyp(lx, lz);
   if (ll > 1e-3) { lx = (lx / ll) * amt * Math.min(1, ll); lz = (lz / ll) * amt * Math.min(1, ll); } else { lx = 0; lz = 0; }
   I.mx = lx; I.mz = lz;
   const px0 = b.pos.x, pz0 = b.pos.z;

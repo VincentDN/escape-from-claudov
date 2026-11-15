@@ -226,11 +226,23 @@ open("dist/sitemap.xml","w",encoding="utf-8").write('<?xml version="1.0" encodin
 html=html.replace('<meta name="cod-relay" content="">','<meta name="cod-relay" content="'+_html.escape(relay,quote=True)+'">')
 print("salons en ligne :",("tout par le serveur de jeu, "+relay) if relay else "pair à pair (PeerJS), sans relais")
 # Musique des menus : dist/menu-theme.mp3 est livré à côté du HTML (pas embarqué) ; l'adresse porte un condensat pour le cache. Absent : pas de musique.
-music=""
-if os.path.exists("dist/menu-theme.mp3"):
+# Music (P5): every assets/music/*.ogg is copied beside the page as dist/music/<name>.<hash>.ogg (streamed, never embedded). The menu
+# theme's address goes in the menu-music meta, the whole table { name: address } in an efc-music meta read by src/efc/46-efc-music.js.
+# No assets/music/: no music, the game stays silent (the legacy dist/menu-theme.mp3 is still used for the menu if present).
+os.makedirs("dist/music",exist_ok=True)
+tracks={}
+for f in sorted(glob.glob("assets/music/*.ogg")):
+    data=open(f,"rb").read(); key=os.path.basename(f)[:-4]
+    name="music/"+key+"."+hashlib.sha1(data).hexdigest()[:8]+".ogg"; tracks[key]=name
+    if not os.path.exists("dist/"+name): open("dist/"+name,"wb").write(data)
+for f in glob.glob("dist/music/*.ogg"):
+    if f[5:] not in tracks.values(): os.remove(f)
+music=tracks.get("menu-theme","")
+if not music and os.path.exists("dist/menu-theme.mp3"):
     music="menu-theme.mp3?v="+hashlib.sha1(open("dist/menu-theme.mp3","rb").read()).hexdigest()[:8]
 html=html.replace("__MENU_MUSIC__",music)
-print("musique des menus :",music or "aucune")
+html=html.replace('<meta name="menu-music" content="'+music+'">','<meta name="menu-music" content="'+music+'">\n<meta name="efc-music" content="'+_html.escape(json.dumps(tracks),quote=True)+'">',1)
+print("musique :",music or "aucune pour les menus,",len(tracks),"pistes dans dist/music,",sum(os.path.getsize("dist/"+n) for n in tracks.values())//1024,"Ko")
 # Identifiant de version : condensat de la page elle-même (marqueur compris), inscrit dans la page et dans dist/version.json.
 # Le jeu compare les deux pour se recharger quand une nouvelle version est en ligne (voir src/09h-update.js et vercel.json).
 build_id=hashlib.sha1(html.encode("utf-8")).hexdigest()[:12]

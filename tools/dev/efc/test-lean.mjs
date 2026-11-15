@@ -78,13 +78,13 @@ try {
   ok(Math.abs(right.side - 0.35) < 0.02 && Math.abs(right.eyeSide - 0.35) < 0.02, '(1) leaning right moves the eye 0.35 m to the right in the open', right);
   ok(half > 0.05 && half < 0.34, '(1) the lean eases in (part way after 0.1 s, full by 0.3 s)', { half });
   ok(Math.abs(right.roll * 180 / Math.PI + 15) < 1.5 && right.gun > 0.05, '(1) camera rolls about 15 degrees, the weapon cants with it', { rollDeg: right.roll * 180 / Math.PI, gun: right.gun });
-  await run(0.3, 'KEYS.LeanL = true;');
+  await run(0.3, 'KEYS.LeanR = false; KEYS.LeanL = true;');
   const left = await page.evaluate(() => LT.side(PL.ent, camera.position));
   ok(Math.abs(left + 0.35) < 0.02, '(1) leaning left moves the eye 0.35 m to the left', left);
-  await run(0.6, 'KEYS.ControlLeft = true; KEYS.LeanR = true;');
+  await run(0.6, 'KEYS.LeanL = false; KEYS.ControlLeft = true; KEYS.LeanR = true;');
   const crouch = await page.evaluate(() => ({ side: LT.side(PL.ent, camera.position), crouch: PL.ent.crouchAmt }));
   ok(crouch.crouch > 0.9 && Math.abs(crouch.side - 0.25) < 0.03, '(1) crouched, the lean is shorter (0.25 m)', crouch);
-  await run(0.5, 'KEYS.LeanR = true; PL.adsWant = true;');
+  await run(0.8, 'KEYS.ControlLeft = false; PL.crouchToggle = false; KEYS.LeanR = true; PL.adsWant = true;');
   const ads = await page.evaluate(() => ({ side: LT.side(PL.ent, camera.position), ads: VM.ads }));
   ok(ads.ads > 0.8 && Math.abs(ads.side - 0.35) < 0.03, '(1) works while aiming', ads);
 
@@ -93,7 +93,7 @@ try {
   await run(0.4, 'KEYS.LeanR = true;');
   const wl = await page.evaluate((p) => ({ x: PL.ent.leanX, camX: camera.position.x - p.x, sees: !!rayWorld(camera.position.x, camera.position.y, camera.position.z, 1, 0, 0, 0.12) }), spot);
   ok(wl.x > 0.15 && wl.x < 0.45 - 0.15 && wl.camX < 0.45 - 0.12 && !wl.sees, '(2) a wall shortens the lean: the eye stays clear of it', wl);
-  await run(0.4, 'KEYS.LeanL = true;');
+  await run(0.4, 'KEYS.LeanR = false; KEYS.LeanL = true;');
   const wl2 = await page.evaluate(() => PL.ent.leanX);
   ok(Math.abs(wl2 + 0.35) < 0.02, '(2) the other side is open: full lean left', wl2);
   await page.evaluate(() => LT.unwall());
@@ -111,7 +111,7 @@ try {
     r.chestSide = LT.side(PL.ent, entChest(PL.ent, new V3())); r.chest = shoot(PL.ent, entChest(PL.ent, new V3())); r.c0side = LT.side(PL.ent, c0);
     KEYS.LeanR = false;
     // a model soldier (how a remote player is posed and hit): a foe statue, leaned by hand
-    const b = foe; b.pos.set(p.x, p.y, p.z); b.vel.set(0, 0, 0); b.yaw = b.lookYaw = 0; b.pitch = 0; b.crouch = false; b.crouchAmt = 0; b.leanX = 0;
+    const b = entities.find((x) => x !== PL.ent && !allied(x, PL.ent) && x.alive && x.model) || foe; r.mAlive = b.alive; b.pos.set(p.x, p.y, p.z); b.vel.set(0, 0, 0); b.yaw = b.lookYaw = 0; b.pitch = 0; b.crouch = false; b.crouchAmt = 0; b.leanX = 0;
     const pose = () => { for (let i = 0; i < 20; i++) { b.pos.set(p.x, p.y, p.z); b.vel.set(0, 0, 0); b.yaw = 0; animSoldier(b, 1 / 30); } };
     PL.ent.pos.x += 30; pose();
     const bh0 = entHead(b, new V3()), me = entities.find((e) => e !== b && !allied(e, b)) || PL.ent;

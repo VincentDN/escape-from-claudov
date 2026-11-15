@@ -1,0 +1,22 @@
+{
+ "sources": {
+  "tg-tension": {
+   "nom": "Tension",
+   "auteur": "Tsorthan Grove",
+   "licence": "CC0 1.0",
+   "url": "https://opengameart.org/content/tension-0",
+   "preuve": "OpenGameArt page, License(s): CC0; Copyright/Attribution Notice: \"CC0 / Public Domain. No Rights Reserved. Free to use, no attribution required.\"",
+   "attribution": "Tension by Tsorthan Grove (opengameart.org/content/tension-0), CC0",
+   "fetched": "2026-11-15"
+  }
+ },
+ "sons": [
+  {
+   "id": "menu-theme",
+   "pack": "music",
+   "source": "tg-tension",
+   "fichier": "tension_loop.flac",
+   "detail": "menu theme: the author's seamless loop played twice (2 min 34 s), fixed gain to -18 LUFS (no compression), Ogg Vorbis q2, 48 kHz stereo"
+  }
+ ]
+}

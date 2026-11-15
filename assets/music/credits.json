@@ -62,6 +62,15 @@
    "preuve": "OpenGameArt page, License(s): CC0; Copyright/Attribution Notice: \"CC0 / Public Domain. No Rights Reserved. Free to use, no attribution required.\"",
    "attribution": "Light Through a Pale Window, from Background Drones Vol 1 by Tsorthan Grove (opengameart.org/content/background-drones-vol-1), CC0",
    "fetched": "2026-11-15"
+  },
+  "bart-chain-winch": {
+   "nom": "Chain winch sounds",
+   "auteur": "bart",
+   "licence": "CC0 1.0",
+   "url": "https://opengameart.org/content/chain-winch-sounds",
+   "preuve": "OpenGameArt page, Author: bart, License(s): CC0; notice: \"Not perfect, but they work well enough as background sounds. Credit appreciated. :)\"",
+   "attribution": "Chain winch sounds by bart (opengameart.org/content/chain-winch-sounds), CC0",
+   "fetched": "2026-11-15"
   }
  },
  "sons": [
@@ -120,6 +129,20 @@
    "source": "cb-horror-stings",
    "fichier": "piano_sting.mp3",
    "detail": "sting, late extract opening: first 10 s, 4 s fade-out, fixed gain to -20 LUFS, Ogg Vorbis q3"
+  },
+  {
+   "id": "amb-chain-1",
+   "pack": "music",
+   "source": "bart-chain-winch",
+   "fichier": "winch.zip / winch - Marker 2.wav",
+   "detail": "Claudov harbour layer, chain against a hull: high-pass 60 Hz, 20 ms fade-in, 0.5 s fade-out, mono, fixed gain to -24 LUFS, Ogg Vorbis q2"
+  },
+  {
+   "id": "amb-chain-2",
+   "pack": "music",
+   "source": "bart-chain-winch",
+   "fichier": "winch.zip / winch - Marker #9.wav",
+   "detail": "Claudov harbour layer, chain against a hull: high-pass 60 Hz, 20 ms fade-in, 0.5 s fade-out, mono, fixed gain to -24 LUFS, Ogg Vorbis q2"
   }
  ]
 }

@@ -1771,3 +1771,9 @@ Se pencher ⇒ Leaning
 Se pencher à gauche ⇒ Lean left
 Se pencher à droite ⇒ Lean right
 Se pencher en bascule (un appui penche, un autre redresse, sinon tenir la touche) ⇒ Toggle lean (one press leans, another straightens up, otherwise hold the key)
+Music ⇒ =
+All music is CC0 (public domain) from OpenGameArt. With thanks to its authors: ⇒ =
+Menu theme: Tension by Tsorthan Grove (opengameart.org/content/tension-0) ⇒ =
+Raid music: Dark Ambient Drone, Machines and Wastelands by Tsorthan Grove ⇒ =
+Stings: Dark Stinger 1 by Kresiek The Furry, String and piano horror stings by congusbongus, Light Through a Pale Window by Tsorthan Grove ⇒ =
+Harbour chains: Chain winch sounds by bart (opengameart.org/content/chain-winch-sounds) ⇒ =

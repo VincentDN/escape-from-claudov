@@ -187,37 +187,50 @@ function efcMusicSting(kind, tag) {
 function efcHarbourStart(out) {
   efcHarbourStop();
   if (typeof CURMAP === 'undefined' || CURMAP.id !== 'claudov' || !AU.ctx || !out) return;
-  const H = EFCM.hb = { out, bufs: [], next: { chain: rand(8, 20), rigging: rand(5, 15), bell: rand(10, 30) } };
+  const H = EFCM.hb = { out, chains: [], next: { chain: rand(8, 20), rigging: rand(5, 15), bell: rand(10, 30) } };
   for (const id of ['amb-chain-1', 'amb-chain-2']) {
-    const url = efcMusicUrl(id); if (!url || typeof fetch !== 'function') continue;
-    fetch(url).then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => (b ? AU.ctx.decodeAudioData(b) : null))
-      .then((buf) => { if (buf && EFCM.hb === H) H.bufs.push(buf); }, () => { /* missing or undecodable: no chains */ });
+    const url = efcMusicUrl(id); if (!url) continue;
+    // one streamed element per take, routed once through its own distance filter, panner and gain into the ambience output
+    const ctx = AU.ctx, a = new Audio(); a.preload = 'auto'; a.src = url;
+    const C = { a, dead: false, lp: ctx.createBiquadFilter(), pan: ctx.createPanner(), g: ctx.createGain() };
+    a.addEventListener('error', () => { C.dead = true; });
+    C.lp.type = 'lowpass'; C.pan.panningModel = 'equalpower'; C.pan.distanceModel = 'inverse'; C.pan.refDistance = 6; C.pan.maxDistance = 400;
+    try { ctx.createMediaElementSource(a).connect(C.lp); } catch (e) { continue; }
+    C.lp.connect(C.pan); C.pan.connect(C.g); C.g.connect(out);
+    if (AU.verb) { C.v = ctx.createGain(); C.v.gain.value = 0.3; C.g.connect(C.v); C.v.connect(AU.verb); }
+    H.chains.push(C);
   }
 }
-function efcHarbourStop() { EFCM.hb = null; }
+function efcHarbourStop() {
+  const H = EFCM.hb; EFCM.hb = null; if (!H) return;
+  for (const C of H.chains) { C.a.pause(); C.a.removeAttribute('src'); setTimeout(() => { for (const n of [C.g, C.v]) if (n) n.disconnect(); }, 1500); }
+}
 function efcHarbourTick(dt) {
   const H = EFCM.hb; if (!H || typeof MATCH === 'undefined' || MATCH.state !== 'playing') return;
   const ins = AU.inside || 0, R = EFC_MUSIC.harbour, quay = () => new V3(rand(-75, -55), rand(-0.5, 2), rand(-70, 70));
   for (const k in H.next) {
     if ((H.next[k] -= dt) > 0) continue;
     H.next[k] = rand(R[k][0], R[k][1]);
-    if (k === 'chain') { if (H.bufs.length) efcHarbourOne(H, H.bufs[Math.floor(Math.random() * H.bufs.length)], quay(), 0.22 * (1 - 0.6 * ins)); continue; }
+    if (k === 'chain') {
+      const free = H.chains.filter((C) => !C.dead && C.a.paused);
+      if (free.length) efcHarbourOne(free[Math.floor(Math.random() * free.length)], quay(), 0.22 * (1 - 0.6 * ins));
+      continue;
+    }
     const id = k === 'bell' ? 'a_buoybell' : 'a_rigging';
     if (!sfxHas(id)) continue;
     const p = k === 'bell' ? new V3(rand(-200, -120), 0, rand(-120, 120)) : new V3(rand(-70, -58), rand(4, 12), rand(-60, 60));
     sfxEmitter(id, p, { gain: (k === 'bell' ? 0.25 : 0.18) * (1 - 0.6 * ins), ref: k === 'bell' ? 25 : 6, roll: 1, max: 400, air: 120, dest: H.out, verb: 0.3, rate: rand(0.94, 1.04) });
+    efcMusicLog('harbour', id);
   }
 }
-function efcHarbourOne(H, buf, p, gain) {
-  const ctx = AU.ctx, s = ctx.createBufferSource(), lp = ctx.createBiquadFilter(), pan = ctx.createPanner(), g = ctx.createGain();
-  s.buffer = buf; s.playbackRate.value = rand(0.85, 1.0);
-  lp.type = 'lowpass'; lp.frequency.value = clamp(9000 - p.distanceTo(camera.position) * 60, 1500, 9000);
-  pan.panningModel = 'equalpower'; pan.distanceModel = 'inverse'; pan.refDistance = 6; pan.rolloffFactor = 1; pan.maxDistance = 400;
-  if (pan.positionX) { pan.positionX.value = p.x; pan.positionY.value = p.y; pan.positionZ.value = p.z; } else pan.setPosition(p.x, p.y, p.z);
-  g.gain.value = gain;
-  s.connect(lp); lp.connect(pan); pan.connect(g); g.connect(H.out);
-  if (AU.verb) { const v = ctx.createGain(); v.gain.value = 0.3; g.connect(v); v.connect(AU.verb); s.onended = () => v.disconnect(); }
-  s.start(); efcMusicLog('harbour', 'chain');
+function efcHarbourOne(C, p, gain) {
+  C.lp.frequency.value = clamp(9000 - p.distanceTo(camera.position) * 60, 1500, 9000);
+  const P = C.pan;
+  if (P.positionX) { P.positionX.value = p.x; P.positionY.value = p.y; P.positionZ.value = p.z; } else P.setPosition(p.x, p.y, p.z);
+  C.g.gain.value = gain; C.a.playbackRate = rand(0.85, 1.0);
+  try { C.a.currentTime = 0; } catch (e) { /* not ready */ }
+  const pr = C.a.play(); if (pr && pr.catch) pr.catch(() => { /* refused: skipped */ });
+  efcMusicLog('harbour', 'chain');
 }
 
 /* ---------- Wiring ---------- */

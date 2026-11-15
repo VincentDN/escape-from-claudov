@@ -53,20 +53,20 @@ const HELPERS = () => {
       for (const k in KEYS) KEYS[k] = false; PL.crouchToggle = false; PL.adsWant = false; efcLeanReset(); Settings.leanToggle = false;
     },
     // other soldiers parked far away and harmless (the test drives one when it needs one)
-    park() { let n = 0; for (const b of entities) if (b !== PL.ent) { b.pos.set(MAP.x0 + 2 + n++ * 1.5, groundHeight(MAP.x0 + 2, MAP.z0 + 2, 30), MAP.z0 + 2); b.vel.set(0, 0, 0); } },
+    park() { let n = 0; for (const b of entities) if (b !== PL.ent) { b.pos.set(MAP.x0 + 2 + n++ * 1.5, groundHeight(MAP.x0 + 2, MAP.z0 + 2, 30), MAP.z0 + 2); b.vel.set(0, 0, 0); b.health = 100; } },
     each: 'PL.ent.health = 100; LT.park();',
     side(e, p) { return (p.x - e.pos.x) * Math.cos(e.yaw) - (p.z - e.pos.z) * Math.sin(e.yaw); }, // m to the right of e's view
   };
 };
 
-const { browser, page, errors } = await openGame({ settings: { map: MAP, mode: 'tdm' }, w: 960, h: 540 });
+const { browser, page, errors } = await openGame({ settings: { map: MAP, mode: 'tdm', limit: 9999, minutes: 60 }, w: 960, h: 540 });
 try {
   await page.evaluate(HELPERS);
   await startSolo(page);
   await simRun(page, 1, 'PL.ent.health = 100;');
   const spot = await page.evaluate(() => LT.spot());
   ok(!!spot, 'found an open spot on ' + MAP, spot);
-  const run = (s, each = '') => simRun(page, s, 'LT.park(); PL.ent.health = 100;' + each);
+  const run = async (s, each = '') => { const r = await simRun(page, s, 'LT.park(); PL.ent.health = 100;' + each); if (r < s - 0.05) ok(false, 'match stopped', await page.evaluate(() => MATCH.state)); return r; };
 
   // (1) the eye in the open: standing, left, crouched, aiming
   await page.evaluate((p) => LT.place(p), spot); await run(0.3);

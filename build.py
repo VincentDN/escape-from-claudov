@@ -2,7 +2,7 @@
 three.js r147 est servi par le site (assets/vendor, tools/vendor.py) ; les modules de src/ sont concaténés dans l'ordre alphabétique.
 Les images (assets/menu-bg.webp et sa carte de profondeur assets/menu-depth.webp, assets/logo.webp) sont intégrées en data URI, et
 changelog.json (journal des mises à jour, validé ici) dans shell.html, à la place des marqueurs qui y figurent. La musique
-des menus, dist/menu-theme.mp3, reste un fichier à côté du HTML : build.py n'en met que l'adresse (avec un condensat) dans
+(assets/music/*.ogg, copiée dans dist/music/) reste en fichiers à côté du HTML : build.py n'en met que les adresses (avec un condensat) dans
 la page. Les textures photo des cartes aussi (un fichier par surface dans dist/tex/, chargé au lancement d'une carte),
 et leurs illustrations (dist/maps/).
 Écrit aussi dist/version.json : l'identifiant de la version construite, que le jeu consulte pour se mettre à jour."""
@@ -225,7 +225,6 @@ open("dist/sitemap.xml","w",encoding="utf-8").write('<?xml version="1.0" encodin
     '  <url><loc>'+SITE+'/</loc><lastmod>'+log[0]["date"]+'</lastmod></url>\n</urlset>\n')
 html=html.replace('<meta name="cod-relay" content="">','<meta name="cod-relay" content="'+_html.escape(relay,quote=True)+'">')
 print("salons en ligne :",("tout par le serveur de jeu, "+relay) if relay else "pair à pair (PeerJS), sans relais")
-# Musique des menus : dist/menu-theme.mp3 est livré à côté du HTML (pas embarqué) ; l'adresse porte un condensat pour le cache. Absent : pas de musique.
 # Music (P5): every assets/music/*.ogg is copied beside the page as dist/music/<name>.<hash>.ogg (streamed, never embedded). The menu
 # theme's address goes in the menu-music meta, the whole table { name: address } in an efc-music meta read by src/efc/46-efc-music.js.
 # No assets/music/: no music, the game stays silent (the legacy dist/menu-theme.mp3 is still used for the menu if present).

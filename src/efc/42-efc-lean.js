@@ -97,4 +97,4 @@ function efcLeanTorso(e, qT, pel) {
   return _efcLeanQ;
 }
 /* Remote copy: smoothed towards the published lean */
-function efcLeanRemote(e, dt) { e.leanX = damp(e.leanX || 0, (e.net && e.net.lean) || 0, 18, dt); }
+function efcLeanRemote(e, dt) { e.leanX = damp(e.leanX || 0, (e.net && e.net.lean) || 0, 30, dt); } // about 0.1 s behind the owner's own easing

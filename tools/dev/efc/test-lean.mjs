@@ -53,7 +53,7 @@ const HELPERS = () => {
       for (const k in KEYS) KEYS[k] = false; PL.crouchToggle = false; PL.adsWant = false; efcLeanReset(); Settings.leanToggle = false;
     },
     // other soldiers parked far away and harmless (the test drives one when it needs one)
-    park() { let n = 0; for (const b of entities) if (b !== PL.ent) { b.pos.set(MAP.x0 + 2 + n++ * 1.5, groundHeight(MAP.x0 + 2, MAP.z0 + 2, 30), MAP.z0 + 2); b.vel.set(0, 0, 0); b.health = 100; } },
+    park() { let n = 0; for (const b of entities) if (b !== PL.ent) { b.pos.set(MAP.x0 + 2 + n++ * 1.5, groundHeight(MAP.x0 + 2, MAP.z0 + 2, 30), MAP.z0 + 2); b.vel.set(0, 0, 0); b.health = 100; b.blindT = 1e9; b.target = null; } PL.ent.health = 100; },
     each: 'PL.ent.health = 100; LT.park();',
     side(e, p) { return (p.x - e.pos.x) * Math.cos(e.yaw) - (p.z - e.pos.z) * Math.sin(e.yaw); }, // m to the right of e's view
   };

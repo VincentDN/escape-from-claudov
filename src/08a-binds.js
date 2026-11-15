@@ -5,6 +5,9 @@
    passe chaque touche par keyCanon, qui renvoie la touche par défaut de l'action à laquelle elle est liée (ou '' pour une touche par défaut
    libérée, qui ne commande plus rien). Les commandes tactiles et la manette, qui écrivent directement KEYS.Space, ne sont pas concernées.
    Touches réservées (non liables) : Échap, P (pause), T (discussion), Entrée (passer la killcam), touches de fonction.
+   Une action peut avoir une touche par défaut différente de son code interne (quatrième champ de BIND_DEFS) : Changer d'arme garde le
+   code 'KeyQ' que lit le reste du jeu mais vient par défaut de Z, Ramasser garde 'KeyE' mais vient de V, et Q et E penchent (codes
+   internes 'LeanL', 'LeanR' : src/efc/42-efc-lean.js).
    Hors plein écran, le navigateur garde certains raccourcis (Ctrl+W, Ctrl+N, Ctrl+T) : ils ne s'écartent que par le verrouillage du
    clavier (syncKeyboardLock, 09-game.js), qui porte sur Échap et sur toutes les touches liées ; le reste est refusé par bindGuard.
    ========================================================================== */
@@ -12,19 +15,21 @@ const BIND_DEFS = [
   ['fwd', 'KeyW', _t('Avancer')], ['back', 'KeyS', _t('Reculer')], ['left', 'KeyA', _t('Aller à gauche')], ['right', 'KeyD', _t('Aller à droite')],
   ['jump', 'Space', _t('Sauter')], ['sprint', 'ShiftLeft', _t('Sprinter, retenir son souffle en lunette')],
   ['crouch', 'ControlLeft', _t('S\u0027accroupir (maintenu), glisser en sprintant')], ['crouchT', 'KeyC', _t('S\u0027accroupir (bascule), glisser en sprintant')],
-  ['reload', 'KeyR', _t('Recharger')], ['w1', 'Digit1', _t('Arme principale')], ['w2', 'Digit2', _t('Arme secondaire')], ['swap', 'KeyQ', _t('Changer d\u0027arme')],
-  ['knife', 'KeyF', _t('Couteau (maintenir pour le garder en main)')], ['nade', 'KeyG', _t('Grenade (maintenir pour la garder en main)')], ['use', 'KeyE', _t('Ramasser l\u0027arme au sol')], ['inspect', 'KeyI', _t('Inspecter l\u0027arme')],
+  ['reload', 'KeyR', _t('Recharger')], ['w1', 'Digit1', _t('Arme principale')], ['w2', 'Digit2', _t('Arme secondaire')], ['swap', 'KeyQ', _t('Changer d\u0027arme'), 'KeyZ'],
+  ['knife', 'KeyF', _t('Couteau (maintenir pour le garder en main)')], ['nade', 'KeyG', _t('Grenade (maintenir pour la garder en main)')], ['use', 'KeyE', _t('Ramasser l\u0027arme au sol'), 'KeyV'], ['inspect', 'KeyI', _t('Inspecter l\u0027arme')],
+  ['leanL', 'LeanL', _t('Se pencher à gauche'), 'KeyQ'], ['leanR', 'LeanR', _t('Se pencher à droite'), 'KeyE'],
   ['ks1', 'Digit4', _t('Première série')], ['ks2', 'Digit5', _t('Deuxième série')], ['ks3', 'Digit6', _t('Troisième série')], ['board', 'Tab', _t('Tableau des scores')],
 ];
 const BIND_RESERVED = new Set(['Escape', 'KeyP', 'KeyT', 'Enter', 'NumpadEnter', 'MetaLeft', 'MetaRight', 'ContextMenu', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
 const BIND = { rev: new Map(), dead: new Set(), layout: null, capture: null };
-const bindDefault = (a) => BIND_DEFS.find((d) => d[0] === a)[1];
+const bindDefault = (a) => { const d = BIND_DEFS.find((x) => x[0] === a); return d[3] || d[1]; }; // touche par défaut (d[3]), sinon le code interne
 const bindValid = (c) => typeof c === 'string' && /^[A-Za-z0-9]{1,20}$/.test(c) && !BIND_RESERVED.has(c) && !/^F\d{1,2}$/.test(c);
 function bindOf(a) { const o = Settings.binds && Settings.binds[a]; return bindValid(o) ? o : bindDefault(a); }
 function bindRebuild() {
   BIND.rev = new Map(); BIND.dead = new Set();
   for (const [a, def] of BIND_DEFS) { const c = bindOf(a); if (!BIND.rev.has(c)) BIND.rev.set(c, def); } // deux actions sur la même touche : la première l'emporte
-  for (const [a, def] of BIND_DEFS) if (!BIND.rev.has(def)) BIND.dead.add(def);                         // touche par défaut libérée : elle ne fait plus rien
+  // touche par défaut ou code interne libéré (Q quand Changer d'arme est sur Z) : elle ne fait plus rien
+  for (const [a, def] of BIND_DEFS) for (const c of [def, bindDefault(a)]) if (!BIND.rev.has(c)) BIND.dead.add(c);
 }
 function keyCanon(code) { if (BIND.rev.has(code)) return BIND.rev.get(code); return BIND.dead.has(code) ? '' : code; }
 /* Touches à garder pour le jeu quand le clavier est verrouillé (plein écran) */

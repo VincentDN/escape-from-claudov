@@ -3,6 +3,9 @@
 Extraction shooter vertical slice built on the Riposte: Frontline 5.6.0 engine (three.js, browser, no bundler).
 Owner: Vincent De Nil. The plan, work packages and ownership rules are in [docs/PLAN.md](docs/PLAN.md). Read it first.
 
+**Joining now?** Read [docs/HANDOFF.md](docs/HANDOFF.md) first: the current state, how to build and test, and the tasks open
+for incoming agents.
+
 ## Hard rules
 
 - **File ownership.** Each work package owns the files listed for it in [docs/contracts/CONTRACT.md](docs/contracts/CONTRACT.md),

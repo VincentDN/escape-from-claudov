@@ -771,7 +771,6 @@ Arme en 3D, flèches pour la faire tourner ⇒ 3D weapon, arrow keys to rotate i
 ajouter un accessoire ⇒ add an attachment
 
 # shell.html
-Escape From Claudov, FPS gratuit dans le navigateur ⇒ Escape From Claudov, free FPS in your browser
 Vue du jeu ⇒ Game view
 Chargement de three.js ⇒ Loading three.js
 Menu principal ⇒ Main menu

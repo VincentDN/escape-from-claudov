@@ -24,13 +24,16 @@ function efcUirOpen(kind, cid) {
   efcUirRender();
   const f = $(kind === 'loot' ? 'efcLootList' : 'efcInvList').querySelector('.efc-it:not(.empty)') || $(kind === 'loot' ? 'efcLoot' : 'efcInv').querySelector('button:not(:disabled)');
   if (f) f.focus({ preventScroll: true });
+  efcEmit('ui:panel', true, kind, EFC_UIR.cid);
 }
 function efcUirClose(silent) {
-  if (!EFC_UIR.panel) return;
+  const { panel, cid } = EFC_UIR;
+  if (!panel) return;
   EFC_UIR.panel = null; EFC_UIR.cid = null; EFC_UIR.all = null;
   $('efcInv').classList.add('hidden'); $('efcLoot').classList.add('hidden');
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   for (const k in KEYS) KEYS[k] = false;
+  efcEmit('ui:panel', false, panel, cid);
   if (!silent && MATCH.state === 'playing' && PL.ent.alive) requestLock(); // back to pointer lock (the key that closed the panel is the gesture)
 }
 function efcUirRender() {

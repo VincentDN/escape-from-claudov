@@ -130,6 +130,8 @@ def main():
         return
     # encodage des masters
     packs = sorted(p.name for p in common.MASTERS.iterdir() if p.is_dir()) if common.MASTERS.exists() else []
+    # The committed ElevenLabs handling bank is managed separately from the legacy source recordings.
+    packs = [p for p in packs if p != 'handling']
     if a.paquet: packs = [p for p in packs if p in a.paquet.split(',')]
     total = 0
     for pack in packs:

@@ -114,10 +114,10 @@ try {
   const pr = await page.evaluate(() => ({ show: $('efcPrompt').classList.contains('show'), text: $('efcPromptT').textContent }));
   check(pr.show && /Search Tool crate/.test(pr.text), 'search prompt near a container', pr);
   await page.keyboard.down('KeyF');
-  await simRun(page, 1, 'PL.ent.health = 100; efcEmit("tick", 1 / 30);');
+  await simRun(page, 1, 'PL.ent.health = 100;');
   const mid = await page.evaluate(() => ({ text: $('efcPromptT').textContent, bar: $('efcPromptBar').style.transform, open: !$('efcLoot').classList.contains('hidden'), knife: PL.knifeT || 0 }));
   check(/Searching/.test(mid.text) && !mid.open && mid.knife === 0, 'holding F shows search progress, no knife', mid);
-  await simRun(page, 1.2, 'PL.ent.health = 100; efcEmit("tick", 1 / 30);');
+  await simRun(page, 1.2, 'PL.ent.health = 100;');
   await page.keyboard.up('KeyF');
   const lo = await page.evaluate(() => ({ open: !$('efcLoot').classList.contains('hidden'), busy: efcCall('ui:busy'), rows: $('efcLootList').querySelectorAll('.efc-it').length, bag: $('efcLootBag').querySelectorAll('.efc-it').length, title: $('efcLootTitle').textContent, focus: document.activeElement && document.activeElement.dataset.take }));
   check(lo.open && lo.busy === true && lo.rows === 3 && lo.bag === 2 && lo.title === 'Tool crate', 'F hold opens the loot panel, ui:busy true', lo);
@@ -130,7 +130,7 @@ try {
   check(tf.call[0] === 'world:take' && tf.rows === 1, 'F takes the selected item', tf);
   // no firing or turning while the panel is open (fallback aim: the engine would read the mouse)
   const guard = await page.evaluate(() => { const y = PL.yaw; for (const el of [canvas, $('efcLoot')]) { el.dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true })); el.dispatchEvent(new MouseEvent('mousemove', { movementX: 300, bubbles: true })); } /* real events target an element, so the window capture guard runs first */ return { held: PL.held, paused: MATCH.state }; });
-  await simRun(page, 0.2, 'PL.ent.health = 100; efcEmit("tick", 1 / 30);');
+  await simRun(page, 0.2, 'PL.ent.health = 100;');
   check(guard.held === false && guard.paused === 'playing', 'mouse does not fire while busy, match not paused', guard);
   await page.evaluate(() => { $('efcLootBag').querySelector('.efc-it').scrollIntoView(); });
   await page.screenshot({ path: SHOTS + '/efc-ui-loot.png', timeout: 300000 });
@@ -163,7 +163,7 @@ try {
     T.box.x -= 10; efcEmit('tick', 1 / 30); return { a, b };
   });
   check(away.a && away.b, 'loot panel closes beyond interactR + 1 m', away);
-  await page.keyboard.down('KeyF'); await simRun(page, 0.5, 'PL.ent.health = 100; efcEmit("tick", 1 / 30);'); await page.keyboard.up('KeyF'); await simRun(page, 2.5, 'PL.ent.health = 100; efcEmit("tick", 1 / 30);');
+  await page.keyboard.down('KeyF'); await simRun(page, 0.5, 'PL.ent.health = 100;'); await page.keyboard.up('KeyF'); await simRun(page, 2.5, 'PL.ent.health = 100;');
   const cancel = await page.evaluate(() => ({ open: !$('efcLoot').classList.contains('hidden'), text: $('efcPromptT').textContent }));
   check(!cancel.open && /^FSearch/.test(cancel.text), 'releasing F early cancels the search', cancel);
 

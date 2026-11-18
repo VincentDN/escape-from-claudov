@@ -6,7 +6,7 @@ efcOn('scav:assign', bots => {
   bots.forEach((bot, i) => {
     bot.squad = 's';
     bot.name = EFC_SCAV_NAMES[i];
-    bot.efcScav = { i, next: 0, visited: '', phase: 'search', target: null, post: null };
+    bot.efcScav = { i, next: 0, visited: '', phase: 'search', target: null, seenAt: -Infinity, post: null };
   });
 });
 efcProvide('scav:spawn', bot => {
@@ -40,7 +40,9 @@ efcProvide('scav:update', (bot, dt, now) => {
     const eye = entEye(bot, new V3()), at = new V3();
     const threats = entities.filter(e => efcIsHuman(e) && e.alive && !e.out && e.pos.distanceTo(bot.pos) <= 24 &&
       lineClear(eye, entChest(e, at)));
-    s.target = threats.reduce((best, e) => !best || e.pos.distanceToSquared(bot.pos) < best.pos.distanceToSquared(bot.pos) ? e : best, null);
+    const threat = threats.reduce((best, e) => !best || e.pos.distanceToSquared(bot.pos) < best.pos.distanceToSquared(bot.pos) ? e : best, null);
+    if (threat) { s.target = threat; s.seenAt = now; }
+    else if (now - s.seenAt > 8 || !s.target?.alive || s.target.out) s.target = null;
     if (s.target) {
       s.post = efcScavengerNearest(bot, efcCall('warden:posts') || []);
       s.phase = 'flee';
@@ -75,7 +77,7 @@ efcProvide('scav:update', (bot, dt, now) => {
   input.fire = false;
   const clear = aim && (() => {
     const hit = rayEntities(entEye(bot, new V3()), aim.clone().normalize(), aim.length() + 0.2, bot);
-    return hit?.e === s.target || hit?.ent === s.target;
+    return hit?.ent === s.target && lineClear(entEye(bot, new V3()), entChest(s.target, new V3()));
   })();
   input.firePressed = !!clear && bot.arms.fireCd <= 0 && now - (s.shot ?? -99) > 0.65;
   if (input.firePressed) s.shot = now;

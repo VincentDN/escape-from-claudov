@@ -14,21 +14,42 @@ try {
     const count = c.items.length;
     efcCall('scav:update', b, 1 / 30, 1);
     const remaining = efcCall('world:list').find(o => o.id === c.id).items.length;
-    const spot = w.pos.clone(), home = EFC.wd.posts[w.efcPost];
-    b.pos.copy(spot);
-    p.pos.copy(spot).add(new V3(0.4, 0, 0.4));
+    const pairs = (inside) => {
+      const posts = EFC.wd.posts;
+      for (let i = 0; i < NAV.count; i += 3) {
+        if (NAV.comp[i] !== NAV.mainComp) continue;
+        const x = NAV.nx[i], y = NAV.ny[i], z = NAV.nz[i];
+        const post = efcScavengerNearest({ pos: { x, z } }, posts);
+        const dist = hyp(post.x - x, post.z - z);
+        if (inside ? dist > post.r + 2 : dist < post.r + 5 || dist > post.r + 16) continue;
+        b.pos.set(x, y, z);
+        for (const [dx, dz] of [[5, 0], [-5, 0], [0, 5], [0, -5]]) {
+          const j = navNode(x + dx, y, z + dz);
+          if (j < 0 || NAV.comp[j] !== NAV.mainComp) continue;
+          p.pos.set(NAV.nx[j], NAV.ny[j], NAV.nz[j]);
+          const distance = p.pos.distanceTo(b.pos);
+          if (distance >= 4 && distance < 8 && lineClear(entEye(b, new V3()), entChest(p, new V3()))) return post;
+        }
+      }
+      throw new Error('No clear Scavenger test placement');
+    };
+    pairs(false);
+    efcCall('scav:update', b, 1 / 30, 2);
+    const retreat = b.efcScav.phase;
+    const home = pairs(true);
     let alerts = 0;
     efcOn('scav:alert', () => { alerts++; });
     efcCall('scav:update', b, 1 / 30, 3);
     const cornered = b.efcScav.phase;
     const ignored = allied(w, b) && allied(b, w) && !allied(p, b);
     const alertFoe = home.members.some(member => member.chaseE === p);
-    return { count, remaining, budget, expectedBudget: efcWardenNumber(1), scavs: scavs.length, alerts, cornered, ignored, alertFoe };
+    return { count, remaining, budget, expectedBudget: efcWardenNumber(1), scavs: scavs.length, alerts, retreat, cornered, ignored, alertFoe };
   });
   assert.equal(result.scavs, 2);
   assert.equal(result.budget, result.expectedBudget);
   assert.equal(result.remaining, result.count - 1);
-  assert.equal(result.alerts, 1);
+  assert.equal(result.retreat, 'flee', JSON.stringify(result));
+  assert.equal(result.alerts, 1, JSON.stringify(result));
   assert.equal(result.cornered, 'cornered');
   assert.ok(result.ignored && result.alertFoe);
   assert.deepEqual(errors, []);

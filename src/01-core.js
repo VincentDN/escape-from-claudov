@@ -70,6 +70,15 @@ try {
   }
   if (Settings.aimAssist !== 'off') Settings.aimAssist = 'normal';
 } catch (e) { /* stockage indisponible */ }
+const EFC_BENCH_BOOT = (() => {
+  if (location.hash !== '#bench') return null;
+  try {
+    const run = JSON.parse(sessionStorage.getItem('efc_bench_route') || 'null');
+    if (run && ['auto', 'high', 'medium', 'low', 'ultra'].includes(run.levels?.[run.rows?.length])) return run;
+  } catch (e) { /* stockage indisponible */ }
+  return null;
+})();
+if (EFC_BENCH_BOOT) Object.assign(Settings, { quality: EFC_BENCH_BOOT.levels[EFC_BENCH_BOOT.rows.length], map: 'claudov', eco: false, dynres: false, fpsMax: '0', perf: true });
 /* Économie d'énergie (CAP, plus bas) : jamais choisie, elle part activée au doigt (téléphone, tablette) et le jeu demande une fois s'il faut la garder
    (ecoAsk, 09zl-economie.js) ; ailleurs, désactivée sans question */
 if (Settings.eco !== true && Settings.eco !== false) { Settings.eco = COARSE; Settings.ecoAsk = COARSE; }
@@ -84,7 +93,7 @@ function gfxSet(k) {
   return k === 'quality' && Settings.quality === 'ultra' ? 'ultra' : ECO_GFX[k];
 }
 if (!(Settings.tpSens > 0)) Settings.tpSens = Settings.sens; // sensibilité du pavé tactile (09qe-pavetactile.js) : celle de la souris au départ, indépendante ensuite
-function saveSettings() { try { localStorage.setItem('dc_settings', JSON.stringify(Settings)); } catch (e) { /* ignoré */ } }
+function saveSettings() { if (EFC_BENCH_BOOT) return; try { localStorage.setItem('dc_settings', JSON.stringify(Settings)); } catch (e) { /* ignoré */ } }
 /* Mode graphique économique (Options, Vidéo ; activé tout seul après une perte du contexte WebGL, voir 01a-gpu.js) : profil Basse allégé (ombres 512, pas d'éclairs
    de tir, rendu plus petit), textures réduites, pas de pré-passe de profondeur. Lu une fois au chargement : le changement relance le jeu. */
 /* Identifiant du build en cours (balise cod-build, écrite par build.py) */
@@ -1365,13 +1374,17 @@ const GPUT = (() => {
   // 0,7 s après son début ; les requêtes de chronométrage, seul chemin graphique exotique de la boucle d'images, sont écartées (le temps CPU suffit à la résolution dynamique)
   const gl = renderer.getContext(), ext = COARSE ? null : gl.getExtension('EXT_disjoint_timer_query_webgl2');
   if (!ext) return null;
-  const T = { gl, ext, pending: [], active: null, ms: 0 };
-  T.begin = () => { if (T.active || T.pending.length > 3) return; T.active = gl.createQuery(); gl.beginQuery(ext.TIME_ELAPSED_EXT, T.active); };
-  T.end = () => { if (!T.active) return; gl.endQuery(ext.TIME_ELAPSED_EXT); T.pending.push(T.active); T.active = null; };
+  const T = { gl, ext, pending: [], active: null, stage: '', ms: 0 };
+  T.begin = (stage = '') => { if (T.active || T.pending.length > 3) return; T.active = gl.createQuery(); T.stage = stage; gl.beginQuery(ext.TIME_ELAPSED_EXT, T.active); };
+  T.end = () => { if (!T.active) return; gl.endQuery(ext.TIME_ELAPSED_EXT); T.pending.push({ query: T.active, stage: T.stage }); T.active = null; };
   T.poll = () => {
-    while (T.pending.length && gl.getQueryParameter(T.pending[0], gl.QUERY_RESULT_AVAILABLE)) {
-      const q = T.pending.shift(), ok = !gl.getParameter(ext.GPU_DISJOINT_EXT);
-      if (ok) { const v = gl.getQueryParameter(q, gl.QUERY_RESULT) / 1e6; T.ms = T.ms ? T.ms * 0.85 + v * 0.15 : v; }
+    while (T.pending.length && gl.getQueryParameter(T.pending[0].query, gl.QUERY_RESULT_AVAILABLE)) {
+      const { query: q, stage } = T.pending.shift(), ok = !gl.getParameter(ext.GPU_DISJOINT_EXT);
+      if (ok) {
+        const v = gl.getQueryParameter(q, gl.QUERY_RESULT) / 1e6;
+        if (stage) efcBenchmarkGpu(stage, v);
+        if (stage !== 'shadow') T.ms = T.ms ? T.ms * 0.85 + v * 0.15 : v;
+      }
       gl.deleteQuery(q);
     }
     return T.ms;

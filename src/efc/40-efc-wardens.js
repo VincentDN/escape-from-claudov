@@ -38,7 +38,8 @@ function efcWardenAssign() {
   W.map = typeof MAPL !== 'undefined' ? MAPL.id : null; W.legs = 0; W.n = N; W.used = used.map((p) => ({ x: p.x, z: p.z, y: gy0(p.x, p.z) }));
   W.posts = G.map((g, i) => ({ i, x: g.x, z: g.z, r: g.r || 10, n: 0, elite: !!g.elite, y: gy0(g.x, g.z), nodes: null, members: [],
     patrolT: MATCH.time + rand(8, 30), alertT: -99 }));
-  const all = efcWardenBots(), bots = all.slice(0, N);
+  const all = efcWardenBots(), scavengers = efcCall('scav:count', N) || 0, bots = all.slice(0, N - scavengers);
+  W.n = bots.length;
   all.forEach((b, k) => {
     if (!b.efcName) b.efcName = b.name;
     b.name = 'Warden ' + EFC_WARDEN_NAMES[k % EFC_WARDEN_NAMES.length];
@@ -51,10 +52,11 @@ function efcWardenAssign() {
   const order = W.posts.slice().sort((a, b) => b.elite - a.elite || away(b) - away(a) || a.i - b.i);
   let k = 0;
   const give = (p) => { if (k < bots.length) { p.members.push(bots[k++]); p.n++; } };
-  if (order[0].elite && N >= C.wardenElite3) for (let j = 0; j < 3; j++) give(order[0]);
+  if (order[0].elite && bots.length >= C.wardenElite3) for (let j = 0; j < 3; j++) give(order[0]);
   for (let round = 0; round < 2 && k < bots.length; round++) for (const p of order) if (p.members.length <= round) give(p);
   for (let j = 0; k < bots.length; j++) give(order[j % order.length]);
   for (const p of W.posts) for (const b of p.members) { b.efcPost = p.i; b.efcElite = p.elite; }
+  efcEmit('scav:assign', all.slice(bots.length, N));
 }
 function efcWardenEnsure() { if (efcRaidMode() && (!EFC.wd.posts.length || EFC.wd.map !== MAPL.id)) efcWardenAssign(); }
 
@@ -216,7 +218,7 @@ function efcWardenGoal(b, now) {
 /* A Warden that sees an enemy or is hurt tells the mates of its post (not the other posts) where it is; they turn to it and converge
    through the engine's hunt and search tactics */
 function efcWardenAlert(b, foe, now) {
-  const p = efcWardenPost(b); if (!p || !foe || allied(foe, b)) return;
+  const p = efcWardenPost(b); if (!p || !foe || allied(foe, b) || efcCall('dev:ignorePlayer', foe)) return;
   b.efcPatrol = null;
   if (now - p.alertT < 1.5) return;
   p.alertT = now;
@@ -246,6 +248,7 @@ function efcGraceCheck(e) {
 }
 function efcWardenGrace(e) {
   if (!efcRaidMode() || !efcIsHumanEnt(e)) return false;
+  if (efcCall('dev:ignorePlayer', e)) return true;
   efcGraceCheck(e);
   return !!(e.efcGrace && e.efcGrace.on);
 }
@@ -281,4 +284,16 @@ efcProvide('warden:info', () => {
     alive: ws.filter((e) => e.alive).length,
     posts: W.posts.map((p) => ({ x: p.x, z: p.z, r: p.r, elite: p.elite, n: p.members.length, alive: p.members.filter((e) => e.alive).length })),
   };
+});
+
+efcProvide('warden:posts', () => EFC.wd.posts);
+efcOn('scav:alert', (post, threat, now) => {
+  const warden = EFC.wd.posts[post]?.members.find(member => member.alive);
+  if (warden) {
+    efcWardenAlert(warden, threat, now);
+    warden.lastKnown.copy(threat.pos);
+    warden.lastSeenT = now;
+    warden.warnT = now + 15;
+    warden.chaseE = threat;
+  }
 });

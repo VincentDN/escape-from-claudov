@@ -12,7 +12,7 @@ function applyDamage(victim, dmg, attacker, weapon, head, dir, srcPos, life) { /
   if (victim.inMecha) return; // à bord de son mecha : les coups vont au blindage (rayMechas, mechaBlast)
   if ((ESSAI || ESSAI_MECHA) && victim.isPlayer && !(attacker === victim && weapon === NET_WSPECIAL.mecha)) return; // essai d'une série (?essai=, 09zm-essai.js) : le joueur ne prend rien (sauf son mecha qui explose avec lui à bord, ce qu'on essaie aussi)
   if (MATCH.online && attacker && attacker !== victim && allied(attacker, victim)) return; // pas de tir allié (en match à mort, personne n'est allié)
-  if (victim.protT > 0) return; // protection de réapparition (match à mort, domination)
+  if (victim.protT > 0 || (victim.isPlayer && efcDevActive('health'))) return; // protection de réapparition (match à mort, domination)
   // victime distante : la touche lui est adressée, elle applique elle-même les dégâts
   if (victim.isRemote) {
     if (attacker && netIsLocal(attacker)) {
@@ -725,10 +725,11 @@ function botsTick(dt, t) {
    renvoie le pas de temps (ralenti pendant l'annonce du résultat). bg : simulation seule, onglet de l'hôte en arrière-plan (hostBgTick) ;
    ni carte tactique, ni HUD, ni enregistrement de la killcam */
 function matchTick(dt, bg) {
+  if (EFC_BENCH_BOOT) efcBenchmarkPlayer();
   const fin = MATCH.state === 'finish';
   if (fin) dt *= finTick(); // annonce du résultat : le jeu continue derrière, en ralenti (09l-fin.js)
   cdTick(); const hold = playHold(); // décompte du départ, migration de l'hôte : le chrono ne tourne pas, ni les points ni le score (09y-decompte.js)
-  MATCH.time += dt; if (!fin && !hold) MATCH.timeLeft -= dt;
+  MATCH.time += dt; if (!fin && !hold && !efcDevActive('timer')) MATCH.timeLeft -= dt;
   const t = MATCH.time;
   for (let i = MATCH.events.length - 1; i >= 0; i--) if (MATCH.events[i].t <= t) { const ev = MATCH.events[i]; MATCH.events.splice(i, 1); ev.fn(); }
   uavTick(dt);
@@ -817,6 +818,7 @@ function frame(now) {
     const r = (CURMAP.def ? CURMAP.def.cam : 46) * 0.65; camera.position.set(Math.sin(a) * r, 22, Math.cos(a) * r); camera.lookAt(0, 2, 0);
     VM.root.visible = false; U.uDesat.value = damp(U.uDesat.value, 0.3, 2, dt); U.uHurt.value = damp(U.uHurt.value, 0, 3, dt); PL.ent.model.root.visible = false;
   }
+  if (EFC_BENCH_BOOT) efcBenchmarkCamera(now);
   U.uFlash.value = Math.max(0, U.uFlash.value - dt * 1.4);
   flashTick(dt); smokeView(); // aveuglé par une flash, dans un nuage de fumée (07-bots.js)
   U.uTime.value = now / 1000; CLOTH_U.uClT.value = now / 1000; WIND_U.uWnT.value = now / 1000; // tissus et flore au vent (02mc-tissus.js, 02md-vent.js)
@@ -826,14 +828,19 @@ function frame(now) {
   updateListener();
   allyMarksUpdate(); // marqueurs d'alliés (09m-marqueurs.js) : la caméra est définitive
   updateSoldierLods(); clothUpdate(dt); updateMapDetail(); grassUpdate(now / 1000); // clothUpdate : tissus des soldats (06gb-tissu.js), après le choix des modèles détaillés
-  pfrLap(4); updateShadows(); pfrLap(5);
-  if (GPUT) GPUT.begin();
+  pfrLap(4);
+  const benchGpu = GPUT && EFC_BENCH_BOOT && EFC_BENCH_CAPTURE.start !== null;
+  if (benchGpu) GPUT.begin('shadow');
+  updateShadows(); pfrLap(5);
+  if (benchGpu) GPUT.end();
+  if (GPUT) GPUT.begin(benchGpu ? 'render' : '');
   renderFrame(dt); pfrLap(6);
   if (GPUT) GPUT.end();
   lagMark();
   gpuFrame(now);
   updateDynRes(now, interval, performance.now() - t0);
   if (PFR.on) pfrFrame(now, interval, performance.now() - t0);
+  if (EFC_BENCH_BOOT) efcBenchmarkFrame(now, interval);
   if (Settings.perf) updatePerfHud();
 }
 /* Indicateur de performances (réglage « Afficher les performances ») */
@@ -969,7 +976,7 @@ async function boot() {
     if (/[?&]diag\b/.test(location.search)) gpuReport(); // ?diag : rapport graphique (01a-gpu.js)
     setTimeout(gpuResume, 400); // partie solo interrompue par un rechargement automatique (01a-gpu.js)
     requestAnimationFrame(frame);
-    netAutoJoin();
+    if (location.hash === '#bench') efcBenchmarkInit(); else netAutoJoin();
   } catch (err) {
     console.error(err);
     $('loadMsg').textContent = _t('Le chargement a échoué : {0}. Rechargez la page ou passez la qualité en Basse.', err.message);

@@ -144,6 +144,7 @@ function mapUnload() {
   }
   grassClear(); skyPhotoFree();
   mapTeardown(); freeMaterials(); lightUnload(); navUnload(); mnavUnload();
+  efcRuntimeBoxesClear();
   COL.length = 0; RAILS.length = 0; RAMPS.length = 0; LINES.length = 0; BRIDGES.length = 0; PONDS.length = 0; OCC.length = 0; LAMPS.length = 0; HASH.clear(); BEAMS.length = 0; PREFABS.clear(); propsClear();
   WORLD.bufs.clear(); WORLD.meshes.length = 0; WORLD.fine.length = 0; WORLD.scatter.length = 0; WORLD.dressing = null; WORLD.force = null;
   COVERS.length = 0; COVER_GRID.clear();

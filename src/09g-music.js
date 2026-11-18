@@ -11,9 +11,20 @@
 const MUS = { el: null, url: '', vol: 0, dead: false, off: false };
 const MUS_FADE_IN = 1.2, MUS_FADE_OUT = 3.5; // vitesses de fondu (par seconde)
 
-function musicInit() {
+function efcMenuTrack() {
+  return Object.hasOwn(EFC_MENU_TRACKS, Settings.menuTrack) ? Settings.menuTrack : 'campaign-acoustic-guitars';
+}
+
+function efcMenuTrackChange() {
   const m = document.querySelector('meta[name="menu-music"]');
-  MUS.url = m ? m.content : ''; if (!MUS.url) MUS.dead = true;
+  const url = efcMusicUrl(efcMenuTrack()) || m?.content || '';
+  if (MUS.url === url) return;
+  efcLoopStop(MUS.el);
+  Object.assign(MUS, { url, el: null, vol: 0, dead: !url });
+}
+
+function musicInit() {
+  efcMenuTrackChange();
   // le navigateur n'autorise le son qu'après un geste : le premier clic ou la première touche relance la lecture
   // (Safari sur iPhone n'accepte la lecture que dans un geste complet : on relance aussi à la fin du toucher et au clic, directement dans le geste)
   const unlock = () => { if (!MUS.el) return; MUS.el.blocked = false; if (MATCH.state === 'menu' && !MUS.off) efcLoopPlay(MUS.el); };

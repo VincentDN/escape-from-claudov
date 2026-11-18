@@ -1,9 +1,9 @@
-# Partisan intro and StG 44 workbench
+# Partisan opening scene and StG 44 workbench
 
-The opening scene and StG 44 workbench come from Vincent De Nil's Partisan Project at commit `d3e07b2`. The opening scene uses the same Three.js scene, rigged procedural character, weapon models, camera, lighting, animations and assets. Its buttons lead to Claudov or to the StG 44 workbench. They are available from the Claudov main menu and load their assets on demand. Serve over HTTP to use JavaScript modules.
+Claudov’s main menu displays the Partisan opening scene from commit `d3e07b2`. The old standalone opening URL returns to Claudov. The game owns the menu, soundtrack and input. The scene uses the original soldier, weapon, workbench and lighting, and stops drawing when hidden.
 
-The StG 44 workbench uses Partisan's four model variants, finishes, attachment models, sliders, selection controls and studio lighting. It is a standalone viewer. Its configuration is saved in the viewer URL and does not affect a raid or an inventory.
+Tap the build number seven times to open the developer menu. Invulnerability and the timer toggle apply to the current browser tab’s solo raids. The module index links to the StG 44 workbench, sound audition, performance benchmark and graphics diagnostics.
 
-Partisan's owner authorized this port. See `LICENSE.Partisan`, `asset-credits.json` and `vendor/three/LICENSE` for source notices.
+The StG 44 viewer uses Partisan’s four variants, finishes, attachments and studio lighting. The viewer saves its configuration in the URL. Serve the built game over HTTP to load the scenes.
 
-The build publishes Claudov’s ElevenLabs handling takes for both scenes.
+See `LICENSE.Partisan`, `asset-credits.json` and `vendor/three/LICENSE` for source notices. The build publishes Claudov’s handling takes for the viewer.

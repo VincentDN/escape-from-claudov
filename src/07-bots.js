@@ -108,7 +108,7 @@ const SPAWNS = [[], []];
 function spawnEntity(e) {
   e.spawnAt = MATCH.time;
   // Escape From Claudov: in a raid a Warden appears at its guard post, facing out (src/efc/40-efc-wardens.js)
-  const wsp = !e.isPlayer && !e.isRemote && efcRaidMode() ? efcWardenSpawn(e) : null;
+  const wsp = !e.isPlayer && !e.isRemote && efcRaidMode() ? (efcCall('scav:spawn', e) || efcWardenSpawn(e)) : null;
   e.pos.copy(wsp || chooseSpawn(e)); e.vel.set(0, 0, 0); e.vy = 0; spawnNote(e);
   e.yaw = wsp ? spawnFace(e.pos, wsp.yaw) : spawnYaw(e, e.pos); e.pitch = 0; e.protT = modeDef().prot;
   e.alive = true; e.health = 100; e.streak = 0; e.comboN = 0; e.crouch = false; e.crouchAmt = 0; e.slideT = 0; e.slideCd = 0; e.slideBuf = 0; e.slideAmt = 0; e.dmgBy.clear(); e.voidDead = false;
@@ -120,6 +120,7 @@ function spawnEntity(e) {
     // d'après (il titubait sur place sans tirer, surtout en ligne où l'hôte enchaîne les parties), sourd aux bruits, prompt à reculer
     e.blindT = 0; e.heardT = -99; e.stepHeardT = -99; e.warnT = 0; e.senseAt = 0; e.slideAt = -99; e.unstickN = 0; e.unstickAt = -99; e.recT = 0; e.backT = 0; e.sideT = 0; e.jumpT = 0; e.mkNadeT = -99;
     e.model.rag = null; e.model.sink = 0; e.model.root.visible = true; e.vel.set(0, 0, 0);
+    efcEmit('scav:spawned', e);
     poseSoldier(e, 0); poseSoldier(e, 0); layoutSoldier(e.model, true);
   }
 }
@@ -274,6 +275,7 @@ function botSense(b, now) {
    surpris : il ne se retourne qu'au bout de D.startle (b.startleT, une fois par surprise, les balles qui suivent ne le figent pas plus
    longtemps), puis à la vitesse d'un grand mouvement de tête (D.spin, updateBot). */
 function botHurt(b, attacker, dmg, dir, now) {
+  if (efcDevIgnorePlayer(attacker)) return;
   const D = botDiff(b);
   b.lastHitT = now; b.fear = Math.min(2, b.fear + dmg / 70);
   let late = 0;

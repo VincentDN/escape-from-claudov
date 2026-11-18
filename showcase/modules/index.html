@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Module index | Escape From Claudov</title>
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<style>
+:root {
+  color-scheme: dark;
+  --green: #10180f;
+  --panel: #10120e;
+  --line: #4b5235;
+  --ink: #eee9dc;
+  --muted: #b6bd9a;
+  --yellow: #f1c86c;
+  font: 15px/1.5 ui-monospace, Menlo, Consolas, monospace;
+  background: var(--green);
+  color: var(--ink);
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 760px; margin: 0 auto; padding: clamp(2rem,6vh,4rem) clamp(1rem,4vw,1.5rem); }
+a { color: var(--yellow); text-underline-offset: .22em; }
+a:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
+.brand { display: inline-block; margin-bottom: 2rem; color: var(--ink); font-weight: 700; letter-spacing: .04em; text-decoration: none; }
+.brand:hover { color: var(--yellow); }
+.terminal { background: var(--panel); border: 1px solid var(--line); box-shadow: 0 20px 60px #0008; }
+.tunnel {
+  display: grid;
+  place-items: center;
+  height: clamp(110px, 23vh, 250px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: repeating-linear-gradient(0deg, transparent 0 3px, #0003 3px 4px), #131a0f;
+}
+.tunnel span {
+  grid-area: 1 / 1;
+  width: var(--size);
+  height: var(--size);
+  border: 1px dashed #f1c86c78;
+  transform: rotate(var(--turn));
+}
+.directory { padding: clamp(1rem,4vw,1.4rem); }
+h1 { margin: 0 0 1rem; font-size: 1rem; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--line); }
+th, td { padding: .55rem .5rem .55rem 0; }
+td { border-bottom: 1px dashed var(--line); vertical-align: top; }
+td:first-child { color: var(--muted); width: 5.2em; }
+td a { text-decoration: none; }
+td a:hover, td a:focus-visible { text-decoration: underline; }
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="../../">ESCAPE FROM CLAUDOV</a>
+  <section class="terminal" aria-labelledby="module-index">
+    <div class="tunnel" aria-hidden="true">
+      <span style="--size:220px;--turn:36deg"></span>
+      <span style="--size:176px;--turn:28deg"></span>
+      <span style="--size:140px;--turn:20deg"></span>
+      <span style="--size:112px;--turn:12deg"></span>
+      <span style="--size:89px;--turn:4deg"></span>
+      <span style="--size:71px;--turn:-4deg"></span>
+      <span style="--size:56px;--turn:-12deg"></span>
+      <span style="--size:44px;--turn:-20deg"></span>
+      <span style="--size:35px;--turn:-28deg"></span>
+    </div>
+    <div class="directory">
+      <h1 id="module-index">Module index <span style="color:var(--muted)">/showcase/modules/</span></h1>
+      <table aria-labelledby="module-index">
+        <thead><tr><th scope="col">Type</th><th scope="col">Name</th></tr></thead>
+        <tbody>
+          <tr><td>[UP]</td><td><a href="../../">../ <span>Return to Claudov</span></a></td></tr>
+          <tr><td>[3D]</td><td><a href="../workbench/stg44/">StG 44 weapon workbench</a></td></tr>
+          <tr><td>[SFX]</td><td><a href="../../#sounds">Sound audition</a></td></tr>
+          <tr><td>[PERF]</td><td><a href="../../#bench">Performance benchmark</a></td></tr>
+          <tr><td>[DIAG]</td><td><a href="../../?diag">Graphics diagnostics</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>

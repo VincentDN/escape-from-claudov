@@ -244,6 +244,6 @@ efcOn('raid:over', (s) => {
 });
 efcOn('match:left', () => efcMusicEnd(true));
 /* For the bench radio (src/efc/55-efc-bench*.js): what the menu theme is, and a switch for it (see src/09g-music.js) */
-efcProvide('music:nowPlaying', () => ({ id: 'menu-theme', title: 'Tension', author: 'Tsorthan Grove', licence: 'CC0', on: typeof MUS === 'undefined' || !MUS.off }));
+efcProvide('music:nowPlaying', () => ({ id: efcMenuTrack(), ...EFC_MENU_TRACKS[efcMenuTrack()], on: typeof MUS === 'undefined' || !MUS.off }));
 efcProvide('music:menu', (on) => { if (typeof MUS !== 'undefined') MUS.off = !on; return !MUS.off; });
 efcProvide('music:calls', () => EFCM.calls.slice());

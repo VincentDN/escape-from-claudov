@@ -58,7 +58,7 @@ async function fresh() {
 
 // (a) menu theme starts in the menu, through the looper, at Settings.music x volume
 let r = await ev(() => { Settings.music = 0.6; Settings.volume = 1; initAudio(); for (let i = 0; i < 40; i++) musicTick(0.1); return { url: MUS.url, el: !!MUS.el, playing: MUS.el && MUS.el.playing, vol: MUS.vol, two: MUS.el && MUS.el.els.length }; });
-check('(a) menu theme starts in the menu', /music\/menu-theme\.\w+\.ogg$/.test(r.url) && r.playing && r.vol > 0.3 && r.two === 2, r);
+check('(a) menu theme starts in the menu', /showcase\/assets\/audio\/campaign-acoustic-guitars\.mp3$/.test(r.url) && r.playing && r.vol > 0.3 && r.two === 2, r);
 r = await ev(() => { efcCall('music:menu', false); for (let i = 0; i < 40; i++) musicTick(0.1); const o = { vol: MUS.vol, playing: MUS.el.playing }; efcCall('music:menu', true); return o; });
 check('(a) radio switch (music:menu false) fades the theme out', r.vol < 0.01 && !r.playing, r);
 

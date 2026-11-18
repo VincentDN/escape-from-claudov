@@ -43,8 +43,8 @@
 </script>
 <meta name="theme-color" content="#0E110D">
 <meta name="google-site-verification" content="gIuJU_6bUl6fEssvTUEoHr2NDUONA5ir-w5quer8q3c">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" type="image/png" sizes="96x96" href="/__ICON_FAVICON96__">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="96x96" href="__ICON_FAVICON96__">
 <link rel="icon" type="image/png" sizes="64x64" href="__ICON_FAVICON__">
 <link rel="apple-touch-icon" href="__ICON_APPLE__">
 <link rel="manifest" href="manifest.webmanifest">
@@ -84,7 +84,17 @@ img { -webkit-user-drag: none; }
    le fond animé (src/09w-fond.js) la lit ici, la dessine dans la toile du jeu avec sa profondeur, puis l'efface en fondu (classe gl). */
 #menuBg { position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); z-index: 19; display: none; background: #050505 var(--key-art) 71% center / cover no-repeat; transition: opacity .6s; }
 #menuBg.gl { opacity: 0; }
-#menuBg.bench { background: #07090a; } /* Escape From Claudov: the workbench scene (src/efc/55-efc-bench.js) replaces the key art; dark until its first frame */
+#efcIntroFrame { position: absolute; inset: 0; border: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
+#menuBg.intro-ready #efcIntroFrame { opacity: 1; }
+#efcIntroFrame[hidden] { display: none; }
+#efcBuild { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); min-height: 44px; padding: 0 12px; background: #11130fc9; color: var(--paper); border: 1px solid #ffffff30; border-radius: 4px; font: 12px ui-monospace, monospace; }
+#efcBuild:focus-visible, #efcDevMenu button:focus-visible, #efcDevMenu a:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; }
+#efcDevMenu { width: min(390px, 88vw); color: var(--paper); background: #171915; border: 1px solid #d1b05d; padding: 24px; border-radius: 6px; }
+#efcDevMenu::backdrop { background: #050604b8; }
+#efcDevMenu form { display: grid; gap: 14px; }
+#efcDevMenu label { display: flex; align-items: center; gap: 10px; }
+#efcDevMenu a { color: var(--acc); }
+
 .hidden { display: none !important; }
 /* mesures de performance (Options, Vidéo) : en haut à droite, coin libre du HUD ; au doigt, en bas à gauche (les boutons tiennent le haut à droite, le score le haut au centre) */
 #perf { position: fixed; top: max(8px, 2.4vh); right: max(16px, 3vh); z-index: 60; padding: 4px 10px; border-radius: 4px; background: rgba(8, 10, 9, 0.62); color: #cfe9d2; font: 600 12px/1.35 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; white-space: pre; text-align: center; pointer-events: none; }
@@ -147,18 +157,18 @@ body.sk-live #ui[data-screen="skins"] .ui-shade { background: none; } /* écran 
 .efc-fork { display: inline-block; margin: 2px 0 0 3px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); text-decoration: none; opacity: .75; }
 .efc-fork:hover, .efc-fork:focus-visible { color: var(--txt, #ece8dc); opacity: 1; text-decoration: underline; }
 .efc-fork:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; }
-/* Escape From Claudov bench menu (src/efc/55-efc-bench.js): as on Partisan's opener, the entries sit in the bottom-left corner over a soft
+/* Partisan opening scene menu: as on Partisan's opener, the entries sit in the bottom-left corner over a soft
    scrim, smaller than over the key art, so the bench, the rifle and the flag stay in view. Sub-screens keep their usual shade. */
-#menuBg.bench ~ #ui #scr-main { justify-content: flex-end; padding-bottom: calc(var(--py) + 40px); }
-#menuBg.bench ~ #ui .main-col { gap: clamp(10px, 2vh, 20px); }
-#menuBg.bench ~ #ui .brand .logo { width: min(340px, 28vw); min-width: 220px; }
-#menuBg.bench ~ #ui .mlist { max-width: 400px; }
-#menuBg.bench ~ #ui .mbtn { padding-top: 5px; padding-bottom: 5px; }
-#menuBg.bench ~ #ui .mbtn b { font-size: clamp(24px, 3.6vh, 36px); }
-#menuBg.bench ~ #ui .mbtn.m2 b { font-size: clamp(20px, 2.9vh, 28px); }
-#menuBg.bench ~ #ui .mbtn span { font-size: 15px; }
-#menuBg.bench ~ #ui .msep { margin-top: 4px; margin-bottom: 4px; }
-#menuBg.bench ~ #ui[data-screen="main"] .ui-shade { background: radial-gradient(ellipse 62% 78% at 0% 100%, rgba(4,5,4,.86) 0%, rgba(4,5,4,.62) 45%, rgba(4,5,4,0) 100%), linear-gradient(0deg, rgba(4,5,4,.55) 0%, rgba(4,5,4,0) 22%); }
+#menuBg.intro-ready ~ #ui #scr-main { justify-content: flex-end; padding-bottom: calc(var(--py) + 40px); }
+#menuBg.intro-ready ~ #ui .main-col { gap: clamp(10px, 2vh, 20px); }
+#menuBg.intro-ready ~ #ui .brand .logo { width: min(340px, 28vw); min-width: 220px; }
+#menuBg.intro-ready ~ #ui .mlist { max-width: 400px; }
+#menuBg.intro-ready ~ #ui .mbtn { padding-top: 5px; padding-bottom: 5px; }
+#menuBg.intro-ready ~ #ui .mbtn b { font-size: clamp(24px, 3.6vh, 36px); }
+#menuBg.intro-ready ~ #ui .mbtn.m2 b { font-size: clamp(20px, 2.9vh, 28px); }
+#menuBg.intro-ready ~ #ui .mbtn span { font-size: 15px; }
+#menuBg.intro-ready ~ #ui .msep { margin-top: 4px; margin-bottom: 4px; }
+#menuBg.intro-ready ~ #ui[data-screen="main"] .ui-shade { background: radial-gradient(ellipse 62% 78% at 0% 100%, rgba(4,5,4,.86) 0%, rgba(4,5,4,.62) 45%, rgba(4,5,4,0) 100%), linear-gradient(0deg, rgba(4,5,4,.55) 0%, rgba(4,5,4,0) 22%); }
 .mlist { display: flex; flex-direction: column; gap: 2px; max-width: 540px; }
 .msep { height: 1px; margin: 8px 0 8px 24px; width: min(320px, 70%); background: linear-gradient(90deg, var(--line-2), transparent); }
 .mbtn { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; background: none; border: 0; padding: 10px 28px 10px 24px; transition: background var(--t2) var(--ease); }
@@ -2624,6 +2634,7 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
   <div class="ami-invite hidden" id="amiInvite" role="alert"></div>
   <p class="ami-note hidden" id="amiNote" role="status"></p>
   <section class="scr" id="scr-main">
+    <button type="button" id="efcBuild">Build __BUILD_ID__</button>
     <div class="main-col">
       <header class="brand">
         <h1 class="logo" role="img" aria-label="Escape From Claudov"></h1>
@@ -2635,8 +2646,6 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
         <button class="mbtn" type="button" id="efcMmSquad" data-go="multi"><b>Squad raid</b><span>Online, up to 8 players in squads</span></button>
         <div class="msep" aria-hidden="true"></div>
         <button class="mbtn m2" type="button" id="efcMmHideout" data-go="hideout"><b>Hideout</b><span id="efcMmStash">Stash and loadout</span></button>
-        <a class="mbtn m2" href="showcase/intro/"><b>Opening Scene</b></a>
-        <a class="mbtn m2" href="showcase/workbench/stg44/"><b>Weapon Workbench</b></a>
         <button class="mbtn m2" type="button" id="efcMmSettings" data-go="options"><b>Settings</b><span>Game, audio, video, controls</span></button>
         <button class="mbtn hidden" type="button" data-go="play" tabindex="-1"><b>Jouer</b><span id="mmPlay">Seul, entre amis ou en ligne</span></button>
         <button class="mbtn m2 hidden" type="button" data-go="classes" tabindex="-1"><b>Classes</b><span>Armes, accessoires et camouflages</span></button>
@@ -3001,6 +3010,19 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
   <div class="fin-black"></div>
 </div>
 <div id="board" class="overlay"><div class="boards"><table id="board0"></table><table id="board1"></table></div></div>
+<dialog id="efcDevMenu" aria-labelledby="efcDevTitle">
+  <form method="dialog">
+    <h2 id="efcDevTitle">Developer menu</h2>
+    <p>Cheats apply to solo raids.</p>
+    <label><input type="checkbox" id="efcDevHealth">Invulnerability</label>
+    <label><input type="checkbox" id="efcDevTimer">Freeze raid timer</label>
+    <label><input type="checkbox" id="efcDevAggro">No Aggro</label>
+    <button class="btn" type="button" id="efcDevResetStash">Reset Stash</button>
+    <p id="efcDevStatus" role="status" hidden></p>
+    <a href="showcase/modules/">Module index</a>
+    <button class="btn" type="submit">Close</button>
+  </form>
+</dialog>
 <div id="pause" class="overlay">
   <div class="pm">
     <nav class="pm-rail" data-nav data-lm=".mbtn" aria-label="Menu pause">

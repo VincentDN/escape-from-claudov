@@ -5,6 +5,7 @@ Owner: Vincent De Nil. The plan, work packages and ownership rules are in [docs/
 
 **Joining now?** Read [docs/HANDOFF.md](docs/HANDOFF.md) first: the current state, how to build and test, and the tasks open
 for incoming agents.
+The second track, for larger multi-file work, is [docs/HANDOFF-ASTRA.md](docs/HANDOFF-ASTRA.md).
 
 ## Hard rules
 

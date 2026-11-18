@@ -293,6 +293,7 @@ const OPT_TABS = [
   [_t('Audio'), [
     ['range', 'volume', _t('Volume général'), 0, 1, 0.05, (v) => Math.round(v * 100) + PCT, () => setVolume(Settings.volume)],
     ['range', 'music', _t('Musique des menus'), 0, 1, 0.05, (v) => Math.round(v * 100) + PCT],
+    ['select', 'menuTrack', _t('Piste de la radio'), Object.entries(EFC_MENU_TRACKS).map(([id, track]) => [id, track.title]), efcMenuTrackChange],
     ['check', 'voice', _t('Annonces vocales (séries, objectifs)')],
   ]],
   [_t('Vidéo'), [
@@ -715,7 +716,7 @@ document.addEventListener('click', (e) => {
 
 /* Fond des menus : visible tant qu'on est dans les menus (la boucle de jeu l'appelle à chaque image) */
 let menuBgOn = false;
-function menuBgShow(on) { if (on !== menuBgOn) { menuBgOn = on; $('menuBg').style.display = on ? 'block' : 'none'; document.body.classList.toggle('mbg', on); if (on) mbgShown(); } } // fond animé : 09w-fond.js
+function menuBgShow(on) { if (on !== menuBgOn) { menuBgOn = on; $('menuBg').style.display = on ? 'block' : 'none'; document.body.classList.toggle('mbg', on); if (on) mbgShown(); else efcOpeningHide(); } } // fond animé : 09w-fond.js
 
 /* ---------- Initialisation ---------- */
 function menuInit() {

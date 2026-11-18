@@ -139,10 +139,17 @@ ok(d0.plain === 100 && (!d0.elite || (Math.abs(d0.elite[0] - 60) < 1e-9 && d0.el
 const ranD = await simRun(page, RESPAWN + 10, 'PL.ent.pos.set(...NEAR); PL.ent.vel.set(0, 0, 0);');
 const d1 = await page.evaluate(() => ({ alive: W.alive, t: W.respawnT }));
 ok(ranD >= RESPAWN + 9.9 && !d1.alive, `(d) player near the post: still dead after the delay (${RESPAWN} s) + 10 s`, d1);
-await page.evaluate(() => { T.backT = -1; T.n = 0; });
-await simRun(page, 10, 'PL.ent.pos.set(...PARK); PL.ent.vel.set(0, 0, 0); T.n++; if (T.backT < 0 && W.alive) T.backT = T.n / 30;');
-const d2 = await page.evaluate(() => { const p = EFC.wd.posts[W.efcPost]; return { alive: W.alive, after: T.backT, post: W.efcPost, d: +hyp(W.pos.x - p.x, W.pos.z - p.z).toFixed(1), r: p.r }; });
-ok(d2.alive && d2.d <= d2.r + 6, '(d) player far away: the Warden is back at a post (within its radius + 6 m)', d2);
+await page.evaluate(() => {
+  PL.ent.pos.set(...PARK); PL.ent.vel.set(0, 0, 0);
+  T.back = null; T.n = 0;
+});
+await simRun(page, 10, `PL.ent.pos.set(...PARK); PL.ent.vel.set(0, 0, 0); T.n++;
+  if (!T.back && W.alive) {
+    const p = EFC.wd.posts[W.efcPost];
+    T.back = { after: T.n / 30, post: p.i, d: hyp(W.pos.x - p.x, W.pos.z - p.z), r: p.r };
+  }`);
+const d2 = await page.evaluate(() => T.back);
+ok(d2 && d2.d <= d2.r + 6, '(d) player far away: the Warden respawns at a post (within its radius + 6 m)', d2);
 ok(errors.length === 0, 'no page errors', errors.slice(0, 10));
 await browser.close();
 console.log(fails.length ? `test-warden: ${fails.length} FAILED` : 'test-warden: all passed');

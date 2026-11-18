@@ -80,6 +80,13 @@ const data = await page.evaluate(() => {
 fails.push(...data.fails);
 console.log('static checks', JSON.stringify(data.info));
 
+await page.evaluate((seed) => {
+  GPUX.halt = true;
+  Math.random = () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+}, Number(process.env.SEED || 0x19731117));
 await startSolo(page);
 const sim = await page.evaluate((secs) => {
   // the player is out of play: invulnerable in the far corner of the checkpoint
@@ -100,10 +107,15 @@ const sim = await page.evaluate((secs) => {
       s.w.push([cm, lost]); s.cm += cm; s.lost += lost; if (s.w.length > 15) { const o = s.w.shift(); s.cm -= o[0]; s.lost -= o[1]; }
       if (s.cm > 0.3 && s.lost / s.cm > 0.55) { s.bumpT += dt; s.maxBump = Math.max(s.maxBump, s.bumpT); } else if (s.cm < 0.3 || s.lost / s.cm < 0.25) s.bumpT = 0;
       // stuck in place: for the last 10 s it stayed within 2 m and ended under 0.5 m from where it was, though it is not fighting and its goal is further on
-      s.trail.push([e.pos.x, e.pos.z]); if (s.trail.length > 300) s.trail.shift();
-      const t0 = s.trail[0], moved = Math.hypot(e.pos.x - t0[0], e.pos.z - t0[1]);
-      const fighting = e.target && MATCH.time - (e.lastSeenT || -99) < 6; // strafing in a firefight is not being stuck
-      const wants = !fighting && (cm > 0.02 * dt * 30 || (e.path && e.path.length > 0));
+      const fighting = e.target && MATCH.time - (e.lastSeenT || -99) < 6;
+      const wants = !fighting && e.goal && cm > 0.02 * dt * 30;
+      // A preceding guard hold or a different destination cannot count as time blocked on this route.
+      if (!wants || !s.goal || Math.hypot(e.goal.x - s.goal.x, e.goal.z - s.goal.z) > 1) {
+        s.trail.length = 0; s.goal = wants ? e.goal.clone() : null;
+      }
+      if (wants) s.trail.push([e.pos.x, e.pos.z]);
+      if (s.trail.length > 300) s.trail.shift();
+      const t0 = s.trail[0], moved = t0 ? Math.hypot(e.pos.x - t0[0], e.pos.z - t0[1]) : Infinity;
       const span = s.trail.length >= 300 && moved < 0.5 ? Math.max(...s.trail.map((q) => Math.hypot(q[0] - t0[0], q[1] - t0[1]))) : 99;
       const arrived = !e.goal || Math.hypot(e.goal.x - e.pos.x, e.goal.z - e.pos.z) < 2;
       if (span < 2 && wants && !arrived) { s.still += dt; if (s.still > s.maxStill) { s.maxStill = s.still; s.where = [+e.pos.x.toFixed(1), +e.pos.y.toFixed(1), +e.pos.z.toFixed(1), Math.round(cm * 3000) / 100, e.path ? e.path.length : -1, +Math.max(...s.trail.map((q) => Math.hypot(q[0] - t0[0], q[1] - t0[1]))).toFixed(1), e.goal ? [+e.goal.x.toFixed(1), +e.goal.z.toFixed(1)] : null, e.target ? 'T' : '', +(MATCH.time - (e.lastSeenT || -99)).toFixed(1)]; } } else s.still = 0;

@@ -6,7 +6,7 @@ efcOn('scav:assign', bots => {
   bots.forEach((bot, i) => {
     bot.squad = 's';
     bot.name = EFC_SCAV_NAMES[i];
-    bot.efcScav = { i, next: 0, visited: '', phase: 'search', target: null, seenAt: -Infinity, post: null };
+    bot.efcScav = { i, next: 0, visited: '', phase: 'search', target: null, seenAt: -Infinity, post: null, item: '', retry: new Map(), sample: null, stuck: 0 };
   });
 });
 efcProvide('scav:spawn', bot => {
@@ -37,6 +37,13 @@ efcProvide('scav:update', (bot, dt, now) => {
   const s = bot.efcScav, input = bot.input;
   if (now >= s.next) {
     s.next = now + 0.55;
+    const stuck = s.sample && bot.path && bot.pathI < bot.path.length && s.sample.distanceToSquared(bot.pos) < 0.025;
+    s.stuck = stuck ? s.stuck + 1 : 0;
+    s.sample = bot.pos.clone();
+    if (s.stuck >= 3) {
+      if (s.item) s.retry.set(s.item, now + 12);
+      s.item = ''; s.stuck = 0; bot.path = null; bot.goal = null;
+    }
     const eye = entEye(bot, new V3()), at = new V3();
     const threats = entities.filter(e => efcIsHuman(e) && e.alive && !e.out && e.pos.distanceTo(bot.pos) <= 24 &&
       lineClear(eye, entChest(e, at)));
@@ -44,6 +51,7 @@ efcProvide('scav:update', (bot, dt, now) => {
     if (threat) { s.target = threat; s.seenAt = now; }
     else if (now - s.seenAt > 8 || !s.target?.alive || s.target.out) s.target = null;
     if (s.target) {
+      s.item = '';
       s.post = efcScavengerNearest(bot, efcCall('warden:posts') || []);
       s.phase = 'flee';
       if (s.post && hyp(bot.pos.x - s.post.x, bot.pos.z - s.post.z) <= s.post.r + 3) {
@@ -56,10 +64,20 @@ efcProvide('scav:update', (bot, dt, now) => {
       if (s.phase === 'flee' && (!bot.path?.length || s.target.pos.distanceTo(bot.pos) < 4)) s.phase = 'cornered';
     } else {
       s.phase = 'search'; s.post = null;
-      const candidates = (efcCall('world:list') || []).filter(c => c.items.length && c.id !== s.visited && ['crate', 'locker', 'bag'].includes(c.kind));
-      const item = efcScavengerNearest(bot, candidates);
-      if (item && efcCall('world:scavenge', item.id, bot)) { s.visited = item.id; bot.path = null; }
-      else if (item && (!bot.goal || hyp(bot.goal.x - item.x, bot.goal.z - item.z) > 1 || !bot.path?.length)) setPath(bot, new V3(item.x, item.y, item.z));
+      const candidates = (efcCall('world:list') || []).filter(c => c.items.length && c.id !== s.visited &&
+        (s.retry.get(c.id) || 0) <= now && ['crate', 'locker', 'bag'].includes(c.kind));
+      const unclaimed = candidates.filter(c => !entities.some(other => other !== bot && other.alive && other.squad === 's' && other.efcScav?.item === c.id));
+      const item = efcScavengerNearest(bot, unclaimed.length ? unclaimed : candidates);
+      if (item && efcCall('world:scavenge', item.id, bot)) {
+        s.visited = item.id; s.item = ''; bot.path = null; bot.goal = null;
+      } else if (item) {
+        s.item = item.id;
+        if (!bot.goal || hyp(bot.goal.x - item.x, bot.goal.z - item.z) > 1 || !bot.path?.length) {
+          setPath(bot, new V3(item.x, item.y, item.z));
+          if (!bot.path?.length) { s.retry.set(item.id, now + 12); s.item = ''; }
+        }
+      }
+
     }
   }
   const dir = s.phase === 'cornered' ? null : pathDir(bot);
@@ -73,7 +91,9 @@ efcProvide('scav:update', (bot, dt, now) => {
   }
   bot.lookYaw = bot.yaw;
   input.mx = 0; input.mz = dir ? (s.phase === 'flee' ? 1 : 0.55) : 0;
-  input.sprint = !!dir && s.phase === 'flee';
+  const leg = dir && bot.path?.[bot.pathI];
+  input.sprint = !!dir && s.phase === 'flee' && !leg?.drop;
+  input.jump = !!(leg?.jump && bot.onGround && bot.pathI > 0 && botLeapNow(bot, bot.path[bot.pathI - 1], leg));
   input.fire = false;
   const clear = aim && (() => {
     const hit = rayEntities(entEye(bot, new V3()), aim.clone().normalize(), aim.length() + 0.2, bot);

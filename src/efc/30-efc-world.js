@@ -162,6 +162,13 @@ efcProvide('world:body', (pos, items, name) => {
   const p = pos ? { x: pos.x, y: pos.y, z: pos.z } : null;
   efcNetToHost('w:body', { pos: p, items: efcClone(items || []), name: typeof name === 'string' ? name : '' });
 });
+efcProvide('world:scavenge', (id, actor) => {
+  const c = EFC_W.map.get(id);
+  if (!efcIsHost() || !actor?.alive || actor.squad !== 's' || !c?.items.length ||
+      !['crate', 'locker', 'bag'].includes(c.kind) || !efcWorldNear(c, actor, EFC.cfg.interactR)) return false;
+  efcNetToAll('w:upd', { id, items: c.items.slice(1) });
+  return true;
+});
 efcProvide('world:list', () => Array.from(EFC_W.map.values()));
 efcProvide('world:near', (p, r) => {
   if (!p) return null;

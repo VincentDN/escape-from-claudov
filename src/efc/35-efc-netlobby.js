@@ -65,7 +65,7 @@ function efcNetSquads() {
   if (!efcNetIsRaid()) return;
   if (PL.ent && NET.squad != null) PL.ent.squad = NET.squad;
   for (const [id, e] of NET.remotes) {
-    if (e.remoteBot) { e.squad = 'w'; continue; }
+    if (e.remoteBot) { if (e.squad !== 's') e.squad = 'w'; continue; }
     const p = NET.players.get(id);
     if (p) e.squad = efcNetTeamOk(p.t);
     else if (e.squad == null) e.squad = -1; // not in the lobby list (yet): nobody's ally

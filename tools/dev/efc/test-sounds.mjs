@@ -180,7 +180,10 @@ const bootAudio = () => (async () => {
   const F = await page.evaluate(() => {
     const ids = [], orig = sfxPlay;
     sfxPlay = (id, ...a) => { ids.push(id); return orig(id, ...a); };
-    const def = WEAPONS.m4; vmEquip(def); const T = RELOAD.rifle.empty, D = { empty: true };
+    const def = WEAPONS.m4;
+    armsW(PL.ent).def = def; // fallback bank selection reads the equipped weapon
+    vmEquip(def);
+    const T = RELOAD.rifle.empty, D = { empty: true };
     for (let i = 0; i <= 240 * T.dur; i++) vmChoreo('reload', Math.min(1, i / 240 / T.dur), D, VM.curDef, VM.cur);
     sfxGun('sniper', null, PL.ent); sfxWhiz(PL.ent.pos.clone()); sfxCasing('wood', null, AU.ctx.currentTime);
     sfxPlay = orig;

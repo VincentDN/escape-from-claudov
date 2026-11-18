@@ -117,7 +117,7 @@ if (sim.ran < secs - 1) fails.push('match stopped at ' + sim.ran + ' s');
 if (sim.out) fails.push(sim.out + ' bot steps out of the map');
 if (sim.maxBump > 10) fails.push('a bot pushed against the decor for ' + sim.maxBump + ' s');
 if (sim.maxStill > 0) fails.push('a bot stood stuck for ' + (10 + sim.maxStill).toFixed(1) + ' s');
-if (!sim.metres.some((m) => m > 30)) fails.push('bots barely move: ' + sim.metres.join(','));
+if (sim.metres.filter((m) => m > 30).length < sim.metres.length * 0.75) fails.push('bots barely move: ' + sim.metres.join(','));
 await browser.close();
 if (errors.length) fails.push(...errors.slice(0, 10));
 if (fails.length) { console.error('FAIL\n' + fails.join('\n')); process.exit(1); }

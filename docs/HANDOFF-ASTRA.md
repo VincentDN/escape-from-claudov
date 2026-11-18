@@ -1,4 +1,4 @@
-# Second track: tasks A1 to A6
+# Second track: tasks A1 to A9
 
 Written 18 November 2026, after the first handoff (`docs/HANDOFF.md`, tasks T1 to T7) was finished and merged. This track is for
 an agent that can take on larger, multi-file work. Read `docs/HANDOFF.md` sections 1 to 4 and 7 first: how to branch, build,
@@ -101,8 +101,66 @@ description). This task is the data half only, with no screen: it must not chang
 - Tests: logic tests for every rule and the migration (vm tests like `test-items.mjs`), the two-client rig for a shared grid,
   the end-to-end raid test unchanged.
 
+## A7. The full grid inventory system (large; after A6)
+
+Build on A6's data model until the grid is the only inventory in the game, end to end. Keep the current screens working until A8
+replaces them, by drawing the grids inside them.
+
+- Every move goes through the grid: looting, equipping, dropping, splitting and merging stacks, moving between the stash and the
+  loadout, the free SKS loadout, the raid kit, extraction and death (the body holds the grid as it was), and the loot tables
+  (rolled items are placed into the container's grid; what does not fit is not rolled).
+- Interaction: drag and drop with the mouse, rotate with R while dragging, double-click to equip or quick-move to the other
+  side, Shift-click to move a whole stack, Ctrl-click to split, drag out of a container to drop, a placement preview that shows
+  valid and invalid cells before the drop. Full keyboard operation stays possible (arrow keys between cells, Enter to pick up
+  and place). Weight still limits movement.
+- Online: the host decides every placement in a shared container; a guest's move is a request, and two players moving into the
+  same cells resolve so that exactly one succeeds.
+- Tests: logic tests for every interaction, the two-client rig for shared grids and races, the end-to-end raid test rewritten
+  for the grid, and a hideout screenshot.
+
+## A8. The new operator and inventory screen (large; after A7)
+
+The owner's reference is a DayZ-style inventory (an image he shared in conversation; this is its description). Recreate the
+layout, not the look: no art, icons, fonts or text from DayZ, Tarkov or any other game.
+
+- **Left column, "Vicinity"**: what is within reach, the container or body being searched as its own grid, then loose items on
+  the ground. Hovering an item shows a card with its picture, name, condition, weight and a short description (the thumbnail
+  service already renders large pictures).
+- **Centre**: the player's operator, full height, in a relaxed idle pose, wearing exactly what is equipped and holding the
+  equipped weapon; it turns slowly when dragged with the mouse. Render it with the game's renderer into the panel, as the
+  thumbnails are, using the engine's soldier model and outfit.
+- **Right column, "Equipment"**: a row of equipment slots across the top (head, face, armour, rig, backpack, primary, secondary,
+  sidearm), then each equipped container as a titled block with its fill count ("Field vest 19/30") and its grid; the equipped
+  primary shows its attachment slots inline (ties in with A9).
+- **Bottom**: a "Hands" panel with the item in hand, and a row of numbered quick slots (1 to 9) that the player assigns by
+  dragging.
+- The same screen serves the hideout (left column becomes the stash) and the raid (left column is the vicinity). It opens with
+  Tab, keeps the match running, frees the cursor and blocks firing, as the current panel does.
+- Tests: the screen opens in both places, every slot and grid accepts a drop, the operator shows the equipped items and the
+  weapon in hand, keyboard operation works, no frame cost while closed. Screenshots of the hideout and of a body search.
+
+## A9. Attachments and weapon modding through the workbench (large; after A2 and A8)
+
+`showcase/workbench/` already has Partisan's StG 44 workbench: attachment models, mount and fit rules, finishes, sliders and
+studio lighting, as a standalone viewer. Turn it into the game's gunsmith.
+
+- **Attachments as items**: every attachment model in `showcase/assets/models/weapons/` (optics, muzzles and suppressors, grips,
+  lights, lasers, magazines, bipods, rails) becomes an item with size, weight, value, a thumbnail and stat effects (recoil,
+  spread, aim speed, magazine size, sound for suppressors). They go into the loot tables (rarer for better parts) and Wardens
+  carry some.
+- **Weapons carry their parts**: a weapon item stores its attachments and finish; the first-person and world models show them;
+  stats change with them; a looted weapon keeps what was on it, so stripping a dead Warden's rifle is worth it.
+- **The workbench**: from the hideout, open a weapon from the stash on the bench (the showcase's lighting and studio set-up, run
+  with the game's renderer or as the showcase page talking to the game through a small message bridge, whichever is cleaner).
+  Mount only parts the player owns in the stash; mount and fit rules from the showcase decide what fits where; removed parts go
+  back to the stash. Save, and the modded weapon is what the player takes into the next raid.
+- **In the field**: attach and detach small parts from the A8 screen by dragging onto the weapon's slots, without the bench.
+- Start with the StG 44 from A2 and the AK-family rifles the showcase covers, then extend the mount rules to the other weapons.
+- Tests: logic tests for fit rules and stat changes, a raid where a looted optic is mounted at the bench and the stats and model
+  change, the two-client rig showing the mounted parts on the remote copy, and screenshots of the bench and of a modded rifle in
+  first person.
+
 ## Not in this track
 
-The grid inventory screen and operator view (waits for A6), omnimovement (P8), the raid-start weapon check (T7 left a proposal
-for the owner), bringing the showcase workbench's saved configurations into the stash (after A2 sets the pattern), the
-remaining Partisan weapons (after A2), and squads in public-server lobbies (the server is not in this repository).
+Omnimovement (P8), the raid-start weapon check (T7 left a proposal for the owner), the remaining Partisan weapons beyond what
+A9 needs (after A2's guide), and squads in public-server lobbies (the server is not in this repository).

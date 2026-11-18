@@ -28,3 +28,5 @@ What remains under its own terms:
      by congusbongus (https://opengameart.org/content/string-and-piano-horror-stings); *Light Through a Pale Window* from
      *Background Drones Vol 1* by Tsorthan Grove (https://opengameart.org/content/background-drones-vol-1)
    - Claudov harbour chains: *Chain winch sounds* by bart (https://opengameart.org/content/chain-winch-sounds)
+
+The raid StG 44 model is a reduced derivative of the Partisan Project Neuro-Bash showcase asset, cleared by Vincent De Nil for this repository. See `showcase/asset-credits.json` and `docs/weapon-port.md`.

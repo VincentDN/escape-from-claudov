@@ -244,6 +244,8 @@ for track in ("duce-uniform", "abdulena", "campaign-acoustic-guitars"):
     if os.path.isfile(filename):
         tracks[track] = filename
 html=html.replace("__MENU_MUSIC__",music)
+stg44 = base64.b64encode(open("assets/raid-models/stg44.glb", "rb").read()).decode("ascii")
+html=html.replace('<meta name="menu-music"', '<meta name="efc-stg44" content="'+stg44+'">\n<meta name="menu-music"', 1)
 html=html.replace('<meta name="menu-music" content="'+music+'">','<meta name="menu-music" content="'+music+'">\n<meta name="efc-music" content="'+_html.escape(json.dumps(tracks),quote=True)+'">',1)
 print("musique :",music or "aucune pour les menus,",len(tracks),"pistes dans dist/music,",sum(os.path.getsize(("dist/" if n.startswith("music/") else "")+n) for n in tracks.values())//1024,"Ko")
 # Identifiant de version : condensat de la page elle-même (marqueur compris), inscrit dans la page et dans dist/version.json.

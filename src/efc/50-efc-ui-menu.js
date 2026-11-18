@@ -162,6 +162,7 @@ function efcUiStashLine() {
 }
 
 /* ---------- Screens and start-up ---------- */
+efcOn('stash:reset', () => { $('efcMmStash').textContent = efcUiStashLine(); });
 efcOn('ui:screen', (name, fresh) => {
   if (name === 'main') $('efcMmStash').textContent = efcUiStashLine();
   else if (name === 'raid') { if (fresh) lmReset(EFC_UI.raidL); else lmRender(EFC_UI.raidL, { focus: true, restore: true }); }

@@ -275,6 +275,7 @@ function botSense(b, now) {
    surpris : il ne se retourne qu'au bout de D.startle (b.startleT, une fois par surprise, les balles qui suivent ne le figent pas plus
    longtemps), puis à la vitesse d'un grand mouvement de tête (D.spin, updateBot). */
 function botHurt(b, attacker, dmg, dir, now) {
+  if (efcDevIgnorePlayer(attacker)) return;
   const D = botDiff(b);
   b.lastHitT = now; b.fear = Math.min(2, b.fear + dmg / 70);
   let late = 0;

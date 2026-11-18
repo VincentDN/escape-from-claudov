@@ -22,6 +22,23 @@ try {
   assert.ok(await dialog.isVisible());
   await dialog.getByRole('checkbox', { name: 'Invulnerability' }).check();
   await dialog.getByRole('checkbox', { name: 'Freeze raid timer' }).check();
+  await dialog.getByRole('checkbox', { name: 'No Aggro' }).check();
+  const saved = await page.evaluate(() => {
+    efcCall('stash:toStash', 'primary');
+    efcCall('stash:setFreeKit', true);
+    return localStorage.getItem(EFC_STASH_KEY);
+  });
+  const reset = dialog.getByRole('button', { name: 'Reset Stash' });
+  page.once('dialog', prompt => prompt.dismiss());
+  await reset.click();
+  assert.equal(await page.evaluate(() => localStorage.getItem(EFC_STASH_KEY)), saved);
+  page.once('dialog', prompt => prompt.accept());
+  await reset.click();
+  assert.equal(await dialog.getByRole('status').textContent(), 'Starter stash and loadout restored.');
+  assert.ok(await page.evaluate(() => {
+    const starter = JSON.stringify(efcStashStarter());
+    return JSON.stringify(efcStash()) === starter && localStorage.getItem(EFC_STASH_KEY) === starter;
+  }));
   assert.equal(await dialog.getByRole('link', { name: 'Module index' }).getAttribute('href'), 'showcase/modules/');
   const modules = await page.request.get(new URL('showcase/modules/', process.env.EFC_TEST_URL).href);
   assert.ok(modules.ok() && (await modules.text()).includes('StG 44 weapon workbench'));
@@ -38,13 +55,22 @@ try {
     p.protT = 0;
     applyDamage(p, 40, null, 'test', false, new V3());
     matchTick(1 / 30, false);
-    const solo = { undamaged: p.health === hp, frozen: MATCH.timeLeft === left };
+    const bot = entities.find(e => !e.isPlayer && !e.isRemote && e.alive);
+    bot.aw.set(p, 1);
+    botSense(bot, MATCH.time);
+    botHurt(bot, p, 20, null, MATCH.time);
+    const solo = {
+      undamaged: p.health === hp,
+      frozen: MATCH.timeLeft === left,
+      ignored: !bot.aw.has(p) && bot.target !== p && !soundFoe({ who: p }, bot),
+      resetBlocked: efcCall('stash:reset') === false,
+    };
     MATCH.online = true;
-    const online = efcDevActive('health') || efcDevActive('timer');
+    const online = efcDevActive('health') || efcDevActive('timer') || efcDevIgnorePlayer(p);
     MATCH.online = false;
     return { ...solo, online };
   });
-  assert.deepEqual(state, {undamaged: true, frozen: true, online: false});
+  assert.deepEqual(state, {undamaged: true, frozen: true, ignored: true, resetBlocked: true, online: false});
   assert.deepEqual(errors, []);
   await page.goto(new URL('showcase/intro/', process.env.EFC_TEST_URL).href, {waitUntil: 'commit'});
   await page.waitForURL(process.env.EFC_TEST_URL, {waitUntil: 'commit'});

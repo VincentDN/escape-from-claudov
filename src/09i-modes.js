@@ -22,6 +22,7 @@ function allied(a, b) {
 }
 /* Un bruit (tir, explosion) est-il celui d'un adversaire de b ? En raid, un bruit sans auteur connu (joueur distant) est hostile */
 function soundFoe(s, b) {
+  if (s.who && efcDevIgnorePlayer(s.who)) return false;
   if (MATCH.mode === 'raid') return s.who ? !allied(s.who, b) : true;
   return MATCH.mode === 'ffa' ? s.who !== b : s.team !== b.team;
 }

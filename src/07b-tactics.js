@@ -562,6 +562,7 @@ function updateBot(b, dt, now) {
 
 /* Pression de tir : balles qui passent près d'un bot */
 function suppressAlongRay(shooter, origin, dir, endT, hitEnt) {
+  if (efcDevIgnorePlayer(shooter)) return;
   for (const e of entities) {
     if (e.isPlayer || !e.alive || allied(e, shooter) || e === hitEnt) continue;
     const c = entChest(e, _cp);

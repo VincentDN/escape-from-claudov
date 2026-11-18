@@ -1775,6 +1775,8 @@ Harbour chains: Chain winch sounds by bart (opengameart.org/content/chain-winch-
 Piste de la radio ⇒ Radio track
 Fusil lourd à cadence modérée, doté d'un chargeur de vingt-cinq coups. ⇒ Heavy rifle with a moderate fire rate and a twenty-five-round magazine.
 Developer menu ⇒ =
+No Aggro ⇒ =
+Reset Stash ⇒ =
 Cheats apply to solo raids. ⇒ =
 Invulnerability ⇒ =
 Freeze raid timer ⇒ =

@@ -166,6 +166,7 @@ function botEars(b, e, d, aw, dt, now, D) {
 /* Mort d'un soldat : le bot tué retient d'où venait le coup (il y retournera peut-être, voir initTactics), ses coéquipiers proches se tournent
    vers l'agresseur et se méfient un moment */
 function botDeathNote(v, a) {
+  if (efcDevIgnorePlayer(a)) return;
   const now = MATCH.time;
   if (!v.isPlayer && !v.isRemote && a && a !== v) v.grudge = { x: a.pos.x, z: a.pos.z, t: now };
   if (!a || a === v || allied(a, v)) return;

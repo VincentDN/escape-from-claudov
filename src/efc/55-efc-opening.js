@@ -1,6 +1,6 @@
 /* Partisan opening scene behind the native menu. The engine owns navigation and audio. */
 const EFC_OPENING = { frame: null, ready: false };
-const EFC_DEV = { taps: 0, health: false, timer: false };
+const EFC_DEV = { taps: 0, health: false, timer: false, aggro: false };
 function efcOpeningHide() {
   if (EFC_OPENING.frame) EFC_OPENING.frame.hidden = true;
   $('menuBg').classList.remove('intro-ready');
@@ -37,15 +37,24 @@ addEventListener('pointermove', event => {
 }, { passive: true });
 
 function efcDevActive(cheat) { return !MATCH.online && MATCH.state === 'playing' && EFC_DEV[cheat]; }
+function efcDevIgnorePlayer(ent) { return ent === PL.ent && efcDevActive('aggro'); }
+efcProvide('dev:ignorePlayer', efcDevIgnorePlayer);
 efcOn('ui:init', () => {
   const dialog = $('efcDevMenu');
+  const status = $('efcDevStatus');
   $('efcBuild').addEventListener('click', () => {
     if (++EFC_DEV.taps !== 7) return;
     EFC_DEV.taps = 0;
+    status.hidden = true;
     if (!dialog.open) dialog.showModal();
   });
-  for (const [id, cheat] of [['efcDevHealth', 'health'], ['efcDevTimer', 'timer']]) {
+  for (const [id, cheat] of [['efcDevHealth', 'health'], ['efcDevTimer', 'timer'], ['efcDevAggro', 'aggro']]) {
     const input = $(id);
     input.addEventListener('change', () => { EFC_DEV[cheat] = input.checked; });
   }
+  $('efcDevResetStash').addEventListener('click', () => {
+    if (!confirm('Replace your saved stash and loadout with starter gear? Loot you have collected will be lost.')) return;
+    status.textContent = efcCall('stash:reset') ? 'Starter stash and loadout restored.' : 'Could not reset the saved stash.';
+    status.hidden = false;
+  });
 });

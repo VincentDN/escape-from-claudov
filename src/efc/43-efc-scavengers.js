@@ -35,6 +35,10 @@ function efcScavengerNearest(bot, candidates) {
 efcProvide('scav:update', (bot, dt, now) => {
   if (bot.squad !== 's' || !efcIsHost()) return false;
   const s = bot.efcScav, input = bot.input;
+  if (s.target && efcCall('dev:ignorePlayer', s.target)) {
+    s.target = null;
+    s.next = now;
+  }
   if (now >= s.next) {
     s.next = now + 0.55;
     const stuck = s.sample && bot.path && bot.pathI < bot.path.length && s.sample.distanceToSquared(bot.pos) < 0.025;
@@ -45,7 +49,7 @@ efcProvide('scav:update', (bot, dt, now) => {
       s.item = ''; s.stuck = 0; bot.path = null; bot.goal = null;
     }
     const eye = entEye(bot, new V3()), at = new V3();
-    const threats = entities.filter(e => efcIsHuman(e) && e.alive && !e.out && e.pos.distanceTo(bot.pos) <= 24 &&
+    const threats = entities.filter(e => efcIsHuman(e) && e.alive && !e.out && !efcCall('dev:ignorePlayer', e) && e.pos.distanceTo(bot.pos) <= 24 &&
       lineClear(eye, entChest(e, at)));
     const threat = threats.reduce((best, e) => !best || e.pos.distanceToSquared(bot.pos) < best.pos.distanceToSquared(bot.pos) ? e : best, null);
     if (threat) { s.target = threat; s.seenAt = now; }

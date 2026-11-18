@@ -218,7 +218,7 @@ function efcWardenGoal(b, now) {
 /* A Warden that sees an enemy or is hurt tells the mates of its post (not the other posts) where it is; they turn to it and converge
    through the engine's hunt and search tactics */
 function efcWardenAlert(b, foe, now) {
-  const p = efcWardenPost(b); if (!p || !foe || allied(foe, b)) return;
+  const p = efcWardenPost(b); if (!p || !foe || allied(foe, b) || efcCall('dev:ignorePlayer', foe)) return;
   b.efcPatrol = null;
   if (now - p.alertT < 1.5) return;
   p.alertT = now;
@@ -248,6 +248,7 @@ function efcGraceCheck(e) {
 }
 function efcWardenGrace(e) {
   if (!efcRaidMode() || !efcIsHumanEnt(e)) return false;
+  if (efcCall('dev:ignorePlayer', e)) return true;
   efcGraceCheck(e);
   return !!(e.efcGrace && e.efcGrace.on);
 }

@@ -2,7 +2,7 @@
    freeKit }), the starter kit, and the raid hand-over: 'raid:kit' takes the loadout out (it is at risk) or hands out the free kit (P6:
    the SKS and 30 rounds, every item free: true, the loadout left in the stash), 'raid:commit' banks what was extracted.
    Corrupt or missing storage never throws: it falls back to the starter stash. Services: stash:get, stash:toLoadout, stash:toStash,
-   stash:save, stash:setFreeKit, raid:freeKit, raid:kit, raid:commit. */
+   stash:save, stash:reset, stash:setFreeKit, raid:freeKit, raid:kit, raid:commit. */
 
 const EFC_STASH_KEY = 'efc_stash_v1';
 const EFC_FREE_WEAPON = 'w_sks', EFC_FREE_ROUNDS = 30; // the free loadout (P6): an SKS with a full magazine and 30 rounds in reserve
@@ -114,6 +114,19 @@ efcProvide('stash:get', efcStashGet);
 efcProvide('stash:toLoadout', efcStashToLoadout);
 efcProvide('stash:toStash', efcStashToStash);
 efcProvide('stash:save', efcStashSave);
+efcProvide('stash:reset', () => {
+  if (MATCH.state !== 'menu' || UI.flow) return false;
+  const starter = efcStashStarter();
+  try {
+    localStorage.setItem(EFC_STASH_KEY, JSON.stringify(starter));
+  } catch {
+    return false;
+  }
+  efcStashCur = starter;
+  efcStashFreeRaid = false;
+  efcEmit('stash:reset');
+  return true;
+});
 efcProvide('stash:setFreeKit', efcStashSetFreeKit);
 efcProvide('raid:freeKit', efcFreeKit);
 efcProvide('raid:kit', efcRaidKit);

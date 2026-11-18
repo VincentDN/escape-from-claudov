@@ -1,7 +1,7 @@
 /* ==========================================================================
    MATCH, HUD, MENU, BOUCLE
    ========================================================================== */
-const MATCH = { state: 'loading', mode: 'tdm', time: 0, timeLeft: 600, score: [0, 0], limit: 75, uav: [0, 0], uavPing: [null, null], sat: [0, 0], iem: [0, 0], events: [], winner: -1 };
+const MATCH = { state: 'loading', mode: 'raid', time: 0, timeLeft: 600, score: [0, 0], limit: 75, uav: [0, 0], uavPing: [null, null], sat: [0, 0], iem: [0, 0], events: [], winner: -1 };
 const $ = (id) => document.getElementById(id);
 const LOCK = { rawNo: false, fallback: false, pending: false, manual: false, fails: 0, inputT: -1e9, resumeT: -1e9, escArmed: false, quiet: false, scriptExit: false, kbLock: false, fsPending: null };
 function pointerActive() { return document.pointerLockElement === canvas || LOCK.fallback || TOUCH.on || PAD.drive; } // au doigt ou à la manette, pas de capture de la souris : toujours actif
@@ -106,7 +106,6 @@ function killEnt(v, a, weapon, head, dir, life) {
       combo = Math.min(COMBO.max, (a.comboN - 1) * COMBO.step);
       a.kills++; a.score += 100 + (head ? 50 : 0) + combo; up = streakKill(a, weapon, life); if (up) a.streak++;
     }
-    if (MATCH.mode === 'tdm') MATCH.score[a.team]++; // en domination, le score vient des points tenus
     domKillBonus(a, v);
     if (a.isPlayer) {
       PL.bestStreak = Math.max(PL.bestStreak, a.streak);
@@ -491,15 +490,13 @@ function startMatch(opt = {}) {
   Object.assign(DYN, { good: 0, slow: 0, need: 4, lastUp: -1e9 }); DYN.win.length = 0;
   if (!opt.online && netInLobby()) netQuit();
   MATCH.online = !!opt.online; if (MATCH.online) hostBgInit(); // hôte en arrière-plan : la partie continue (hostBgTick)
-  const want = MATCH.online ? NET.cfg.mode : Settings.mode, mode = !MODES[want] || !CURMAP.def || (want === 'dom' && !CURMAP.def.dom) ? 'tdm' : want; // en ligne, le mode est celui du salon
-  MATCH.limit = MATCH.online ? NET.cfg.limit : Settings[MODES[mode].key];
-  if (mode === 'raid') MATCH.limit = Infinity; // raid: no kill limit, the raid length is EFC.cfg.raidMinutes
-  SMOKES.length = 0; PL.flashT = 0; MATCH.score = [0, 0]; MATCH.time = 0; MATCH.timeLeft = (mode === 'raid' ? EFC.cfg.raidMinutes : MATCH.online ? NET.cfg.time : Settings.minutes) * 60; MATCH.uav = [0, 0]; MATCH.uavPing = [null, null]; MATCH.sat = [0, 0]; MATCH.iem = [0, 0]; MATCH.events = []; MATCH.winner = -1;
+  MATCH.limit = Infinity;
+  SMOKES.length = 0; PL.flashT = 0; MATCH.score = [0, 0]; MATCH.time = 0; MATCH.timeLeft = EFC.cfg.raidMinutes * 60; MATCH.uav = [0, 0]; MATCH.uavPing = [null, null]; MATCH.sat = [0, 0]; MATCH.iem = [0, 0]; MATCH.events = []; MATCH.winner = -1;
   for (const n of NADES) scene.remove(n.mesh); NADES.length = 0; clearThrowKnives(); soundEvents.length = 0; clearAircraft(); clearDrops();
   FX.holes.clear(); FX.splats.clear(); FX.scorch.clear(); propsReset();
   for (const e of entities) { e.kills = e.deaths = e.score = e.assists = e.streak = e.comboN = 0; e.comboT = -99; e.alive = false; e.lastShotT = -9; }
   MATCH.state = 'playing'; kcReset(); MATCH.finalPending = null; MATCH.lastKill = null; MATCH.fin = null; MATCH.finSoon = false; finClear(); MATCH.startAt = MATCH.time;
-  modeStart(mode);
+  modeStart();
   // armes des bots selon le type de la carte (07-bots.js) : la première partie après le chargement garde le tirage fait pendant la compilation
   // (mapCompile) ; les suivantes tirent à nouveau, et ce qui manque se construit ici, au déploiement, pas à la première apparition
   if (BOT_ARM.map !== MAPL.id) { botArmForMap(); botArmPrebuild(); }

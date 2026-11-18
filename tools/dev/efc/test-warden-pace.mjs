@@ -1,7 +1,7 @@
 // P2b Warden pace test, raid on Claudov: ground speed per state over scripted runs (idle patrol leg, alert search, combat advance), each
 // within 15 % of its number (combat: EFC.cfg.wardenCombatMul times the engine's speed, measured in the same run with the pace off), the step
 // cadence scales with speed with the stance foot planted, an idle Warden turns its head first and its body slower, no Warden fires while
-// its weapon comes up, and tdm speeds are the engine's. Optional contact sheet: SHEET=/tmp/warden-pace.png (one rendered frame).
+// its weapon comes up. Optional contact sheet: SHEET=/tmp/warden-pace.png (one rendered frame).
 // NODE_PATH=/opt/node22/lib/node_modules node tools/dev/efc/test-warden-pace.mjs
 import { openGame, startSolo, simRun } from './harness.mjs';
 const { browser, page, errors } = await openGame({ settings: { map: 'claudov', mode: 'raid' } });
@@ -110,7 +110,8 @@ const idleSet = await page.evaluate(() => {
   return { name: W.name, to: q.i, d: Math.round(hyp(q.x - W.pos.x, q.z - W.pos.z)) };
 });
 ok(!!idleSet && !idleSet.none, '(2) an idle Warden sent on a patrol leg', idleSet);
-if (!idleSet || idleSet.none) { await browser.close(); process.exit(1); }
+if (!idleSet || idleSet.none) { ok(errors.length === 0, 'no page errors', errors.slice(0, 10));
+await browser.close(); process.exit(1); }
 await simRun(page, 25, each);
 const sIdle = await page.evaluate(() => recEnd());
 ok(sIdle.n > 150 && near(sIdle.v, cfg.idle), `(2) idle patrol ground speed within 15 % of ${cfg.idle} m/s (median of walking steps)`, sIdle);
@@ -181,20 +182,8 @@ const net = await page.evaluate(() => {
 });
 ok(net.inPresence && net.inApply && net.copy.efcPose === net.pose && net.plain.efcPose === 0, '(7) a Warden\'s posture is published (p.wp) and applied to the remote copy', net);
 
-// (8) tdm: the engine's speeds, no posture
-await page.evaluate(() => { T.inv = true; Settings.mode = 'tdm'; endMatch(); LOCK.fallback = true; startMatch({}); MATCH.timeLeft = 1e5; window.HOLD = [PL.ent.pos.x, PL.ent.pos.y, PL.ent.pos.z]; });
-await simRun(page, 8, 'PL.ent.health = 100; window.MAXV = Math.max(window.MAXV || 0, ...entities.filter((e) => !e.isPlayer && e.alive).map((e) => hyp(e.vel.x, e.vel.z)));');
-const td = await page.evaluate(() => {
-  const W = entities.find((e) => !e.isPlayer && e.alive && !e.visible); window.W = W;
-  return { mode: MATCH.mode, posed: entities.filter((e) => e.efcPose || e.efcState).length, maxV: +window.MAXV.toFixed(2), name: W && W.name };
-});
-const sTdm = await huntRun('*', true, false, 6);
-ok(td.mode === 'tdm' && td.posed === 0, '(8) tdm: no soldier has a Warden posture', td);
-ok(td.maxV > 5, '(8) tdm bots still sprint at the engine\'s speeds (max ground speed m/s)', td.maxV);
-ok(sTdm.n > 60 && near(sTdm.v, sEng.v, 0.08), '(8) tdm hunt speed equals the engine\'s (raid, pace off)', { tdm: sTdm.v, engine: sEng.v });
-
+console.log('speeds', JSON.stringify({ idle: sIdle, alert: sAlert, combat: sCombat, engine: sEng }));
 ok(errors.length === 0, 'no page errors', errors.slice(0, 10));
-console.log('speeds', JSON.stringify({ idle: sIdle, alert: sAlert, combat: sCombat, engine: sEng, tdm: sTdm }));
 await browser.close();
 console.log(fails.length ? `test-warden-pace: ${fails.length} FAILED` : 'test-warden-pace: all passed');
 process.exit(fails.length ? 1 : 0);

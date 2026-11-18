@@ -40,7 +40,7 @@ export function startServer() {
    o.init: extra script run before the game. Page errors are pushed to `errors` with the page name. */
 export async function openNetPage(context, base, o, errors) {
   const name = o.name || 'Page';
-  const settings = Object.assign({ quality: 'low', sv: 7, dynres: false, eco: false, map: 'simoun', mode: 'tdm', difficulty: 1 }, o.settings || {});
+  const settings = Object.assign({ quality: 'low', sv: 7, dynres: false, eco: false, map: 'simoun', mode: 'raid', difficulty: 1 }, o.settings || {});
   const page = await context.newPage();
   page.efcName = name;
   page.on('pageerror', (e) => errors.push(`[${name} pageerror] ` + e.message + '\n' + (e.stack || '').split('\n').slice(0, 4).join('\n')));

@@ -18,7 +18,7 @@ export function launchEfcBrowser(extraArgs = []) {
 /* o.settings: merged into the saved settings (map, mode, difficulty...). o.w, o.h: viewport. o.init: script run before the page.
    Returns { browser, page, errors }. The page is at the main menu with the map built. */
 export async function openGame(o = {}) {
-  const settings = Object.assign({ quality: 'low', sv: 7, dynres: false, eco: false, map: 'simoun', mode: 'tdm', difficulty: 1 }, o.settings || {});
+  const settings = Object.assign({ quality: 'low', sv: 7, dynres: false, eco: false, map: 'simoun', mode: 'raid', difficulty: 1 }, o.settings || {});
   const browser = o.browser || await launchEfcBrowser();
   const page = await browser.newPage({ bypassCSP: true, viewport: { width: o.w || 480, height: o.h || 270 } });
   await page.addInitScript(`try{if(!localStorage.getItem('dc_settings'))localStorage.setItem('dc_settings', ${JSON.stringify(JSON.stringify(settings))})}catch(e){}; window.MATCH_COUNTDOWN = 0; window.EFC_TEST = true;`);

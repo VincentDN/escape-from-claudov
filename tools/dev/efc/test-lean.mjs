@@ -59,7 +59,7 @@ const HELPERS = () => {
   };
 };
 
-const { browser, page, errors } = await openGame({ settings: { map: MAP, mode: 'tdm', limit: 9999, minutes: 60 }, w: 960, h: 540 });
+const { browser, page, errors } = await openGame({ settings: { map: MAP, mode: 'raid', limit: 9999, minutes: 60 }, w: 960, h: 540 });
 try {
   await page.evaluate(HELPERS);
   await startSolo(page);

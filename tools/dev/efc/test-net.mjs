@@ -1,19 +1,16 @@
-// NETLOBBY test: two clients (host and guest pages, fakepeer) through a raid lobby, a raid match and a team deathmatch lobby.
+// NETLOBBY test: two clients (host and guest pages, fakepeer) through a raid lobby, a raid match.
 // node tools/dev/efc/test-net.mjs   (needs a build: python3 build.py). Exits non-zero on failure.
 import { openPair, createLobby, joinLobby, launch, waitInMatch, stepBoth, settle } from './net2.mjs';
 
 const MAP = process.env.MAP || 'claudov', KEEP = 'PL.ent.health = 100;', EFC_HOLD = 7;
-// MODES.raid comes from the RAID package; when it is missing in this worktree, a minimal stand-in (test page only)
-const RAID_STANDIN = `window.EFC_RAID_STANDIN = () => { if (!MODES.raid) { MODES.raid = Object.assign({}, MODES.tdm, { name: 'Raid', btn: 'Raid', sub: 'Raid', key: 'limit' }); return true; } return false; };`;
 let fails = 0;
 const ok = (cond, msg, extra) => { console.log((cond ? 'PASS ' : 'FAIL ') + msg + (extra !== undefined ? ' ' + JSON.stringify(extra) : '')); if (!cond) fails++; };
 const t0 = Date.now(), wall = () => Math.round((Date.now() - t0) / 1000) + 's';
 
-const rig = await openPair({ map: MAP, init: RAID_STANDIN });
+const rig = await openPair({ map: MAP });
 const { host, guest } = rig, both = [host, guest];
 try {
-  const standin = await host.evaluate(() => window.EFC_RAID_STANDIN()); await guest.evaluate(() => window.EFC_RAID_STANDIN());
-  console.log(`pages ready (${wall()}), MODES.raid ${standin ? 'stand-in' : 'from RAID'}`);
+  console.log(`pages ready (${wall()})`);
 
   // (a) raid lobby, join by code, squads
   const code = await createLobby(host, { map: MAP });
@@ -135,23 +132,15 @@ try {
   // end: the host ends the raid, the guest goes through matchFinish ('end' message)
   await host.evaluate(() => matchFinish());
   await settle(400); await stepBoth(both, 0.4);
-  // with the real RAID package a raid that the host ends makes everyone still inside missing in action; with the stand-in the engine state is 'finish'
+  // The guest may have extracted before the host ends the raid.
   const rs = () => { const r = efcCall('raid:state'); return { s: MATCH.state, r: r ? r.state : null, tl: Math.round(MATCH.timeLeft) }; };
   const eh = await host.evaluate(rs), eg = await guest.evaluate(rs);
-  const over = (x) => (x.r ? x.r === 'mia' || x.r === 'out' : x.s === 'finish'); // the guest may already have extracted in (e)
+  const over = (x) => (x.r === 'mia' || x.r === 'out'); // the guest may already have extracted in (e)
   ok(over(eh) && over(eg) && eg.tl > 60, '(end) host ends the raid, guest finishes with it', [eh, eg]);
 
-  // (f) back to the lobby, switch to team deathmatch, launch again
-  await host.evaluate(() => toMenu()); await guest.evaluate(() => toMenu()); await settle(600);
-  await host.evaluate(() => netSetupSet('mode', 'tdm')); await settle(400);
-  const lt = await guest.evaluate(() => ({ phase: NET.phase, mode: NET.cfg.mode, t: [...NET.players.values()].map((p) => p.t) }));
-  ok(lt.phase === 'lobby' && lt.mode === 'tdm' && lt.t.every((t) => t === 0 || t === 1), '(f) tdm lobby with two teams', lt);
-  await launch(host);
-  await Promise.all([waitInMatch(host), waitInMatch(guest)]);
-  await stepBoth(both, 1.5, KEEP);
-  const fh = await host.evaluate((gid) => ({ s: MATCH.state, m: MATCH.mode, r: !!NET.remotes.get(gid), bots: entities.filter((e) => e.netBot).length }), gid);
-  const fg = await guest.evaluate((hid) => ({ s: MATCH.state, m: MATCH.mode, r: !!NET.remotes.get(hid) }), h0.me);
-  ok(fh.s === 'playing' && fh.m === 'tdm' && fh.r && fg.s === 'playing' && fg.m === 'tdm' && fg.r, '(f) a tdm lobby still launches', [fh, fg]);
+  // (f) an old client asking for a retired mode cannot change the lobby rules
+  const retired = await host.evaluate(() => ['tdm', 'ffa', 'dom'].map((mode) => netCfg({ mode }).mode));
+  ok(retired.every((mode) => mode === 'raid'), '(f) retired modes resolve to raid', retired);
 } catch (e) {
   fails++; console.log('FAIL exception: ' + (e && e.stack || e));
 } finally {

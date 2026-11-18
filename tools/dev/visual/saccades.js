@@ -8,7 +8,7 @@
    fois la partie lancée : ce qui est mesuré est le temps du fil principal, indépendant de la carte graphique, à ces ordres de dessin près (un
    millier d'appels coûtent de 1 à 2 ms de plus sur une vraie machine). Les images sont jouées une à une à FPS images par seconde simulées
    (dt de 1/FPS : les mêmes calculs, le même nombre d'allocations par image qu'à cette cadence).
-   node saccades.js [images=2000]   MAP=simoun (défaut) ; MODE=tdm (défaut), ffa ou dom ; FPS=280 ; Q=high ; TURN=3 (pixels de souris par image, 0 : caméra fixe) ; RUN=0 (joueur
+   node saccades.js [images=2000]   MAP=simoun (défaut) ; FPS=280 ; Q=high ; TURN=3 (pixels de souris par image, 0 : caméra fixe) ; RUN=0 (joueur
    immobile) ; PAGE=autre/version.html ; TOP=8 ; ALLOC=25 (octets alloués par fonction, les 25 premières) ; OLD=1 (avec ALLOC : seulement les objets qui survivent à un petit ramasse-miettes, ceux qui finissent dans la vieille génération et déclenchent les grandes pauses) ; STEPS=3 (étapes citées par image lente) ; EXTRA=f,g (fonctions chronométrées en plus) ; PROF=25 (temps propre par fonction ; à ne pas combiner avec ALLOC, qui ralentit tout) ; W=128 H=72 (taille de la fenêtre : petite,
    pour que les ordres non supprimés, les effacements de cibles de rendu par exemple, ne coûtent rien) ; JSON=1 (écrit saccades-<carte>.json). */
 const fs = require('fs'), path = require('path');
@@ -17,7 +17,7 @@ const N = +(process.argv[2] || 2000), MAP = process.env.MAP || 'simoun', TOP = +
 (async () => {
   const { browser, page, logs } = await openGame({ page: process.env.PAGE, w: +(process.env.W || 128), h: +(process.env.H || 72), noHdri: true,
     init: `window.__DRAWS = 0; window.__noDraw = false; (() => { for (const k of ['drawArrays', 'drawElements', 'drawArraysInstanced', 'drawElementsInstanced', 'drawRangeElements']) { const o = WebGL2RenderingContext.prototype[k]; WebGL2RenderingContext.prototype[k] = function () { if (window.__noDraw) { window.__DRAWS++; return; } return o.apply(this, arguments); }; } })();`,
-    settings: { quality: process.env.Q || 'high', dynres: false, difficulty: 1, map: MAP, mode: process.env.MODE || 'tdm', lang: 'fr' } });
+    settings: { quality: process.env.Q || 'high', dynres: false, difficulty: 1, map: MAP, mode: process.env.MODE || 'raid', lang: 'fr' } });
   const cdp = await page.context().newCDPSession(page);
   const evts = []; cdp.on('Tracing.dataCollected', (d) => evts.push(...d.value));
   await page.evaluate(() => { LOCK.fallback = true; startMatch({}); PL.ent.protT = 1e9; });

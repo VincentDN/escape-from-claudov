@@ -13,7 +13,7 @@
 const { openGame } = require('./common');
 (async () => {
   const map = process.argv[2] || 'sable', secs = +(process.argv[3] || 150);
-  const { browser, page, logs } = await openGame({ page: process.env.PAGE, w: 480, h: 270, settings: { quality: 'low', difficulty: +(process.env.DIFF || 2), map, mode: 'tdm' }, noHdri: true });
+  const { browser, page, logs } = await openGame({ page: process.env.PAGE, w: 480, h: 270, settings: { quality: 'low', difficulty: +(process.env.DIFF || 2), map, mode: 'raid' }, noHdri: true });
   const r = await page.evaluate(([secs, nCache, trace]) => {
     LOCK.fallback = true; startMatch({});
     let seed = 12345; // tirage des essais, à part de celui du jeu

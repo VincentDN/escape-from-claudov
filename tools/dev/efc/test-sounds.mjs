@@ -86,8 +86,8 @@ const bootAudio = () => (async () => {
     arms.switching = 0;
     return { mode: MATCH.mode, started, repeated, takes };
   });
-  ok(holster.mode === 'tdm' && holster.started && !holster.repeated && holster.takes.join() === 'hf_handle,hf_hit',
-    'TDM switch plays the holster once ' + JSON.stringify(holster));
+  ok(holster.mode === 'raid' && holster.started && !holster.repeated && holster.takes.join() === 'hf_handle,hf_hit',
+    'Raid switch plays the holster once ' + JSON.stringify(holster));
   const T = await page.evaluate(() => {
     const rec = [], orig = efcHandlingPlay;
     efcHandlingPlay = (kind, delay, pos, fam) => { const r = orig(kind, delay, pos, fam); rec.push({ kind, delay: delay || 0, ts: VM.rlS, played: r, at: rec.at }); return r; };

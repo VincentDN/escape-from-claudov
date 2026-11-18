@@ -1,5 +1,5 @@
 /* Qualité des apparitions : simulation accélérée d'une partie entre bots (le joueur est retiré du jeu), qui note chaque apparition au moment
-   où elle a lieu. node apparitions.js [secondes=180] [page=dist/index.html] ; MAP=givre, MODE=tdm, ffa ou dom, DIFF=0 à 2.
+   où elle a lieu. node apparitions.js [secondes=180] [page=dist/index.html] ; MAP=givre, , DIFF=0 à 2.
    Rapporte, pour les réapparitions en cours de partie :
      vue       part des apparitions qu'un adversaire voit (ligne de vue dégagée vers la tête ou le buste, à moins de 60 m) ;
      deFace    part de celles qu'un adversaire voit dans son champ (60 degrés de part et d'autre de son regard) : il voit l'autre apparaître ;
@@ -12,7 +12,7 @@
 const { openGame } = require('./common');
 (async () => {
   const secs = +(process.argv[2] || 180), seeds = +(process.env.SEEDS || 1);
-  const { browser, page, logs } = await openGame({ page: process.argv[3], w: 480, h: 270, settings: { quality: 'low', difficulty: +(process.env.DIFF || 2), map: process.env.MAP || 'sable', mode: process.env.MODE || 'tdm' }, noHdri: true });
+  const { browser, page, logs } = await openGame({ page: process.argv[3], w: 480, h: 270, settings: { quality: 'low', difficulty: +(process.env.DIFF || 2), map: process.env.MAP || 'sable', mode: process.env.MODE || 'raid' }, noHdri: true });
   const runs = [];
   for (let s = 0; s < seeds; s++) runs.push(await page.evaluate((secs) => {
     LOCK.fallback = true;
@@ -63,7 +63,7 @@ const { openGame } = require('./common');
   const all = runs.flatMap((r) => r.ev.filter((e) => !e.open)), deaths = runs.flatMap((r) => r.deaths);
   const pct = (n, d) => (d ? +((n / d) * 100).toFixed(1) : 0), med = (a) => { const b = a.slice().sort((x, y) => x - y); return b.length ? +b[b.length >> 1].toFixed(1) : 0; };
   const r = {
-    carte: process.env.MAP || 'sable', mode: process.env.MODE || 'tdm', apparitions: all.length,
+    carte: process.env.MAP || 'sable', mode: process.env.MODE || 'raid', apparitions: all.length,
     vue: pct(all.filter((e) => e.seen).length, all.length), deFace: pct(all.filter((e) => e.face).length, all.length),
     proche: pct(all.filter((e) => e.near).length, all.length), mort5: pct(deaths.filter((t) => t < 5).length, deaths.length), morts: deaths.length,
     distAdv: med(all.map((e) => e.md)), ms: { mediane: med(runs.flatMap((r) => r.ms)), max: +Math.max(...runs.flatMap((r) => r.ms)).toFixed(1) },

@@ -42,18 +42,18 @@ function srvHostScore() { return document.hidden ? 0 : TOUCH.on ? 1 : 2; }
 /* Salons de la liste reçue (GET /salons, netPubFetch) : bornés, ceux d'une autre version du jeu écartés (sauf vides) */
 function srvRead(d) {
   SRV.list = srvParse(d);
-  SRV.crees = !SRV.list || !Array.isArray(d.crees) ? [] : d.crees.filter((s) => s && (s.i === '' || /^[A-Z0-9]{5}$/.test(s.i)) && MODES[s.o] && MAPS.some((m) => m.id === s.m && m.ok) && SRV_PHASES.includes(s.p) && s.v === NET_PROTO)
+  SRV.crees = !SRV.list || !Array.isArray(d.crees) ? [] : d.crees.filter((s) => s && (s.i === '' || /^[A-Z0-9]{5}$/.test(s.i)) && s.o === 'raid' && MAPS.some((m) => m.id === s.m && m.ok) && SRV_PHASES.includes(s.p) && s.v === NET_PROTO)
     .map((s) => ({ i: s.i, o: s.o, m: s.m, j: clamp(s.j | 0, 0, 99), x: clamp(s.x | 0, 1, 99), p: s.p, n: netClean(s.n), pv: !!s.pv }));
 }
 function srvParse(d) {
   if (!d || !Array.isArray(d.serveurs)) return null;
-  return d.serveurs.filter((s) => s && /^[a-z]{3}[0-9]{1,2}$/.test(s.i) && MODES[s.o] && MAPS.some((m) => m.id === s.m && m.ok) && SRV_PHASES.includes(s.p) && (s.v === NET_PROTO || !(s.j > 0)))
+  return d.serveurs.filter((s) => s && /^[a-z]{3}[0-9]{1,2}$/.test(s.i) && s.o === 'raid' && MAPS.some((m) => m.id === s.m && m.ok) && SRV_PHASES.includes(s.p) && (s.v === NET_PROTO || !(s.j > 0)))
     .map((s) => ({ i: s.i, o: s.o, k: clamp(s.k | 0, 1, 99), m: s.m, j: clamp(s.j | 0, 0, 99), x: clamp(s.x | 0, 1, 99), p: s.p }));
 }
 function srvSend(m) { const ws = SRV.ws; if (ws && ws.readyState === 1) { try { ws.send(JSON.stringify(m)); } catch (e) { /* connexion en cours de fermeture */ } } }
 
 /* ---------- Entrer, rester, sortir ---------- */
-/* Entre dans un salon du serveur : un salon permanent (id 'tdm1'), un salon créé (son code), ou un salon à créer ('nouveau', o.make : ses
+/* Entre dans un salon du serveur : un salon permanent, un salon créé (son code), ou un salon à créer ('nouveau', o.make : ses
    réglages) ; o.code : code tapé par le joueur (s'il n'est pas sur le serveur, c'est peut-être le salon d'un hôte, rejoint ensuite) */
 function srvJoin(id, o = {}) {
   if (netInLobby() || !netViaServer() || !acctGate(o.code ? id : undefined)) return;
@@ -113,7 +113,7 @@ function srvMsg(m) {
     const first = !SRV.st;
     if (SRV.id === 'nouveau' && /^[A-Z0-9]{5}$/.test(m.i)) SRV.id = m.i; // salon créé : son code, pour revenir après une coupure
     const c = m.cfg && typeof m.cfg === 'object' ? m.cfg : {};
-    SRV.st = { o: MODES[m.o] ? m.o : 'tdm', k: clamp(m.k | 0, 0, 99), ph: m.ph, i: SRV.id, ps: !!m.ps, own: String(m.own || ''),
+    SRV.st = { o: 'raid', k: clamp(m.k | 0, 0, 99), ph: m.ph, i: SRV.id, ps: !!m.ps, own: String(m.own || ''),
       cfg: { bots: c.b ? 1 : 0, diff: clamp(c.df | 0, 0, 2), limit: clamp(c.lim | 0, 1, 999), time: clamp(c.min | 0, 1, 99), pub: c.pub ? 1 : 0 }, m: mapById(m.m).id, c: Array.isArray(m.c) ? m.c.slice(0, 2).map((c) => mapById(c).id) : [], vt: Array.isArray(m.vt) ? [m.vt[0] | 0, m.vt[1] | 0] : [0, 0],
       mv: m.mv === 0 || m.mv === 1 ? m.mv : -1, vo: !!m.vo, r: clamp(+m.r || 0, 0, 600000), s: clamp(m.s | 0, 1, 99), x: clamp(m.x | 0, 1, 99), me: String(m.me || ''),
       code: /^[A-Z0-9]{5}$/.test(m.code) ? m.code : '', hote: String(m.hote || ''),
@@ -206,7 +206,7 @@ function srvStartClick() {
 }
 /* Crée un salon sur le serveur, public ou privé, avec ses réglages du Solo (mémoire commune) */
 function srvCreate(pub) {
-  const MD = MODES[Settings.mode] || MODES.tdm;
+  const MD = MODES[Settings.mode] || MODES.raid;
   NETP.vis = pub ? 1 : 0; try { localStorage.setItem('cod_salon_pub', String(NETP.vis)); } catch (e) { /* stockage indisponible */ }
   lmClose(LM.scr.multi);
   srvJoin('nouveau', { make: { m: Settings.map, o: Settings.mode, b: '1', df: String(Settings.difficulty), lim: String(Settings[MD.key]), min: String(Settings.minutes), pub: String(NETP.vis) } });
@@ -357,7 +357,7 @@ const SRV_PAGES = {
     rows.push({ k: 'link', key: 'class', label: _t('Modifier la classe'), open: () => uiGo('classes') });
     if (st && st.ps) rows.push({ k: 'link', key: 'invite', label: _t('Inviter des amis'), page: 'invite' });
     rows.push({ k: 'link', key: 'chat', label: _t('Discussion'), value: CHAT.unread ? String(CHAT.unread) : '', page: 'chat' });
-    const MD = MODES[st ? st.o : 'tdm'], rules = st ? st.cfg.limit + ' ' + MD.unit + ' · ' + st.cfg.time + ' min' : '';
+    const rules = st ? EFC.cfg.raidMinutes + ' min' : '';
     const sub = !st ? '' : st.ps ? [MD.name, st.cfg.pub ? _t('Public') : _t('Privé')].join(' · ') : [_t('Salon public {0}', st.k), rules].join(' · ');
     return { title: srvTitle(), sub, rows, stage: srvStage, preview: st && st.ps ? mapPreview(mapById(st.m), srvMatchCfg()) : '' };
   },

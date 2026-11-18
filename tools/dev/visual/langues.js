@@ -40,7 +40,7 @@ const OK = /Kervénec|Hôtel du Col|Café de la Marine|Français|Riposte: Frontl
   }
   // sous-écrans : modes de jeu, onglets d'Options, textes légaux, profil (création de compte, mot de passe oublié, code de secours)
   await page.evaluate(() => uiGo('solo'));
-  for (const m of ['ffa', 'dom', 'tdm']) { await page.evaluate((m) => { Settings.mode = m; renderSolo(); }, m); await scan('solo-' + m); }
+  for (const m of ['ffa', 'dom', 'raid']) { await page.evaluate((m) => { Settings.mode = m; renderSolo(); }, m); await scan('solo-' + m); }
   for (const pg of ['map', 'setup']) { await page.evaluate((pg) => { lmReset(LM.scr.solo); lmPush(LM.scr.solo, pg); }, pg); await page.waitForTimeout(250); await scan('solo-' + pg); } // sous-menus du Solo
   await page.evaluate(() => lmReset(LM.scr.solo));
   await page.evaluate(() => uiGo('options'));
@@ -54,7 +54,7 @@ const OK = /Kervénec|Hôtel du Col|Café de la Marine|Français|Riposte: Frontl
     ACCT.state = 'ready'; ACCT.view = 'login';
     ACCT.user = { username: 'tester', displayName: 'Tester', hasPassword: true, hasRecovery: false };
     ACCT.level = { level: 4, into: 40, need: 200, xp: 900 }; ACCT.stats = { matches: 5, wins: 2, kills: 40, deaths: 20, assists: 3, hits: 50, shots: 100, headshots: 8, bestStreak: 6, seconds: 3600 };
-    ACCT.recent = [{ map: 'sable', mode: 'tdm', result: 'win', online: true, kills: 9, deaths: 3, xp: 120, played_at: '2026-10-01T10:00:00Z' }, { map: 'givre', mode: 'ffa', result: 'quit', online: false, kills: 2, deaths: 5, xp: 10, played_at: '2026-10-02T10:00:00Z' }];
+    ACCT.recent = [{ map: 'sable', mode: 'raid', result: 'win', online: true, kills: 9, deaths: 3, xp: 120, played_at: '2026-10-01T10:00:00Z' }, { map: 'givre', mode: 'ffa', result: 'quit', online: false, kills: 2, deaths: 5, xp: 10, played_at: '2026-10-02T10:00:00Z' }];
     acctRender();
   }); await scan('profile-user');
   await page.evaluate(() => { ACCT.code = 'ABCDE-FGHJK-LMNPQ-RSTUV'; ACCT.codeNote = _t('Compte créé : bienvenue !'); acctRender(); }); await scan('profile-code');

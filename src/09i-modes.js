@@ -1,20 +1,5 @@
-/* ==========================================================================
-   MODES DE JEU
-   Trois modes, en solo comme en ligne (l'hôte du salon choisit le mode ; en ligne, c'est lui qui décide de la fin de la partie et
-   qui tient les points de la domination, les invités en reçoivent l'état, voir domNetApply) :
-     tdm  match à mort par équipe : 6 contre 6, premier camp à N éliminations ;
-     ffa  match à mort : chacun pour soi, les 12 soldats s'affrontent, premier à N éliminations ;
-     dom  domination : trois points à tenir (A côté d'Alpha, B au centre, C côté Bravo), chaque point tenu rapporte
-          un point de score toutes les DOM.tick secondes, premier camp à N points.
-   MATCH.mode vaut 'tdm' tant qu'aucun mode n'est choisi. Les règles d'alliance passent par
-   allied(a, b) : en match à mort, personne n'est l'allié de personne, quelle que soit l'équipe d'origine du soldat (qui
-   ne sert plus qu'à la tenue et à la base de départ).
-   Ce fichier porte aussi le système d'apparition (spawnOpening au départ, chooseSpawn ensuite), qui dépend du mode : voir plus bas.
-   ========================================================================== */
+/* Règles du raid et fonctions héritées d'apparition et de score. */
 const MODES = {
-  tdm: { name: _t('Match à mort par équipe'), btn: _t('Par équipe'), sub: _t('Match à mort par équipe'), teams: _t('6 contre 6 (vous et 5 alliés)'), lim: _t('Limite d\u0027éliminations'), unit: _t('éliminations'),
-    limits: [20, 30, 50, 75], key: 'limit', respawn: 4, botRespawn: 5.5, prot: 2,
-    hint: _t('Deux équipes de six. Le premier camp à la limite d\u0027éliminations l\u0027emporte.') },
   ffa: { name: _t('Match à mort'), btn: _t('Chacun pour soi'), sub: _t('Match à mort, chacun pour soi'), teams: _t('Chacun pour soi, vous et 7 bots (8 joueurs)'), lim: _t('Limite d\u0027éliminations'), unit: _t('éliminations'),
     limits: [10, 20, 30, 50], key: 'limitFfa', respawn: 3, botRespawn: 3.5, prot: 2,
     hint: _t('Personne n\u0027est votre allié. Le premier à la limite d\u0027éliminations l\u0027emporte.') },
@@ -26,8 +11,7 @@ const MODES = {
     limits: [0], key: 'limitRaid', respawn: Infinity, get botRespawn() { return EFC.cfg.wardenRespawn; }, prot: 0,
     hint: 'One life. Loot what you can and reach an open extract before the timer runs out.' },
 };
-const MODE_IDS = ['tdm', 'ffa', 'dom', 'raid'];
-function modeDef() { return MODES[MATCH.mode] || MODES.tdm; }
+function modeDef() { return MODES[MATCH.mode] || MODES.raid; }
 /* No two sides: free-for-all, and the raid (squads, see allied) */
 function modeFfa() { return MATCH.mode === 'ffa' || MATCH.mode === 'raid'; }
 /* Alliés : même équipe, sauf en match à mort où chacun joue pour soi ; en raid, même escouade (efcSquadOf, src/efc/11-efc-squad.js) */
@@ -45,8 +29,8 @@ function soundFoe(s, b) {
 const ffaCmp = (a, b) => b.kills - a.kills || a.deaths - b.deaths || b.score - a.score;
 
 /* ---------- Début et fin de partie ---------- */
-function modeStart(mode) {
-  MATCH.mode = MODES[mode] ? mode : 'tdm';
+function modeStart() {
+  MATCH.mode = 'raid';
   SPAWN_LOG.length = 0; DEATH_LOG.length = 0; SPAWN_TRAP.length = 0; OPEN.on = true; // départ : chacun sa place (spawnOpening), jusqu'au « En avant ! »
   for (const e of entities) { e.protT = 0; e.lastDeath = null; e.caps = 0; e.out = false; }
   squadReset();
@@ -99,8 +83,7 @@ function ffaRank() { return ffaList().sort(ffaCmp).indexOf(PL.ent) + 1; }
 /* Limite atteinte par un tueur (éliminations) : la partie se joue sur une dernière killcam */
 function killLimitReached() {
   if (MATCH.mode === 'ffa') { ffaScore(); return ffaList().some((e) => e.kills >= MATCH.limit); }
-  if (MATCH.mode === 'dom' || MATCH.mode === 'raid') return false; // raid: no kill limit, only the timer
-  return MATCH.score[0] >= MATCH.limit || MATCH.score[1] >= MATCH.limit;
+  return false; // raid: the timer ends the match
 }
 
 /* ==========================================================================
@@ -120,7 +103,7 @@ function killLimitReached() {
    coéquipiers, hors du regard d'un adversaire même sans ligne de vue (il tournerait le coin et verrait l'autre apparaître), loin d'une
    apparition récente (la sienne ou celle d'un autre joueur du salon, spawnNote), d'une mort récente, de sa propre mort, et des endroits
    où son camp vient de se faire tuer à l'apparition (SPAWN_TRAP : évités SPAWN.trapMem s).
-   Candidats : tdm la base et les points de passage au sol de sa moitié de carte ; ffa les deux bases et tous les points de passage au
+   Candidats : ffa les deux bases et tous les points de passage au
    sol ; dom la base (de l'autre côté si les fronts se sont croisés, domSide) et, dès que le camp tient un point, les points de passage.
    ========================================================================== */
 const SPAWN = { near: 12, sight: 70, nade: 8, fightR: 10, fightT: 4, look: 40, trapT: 5, trapR: 14, trapMem: 20, keep: 3, spread: 8 };
@@ -203,7 +186,6 @@ function spawnPool(e, wide) {
   if (modeFfa()) return SPAWNS[0].concat(SPAWNS[1], spawnField());
   const t = spawnBase(e.team), home = SPAWNS[t];
   if (wide) return home.concat(spawnField(), SPAWNS[1 - t]);
-  if (MATCH.mode === 'tdm') { const side = Math.sign(spawnMid(home)[1]); return home.concat(spawnField().filter((p) => p[1] * side > 6)); } // sa moitié de carte
   return DOM.pts.some((p) => p.owner === e.team) ? home.concat(spawnField()) : home;
 }
 /* Adversaires et alliés en vie, et le front */
@@ -322,11 +304,7 @@ function spawnSpot(e, x, z, C) {
 function spawnYaw(e, p) {
   if (e.efcYaw !== undefined) return spawnFace(p, e.efcYaw); // raid insertion: the heading of the insertion point
   let tx = 0, tz = 0;
-  if (MATCH.mode === 'tdm') {
-    if (OPEN.on) return e.team === 0 ? 0 : Math.PI;
-    const foes = entities.filter((o) => o.alive && !o.off && !allied(o, e)).map((o) => [o.pos.x, o.pos.z]);
-    [tx, tz] = spawnMid(foes.length ? foes : SPAWNS[1 - e.team]);
-  } else if (MATCH.mode === 'dom') {
+  if (MATCH.mode === 'dom') {
     let bd = 1e9;
     for (const q of DOM.pts) { const d = hyp(q.x - p.x, q.z - p.z) + (q.owner === e.team ? 40 : 0); if (d < bd) { bd = d; tx = q.x; tz = q.z; } }
   }

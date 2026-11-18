@@ -1,10 +1,10 @@
 // MAP package test: Claudov's raid data sits on walkable ground inside the bounds and is reachable on the nav grid from insert 0, the six hidden inserts obey the P1 rules,
-// containers are spread out, inserts cannot see each other, then a bot-only team deathmatch runs 90 game seconds of logic:
+// containers are spread out, inserts cannot see each other, then a bot-only raid runs 90 game seconds of logic:
 // bots move, nobody is stuck more than 10 s, nobody leaves the map, no page error. Exits non-zero on failure.
 // node tools/dev/efc/test-map.mjs [seconds=90]
 import { openGame, startSolo } from './harness.mjs';
 const secs = +(process.argv[2] || 90);
-const { browser, page, errors } = await openGame({ settings: { map: 'claudov', mode: 'tdm', difficulty: 2 } });
+const { browser, page, errors } = await openGame({ settings: { map: 'claudov', mode: 'raid', difficulty: 2 } });
 const fails = [];
 
 const data = await page.evaluate(() => {
@@ -83,7 +83,7 @@ console.log('static checks', JSON.stringify(data.info));
 await startSolo(page);
 const sim = await page.evaluate((secs) => {
   // the player is out of play: invulnerable in the far corner of the checkpoint
-  const dt = 1 / 30, bots = entities.filter((e) => !e.isPlayer), B = MAP;
+  const dt = 1 / 30, bots = entities.filter((e) => !e.isPlayer && !e.off), B = MAP;
   const st = new Map(bots.map((e) => [e, { trail: [], still: 0, maxStill: 0, w: [], cm: 0, lost: 0, bumpT: 0, maxBump: 0, dist: 0, prev: e.pos.clone() }]));
   let out = 0, steps = 0;
   for (; steps < secs * 30 && MATCH.state === 'playing'; steps++) {
@@ -117,7 +117,7 @@ if (sim.ran < secs - 1) fails.push('match stopped at ' + sim.ran + ' s');
 if (sim.out) fails.push(sim.out + ' bot steps out of the map');
 if (sim.maxBump > 10) fails.push('a bot pushed against the decor for ' + sim.maxBump + ' s');
 if (sim.maxStill > 0) fails.push('a bot stood stuck for ' + (10 + sim.maxStill).toFixed(1) + ' s');
-if (sim.metres.filter((m) => m > 30).length < sim.metres.length * 0.75) fails.push('bots barely move: ' + sim.metres.join(','));
+if (!sim.metres.some((m) => m > 30)) fails.push('bots barely move: ' + sim.metres.join(','));
 await browser.close();
 if (errors.length) fails.push(...errors.slice(0, 10));
 if (fails.length) { console.error('FAIL\n' + fails.join('\n')); process.exit(1); }

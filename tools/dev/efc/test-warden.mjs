@@ -1,4 +1,4 @@
-// WARDEN package test: Wardens in raid mode on simoun (posts, guard and patrol, group alert, reinforcements, loot), then tdm unchanged.
+// WARDEN package test: Wardens in raid mode on simoun (posts, guard and patrol, group alert, reinforcements, loot).
 // NODE_PATH=/opt/node22/lib/node_modules node tools/dev/efc/test-warden.mjs ; RESPAWN=30 shortens the reinforcement delay (default: the game's EFC.cfg.wardenRespawn, 75 s)
 // Stand-ins, in this page only, for what other packages add (each used only when missing): MODES.raid, allied()/soundFoe() by squad,
 // the 'damage' filter in applyDamage and the 'died' event in killEnt (RAID), 'world:body' (WORLD) and 'loot:roll' (ITEMS).
@@ -8,7 +8,6 @@ const { browser, page, errors } = await openGame({ settings: { map: 'simoun', mo
 const fails = [], ok = (cond, msg, info) => { console.log((cond ? 'PASS ' : 'FAIL ') + msg + (info !== undefined ? ' ' + JSON.stringify(info) : '')); if (!cond) fails.push(msg); };
 const stand = await page.evaluate((RESPAWN) => {
   const used = [];
-  if (!MODES.raid) { MODES.raid = Object.assign({}, MODES.tdm, { name: 'Raid', botRespawn: EFC.cfg.wardenRespawn, prot: 0 }); used.push('MODES.raid'); }
   const was = MATCH.mode; MATCH.mode = 'raid';
   const squadAware = !allied({ team: 0, squad: 'w' }, { team: 0, squad: 0 });
   MATCH.mode = was;
@@ -144,12 +143,6 @@ await page.evaluate(() => { T.backT = -1; T.n = 0; });
 await simRun(page, 10, 'PL.ent.pos.set(...PARK); PL.ent.vel.set(0, 0, 0); T.n++; if (T.backT < 0 && W.alive) T.backT = T.n / 30;');
 const d2 = await page.evaluate(() => { const p = EFC.wd.posts[W.efcPost]; return { alive: W.alive, after: T.backT, post: W.efcPost, d: +hyp(W.pos.x - p.x, W.pos.z - p.z).toFixed(1), r: p.r }; });
 ok(d2.alive && d2.d <= d2.r + 6, '(d) player far away: the Warden is back at a post (within its radius + 6 m)', d2);
-// (e) tdm still runs
-await page.evaluate(() => { T.inv = false; Settings.mode = 'tdm'; endMatch(); LOCK.fallback = true; startMatch({}); });
-const ranE = await simRun(page, 20, 'PL.ent.health = 100;');
-const e = await page.evaluate(() => ({ mode: MATCH.mode, squads: entities.filter((x) => x.squad === 'w').length, names: entities.filter((x) => /^Warden/.test(x.name)).length, alive: entities.filter((x) => x.alive).length }));
-ok(e.mode === 'tdm' && ranE >= 19.9, '(e) tdm runs 20 s', { ...e, ran: ranE });
-ok(e.squads === 0 && e.names === 0, '(e) no Warden left in tdm (squad and names restored)', e);
 ok(errors.length === 0, 'no page errors', errors.slice(0, 10));
 await browser.close();
 console.log(fails.length ? `test-warden: ${fails.length} FAILED` : 'test-warden: all passed');

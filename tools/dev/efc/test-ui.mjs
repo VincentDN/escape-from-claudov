@@ -93,8 +93,8 @@ try {
   await page.waitForFunction(() => UI.screen === 'deploy' && !UI.busy, null, { timeout: 120000, polling: 200 });
   const dp = await page.evaluate(() => ({ raid: $('scr-deploy').classList.contains('raid'), mode: Settings.mode, kit: $('efcDepKit').getClientRects().length > 0, picker: $('cpDeploy').getClientRects().length > 0, h2: $('scr-deploy').querySelector('h2').textContent }));
   check(dp.raid && dp.mode === 'raid' && dp.kit && !dp.picker && dp.h2 === 'Ready to deploy', 'deploy screen in its raid view, Settings.mode raid', dp);
-  // the panels are tested against fakes: run the match as tdm so the real RAID, WORLD and Warden code stays inert
-  await page.evaluate(() => { Settings.mode = 'tdm'; menuDeploy(); });
+  // the panels are tested against fakes: run the match as a raid and install the fake providers after deployment
+  await page.evaluate(() => { menuDeploy(); });
   await page.waitForFunction(() => MATCH.state === 'playing', null, { timeout: 60000, polling: 200 });
   await simRun(page, 1, 'PL.ent.health = 100;');
 

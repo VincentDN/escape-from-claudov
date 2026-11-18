@@ -3,6 +3,7 @@
     "version": "0.2.0",
     "date": "2026-11-18",
     "changes": [
+      {"t": "improved", "x": "Le raid d'extraction est désormais le seul mode jouable.", "x_en": "Extraction raid is now the only playable mode."},
       {"t": "improved", "x": "Les points d'insertion sont à couvert et le nombre de Gardiens dépend de la taille de la carte.", "x_en": "Insertion points are hidden from view, and Warden numbers scale with map size."},
       {"t": "improved", "x": "De nouveaux sons accompagnent les tirs, les rechargements et la manipulation de l'équipement.", "x_en": "New sounds accompany shots, reloads, and equipment handling."},
       {"t": "new", "x": "Le menu principal s'ouvre sur un établi en trois dimensions.", "x_en": "The main menu opens on a 3D workbench."},

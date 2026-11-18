@@ -20,7 +20,7 @@ const OUT = path.join(HERE, 'minicartes');
   const maps = (process.env.CARTES || 'sable,givre,embruns,floreal,meltem,tephra,stratus,simoun,lotissement').split(',');
   for (const id of maps) {
     console.log(id);
-    const { browser, page, logs } = await openGame({ page: process.argv[2], ...(process.env.TEL ? { mobile: true } : { w: 1280, h: 720 }), settings: { quality: 'low', map: id, mode: id === 'givre' ? 'dom' : 'tdm' }, noHdri: true });
+    const { browser, page, logs } = await openGame({ page: process.argv[2], ...(process.env.TEL ? { mobile: true } : { w: 1280, h: 720 }), settings: { quality: 'low', map: id, mode: id === 'givre' ? 'dom' : 'raid' }, noHdri: true });
     const r = await page.evaluate((RENDU) => {
       LOCK.fallback = true; startMatch({});
       KS.sat = null; // la mini-carte se passe du relevé satellite

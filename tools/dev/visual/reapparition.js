@@ -7,7 +7,7 @@ let fails = 0;
 const ok = (c, m) => { if (!c) { fails++; console.log('ECHEC :', m); } else console.log('ok    :', m); };
 (async () => {
   const { browser, page, logs } = await openGame({ settings: { quality: 'low', lang: 'fr' }, page: process.env.PAGE }); // PAGE=autre/version.html
-  await page.evaluate(() => { Settings.mode = 'tdm'; startMatch({}); });
+  await page.evaluate(() => { Settings.mode = 'raid'; startMatch({}); });
   await page.waitForTimeout(500);
   const r = await page.evaluate(() => {
     let t = performance.now();

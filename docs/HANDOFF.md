@@ -7,6 +7,8 @@ Owner: Vincent De Nil. Live build: https://vincentdn.github.io/escape-from-claud
 The tasks below were picked because each is small, has a clear finish line and a test that proves it. Do them in order unless the
 owner says otherwise. Bigger work (section 6) is parked on purpose: do not start it.
 
+**Current game mode:** extraction raids are the only playable mode. Old solo settings and lobby configurations requesting a classic mode resolve to Raid. Earlier package briefs describe the engine at the time they were written.
+
 ## 1. Before you start
 
 - Branch from `main` (it holds everything merged so far, the same as `claude/trusting-franklin-zp9ch5`). Name your branch
@@ -141,7 +143,7 @@ The weapon-switch holster sound only plays in raids, because it hangs off the ra
 - Files: `src/07c-controller.js` (engine, French) at the point where a weapon switch begins, and `src/efc/45-efc-sounds.js`.
   Expose a function in the sounds module and call it from the engine with a guard (`typeof fn === 'function'`), so the engine
   still runs without the module.
-- Done when: `test-sounds.mjs` gains a check that a weapon switch in a team deathmatch plays the holster event, and passes.
+- Done when: `test-sounds.mjs` gains a check that a weapon switch in a raid plays the holster event, and passes.
 
 ### T7. Raid-start weapon check (medium, stretch)
 

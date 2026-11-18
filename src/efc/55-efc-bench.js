@@ -31,7 +31,7 @@ function efcBenchInit() {
   try {
     B.scene = new THREE.Scene(); B.scene.userData.efcBench = true;
     B.cam = new THREE.PerspectiveCamera(42, 1, 0.05, 20);
-    efcBenchRoom(B); efcBenchFlag(B); efcBenchPhone(B); efcBenchRifle(B); efcBenchMergeParts(B);
+    efcBenchRoom(B); efcBenchRadioInit(B); efcBenchFlag(B); efcBenchPhone(B); efcBenchRifle(B); efcBenchMergeParts(B);
     B.scene.traverse((o) => { if (o.isMesh && o.material.isMeshStandardMaterial) o.material.onBeforeCompile = efcBenchSpotFix; });
     if (!COARSE) addEventListener('pointermove', (e) => { B.want.x = (e.clientX / Math.max(1, innerWidth)) * 2 - 1; B.want.y = (e.clientY / Math.max(1, innerHeight)) * 2 - 1; }, { passive: true });
     B.on = true; B.buildMs = Math.round(performance.now() - t0);
@@ -45,12 +45,78 @@ function efcBenchInit() {
    (the engine never casts spot shadows, so it never met this): the bench's materials use the declared name */
 function efcBenchSpotFix(sh) { sh.fragmentShader = sh.fragmentShader.replace('#include <lights_fragment_begin>', THREE.ShaderChunk.lights_fragment_begin.replace(/vSpotShadowCoord/g, 'vSpotLightCoord')); }
 function efcBenchMotion() { return typeof mbgMotion === 'function' ? mbgMotion() : true; }
+/* Place a native button over the projected radio, so pointer and keyboard use the same control. */
+function efcBenchRadioInit(B) {
+  if (!efcHas('music:nowPlaying') || !efcHas('music:menu')) return;
+  const box = new THREE.Box3().setFromObject(B.radio);
+  B.radioCorners = [];
+  for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) {
+    B.radioCorners.push(new THREE.Vector3(x, y, z));
+  }
+  const button = document.createElement('button'), label = document.createElement('span');
+  B.radioButton = button;
+  B.radioLabel = label;
+  button.id = 'efcBenchRadio';
+  button.type = 'button';
+  button.hidden = true;
+  button.style.cssText = 'position:fixed;z-index:2;background:transparent;border:0;border-radius:4px;padding:0;cursor:pointer';
+  label.style.cssText = 'position:absolute;top:100%;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 8px;border-radius:4px;background:#141712;color:#fff;font:14px system-ui;pointer-events:none';
+  label.hidden = true;
+  label.setAttribute('aria-hidden', 'true');
+  button.append(label);
+  const hint = () => { label.hidden = document.activeElement !== button && !button.matches(':hover'); };
+  for (const ev of ['pointerenter', 'pointerleave', 'focus', 'blur']) button.addEventListener(ev, hint);
+  button.addEventListener('click', () => {
+    const playing = efcCall('music:nowPlaying');
+    if (!playing) return;
+    efcCall('music:menu', !playing.on);
+    efcBenchRadioState(B);
+    B.drawn = ''; // refresh a still frame as well as an animated bench
+  });
+  $('scr-main').append(button);
+}
+
+function efcBenchRadioState(B, track = efcCall('music:nowPlaying')) {
+  if (!B.radioButton || !track) return;
+  const text = track.title + ' by ' + track.author;
+  if (B.radioLabel.textContent !== text) {
+    B.radioButton.setAttribute('aria-label', 'Radio, ' + text);
+    B.radioLabel.textContent = text;
+  }
+  const pressed = String(track.on);
+  if (B.radioButton.getAttribute('aria-pressed') !== pressed) B.radioButton.setAttribute('aria-pressed', pressed);
+}
+
+function efcBenchRadioPlace(B) {
+  const button = B.radioButton;
+  if (!button) return;
+  if (UI.screen !== 'main') { button.hidden = true; return; }
+  B.cam.updateMatrixWorld();
+  let left = Infinity, right = -Infinity, top = Infinity, bottom = -Infinity;
+  const ndc = new THREE.Vector3();
+  for (const corner of B.radioCorners) {
+    ndc.copy(corner).project(B.cam);
+    left = Math.min(left, ndc.x); right = Math.max(right, ndc.x);
+    top = Math.min(top, ndc.y); bottom = Math.max(bottom, ndc.y);
+  }
+  const rect = renderer.domElement.getBoundingClientRect();
+  button.hidden = left > 1 || right < -1 || top > 1 || bottom < -1;
+  Object.assign(button.style, {
+    left: rect.left + (left + 1) * rect.width / 2 + 'px',
+    top: rect.top + (1 - bottom) * rect.height / 2 + 'px',
+    width: Math.max(30, (right - left) * rect.width / 2) + 'px',
+    height: Math.max(30, (bottom - top) * rect.height / 2) + 'px',
+  });
+}
+
 /* One bench frame (from mbgDraw). Returns true when it drew */
 function efcBenchDraw(dt) {
   const B = EFC_BENCH; if (!B.on || B.failed) return;
   const main = UI.screen === 'main', move = efcBenchMotion();
   renderer.getDrawingBufferSize(_ebV2);
-  const key = _ebV2.x + 'x' + _ebV2.y, live = main && move;
+  const track = efcCall('music:nowPlaying');
+  const musicOn = track?.on ?? true;
+  const key = _ebV2.x + 'x' + _ebV2.y + ':' + main + ':' + musicOn, live = main && move;
   if (!live && B.drawn === key && B.env) return; // paused or reduced motion: the still frame stays on the canvas (once the light probe is in)
   const t0 = performance.now(), d = Math.min(dt || 0, 0.05);
   if (live) B.t += d;
@@ -62,7 +128,11 @@ function efcBenchDraw(dt) {
   cam.position.set(S.pos[0] + L.x * 0.05, S.pos[1] - L.y * 0.03 + sway, S.pos[2]);
   cam.lookAt(S.target[0] + L.x * 0.1, S.target[1] - L.y * 0.06, S.target[2]);
   efcBenchPlaceRifle(B, L.x, L.y);
-  if (move) { efcBenchDrape(B, B.t, true); efcBenchLcd(B, B.t); B.dial.material.emissiveIntensity = 1.3 + Math.random() * 0.15; }
+  if (move) { efcBenchDrape(B, B.t, true); efcBenchLcd(B, B.t); }
+  B.dial.material.emissiveIntensity = musicOn ? 1.3 + (move ? Math.random() * 0.15 : 0) : 0;
+  B.dial.material.color.setHex(musicOn ? 0xffd9a0 : 0x33281d);
+  efcBenchRadioState(B);
+  efcBenchRadioPlace(B);
   efcBenchRender(B);
   B.drawn = key; B.frameMs = Math.round((performance.now() - t0) * 10) / 10;
   if (B.firstAt === null) B.firstAt = Math.round(performance.now());
@@ -96,6 +166,7 @@ function efcBenchFree(all) {
   if (B.lamp && B.lamp.shadow && B.lamp.shadow.map) { B.lamp.shadow.map.dispose(); B.lamp.shadow.map = null; }
   B.drawn = '';
   if (!all) return;
+  B.radioButton?.remove(); B.radioButton = null;
   for (const g of B.merged) g.dispose();
   for (const k in B.mats) { const m = B.mats[k]; if (m.map) m.map.dispose(); m.dispose(); }
   for (const m of B.ownMats) { if (m.map) m.map.dispose(); m.dispose(); }
@@ -107,7 +178,7 @@ function efcBenchFree(all) {
   const bg = $('menuBg'); if (bg) bg.classList.remove('bench');
 }
 /* Lost context (from mbgFail): stop, and let the CSS key art show */
-function efcBenchFail() { EFC_BENCH.failed = true; const bg = $('menuBg'); if (bg) bg.classList.remove('bench'); }
+function efcBenchFail() { EFC_BENCH.failed = true; if (EFC_BENCH.radioButton) EFC_BENCH.radioButton.hidden = true; const bg = $('menuBg'); if (bg) bg.classList.remove('bench'); }
 /* Out of the menus (any match, raid or not) the lamp's shadow map is released within a second */
 function efcBenchIdle() { const B = EFC_BENCH; if (B.lamp && B.lamp.shadow.map && typeof MATCH !== 'undefined' && MATCH.state !== 'menu') efcBenchFree(false); }
 setInterval(efcBenchIdle, 1000);

@@ -209,6 +209,7 @@ function updateBot(b, dt, now) {
   if (!b.alive) {
     releaseCover(b);
     animSoldier(b, dt);
+    if (b.squad === 's') return; // les récupérateurs ne réapparaissent pas
     // raid: a Warden waits EFC.cfg.wardenRespawn, then comes back only where no human is near or watching (efcWardenCanRespawn retries every 5 s)
     if (efcRaidMode() && b.efcDeaths !== b.deaths && isFinite(b.respawnT)) { b.efcDeaths = b.deaths; b.respawnT = EFC.cfg.wardenRespawn; }
     if (MATCH.state === 'playing') { b.respawnT -= dt; if (b.respawnT <= 0) { if (efcRaidMode() && !efcWardenCanRespawn(b, MATCH.time)) b.respawnT = 5; else { spawnEntity(b); initTactics(b); } } }
@@ -219,6 +220,7 @@ function updateBot(b, dt, now) {
     const I = b.input; I.mx = 0; I.mz = 0; I.sprint = false; I.jump = false; I.fire = false; I.firePressed = false; I.ads = false;
     ctlMove(b, dt); animSoldier(b, dt); return;
   }
+  if (efcCall('scav:update', b, dt, now)) return;
   const D = botDiff(b), def = b.weapon;
   b.senseT -= dt; if (b.senseT <= 0) { b.senseT = rand(0.12, 0.22); botSense(b, now); }
   if (now - b.lastHitT > 5 && b.health < 100) b.health = Math.min(100, b.health + 30 * dt);

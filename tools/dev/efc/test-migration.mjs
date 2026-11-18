@@ -6,8 +6,8 @@ const keep = 'PL.ent.protT = 1; PL.ent.health = 100;';
 const snapshot = () => ({
   role: NET.role, left: MATCH.timeLeft, state: efcCall('raid:state').state,
   loot: efcCall('world:list').map(c => [c.id, c.items]).sort((a, b) => a[0].localeCompare(b[0])),
-  wardens: entities.filter(e => (e.remoteBot || e.netBot) && e.squad === 'w')
-    .map(e => ({ id: e.peer || e.netId, alive: e.alive, health: e.health, pos: e.pos.toArray() }))
+  bots: entities.filter(e => e.remoteBot || e.netBot)
+    .map(e => ({ id: e.peer || e.netId, squad: e.squad, alive: e.alive, health: e.health, pos: e.pos.toArray() }))
     .sort((a, b) => a.id.localeCompare(b.id)),
 });
 try {
@@ -26,14 +26,14 @@ try {
   await stepBoth([host, guest], 0.6, keep);
   await guest.waitForFunction(({id, length}) => efcCall('world:list').find(c => c.id === id)?.items.length === length - 1, target);
   const slain = await host.evaluate(() => {
-    const w = entities.find(e => e.netBot && e.alive);
+    const w = entities.find(e => e.netBot && e.alive && e.squad === 'w');
     applyDamage(w, 1000, PL.ent, 'test', true, new V3(1, 0, 0));
     return w.netId;
   });
   await stepBoth([host, guest], 0.6, keep);
   await guest.waitForFunction(id => NET.remotes.get(id)?.alive === false, slain);
   const before = await guest.evaluate(snapshot);
-  assert.ok(before.wardens.some(w => w.alive) && before.wardens.some(w => w.id === slain && !w.alive));
+  assert.ok(before.bots.some(w => w.alive) && before.bots.some(w => w.id === slain && !w.alive));
   await guest.evaluate(() => {
     // A public relay sends hostdown and keeps the guest connection open during the grace period.
     const conn = NET.hostConn;
@@ -52,16 +52,16 @@ try {
   assert.equal(after.left, before.left);
   assert.equal(after.state, before.state);
   assert.deepEqual(after.loot, before.loot);
-  assert.deepEqual(after.wardens.map(w => [w.id, w.alive]), before.wardens.map(w => [w.id, w.alive]));
-  for (const w of after.wardens.filter(w => w.alive)) {
-    const original = before.wardens.find(b => b.id === w.id);
+  assert.deepEqual(after.bots.map(w => [w.id, w.squad, w.alive]), before.bots.map(w => [w.id, w.squad, w.alive]));
+  for (const w of after.bots.filter(w => w.alive)) {
+    const original = before.bots.find(b => b.id === w.id);
     assert.deepEqual(w.pos, original.pos);
     assert.equal(w.health, original.health);
   }
   await stepBoth([guest], 2, keep);
   const later = await guest.evaluate(snapshot);
   assert.ok(later.left < after.left);
-  assert.ok(later.wardens.some(w => w.alive && w.pos.some((value, i) => Math.abs(value - after.wardens.find(b => b.id === w.id).pos[i]) > 0.05)));
+  assert.ok(later.bots.some(w => w.alive && w.pos.some((value, i) => Math.abs(value - after.bots.find(b => b.id === w.id).pos[i]) > 0.05)));
   await guest.evaluate(() => {
     const active = efcRaidExtracts().find(x => x.open);
     PL.ent.pos.set(active.x, gy0(active.x, active.z), active.z);

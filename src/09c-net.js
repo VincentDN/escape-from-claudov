@@ -660,7 +660,7 @@ function netRebalanceBots() {
 }
 function netBotOn(b) {
   b.netBot = true; b.netId = NET.me + '~b' + b.id; b.netQ = { seq: 0, list: [] };
-  if (efcNetIsRaid()) b.squad = 'w'; // raid : les bots de l'hôte sont des Wardens
+  if (efcNetIsRaid() && b.squad !== 's') b.squad = 'w'; // raid : les bots de l'hôte sont des Wardens
   b.kills = b.deaths = b.score = b.assists = b.streak = 0;
   spawnEntity(b);
 }
@@ -743,6 +743,8 @@ function netAdoptBots() {
     pool.splice(pool.indexOf(b), 1);
     if (raid) {
       b.off = b.efcOff = false;
+      b.squad = r.squad;
+      if (b.squad === 's' && !b.efcScav) efcEmit('scav:assign', [b]);
       if (was.weapon && b.weapon.key !== was.weapon.key) {
         b.weapon = was.weapon;
         setSoldierGun(b.model, was.weapon.key);
@@ -873,6 +875,7 @@ function netMakeRemote(id, P) {
     target: null, visible: false, lastSeenT: -99, lastShotT: -99, respawnT: 0, recoil: 0, net: { tgt: new V3(), tv: new V3(), at: 0, shots: P.f | 0, yaw: 0, pitch: 0, airT: -99 },
   };
   initCtl(e, [def], 1);
+  if (e.remoteBot && efcNetIsRaid() && P.scav === 1) e.squad = 's';
   e.skin = netSkin(P);
   e.model = makeSoldier(e.skin, skinRel(e), def.key);
   entities.push(e); NET.remotes.set(id, e); kcAssign(e);
@@ -1204,6 +1207,7 @@ function netPresence(e, now) {
   { const wp = efcWardenPub(e); if (wp) p.wp = wp; } // raid: a Warden's posture and head yaw (41-efc-warden-pose.js)
   if (!me) {
     p.b = 1;
+    if (e.squad === 's') p.scav = 1;
     if (efcNetIsRaid() && !e.alive && Number.isFinite(e.respawnT)) p.wr = r(e.respawnT, 1);
   }
   else { // accusé (netPredHealth, netTradeOpen) : dernier événement appliqué de chaque expéditeur des 3 dernières secondes, avant une touche en attente

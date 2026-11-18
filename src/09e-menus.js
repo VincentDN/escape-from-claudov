@@ -293,6 +293,7 @@ const OPT_TABS = [
   [_t('Audio'), [
     ['range', 'volume', _t('Volume général'), 0, 1, 0.05, (v) => Math.round(v * 100) + PCT, () => setVolume(Settings.volume)],
     ['range', 'music', _t('Musique des menus'), 0, 1, 0.05, (v) => Math.round(v * 100) + PCT],
+    ['select', 'menuTrack', _t('Piste de la radio'), Object.entries(EFC_MENU_TRACKS).map(([id, track]) => [id, track.title]), efcMenuTrackChange],
     ['check', 'voice', _t('Annonces vocales (séries, objectifs)')],
   ]],
   [_t('Vidéo'), [

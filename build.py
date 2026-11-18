@@ -239,9 +239,13 @@ for f in glob.glob("dist/music/*.ogg"):
 music=tracks.get("menu-theme","")
 if not music and os.path.exists("dist/menu-theme.mp3"):
     music="menu-theme.mp3?v="+hashlib.sha1(open("dist/menu-theme.mp3","rb").read()).hexdigest()[:8]
+for track in ("duce-uniform", "abdulena", "campaign-acoustic-guitars"):
+    filename = "showcase/assets/audio/"+track+".mp3"
+    if os.path.isfile(filename):
+        tracks[track] = filename
 html=html.replace("__MENU_MUSIC__",music)
 html=html.replace('<meta name="menu-music" content="'+music+'">','<meta name="menu-music" content="'+music+'">\n<meta name="efc-music" content="'+_html.escape(json.dumps(tracks),quote=True)+'">',1)
-print("musique :",music or "aucune pour les menus,",len(tracks),"pistes dans dist/music,",sum(os.path.getsize("dist/"+n) for n in tracks.values())//1024,"Ko")
+print("musique :",music or "aucune pour les menus,",len(tracks),"pistes dans dist/music,",sum(os.path.getsize(("dist/" if n.startswith("music/") else "")+n) for n in tracks.values())//1024,"Ko")
 # Identifiant de version : condensat de la page elle-même (marqueur compris), inscrit dans la page et dans dist/version.json.
 # Le jeu compare les deux pour se recharger quand une nouvelle version est en ligne (voir src/09h-update.js et vercel.json).
 build_id=hashlib.sha1(html.encode("utf-8")).hexdigest()[:12]

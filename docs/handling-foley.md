@@ -16,3 +16,16 @@ The Partisan inbound weapon sounds archive lists 723 cuts. Excluding the 42 file
 | `handle/bolt-0075_05s.wav` | Quiet raid-start weapon check | An 84 ms handling cue for the hand settling onto the weapon. |
 
 The archive is a reference for new Foley. The 181 UI-suspect cuts still need individual identification before use.
+
+## CC0 handling additions
+
+Six new cuts extend the long action and clunk pools, using the Partisan shooter manifest’s CC0 reload sources [674742](https://freesound.org/s/674742/), [815879](https://freesound.org/s/815879/), and [432141](https://freesound.org/s/432141/) in that order. The inbound references remain audition references.
+
+| Take | Source | Source start |
+| --- | --- | --- |
+| `hf_clunk-7` | Reload recording 1 | 1.113 s |
+| `hf_long-7` | Reload recording 1 | 0.221 s |
+| `hf_clunk-8` | Reload recording 2 | 1.711 s |
+| `hf_long-8` | Reload recording 2 | 0.053 s |
+| `hf_clunk-9` | Reload recording 3 | 0.668 s |
+| `hf_long-9` | Reload recording 3 | 0.001 s |

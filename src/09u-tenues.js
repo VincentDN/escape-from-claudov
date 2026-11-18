@@ -8,17 +8,11 @@
    d'armes (une par tâche).
    Le soldat d'aperçu se tient comme en partie : la pose vient de poseSoldier (06b-soldier.js), figée en posture de combat (sans les
    mouvements d'attente tirés au hasard), l'arme principale de la classe choisie en main (le modèle de l'armurerie, mêmes matières).
-   Aperçu animé (skinLive), dès que le fond animé des menus est là (09w-fond.js) : le soldat marche sur place, arme en visée, de trois
-   quarts (SK_POSE.a, l'angle de chaque arrivée sur l'écran) ; il ne tourne qu'au doigt (c'est lui qui tourne, pas la caméra : sa cape,
-   simulée, suit le mouvement, avec l'air de sa marche et la brise d'un ventilateur de studio). Il est dessiné dans la toile du jeu,
-   pendant la boucle d'images et juste après le fond (même cadence : celle de l'écran sur ordinateur, 60 images par seconde au plus au doigt, 09w-fond.js), dans le cadre de l'aperçu (viewport et
-   scissor), sans cible de rendu ni relecture : un studio (fond en dégradé, sol éclairé avec les ombres de contact des pieds, lumière
-   principale, d'appoint et de contour teintée de vert), aucune carte d'ombre ni texture de plus. Mouvement réduit : soldat immobile,
-   qui ne tourne qu'au doigt. Sans fond animé (mode graphique économique, contexte perdu) : l'image fixe d'avant, rendue à part et
-   recopiée (skinDraw).
+   The animated preview uses the game renderer and paints into the outfit panel above the menu scene.
+   Reduced motion keeps the pose still. The static preview remains available if live rendering fails.
    ========================================================================== */
 const SKV = { host: null, cv: null, ctx: null, a: 0.6, drag: null, dirty: true, W: 0, H: 0, models: {}, mats: {}, guns: {}, pose: null, view: '', lmodels: {}, lguns: {},
-  live: false, fail: false, acc: 0, ft: 0, lv: '', mine: '' };
+  fail: false, acc: 0, ft: 0, lv: '', mine: '' };
 /* Toutes les tenues de l'écran : celles de base, puis celles de défi (06gc-tenues-defi.js) ; SKV.view : celle de l'aperçu (la tenue portée, ou une
    tenue de défi verrouillée que l'on regarde avant de l'avoir). Une tenue unique (06gd-tenue-unique.js) ne s'y ajoute que pour son propriétaire
    (skinListed) : les autres n'en voient ni la carte ni la vignette */
@@ -221,19 +215,19 @@ function renderSkins() {
   VTHUMB.queue = VTHUMB.queue.filter((k) => !want.includes(k));
   for (const k of want.reverse()) thumbsWant(k);
 }
-/* Une image de l'aperçu : appelée par la boucle principale tant que l'écran Tenues est affiché, avant le fond ; aperçu animé : demande au
-   fond de se redessiner si l'aperçu a changé (mouvement réduit : le fond ne se redessine pas de lui-même) ; image fixe : ne rend que si
-   quelque chose a changé */
-function skinTick() {
+/* Render the studio preview into its panel above the separate menu background. */
+function skinTick(dt) {
   if (!SKV.host) return;
-  const live = MBG.live && !MBG.failed && !SKV.fail;
-  if (live !== SKV.live) { SKV.live = live; SKV.host.classList.toggle('live', live); document.body.classList.toggle('sk-live', live); if (live && SKV.ctx) SKV.ctx.clearRect(0, 0, SKV.cv.width, SKV.cv.height); SKV.dirty = true; }
-  if (live) { if (SKV.dirty) mbgShown(); return; }
   const r = SKV.host.getBoundingClientRect(), W = Math.round(r.width), H = Math.round(r.height);
   if (W < 20 || H < 20) return;
   if (W !== SKV.W || H !== SKV.H) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2), bs = renderer.getDrawingBufferSize(_vwV2), k = Math.min(dpr, bs.x / W, bs.y / H);
     SKV.W = W; SKV.H = H; SKV.cv.width = Math.max(2, Math.floor(W * k)); SKV.cv.height = Math.max(2, Math.floor(H * k)); SKV.dirty = true;
+  }
+  SKV.acc += dt;
+  if (!SKV.fail && (SKV.dirty || (efcOpeningMotion() && SKV.acc >= 1 / 30))) {
+    try { skinLiveDraw(); return; }
+    catch (e) { SKV.fail = true; SKV.dirty = true; gpuLog('skin live view failed: ' + e.message); }
   }
   if (!SKV.dirty) return;
   SKV.dirty = false;
@@ -280,6 +274,7 @@ function skinLivePose(M, key, d, move) {
 }
 /* Studio : fond en dégradé (dessiné à part, en coordonnées d'image), sol éclairé et ombres de contact, trois lumières et le ciel */
 const SKS = { scene: null, cam: null, bg: null, bgCam: null, floor: null, rim: null };
+const SK_BG_VS = `varying vec2 vS; void main() { vS = position.xy * 0.5 + 0.5; gl_Position = vec4(position, 1.0); }`;
 const SK_BG_FS = `uniform vec2 uRes; uniform vec3 uTint; varying vec2 vS;
 void main() {
   vec2 p = vS - vec2(0.5, 0.6); p.x *= uRes.x / uRes.y;
@@ -313,7 +308,7 @@ function skinStudio() {
     uniforms: { uFeet: { value: new THREE.Vector4() }, uPel: { value: new THREE.Vector2() }, uTint: { value: new THREE.Color() } } });
   SKS.floor = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 4.6), fm); SKS.floor.rotation.x = -Math.PI / 2; SKS.floor.position.y = 0.002; SKS.floor.renderOrder = -1; sc.add(SKS.floor);
   SKS.scene = sc; SKS.cam = new THREE.PerspectiveCamera(VW_FOV, 1, 0.05, 30);
-  const bm = new THREE.ShaderMaterial({ vertexShader: MBG_VS, fragmentShader: SK_BG_FS, depthTest: false, depthWrite: false, toneMapped: false,
+  const bm = new THREE.ShaderMaterial({ vertexShader: SK_BG_VS, fragmentShader: SK_BG_FS, depthTest: false, depthWrite: false, toneMapped: false,
     uniforms: { uRes: { value: new THREE.Vector2() }, uTint: { value: new THREE.Color() } } });
   const tri = new THREE.BufferGeometry(); tri.setAttribute('position', new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
   const bg = new THREE.Mesh(tri, bm); bg.frustumCulled = false;
@@ -323,19 +318,11 @@ function skinStudio() {
 /* teinte du studio : le vert des bandes alliées (l'aperçu montre la tenue telle que la voient les alliés, la vue ennemie ne sert qu'en partie) */
 const SK_TINT = new THREE.Color(0x8fe0a2);
 const _skR = new THREE.Vector4(), _skS = new THREE.Vector4(), _skC = new THREE.Color();
-/* Appelée par la boucle d'images juste après le fond des menus (drew : le fond vient d'être dessiné, la toile est donc à jour ailleurs) :
-   pose du soldat pour le temps écoulé depuis son image précédente, puis rendu dans le cadre de l'aperçu */
-function skinLive(drew, dt) {
-  SKV.acc += dt;
-  if (!SKV.live || !drew || !SKV.host) return;
-  try { skinLiveDraw(); } catch (e) { SKV.fail = true; gpuLog('skin live view failed: ' + (e && e.message)); } // l'image fixe reprend (skinTick)
-}
 function skinLiveDraw() {
   const d = Math.min(SKV.acc, 0.1); SKV.acc = 0;
-  const r = SKV.host.getBoundingClientRect(), cr = renderer.domElement.getBoundingClientRect();
-  if (r.width < 20 || r.height < 20 || cr.width < 20 || r.bottom <= cr.top || r.top >= cr.bottom) return;
-  const k = VIEW.w / cr.width, x = (r.left - cr.left + 1) * k, y = (cr.bottom - r.bottom + 1) * k, w = (r.width - 2) * k, h = (r.height - 2) * k; // (dans la bordure)
-  const move = mbgMotion(), skin = SKINS[SKV.view] ? SKV.view : skinMine(), M = skinLiveModel(skin), m = skinPvMat(skin), key = skinPvGunKey();
+  const pixelRatio = renderer.getPixelRatio(), cv = SKV.cv;
+  const w = cv.width / pixelRatio, h = cv.height / pixelRatio;
+  const move = efcOpeningMotion(), skin = SKINS[SKV.view] ? SKV.view : skinMine(), M = skinLiveModel(skin), m = skinPvMat(skin), key = skinPvGunKey();
   // autre tenue, ou retour sur l'écran (soldat remis de trois quarts d'un coup) : son tissu repart du repos, sans prendre le saut pour un élan
   if (SKV.lv !== skin) { SKV.lv = skin; if (M.cloth) M.cloth.sim.live = false; }
   skinLivePose(M, key, d, move);
@@ -351,9 +338,10 @@ function skinLiveDraw() {
   R.getViewport(_skR); R.getScissor(_skS);
   S.scene.environment = envMap; S.scene.add(M.root); skinSkel(M);
   try {
-    R.setRenderTarget(null); R.setViewport(x, y, w, h); R.setScissor(x, y, w, h); R.setScissorTest(true);
+    R.setRenderTarget(null); R.setViewport(0, 0, w, h); R.setScissor(0, 0, w, h); R.setScissorTest(true);
     R.autoClear = false; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1; R.outputEncoding = THREE.sRGBEncoding;
     R.render(S.bg, S.bgCam); R.clearDepth(); R.render(S.scene, S.cam);
+    SKV.ctx.drawImage(R.domElement, 0, R.domElement.height - cv.height, cv.width, cv.height, 0, 0, cv.width, cv.height);
   } finally {
     S.scene.remove(M.root);
     R.toneMapping = keep.tm; R.toneMappingExposure = keep.ex; R.outputEncoding = keep.oe; R.autoClear = keep.ac;

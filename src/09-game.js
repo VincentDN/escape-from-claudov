@@ -515,7 +515,7 @@ function startMatch(opt = {}) {
   FinalShader.uniforms.uDamage.value = 0; FinalShader.uniforms.uDesat.value = 0; FinalShader.uniforms.uHurt.value = 0;
   giveLoadout(); updateStreakHud(); hideDeathScreen();
   VM.root.visible = true; VM.holder.visible = true;
-  uiHide(); $('end').classList.remove('show'); $('pause').classList.remove('show'); $('hud').classList.remove('hidden');
+  uiHide(); menuBgShow(false); $('end').classList.remove('show'); $('pause').classList.remove('show'); $('hud').classList.remove('hidden');
   HUD.lastAmmo = '';
   // le passage en plein écran (demandé au clic de déploiement) fait refuser une capture demandée pendant la transition : on l'attend
   if (LOCK.fsPending) { const fs = LOCK.fsPending; LOCK.fsPending = null; LOCK.quiet = true; fs.then(() => setTimeout(() => { if (MATCH.state === 'playing') requestLock(); }, 80)); }
@@ -779,18 +779,22 @@ function frame(now) {
   // pas de temps jamais négatif (horodatage d'image antérieur au précédent) : les lissages exponentiels divergeraient
   let dt = clamp(interval / 1000, 0, 0.05); lastT = now;
   if (PAD.seen) padTick(dt); // manette (09qc-manette.js)
-  // menus : scène 3D non rendue, sauf au choix de la classe (vue aérienne de la carte) ; le fond animé (09w-fond.js) remplace l'image CSS (#menuBg) une fois prêt
   musicTick(dt); sfxTick(dt);
   CAMO_U.uCamoT.value = now / 1000; CAMO_U.uHoloFx.value = RQ.q.lean ? 0 : 1; // le Holo dérive aussi dans la vitrine de l'atelier ; ses paillettes, pas en qualité Basse (06q-camos.js)
-  const aerial = MATCH.state === 'menu' && UI.screen === 'deploy';
-  if (MATCH.state === 'menu' && !aerial) { menuBgShow(true); if (UI.screen === 'arsenal' && ARSUI.tab !== 'k') vwTick(dt); else if (UI.screen === 'skins') skinTick(); const drew = mbgDraw(dt); if (UI.screen === 'skins') skinLive(drew, dt); return; } // l'atelier de classe dessine l'arme dans son cadre (09o-vitrine.js), puis le fond animé (09w-fond.js), et par-dessus, l'écran Tenues son soldat animé (09u-tenues.js)
+  if (MATCH.state === 'menu') {
+    menuBgShow(true);
+    efcOpeningScene();
+    if (UI.screen === 'arsenal' && ARSUI.tab !== 'k') vwTick(dt);
+    else if (UI.screen === 'skins') skinTick(dt);
+    return;
+  }
   menuBgShow(false);
   renderer.info.reset();
   if (PFR.on) { PFR.inFrame = true; PFR.lt = performance.now(); } // enregistreur de performances (09zo-perfs.js)
   // objets créés en cours de partie (armes ramassées, projectiles) : admis dans la pré-passe au plus tard une seconde après
   if (++frameN % 60 === 0) markPrepass(scene);
   const U = FinalShader.uniforms;
-  if (aerial) {
+  if (MATCH.state === 'menu' && UI.screen === 'deploy') {
     menuT += dt;
     const a = menuT * 0.035 + 0.6, r = CURMAP.def ? CURMAP.def.cam : 46;
     camera.position.set(Math.sin(a) * r * 0.75, 17 + Math.sin(menuT * 0.1) * 3, Math.cos(a) * r);

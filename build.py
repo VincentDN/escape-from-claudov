@@ -1,6 +1,6 @@
 """Assemble le jeu en un seul fichier HTML : dist/index.html
 three.js r147 est servi par le site (assets/vendor, tools/vendor.py) ; les modules de src/ sont concaténés dans l'ordre alphabétique.
-Les images (assets/menu-bg.webp et sa carte de profondeur assets/menu-depth.webp, assets/logo.webp) sont intégrées en data URI, et
+Les images (assets/logo.webp) sont intégrées en data URI, et
 changelog.json (journal des mises à jour, validé ici) dans shell.html, à la place des marqueurs qui y figurent. La musique
 (assets/music/*.ogg, copiée dans dist/music/) reste en fichiers à côté du HTML : build.py n'en met que les adresses (avec un condensat) dans
 la page. Les textures photo des cartes aussi (un fichier par surface dans dist/tex/, chargé au lancement d'une carte),
@@ -72,9 +72,7 @@ for f in sorted(glob.glob("assets/vendor/hdri/*.exr")):
 # Socle de la page : les données du démarrage qui ne changent presque jamais d'une version à l'autre (740 Ko en base64), livrées dans
 # deux scripts à condensat à côté de la page plutôt que dedans : une mise à jour du jeu ne les fait pas retélécharger (cache immuable,
 # vercel.json et le service worker). Une balise script marche aussi en file:// (une image chargée depuis un fichier ne pourrait pas
-# aller dans WebGL). socle-ui, en tête de page, avant le premier affichage : l'illustration des menus et le logo, posés en variables CSS
-# (--key-art, --logo). socle, juste avant le code du jeu : window.SOCLE, avec la carte de profondeur du fond animé (depth,
-# src/09w-fond.js), l'usure des armes (grain : assets/arme/surface.webp, python3 tools/build_armes.py, lue par src/06-weapons.js), les
+# aller dans WebGL). socle-ui, en tête de page : le logo. socle : les données graphiques du moteur et des armes.
 # scans de tissu des tenues (tissus et teinte : assets/tenue/, python3 tools/build_tenues.py, lus par src/06e-gear.js), les animations
 # cuites (anim : assets/anim/clips.bin et clips.json, node tools/dev/anim/cuire.mjs depuis le pack Mixamo hors dépôt, lues par
 # src/06ab-anim.js) et la fanfare de montée de niveau (rankup, assets/rankup.mp3, src/05b-rankup-sound.js). Absent (réseau coupé) : le jeu
@@ -90,9 +88,9 @@ def socle_js(key,body):
     name="tex/"+key+"."+hashlib.sha1(body.encode("utf-8")).hexdigest()[:8]+".js"
     if not os.path.exists("dist/"+name): open("dist/"+name,"w",encoding="utf-8").write(body)
     socle[key]=name
-socle_js("socle-ui","(function(s){s.setProperty('--key-art',"+json.dumps("url("+data_uri("assets/menu-bg.webp")+")")+");s.setProperty('--logo',"+json.dumps("url("+data_uri("assets/logo.webp")+")")+")})(document.documentElement.style);\n")
+socle_js("socle-ui","(function(s){s.setProperty('--logo',"+json.dumps("url("+data_uri("assets/logo.webp")+")")+")})(document.documentElement.style);\n")
 tissus={k:data_uri(f"assets/tenue/{k}.webp") if os.path.exists(f"assets/tenue/{k}.webp") else "" for k in ("tissus","teinte")}
-socle_js("socle","window.SOCLE="+json.dumps({"depth":data_uri("assets/menu-depth.webp"),"grain":data_uri(grain) if os.path.exists(grain) else "",**tissus,"anim":anim,
+socle_js("socle","window.SOCLE="+json.dumps({"grain":data_uri(grain) if os.path.exists(grain) else "",**tissus,"anim":anim,
     "rankup":""},separators=(",",":"))+";\n")
 # three.js r147 et ses modules d'exemples (assets/vendor/three-r147.js, tools/vendor.py) : même emballage, chargé juste avant le code du jeu
 three=open("assets/vendor/three-r147.js",encoding="utf-8").read()

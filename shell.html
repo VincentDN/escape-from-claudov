@@ -68,8 +68,6 @@
   /* espacements, formes, cible tactile, mouvement */
   --sp1: 4px; --sp2: 8px; --sp3: 12px; --sp4: 16px; --sp5: 24px; --sp6: 32px; --sp7: 48px;
   --cut: 10px; --hit: 44px; --ease: cubic-bezier(.2,.7,.2,1); --t1: .12s; --t2: .2s; --t3: .32s; --shadow: 0 18px 50px rgba(0,0,0,.55);
-  /* --logo (assets/logo.webp) et --key-art (illustration 21:9 du menu, assets/menu-bg.webp : fond des menus, du démarrage et de l'installation) :
-     posées sur la page par le socle (dist/tex/socle-ui.<condensat>.js, chargé en tête, voir build.py) */
   box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 *, *::before, *::after { box-sizing: inherit; }
@@ -80,10 +78,7 @@ input, textarea, select, [contenteditable] { -webkit-user-select: text; user-sel
 .ac-code, #grTxt { -webkit-touch-callout: default; }
 img { -webkit-user-drag: none; }
 #game { position: fixed; top: 0; left: 0; width: 100%; height: var(--app-h, 100%); display: block; } /* --app-h : voir VIEW (01-core.js) */
-/* Fond des menus : illustration 21:9 assets/menu-bg.webp, intégrée par build.py en data URI (marqueur dans url() ci-dessous). Image de repli :
-   le fond animé (src/09w-fond.js) la lit ici, la dessine dans la toile du jeu avec sa profondeur, puis l'efface en fondu (classe gl). */
-#menuBg { position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); z-index: 19; display: none; background: #050505 var(--key-art) 71% center / cover no-repeat; transition: opacity .6s; }
-#menuBg.gl { opacity: 0; }
+#menuBg { position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); z-index: 19; display: none; background: radial-gradient(ellipse at 68% 44%, #25251a, #090c09 75%); }
 #efcIntroFrame { position: absolute; inset: 0; border: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
 #menuBg.intro-ready #efcIntroFrame { opacity: 1; }
 #efcIntroFrame[hidden] { display: none; }
@@ -129,8 +124,7 @@ kbd.key.dp.d1::after { top: auto; bottom: 0; } kbd.key.dp.d2::after, kbd.key.dp.
 /* voile des menus : au menu principal, seule la colonne des entrées est assombrie (le ciel de l'illustration y est déjà sombre) ; ailleurs, un voile plus
    uniforme garde le décor vivant derrière les panneaux */
 .ui-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(4,5,4,.82) 0%, rgba(4,5,4,.55) 30%, rgba(4,5,4,.08) 58%, rgba(4,5,4,0) 100%); transition: background .4s; }
-#ui:not([data-screen="main"]) .ui-shade { background: linear-gradient(90deg, rgba(4,5,4,.9) 0%, rgba(4,5,4,.76) 50%, rgba(4,5,4,.6) 100%); }
-body.sk-live #ui[data-screen="skins"] .ui-shade { background: none; } /* écran Tenues, aperçu animé : le même voile est posé par le fond (09w-fond.js), sous le soldat */
+#ui:not([data-screen="main"]) .ui-shade { background: linear-gradient(90deg, rgba(4,5,4,.9) 0%, rgba(4,5,4,.65) 50%, rgba(4,5,4,.26) 100%); }
 /* Choix de la classe : la vue aérienne de la carte (scène 3D) reste visible à droite */
 #ui[data-screen="deploy"] .ui-shade { background: linear-gradient(90deg, rgba(4,5,4,.88) 0%, rgba(4,5,4,.66) 55%, rgba(4,5,4,.1) 100%); }
 .scr { --py: clamp(22px, 4.5vh, 50px); --px: clamp(22px, 4.5vw, 72px); position: absolute; inset: 0; display: none; flex-direction: column; gap: 18px; padding: var(--py) var(--px); overflow-y: auto; }
@@ -998,7 +992,6 @@ div.lb-foot { display: flex; justify-content: flex-end; }
 .sk { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 28px; align-items: start; }
 .sk-stage { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .skv { aspect-ratio: 3 / 4; max-height: calc(var(--app-h, 100vh) * .68); min-height: 0; }
-.skv.live { background: none; } /* aperçu animé : le soldat et son studio sont dessinés dans la toile du jeu, sous ce cadre (09u-tenues.js) */
 .sk-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 10px; align-content: start; margin: -8px; padding: 8px; }
 .sk-card { position: relative; display: flex; align-items: stretch; gap: 12px; padding: 0; text-align: left; color: var(--paper); background: rgba(10,11,9,.6); border: 1px solid var(--line); overflow: hidden; transition: background var(--t1), border-color var(--t1); }
 .sk-card img { flex: none; width: 34%; aspect-ratio: 2 / 3; object-fit: cover; background: #181b14; }
@@ -1824,7 +1817,7 @@ html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent
 .scr, .overlay, #whatsnew, #avEditor, #pwaOffer, #gpuLost, #gpuRep, #netLeave, #ecoAsk, #matchload, button, a, label, input, select, textarea { touch-action: manipulation; }
 body.touch #game { touch-action: none; }
 /* Fenêtre d'installation, à l'ouverture du jeu sur écran tactile (src/09r-pwa.js) : au-dessus de tout, même de « Tournez votre téléphone » */
-#pwaOffer { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; overflow-y: auto; padding: max(16px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); background: linear-gradient(rgba(4,5,4,.86), rgba(4,5,4,.86)), #050505 var(--key-art) 71% center / cover no-repeat; } /* l'illustration sous un voile : voir #loading */
+#pwaOffer { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; overflow-y: auto; padding: max(16px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); background: linear-gradient(rgba(4,5,4,.86), rgba(4,5,4,.86)), #10130e; } /* l'illustration sous un voile : voir #loading */
 /* boîte de la fenêtre : le langage des autres fenêtres (panneau, filet clair, filet haut jaune), sur l'illustration voilée ; texte à gauche, boutons pleine largeur */
 .po-box { position: relative; width: min(600px, 100%); margin: auto; padding: 26px 30px 20px; text-align: left; background: var(--panel-2); border: 1px solid var(--line-2); border-top: 3px solid var(--acc); box-shadow: var(--shadow); }
 .po-box .logo { width: min(260px, 62%); margin: 0 0 18px; }
@@ -2060,7 +2053,7 @@ body.touch #tacmap.show { pointer-events: auto; }
 body.touch #tacmap.show ~ #tcMapBar { display: flex; }
 body.touch .tac-box footer { display: none; }
 /* « Tournez votre appareil » : l'illustration voilée, le téléphone qui pivote (immobile, déjà tourné, en mouvement réduit) */
-#rotate { position: fixed; inset: 0; z-index: 90; display: none; place-items: center; padding: max(30px, env(safe-area-inset-top)) 30px; text-align: center; background: linear-gradient(rgba(4,5,4,.84), rgba(4,5,4,.84)), #050505 var(--key-art) 71% center / cover no-repeat; }
+#rotate { position: fixed; inset: 0; z-index: 90; display: none; place-items: center; padding: max(30px, env(safe-area-inset-top)) 30px; text-align: center; background: linear-gradient(rgba(4,5,4,.84), rgba(4,5,4,.84)), #10130e; }
 #rotate svg { display: block; width: 84px; margin: 0 auto 18px; fill: none; stroke: var(--acc); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; animation: rotHint 2.4s ease-in-out infinite; }
 #rotate b { display: block; font-family: var(--stencil); font-weight: 400; font-size: 32px; line-height: 1.1; color: var(--paper); }
 #rotate span { display: block; margin-top: 8px; font-size: var(--fs-m); color: var(--dim); }

@@ -36,6 +36,22 @@ try {
   check(t1 > t0, 'idle motion runs on the main menu', [t0, t1]);
   if (shots) await page.screenshot({ path: SHOTS + '/efc-bench-1280.png', timeout: 300000 });
 
+  // The DOM hit target tracks the radio and uses the same button for click and Enter.
+  const radio = page.locator('#efcBenchRadio');
+  const radioBefore = await page.evaluate(() => efcCall('music:nowPlaying'));
+  // The swaying camera moves this hit target between frames. Click where the radio is now.
+  const hit = await radio.boundingBox();
+  if (!hit) throw new Error('The radio has no visible hit target');
+  await page.mouse.click(hit.x + hit.width / 2, hit.y + hit.height / 2);
+  await page.waitForFunction(() => EFC_BENCH.dial.material.emissiveIntensity === 0, null, { timeout: 120000 });
+  const radioAfter = await page.evaluate(() => efcCall('music:nowPlaying'));
+  check(radioBefore.on && !radioAfter.on, 'clicking the radio turns the theme and dial off');
+  await radio.focus();
+  check(await radio.locator('span').isVisible() && (await radio.locator('span').textContent()).includes(radioBefore.author), 'the focused radio shows the track and artist');
+  await radio.press('Enter');
+  await page.waitForFunction(() => EFC_BENCH.dial.material.emissiveIntensity > 0, null, { timeout: 120000 });
+  check(await page.evaluate(() => efcCall('music:nowPlaying').on), 'Enter turns the radio back on');
+
   // ---------- keyboard: every entry reachable with Tab and opened with Enter; Escape comes back ----------
   const entries = [['efcMmRaid', 'raid'], ['efcMmSquad', 'multi'], ['efcMmHideout', 'hideout'], ['efcMmSettings', 'options'], ['efcCreditsBtn', 'credits']];
   for (const [id, screen] of entries) {

@@ -1,41 +1,22 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"><meta name="googlebot" content="noindex, nofollow"><meta name="seo_hidden" content="true"><title>Partisan Project | The Workbench</title><link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../shared/loader.css"><style>
-:root{color-scheme:dark;--bg:#07090a;--text:#eceeea;--dim:#9aa9b0;--line:#b4c4cc26;--accent:#ef8f39}*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,sans-serif;overflow:hidden}header{position:absolute;inset:0 0 auto 0;z-index:4;padding:15px 22px;display:flex;justify-content:space-between;gap:16px;font:11px/1.5 ui-monospace,monospace;background:linear-gradient(#000a,transparent)}a{color:#a9d4e5}#stage{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
-.prompt{position:absolute;left:clamp(16px,5vw,64px);bottom:clamp(40px,10vh,96px);z-index:4;max-width:400px}h1{font-size:clamp(18px,2.2vw,23px);line-height:1.2;font-weight:600;letter-spacing:.04em;margin:0 0 10px;text-shadow:0 2px 12px #000}p{color:var(--dim);margin:0 0 16px;text-shadow:0 1px 8px #000}
-.actions{display:flex;flex-direction:column;align-items:stretch;gap:10px;width:max-content;max-width:100%}
-.act{position:relative}
-.act button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 13px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;border-radius:3px;padding:14px 20px;cursor:pointer;text-align:left}
-.act button.primary{color:#1a1208;background:var(--accent);border:0;box-shadow:0 0 0 1px #ffc18a55,0 8px 24px #0008}
-.act button.primary:hover,.act button.primary:focus-visible{background:#ffb068;outline:2px solid #ffc18a;outline-offset:3px}
-.act button.secondary{color:#ffc18a;background:#0b0d0ecc;border:1px solid #ef8f39aa;box-shadow:0 8px 24px #0008}
-.act button.secondary:hover,.act button.secondary:focus-visible{background:#1a1510e6;outline:2px solid #ffc18a;outline-offset:3px}
-.act button[aria-disabled=true]{color:#7d878c;background:#0b0d0ecc;border:1px dashed #b4c4cc40;cursor:not-allowed;box-shadow:none}
-.act button[aria-disabled=true]:focus-visible{outline:2px solid #9aa9b0;outline-offset:3px}
-.act button:disabled{opacity:.5;cursor:default}
-.key{display:inline-block;padding:1px 6px;border:1px solid currentColor;border-radius:3px;font-size:10px;opacity:.7}
-.soon{font-size:10px;letter-spacing:.08em;opacity:.8}
-/* the tooltip: on hover and on keyboard focus, so it is never mouse-only */
-.tip{position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);width:260px;padding:9px 12px;border-radius:4px;background:#0b0d0ef2;border:1px solid var(--line);color:var(--text);font:12px/1.45 system-ui,sans-serif;letter-spacing:0;text-transform:none;opacity:0;pointer-events:none;transition:opacity .15s;z-index:5}
-.act:hover .tip,.act:focus-within .tip{opacity:1}
-.prompt {transition:opacity .5s}.leaving .prompt{opacity:0}.leaving #fade{position:fixed;inset:0;z-index:10;background:#000;opacity:1;pointer-events:none;transition:opacity 1.2s ease}#fade.clear{opacity:0}
-[hidden]{display:none!important}
-@media(max-width:900px){.tip{left:0;top:auto;bottom:calc(100% + 8px);transform:none}}
-@media(max-width:600px){.actions{width:auto}.prompt{left:10px;right:10px;max-width:none;padding:14px 16px;background:#07090ad9;border-radius:6px}.addr{display:none}header{padding:12px 16px}}
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Claudov opening scene</title>
+<link rel="stylesheet" href="../shared/loader.css">
+<style>
+html,body,#stage{margin:0;width:100%;height:100%;overflow:hidden;background:#07090a}
+#stage canvas{display:block;width:100%;height:100%}
 </style>
 <script type="importmap">{"imports":{"three":"../vendor/three/build/three.module.min.js","three/addons/":"../vendor/three/examples/jsm/"}}</script>
-</head><body>
-<div id="stage" role="img" aria-label="Over-the-shoulder view of a partisan at a workbench, an AK rifle lying flat on the table under a lamp, and an old Nokia phone with its screen lit. Move the mouse to look around."></div>
-<div id="status" class="nk-loader nk-fixed" role="status" aria-live="polite"><span class="nk-spin" aria-hidden="true"></span><span class="nk-text">Setting up the bench</span></div>
-<div class="prompt">
- <h1>ANTISTASI EXPERIMENT · THE WORKBENCH</h1>
- <p>Somewhere deep in the mountains of Altis, an FIA insurgent builds weapons for the resistance. <span lang="el">Θάνατος στον εισβολέα</span>, ALTIS MUST BE FREE!</p>
- <div class="actions">
-  <div class="act"><button id="campaign" class="primary" disabled aria-describedby="tip-campaign">Enter Claudov<span class="key" aria-hidden="true">C</span></button><span id="tip-campaign" class="tip" role="tooltip">Open the Escape From Claudov raid menu.</span></div>
-  <div class="act"><button id="start" class="secondary" disabled aria-describedby="tip-demos">Weapon Workbench<span class="key" aria-hidden="true">E</span></button><span id="tip-demos" class="tip" role="tooltip">Open the StG 44 model viewer.</span></div>
-  <div class="act"><button id="guided" class="secondary" aria-disabled="true" aria-describedby="tip-guided">Start Guided Demo<span class="soon">Unavailable</span></button><span id="tip-guided" class="tip" role="tooltip">Vincent explains how it all works. Not available yet.</span></div>
- </div>
-</div>
-<div id="fade"></div>
-<script type="module" src="./workbench.js"></script>
-</body></html>
+</head>
+<body>
+<div id="stage" aria-hidden="true"></div>
+<div id="status" class="nk-loader nk-fixed" role="status"><span class="nk-spin" aria-hidden="true"></span><span class="nk-text">Loading scene</span></div>
+<script type="module">
+if (parent === window) location.replace('../../' + location.hash);
+else import('./workbench.js');
+</script>
+</body>
+</html>

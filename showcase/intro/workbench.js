@@ -1,7 +1,4 @@
-// Workbench intro: an over-the-shoulder opening shot in the style of The Last of Us Part II's
-// workbench. The operator from the AK customiser leans over a table with the rifle lying flat,
-// hands on it. "Load all demos" pushes the camera down onto the Nokia beside it, fades to black and hands
-// over to the index (menu/), the same phone close up with every demo on its screen.
+// Over-the-shoulder opening shot. The operator leans over the rifle on the workbench.
 // Scene space: operator's feet on y=0 facing +z, right side -x (see operator.js); meters.
 import * as T from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -10,26 +7,14 @@ import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 import {MODELS,DEFAULT_MODEL} from './ak15-weapon-customiser/models.js';
 import {DEFAULT_OPERATOR,buildOperator} from './ak15-weapon-customiser/operator.js';
 import {solveArm} from './ak15-weapon-customiser/field.js';
-import {mountTopBar} from '../shared/topbar.js';
-import * as mech from './ak15-weapon-customiser/mech.js';
 import {loaderError} from '../shared/loader.js';
 
-const INDEX='../workbench/stg44/';
-const CAMPAIGN='../../';
 const TABLE={top:.86,x:[-.95,.95],z:[.24,1.04]};
 const RIFLE_AT=new T.Vector3(.04,0,.47);// x/z on the table; y comes from the rifle's own thickness
 // Camera behind and above the right shoulder, looking down at the rifle.
 const SHOT={position:new T.Vector3(-.56,1.86,0),target:new T.Vector3(-.06,.84,.42)};
-const PUSH_IN={duration:1.9,fadeAt:.75};// seconds; the fade starts at this fraction of the push
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// ---------- Sound ----------
-// The top bar (shared/topbar.js) holds the music player and puts the sound layer in its bench mix: the music comes out of
-// the old radio, with the camp around it. The layer belongs to the shell, so the music carries on from page to page.
-const sound=mountTopBar({scene:'bench',overlay:true,current:'intro'});
-
-const stage=document.querySelector('#stage'),status=document.querySelector('#status'),start=document.querySelector('#start'),fade=document.querySelector('#fade');
-const campaignBtn=document.querySelector('#campaign'),guided=document.querySelector('#guided'),actions=[campaignBtn,start];
+const stage=document.querySelector('#stage'),status=document.querySelector('#status');
 const renderer=new T.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
 renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;stage.append(renderer.domElement);
@@ -73,7 +58,7 @@ mesh(new T.ConeGeometry(.12,.14,10,1,true),std(0x3c4a3f,.6,{side:T.DoubleSide}),
 mesh(new T.SphereGeometry(.03,8,6),new T.MeshBasicMaterial({color:0xfff0d0}),[lamp.position.x,lamp.position.y,lamp.position.z],false);
 
 // The old radio at the back of the bench: wooden case, cloth grille, lit tuning dial, two knobs
-// and a carry handle. The music comes out of it (bench-audio.js pans the sound to its position).
+// and a carry handle.
 const RADIO_AT=new T.Vector3(-.26,TABLE.top,.92);
 const radio=new T.Group();radio.position.copy(RADIO_AT);radio.rotation.y=.25;scene.add(radio);
 {
@@ -150,7 +135,6 @@ function drawLcd(time){
  for(let k=0;k<px.length;k+=4){const on=px[k+1]<120;px[k]=on?0x1f:0x9f;px[k+1]=on?0x2a:0xb1;px[k+2]=on?0x14:0x84;}
  g.putImageData(img,0,0);lcdTex.needsUpdate=true;
 }
-const phoneScreen=()=>new T.Vector3(0,PHONE.screen.y,PHONE.t+.004).applyMatrix4(phone.matrixWorld);
 
 // FIA flag (Altis) draped over the near edge of the bench: most of it lies flat on the table
 // top under the rifle and the rest hangs down towards the operator's knees, swaying a little. The cloth is a grid
@@ -235,156 +219,35 @@ function placeRifle(){
  }
 }
 
-// ---------- Look (mouse, touch, gamepad) and the push-in ----------
-const look={x:0,y:0},want={x:0,y:0};
-addEventListener('pointermove',e=>{want.x=e.clientX/innerWidth*2-1;want.y=e.clientY/innerHeight*2-1;});
-function pollPad(){
- for(const pad of navigator.getGamepads?.()||[]){
-  if(!pad)continue;
-  const [x,y]=pad.axes;if(Math.hypot(x,y)>.15){want.x=x;want.y=y;}
-  if(pad.buttons[0]?.pressed)begin(CAMPAIGN);else if(pad.buttons[9]?.pressed)begin(INDEX);
- }
-}
-let push=null;
-// Leave the bench for `dest`. The demos push down onto the Nokia (the index is that phone close up); the campaign
-// leans in over the bench, as if to the map spread on it, and fades.
-function begin(dest=INDEX){
- if(push||start.disabled)return;
- for(const b of actions)b.disabled=true;
- document.body.classList.add('leaving');
- mech.tap();// a key press on the phone
- phone.updateMatrixWorld(true);
- const from=camera.position.clone(),fromTarget=currentTarget.clone();
- let to,toTarget;
- if(dest===INDEX){toTarget=phoneScreen();to=toTarget.clone().add(new T.Vector3(0,.075,-.025));}// straight down onto the LCD
- else{toTarget=fromTarget.clone();to=from.clone().lerp(fromTarget,.45);}// lean in over the bench
- push={start:performance.now()/1000,from,fromTarget,to,toTarget,faded:false,dest};
- if(reduceMotion)push.start-=PUSH_IN.duration*PUSH_IN.fadeAt;
-}
-campaignBtn.addEventListener('click',()=>begin(CAMPAIGN));
-start.addEventListener('click',()=>begin(INDEX));
-guided.addEventListener('click',e=>e.preventDefault());// not available yet: it says so in its tooltip
-addEventListener('keydown',e=>{if(e.target.matches('a,button,input,select,textarea'))return;const k=e.key.toLowerCase();if(k==='c')begin(CAMPAIGN);else if(k==='e')begin(INDEX);});
-// Coming back with the browser's back button restores this page from cache: reset the shot.
-addEventListener('pageshow',e=>{if(e.persisted){sound.scene('bench');push=null;for(const b of actions)b.disabled=false;document.body.classList.remove('leaving');fade.classList.add('clear');clock.getDelta();requestAnimationFrame(frame);}});
-
-const currentTarget=SHOT.target.clone();
-const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+// The real Claudov menu owns input. Receive its pointer position without intercepting clicks.
+const look={x:0,y:0},want={x:0,y:0},currentTarget=SHOT.target.clone();
+addEventListener('message',event=>{
+ if(event.source!==parent||event.origin!==location.origin||event.data?.type!=='claudov-opening-look')return;
+ want.x=event.data.x;want.y=event.data.y;
+});
 function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;
  camera.fov=w/h<1?60:42;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 
 const clock=new T.Clock();
-function frame(){
+let lastFrame=-Infinity;
+function frame(now){
+ requestAnimationFrame(frame);
+ if(document.hidden||frameElement?.hidden||!stage.clientWidth||!stage.clientHeight||now-lastFrame<1000/30)return;
+ lastFrame=now;
  const dt=Math.min(clock.getDelta(),.05),time=clock.elapsedTime;
- pollPad();
- const k=1-Math.exp(-dt*(push?1.5:4));look.x+=(want.x-look.x)*k;look.y+=(want.y-look.y)*k;
- pose(time);placeRifle();
- drapeFlag(time);
- drawLcd(time);
- radio.userData.dial.material.emissiveIntensity=1.3+Math.random()*.15;// valve glow flicker
- if(sound.bench){const at=radio.getWorldPosition(new T.Vector3()).project(camera);sound.bench.setPan(at.x*.8);}
- if(push){
-  // Wall-clock time, so a slow device still hands over on schedule.
-  const t=performance.now()/1000-push.start,u=Math.min(t/PUSH_IN.duration,1),e=ease(u);
-  camera.position.lerpVectors(push.from,push.to,e);currentTarget.lerpVectors(push.fromTarget,push.toTarget,e);
-  if(u>=PUSH_IN.fadeAt&&!push.faded){push.faded=true;fade.classList.remove('clear');}
-  // Fully black: stop rendering so the main thread is free for the navigation.
-  if(t>=PUSH_IN.duration+.5){if(!sound.shared)sound.music.handoff();location.href=push.dest;return;}
- }else{
-  const sway=reduceMotion?0:Math.sin(time*.6)*.006;
-  camera.position.set(SHOT.position.x+look.x*.05,SHOT.position.y-look.y*.03+sway,SHOT.position.z);
-  currentTarget.set(SHOT.target.x+look.x*.1,SHOT.target.y-look.y*.06,SHOT.target.z);
- }
+ const k=1-Math.exp(-dt*4);look.x+=(want.x-look.x)*k;look.y+=(want.y-look.y)*k;
+ pose(time);placeRifle();drapeFlag(time);drawLcd(time);
+ radio.userData.dial.material.emissiveIntensity=1.3+Math.random()*.15;
+ const sway=reduceMotion?0:Math.sin(time*.6)*.006;
+ camera.position.set(SHOT.position.x+look.x*.05,SHOT.position.y-look.y*.03+sway,SHOT.position.z);
+ currentTarget.set(SHOT.target.x+look.x*.1,SHOT.target.y-look.y*.06,SHOT.target.z);
  camera.lookAt(currentTarget);
  renderer.render(scene,camera);
- requestAnimationFrame(frame);
 }
-
-// ---------- Dithered load-in: the bench boots like a phone ----------
-// While the bench loads, the whole screen is a Nokia LCD at chunky resolution, two tones through an 8 x 8 ordered
-// dither: the backlight fades up, a lambda draws itself in and PARTISAN types out under it, a boot log ticks
-// through, and a pixel snake runs round the border, growing as the bench loads. Then READY blinks and the screen drops
-// out pixel by pixel from the middle outwards. About five seconds of frames (a loading stall pauses it); any key or click skips to the reveal once the bench
-// has loaded. Reduced motion: a still screen and a quick reveal.
-const B8=(()=>{let m=[[0]];for(let n=1;n<8;n*=2)m=[...m.map(r=>[...r.map(v=>4*v),...r.map(v=>4*v+2)]),...m.map(r=>[...r.map(v=>4*v+3),...r.map(v=>4*v+1)])];return m.flat();})();
-const INK=[22,32,15],PAPER=[159,177,132],DARK=[7,9,10];
-const BOOT={flicker:[.3,.75],lambda:[.8,1.9],name:1.55,log:2.1,logStep:.32,minDone:3.7,ready:.55,reveal:1.5};
-const BOOT_LOG=['PARTISAN OS 3310.λ','SIM CARD ......... OK','RADIO NET ........ OK','STASH ............ OK','WORKBENCH ....... '];
-const dither=document.createElement('canvas'),bootLcd=document.createElement('canvas'),bootG=bootLcd.getContext('2d',{willReadFrequently:true});
-// text goes on its own layer, cut at a fixed threshold so the letters stay crisp instead of dithering to mush
-const bootText=document.createElement('canvas'),bootTG=bootText.getContext('2d',{willReadFrequently:true});
-Object.assign(dither.style,{position:'fixed',inset:'0',width:'100%',height:'100%',zIndex:9,imageRendering:'pixelated',pointerEvents:'none'});
-dither.setAttribute('aria-hidden','true');
-document.body.append(dither);fade.classList.add('clear');
-// the boot's own clock: it advances at most 1/20 s a frame, so a loading stall pauses the boot instead of skipping it
-let bootT=0,bootLast=null;
-let loadedAt=null,revealAt=null,skip=false;
-const bootSkip=()=>{skip=true;};
-addEventListener('keydown',bootSkip,{once:true});addEventListener('pointerdown',bootSkip,{once:true});
-/** Estimated progress while loading (creeps toward 90%), then 100%. */
-const progress=t=>loadedAt!==null?1:.9*(1-Math.exp(-t/2.2));
-/** The boot screen in grey (white = lit LCD pixel), on the low-res canvas. */
-function bootFrame(t,w,h){
- const g=bootG,u=Math.min(w,h);
- g.fillStyle='#000';g.fillRect(0,0,w,h);
- // the lambda draws in: one long stroke and the short leg
- bootTG.clearRect(0,0,w,h);
- const L=Math.max(0,Math.min(1,(t-BOOT.lambda[0])/(BOOT.lambda[1]-BOOT.lambda[0]))),S=u*.28,cx=w/2,cy=h*.3;
- if(L>0){
-  g.strokeStyle='#fff';g.lineWidth=Math.max(2,u*.05);g.lineCap='square';
-  const a=[cx-S*.42,cy-S*.5],b=[cx+S*.42,cy+S*.5],m=[cx,cy-S*.02],c=[cx-S*.42,cy+S*.5];
-  const k1=Math.min(1,L/.65),k2=Math.max(0,(L-.65)/.35);
-  g.beginPath();g.moveTo(...a);g.lineTo(a[0]+(b[0]-a[0])*k1,a[1]+(b[1]-a[1])*k1);
-  if(k2>0){g.moveTo(...m);g.lineTo(m[0]+(c[0]-m[0])*k2,m[1]+(c[1]-m[1])*k2);}
-  g.stroke();
-  // a soft glow behind it, which the dither turns into a halftone
-  const glow=g.createRadialGradient(cx,cy,0,cx,cy,S*1.1);glow.addColorStop(0,`rgba(255,255,255,${.35*L})`);glow.addColorStop(1,'rgba(255,255,255,0)');
-  g.globalCompositeOperation='destination-over';g.fillStyle=glow;g.fillRect(0,0,w,h);g.globalCompositeOperation='source-over';
- }
- const T=bootTG,fs=Math.max(8,Math.round(u/13));
- T.font=`700 ${fs}px ui-monospace, Menlo, Consolas, monospace`;T.textBaseline='top';T.fillStyle='#fff';
- if(t>BOOT.name){const word='PARTISAN',n=Math.min(word.length,Math.floor((t-BOOT.name)*14));T.textAlign='center';T.fillText(word.slice(0,n)+(n<word.length&&t*6%2<1?'_':''),cx,cy+S*.6);}
- // the boot log, bottom left
- T.textAlign='left';const ls=Math.max(7,Math.round(u/19));T.font=`700 ${ls}px ui-monospace, Menlo, Consolas, monospace`;
- const lines=Math.min(BOOT_LOG.length,Math.floor((t-BOOT.log)/BOOT.logStep)+1),x0=Math.round(u*.08),y0=h-Math.round(u*.08)-BOOT_LOG.length*(ls+2);
- for(let i=0;i<lines&&t>BOOT.log;i++){
-  let line='> '+BOOT_LOG[i];
-  if(i===BOOT_LOG.length-1)line+=String(Math.floor(progress(t)*100)).padStart(3,' ')+'%';
-  T.fillText(line,x0,y0+i*(ls+2));
- }
- if(revealAt!==null||(loadedAt!==null&&t>=BOOT.minDone)){if(Math.floor(t*5)%2===0){T.textAlign='right';T.fillText('READY',w-x0,y0+(BOOT_LOG.length-1)*(ls+2));}}
- // the snake runs round the border, its length the progress
- const per=2*(w+h)-8,len=Math.max(4,Math.round(per*.08+per*.45*progress(t))),head=Math.floor(t*per*.22)%per;
- const at=i=>{i=((i%per)+per)%per;const W=w-2,H=h-2;if(i<W)return[1+i,1];i-=W;if(i<H)return[w-2,1+i];i-=H;if(i<W)return[w-2-i,h-2];i-=W;return[1,h-2-i];};
- if(t>BOOT.flicker[1]){g.fillStyle='#fff';for(let i=0;i<len;i++){const[x,y]=at(head-i);g.fillRect(x,y,1,1);}const[fx,fy]=at(head+Math.floor(per*.3));if(Math.floor(t*4)%2===0)g.fillRect(fx,fy,1,1);}
-}
-function drawDither(){
- const now=performance.now()/1000;
- bootT+=bootLast===null?0:Math.min(now-bootLast,.05);bootLast=now;
- const t=reduceMotion?BOOT.minDone+1:bootT;
- const px=Math.max(2,Math.round(Math.min(innerWidth,innerHeight)/170)),w=Math.ceil(innerWidth/px),h=Math.ceil(innerHeight/px);
- if(dither.width!==w||dither.height!==h){dither.width=bootLcd.width=bootText.width=w;dither.height=bootLcd.height=bootText.height=h;}
- window.PARP_BOOT={t,loaded:loadedAt!==null,revealed:revealAt!==null};
- if(revealAt===null&&loadedAt!==null&&(skip||t>=BOOT.minDone+BOOT.ready))revealAt=now;
- const k=revealAt===null?0:Math.min(1,(now-revealAt)/(reduceMotion?.25:BOOT.reveal));
- bootFrame(t,w,h);
- const txt=bootTG.getImageData(0,0,w,h).data, src=bootG.getImageData(0,0,w,h).data,g=dither.getContext('2d'),img=g.createImageData(w,h),out=img.data;
- // the backlight: off, then it fades up smoothly
- const [f0,f1]=BOOT.flicker,light=t<f0?0:t<f1?(t-f0)/(f1-f0):1;// the backlight fades up smoothly (no flicker)
- for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-  const i=y*w+x,o=i*4,th=(B8[(y&7)*8+(x&7)]+.5)/64;
-  if(th*.55+Math.hypot(x/w-.5,(y/h-.5)*h/w)*1.4*.45<k*1.05){out[o+3]=0;continue;}// revealed
-  const lit=txt[o+3]>110||src[o]/255>th,c=light===0?DARK:lit?INK:PAPER;// lit pixels are the LCD's dark ink on the green paper
-  out[o]=DARK[0]+(c[0]-DARK[0])*light;out[o+1]=DARK[1]+(c[1]-DARK[1])*light;out[o+2]=DARK[2]+(c[2]-DARK[2])*light;out[o+3]=255;
- }
- g.putImageData(img,0,0);
- if(k<1)requestAnimationFrame(drawDither);else{dither.remove();removeEventListener('keydown',bootSkip);removeEventListener('pointerdown',bootSkip);}
-}
-requestAnimationFrame(drawDither);
-const reveal=()=>{loadedAt??=performance.now()/1000;};
-
 loadRifle().then(()=>{
- status.hidden=true;for(const b of actions)b.disabled=false;campaignBtn.focus({preventScroll:true});
- requestAnimationFrame(frame);requestAnimationFrame(reveal);
-}).catch(err=>{loaderError(status,'Could not load the rifle: '+err.message);reveal();});
+ status.hidden=true;
+ renderer.render(scene,camera);
+ parent.postMessage({type:'claudov-opening-ready'},location.origin);
+ requestAnimationFrame(frame);
+}).catch(err=>loaderError(status,'Could not load the rifle: '+err.message));

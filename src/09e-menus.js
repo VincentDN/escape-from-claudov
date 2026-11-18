@@ -716,7 +716,7 @@ document.addEventListener('click', (e) => {
 
 /* Fond des menus : visible tant qu'on est dans les menus (la boucle de jeu l'appelle à chaque image) */
 let menuBgOn = false;
-function menuBgShow(on) { if (on !== menuBgOn) { menuBgOn = on; $('menuBg').style.display = on ? 'block' : 'none'; document.body.classList.toggle('mbg', on); if (on) mbgShown(); } } // fond animé : 09w-fond.js
+function menuBgShow(on) { if (on !== menuBgOn) { menuBgOn = on; $('menuBg').style.display = on ? 'block' : 'none'; document.body.classList.toggle('mbg', on); if (on) mbgShown(); else efcOpeningHide(); } } // fond animé : 09w-fond.js
 
 /* ---------- Initialisation ---------- */
 function menuInit() {

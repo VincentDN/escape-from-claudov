@@ -12,7 +12,7 @@ const MUS = { el: null, url: '', vol: 0, dead: false, off: false };
 const MUS_FADE_IN = 1.2, MUS_FADE_OUT = 3.5; // vitesses de fondu (par seconde)
 
 function efcMenuTrack() {
-  return Object.hasOwn(EFC_MENU_TRACKS, Settings.menuTrack) ? Settings.menuTrack : 'menu-theme';
+  return Object.hasOwn(EFC_MENU_TRACKS, Settings.menuTrack) ? Settings.menuTrack : 'campaign-acoustic-guitars';
 }
 
 function efcMenuTrackChange() {

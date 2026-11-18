@@ -12,7 +12,7 @@ function applyDamage(victim, dmg, attacker, weapon, head, dir, srcPos, life) { /
   if (victim.inMecha) return; // à bord de son mecha : les coups vont au blindage (rayMechas, mechaBlast)
   if ((ESSAI || ESSAI_MECHA) && victim.isPlayer && !(attacker === victim && weapon === NET_WSPECIAL.mecha)) return; // essai d'une série (?essai=, 09zm-essai.js) : le joueur ne prend rien (sauf son mecha qui explose avec lui à bord, ce qu'on essaie aussi)
   if (MATCH.online && attacker && attacker !== victim && allied(attacker, victim)) return; // pas de tir allié (en match à mort, personne n'est allié)
-  if (victim.protT > 0) return; // protection de réapparition (match à mort, domination)
+  if (victim.protT > 0 || (victim.isPlayer && efcDevActive('health'))) return; // protection de réapparition (match à mort, domination)
   // victime distante : la touche lui est adressée, elle applique elle-même les dégâts
   if (victim.isRemote) {
     if (attacker && netIsLocal(attacker)) {
@@ -729,7 +729,7 @@ function matchTick(dt, bg) {
   const fin = MATCH.state === 'finish';
   if (fin) dt *= finTick(); // annonce du résultat : le jeu continue derrière, en ralenti (09l-fin.js)
   cdTick(); const hold = playHold(); // décompte du départ, migration de l'hôte : le chrono ne tourne pas, ni les points ni le score (09y-decompte.js)
-  MATCH.time += dt; if (!fin && !hold) MATCH.timeLeft -= dt;
+  MATCH.time += dt; if (!fin && !hold && !efcDevActive('timer')) MATCH.timeLeft -= dt;
   const t = MATCH.time;
   for (let i = MATCH.events.length - 1; i >= 0; i--) if (MATCH.events[i].t <= t) { const ev = MATCH.events[i]; MATCH.events.splice(i, 1); ev.fn(); }
   uavTick(dt);

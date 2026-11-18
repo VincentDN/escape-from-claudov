@@ -50,7 +50,7 @@ const EFC_MENU_TRACKS = {
   'campaign-acoustic-guitars': { title: '3 Acoustic Guitars', author: 'Aussens@iter', licence: 'CC0' },
 };
 
-const Settings = { binds: {}, touch: 'auto', tcRun: 'stick', tcStick: 'float', tcLay: null, aimAssist: 'normal', tpMode: 'auto', tpSeen: false, tpHint: false, tpAuto: true, tpDblAds: true, adsToggle: false, tcAuto: true, tcDblAds: true, tcQuick: true, tcVib: true, tcAlpha: '1', tcV: 0, gfxSafe: false, gfxSafeAuto: '', padSeen: false, padSens: 1.0, padAdsMul: 0.65, adsMul: 1.0, padDead: 0.1, padCurve: 'reactive', padAccel: 'normal', padRun: 'click', padLay: 'default', padVib: true, sens: 1.0, fov: 62, quality: 'auto', dynres: true, eco: null, fpsMax: '0', perf: false, ao: false, rays: true, grass: true, difficulty: 2, loadout: 0, mode: 'raid', limit: 75, limitFfa: 20, limitDom: 150, minutes: 10, map: 'sable', volume: 0.8, music: 0.5, menuTrack: 'menu-theme', voice: true, nadeArc: true, invertY: false, fsGame: false, allyMarks: true, hudScale: '1', skin: 'assault', lang: 'auto', sv: 8 };
+const Settings = { binds: {}, touch: 'auto', tcRun: 'stick', tcStick: 'float', tcLay: null, aimAssist: 'normal', tpMode: 'auto', tpSeen: false, tpHint: false, tpAuto: true, tpDblAds: true, adsToggle: false, tcAuto: true, tcDblAds: true, tcQuick: true, tcVib: true, tcAlpha: '1', tcV: 0, gfxSafe: false, gfxSafeAuto: '', padSeen: false, padSens: 1.0, padAdsMul: 0.65, adsMul: 1.0, padDead: 0.1, padCurve: 'reactive', padAccel: 'normal', padRun: 'click', padLay: 'default', padVib: true, sens: 1.0, fov: 62, quality: 'auto', dynres: true, eco: null, fpsMax: '0', perf: false, ao: false, rays: true, grass: true, difficulty: 2, loadout: 0, mode: 'raid', limit: 75, limitFfa: 20, limitDom: 150, minutes: 10, map: 'sable', volume: 0.8, music: 0.5, menuTrack: 'campaign-acoustic-guitars', voice: true, nadeArc: true, invertY: false, fsGame: false, allyMarks: true, hudScale: '1', skin: 'assault', lang: 'auto', sv: 9 };
 try {
   const s = JSON.parse(localStorage.getItem('dc_settings') || 'null');
   // réglages d'avant la version 2 : la qualité « Haute » y était la valeur par défaut, on passe en automatique
@@ -68,6 +68,7 @@ try {
     for (const o of [Settings.binds, Settings.tcLay]) if (o && typeof o === 'object') for (const k in ren) if (k in o) { o[ren[k]] = o[k]; delete o[k]; }
     Settings.sv = 8;
   }
+  if (s && s.sv < 9) { if (Settings.menuTrack === 'menu-theme') Settings.menuTrack = 'campaign-acoustic-guitars'; Settings.sv = 9; }
   if (Settings.aimAssist !== 'off') Settings.aimAssist = 'normal';
 } catch (e) { /* stockage indisponible */ }
 const EFC_BENCH_BOOT = (() => {

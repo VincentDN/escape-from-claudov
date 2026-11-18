@@ -1,5 +1,5 @@
-/* Escape From Claudov stash: the player's persistent items and loadout in localStorage ('efc_stash_v1', shape { v: 1, items, loadout,
-   freeKit }), the starter kit, and the raid hand-over: 'raid:kit' takes the loadout out (it is at risk) or hands out the free kit (P6:
+/* Escape From Claudov stash: the player's persistent items and loadout in localStorage ('efc_stash_v1', shape { v: 2, items, loadout,
+   freeKit, grids }), the starter kit, and the raid hand-over: 'raid:kit' takes the loadout out (it is at risk) or hands out the free kit (P6:
    the SKS and 30 rounds, every item free: true, the loadout left in the stash), 'raid:commit' banks what was extracted.
    Corrupt or missing storage never throws: it falls back to the starter stash. Services: stash:get, stash:toLoadout, stash:toStash,
    stash:save, stash:reset, stash:setFreeKit, raid:freeKit, raid:kit, raid:commit. */
@@ -15,7 +15,7 @@ function efcStashStarter() {
   const items = [];
   for (const it of [{ id: 'w_ak47', n: 1 }, { id: 'w_usp', n: 1 }, { id: 'ammo_rifle', n: 90 }, { id: 'ammo_pistol', n: 36 },
     { id: 'med_bandage', n: 3 }, { id: 'med_kit', n: 1 }]) { const n = efcItemNorm(it); if (n) efcStackInto(items, n); }
-  return { v: 1, items, loadout };
+  return { v: 2, items, loadout };
 }
 /* Rebuilds a valid Inventory from untrusted data: unknown items dropped, slot items must match their slot */
 function efcInvSanitize(raw) {
@@ -29,14 +29,29 @@ function efcInvSanitize(raw) {
 function efcStashLoad() {
   let raw = null;
   try { const s = localStorage.getItem(EFC_STASH_KEY); raw = s ? JSON.parse(s) : null; } catch (e) { raw = null; }
-  if (!raw || typeof raw !== 'object' || raw.v !== 1 || !Array.isArray(raw.items)) return efcStashStarter();
-  const st = { v: 1, items: [], loadout: efcInvSanitize(raw.loadout), freeKit: raw.freeKit === true };
+  if (!raw || typeof raw !== 'object' || ![1, 2].includes(raw.v) || !Array.isArray(raw.items)) return efcStashStarter();
+  const st = { v: 2, items: [], loadout: efcInvSanitize(raw.loadout), freeKit: raw.freeKit === true };
   for (const r of raw.items) { const it = efcItemNorm(r); if (it) efcStackInto(st.items, it); }
+  efcStashBankOverflow(st);
+  if (raw.v === 1) efcStashWrite(st);
   return st;
+}
+function efcStashBankOverflow(st) {
+  const inv = st.loadout;
+  while (inv.bag.length && (!efcFits(efcInvWeight(inv), efcInvCap(inv)) || !efcGridLoadout(inv))) {
+    const it = inv.bag.pop();
+    if (!it.free) efcStackInto(st.items, it);
+  }
+}
+function efcStashGrids(st) {
+  return { stash: efcGridStash(st.items), loadout: efcGridLoadout(st.loadout) };
+}
+function efcStashWrite(st) {
+  try { localStorage.setItem(EFC_STASH_KEY, JSON.stringify({ ...st, grids: efcStashGrids(st) })); return true; } catch { return false; }
 }
 function efcStash() { return efcStashCur || (efcStashCur = efcStashLoad()); }
 function efcStashSave() {
-  try { localStorage.setItem(EFC_STASH_KEY, JSON.stringify(efcStash())); return true; } catch (e) { return false; }
+  return efcStashWrite(efcStash());
 }
 function efcHasWeapon(list) { return list.some((it) => { const d = efcItemDef(it.id); return d && d.kind === 'weapon' && !it.free; }); }
 /* Copy for the UI. fallback: true when the player owns no weapon at all; freeKit: the stored choice (the Raid screen's option);
@@ -75,7 +90,7 @@ function efcStashToStash(where) {
   if (!it) return false;
   if (!it.free) efcStackInto(st.items, it);
   // without a pack the loadout bag may now be over the limit: move the overflow to the stash
-  while (inv.bag.length && !efcFits(efcInvWeight(inv), efcInvCap(inv))) efcStackInto(st.items, inv.bag.pop());
+  efcStashBankOverflow(st);
   efcStashSave();
   return true;
 }
@@ -111,17 +126,14 @@ function efcRaidCommit(result, inv) {
 }
 
 efcProvide('stash:get', efcStashGet);
+efcProvide('stash:grids', () => efcStashGrids(efcStash()));
 efcProvide('stash:toLoadout', efcStashToLoadout);
 efcProvide('stash:toStash', efcStashToStash);
 efcProvide('stash:save', efcStashSave);
 efcProvide('stash:reset', () => {
   if (MATCH.state !== 'menu' || UI.flow) return false;
   const starter = efcStashStarter();
-  try {
-    localStorage.setItem(EFC_STASH_KEY, JSON.stringify(starter));
-  } catch {
-    return false;
-  }
+  if (!efcStashWrite(starter)) return false;
   efcStashCur = starter;
   efcStashFreeRaid = false;
   efcEmit('stash:reset');

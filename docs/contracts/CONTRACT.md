@@ -23,13 +23,15 @@ ItemDef   { id, name, kind: 'weapon'|'ammo'|'armor'|'pack'|'med'|'loot', w (kg),
 Item      { id, n }                     // n: count. Weapons also carry { mag, res } (rounds in the magazine, reserve rounds)
 Inventory { slots: { primary: Item|null, sidearm: Item|null, armor: Item|null, pack: Item|null }, bag: Item[] }
 Grid      { cols, rows, entries: [{ item: Item, x, y, rotated: boolean }] }
-Container { id, kind: 'crate'|'locker'|'bag'|'body'|'drop', x, y, z, yaw, name, items: Item[] }
+Container { id, kind: 'crate'|'locker'|'bag'|'body'|'drop', x, y, z, yaw, name, grid: Grid, rev, items: Item[] }
 MapData   { inserts:  [{ x, z, yaw }],                       // one per squad, members spawn around it
             extracts: [{ id, name, x, z, r, openAt }],        // openAt: raid seconds before it opens
             containers: [{ kind, table, x, z, yaw }],         // table: loot table name
             guards:   [{ x, z, r, n, elite }] }               // Warden group posts
 Summary   { result: 'extracted'|'dead'|'mia', kills, time, extract (name or ''), items: Item[], value }
 ```
+
+World container grids are authored by the host. The flat item list is projected from entries in order. Each update advances the revision; a take must name the revision it was selected from. Wire protocol 11 requires both clients to support the grid payload.
 
 Entity fields added to engine soldiers: `e.squad` (number 0..3 for player squads, `'w'` for Wardens). Two soldiers are allies in a
 raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 or 1.
@@ -48,12 +50,13 @@ raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 
 | `grid:take` / `grid:split` | ITEMS | `(grid, index, count?) -> { grid, item } or null` / `(grid, index, count, x, y, rotated?) -> Grid or null` | The original grid is unchanged on success or failure |
 | `inv:new` | ITEMS | `() -> Inventory` | Empty |
 | `inv:weight` / `inv:cap` / `inv:value` | ITEMS | `(inv) -> number` | Weight counts the bag only; equipped slots are free |
-| `inv:add` | ITEMS | `(inv, item) -> boolean` | Stacks, then appends; false when over the carry limit. Auto-equips into an empty matching slot |
+| `inv:add` | ITEMS | `(inv, item) -> boolean` | Stacks, then appends; false when over the carry limit or out of cells. Auto-equips into an empty matching slot |
 | `inv:remove` | ITEMS | `(inv, bagIdx, n) -> Item or null` | |
 | `inv:equip` / `inv:unequip` | ITEMS | `(inv, bagIdx)` / `(inv, slot) -> boolean` | |
 | `inv:all` | ITEMS | `(inv) -> Item[]` | Everything carried, slots included (what a body holds) |
 | `inv:weapons` | ITEMS | `(inv) -> array` | The argument `makeArms()` expects, built from the primary and sidearm slots; fists/knife-only fallback handled by the engine |
-| `stash:get` | ITEMS | `() -> { items: Item[], loadout: Inventory }` | Persisted in `localStorage` key `efc_stash_v1` |
+| `stash:get` | ITEMS | `() -> { items: Item[], loadout: Inventory }` | Stored as version 2 under `efc_stash_v1`; v1 saves migrate once and overflow moves to the stash |
+| `stash:grids` / `grid:loadout` | ITEMS | `() -> { stash: Grid[], loadout: object }` / `(inv) -> object or null` | Indexed layouts for the flat list API; gear determines vest/pack capacity; all stash items span as many pages as needed |
 | `stash:toLoadout` / `stash:toStash` | ITEMS | `(stashIdx)` / `(slotOrBagIdx) -> boolean` | Save after each move |
 | `raid:kit` | ITEMS | `() -> Inventory` | Moves the loadout out of the stash (it is now at risk) and returns it. Never returns an unarmed kit: adds the free fallback pistol |
 | `raid:commit` | ITEMS | `(result, inv)` | `'extracted'`: everything goes to the stash. Otherwise it is lost |

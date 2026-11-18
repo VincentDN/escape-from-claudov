@@ -2,8 +2,8 @@
    validate both ends of a transfer before committing either one. */
 const EFC_GRID_LIMIT = 512;
 const EFC_GRID_SIZES = {
-  stash: [10, 20], pockets: [4, 2], crate: [8, 6],
-  locker: [8, 8], bag: [6, 5], body: [10, 10], drop: [6, 2],
+  stash: [10, 20], pockets: [6, 3], crate: [8, 6],
+  locker: [8, 8], bag: [6, 5], body: [20, 20], drop: [6, 3],
 };
 
 function efcGridNew(cols, rows) {
@@ -104,6 +104,48 @@ function efcGridSplit(grid, index, count, x, y, rotated = false) {
   return taken && efcGridPlace(taken.grid, taken.item, x, y, rotated);
 }
 
+/* The list UI keeps bag indexes; the grid view carries those indexes through placement. */
+function efcGridLoadout(inv) {
+  const grids = { pockets: efcGridContainer('pockets') };
+  for (const slot of ['armor', 'pack']) {
+    if (inv.slots[slot]) grids[slot] = efcGridContainer(slot, inv.slots[slot].id);
+  }
+  const order = inv.bag.map((item, index) => ({ item, index }));
+  order.sort((a, b) => {
+    const [aw, ah] = efcGridSize(a.item), [bw, bh] = efcGridSize(b.item);
+    return bw * bh - aw * ah;
+  });
+  for (const { item, index } of order) {
+    let placed = false;
+    for (const kind of Object.keys(grids)) {
+      const grid = efcGridFirstFit(grids[kind], item);
+      if (!grid) continue;
+      grid.entries.at(-1).index = index;
+      grids[kind] = grid;
+      placed = true;
+      break;
+    }
+    if (!placed) return null;
+  }
+  return grids;
+}
+
+/* Old stashes had no capacity limit. Keep all entries when building their grid. */
+function efcGridStash(items) {
+  const pages = [efcGridContainer('stash')];
+  for (const [index, item] of items.entries()) {
+    let grid = efcGridFirstFit(pages.at(-1), item);
+    if (!grid) {
+      pages.push(efcGridContainer('stash'));
+      grid = efcGridFirstFit(pages.at(-1), item);
+    }
+    grid.entries.at(-1).index = index;
+    pages[pages.length - 1] = grid;
+  }
+  return pages;
+}
+
+efcProvide('grid:loadout', efcGridLoadout);
 efcProvide('grid:container', efcGridContainer);
 efcProvide('grid:new', efcGridNew);
 efcProvide('grid:size', efcGridSize);

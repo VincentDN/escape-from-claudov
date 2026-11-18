@@ -51,7 +51,10 @@ function efcInvAdd(inv, item) {
   const slot = efcSlotFor(it.id);
   if (slot && !inv.slots[slot]) { inv.slots[slot] = it; return true; }
   if (!efcFits(efcInvWeight(inv) + efcItemWeight(it), efcInvCap(inv))) return false;
-  efcStackInto(inv.bag, it);
+  const bag = efcClone(inv.bag);
+  efcStackInto(bag, it);
+  if (!efcGridLoadout({ slots: inv.slots, bag })) return false;
+  inv.bag = bag;
   return true;
 }
 /* Takes n (default: the whole stack) from bag entry bagIdx; returns the removed Item or null */
@@ -72,7 +75,7 @@ function efcInvEquip(inv, bagIdx) {
   const old = inv.slots[slot];
   const bag = inv.bag.slice(); if (old) bag[bagIdx] = old; else bag.splice(bagIdx, 1);
   const cap = efcInvCap({ slots: Object.assign({}, inv.slots, { [slot]: it }), bag });
-  if (!efcFits(efcBagWeight(bag), cap)) return false;
+  if (!efcFits(efcBagWeight(bag), cap) || !efcGridLoadout({ slots: { ...inv.slots, [slot]: it }, bag })) return false;
   inv.slots[slot] = it; inv.bag = bag;
   return true;
 }
@@ -82,6 +85,7 @@ function efcInvUnequip(inv, slot) {
   const it = inv.slots[slot];
   const cap = efcInvCap({ slots: Object.assign({}, inv.slots, { [slot]: null }), bag: [] });
   if (!efcFits(efcInvWeight(inv) + efcItemWeight(it), cap)) return false;
+  if (!efcGridLoadout({ slots: { ...inv.slots, [slot]: null }, bag: [...inv.bag, it] })) return false;
   inv.slots[slot] = null; inv.bag.push(it);
   return true;
 }

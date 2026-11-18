@@ -8,7 +8,7 @@ const EFC_W = {
   seed: 0, // loot seed of the current raid
   wasHost: true, // last efcIsHost() seen by the tick listener (host migration)
   kinds: ['crate', 'locker', 'bag', 'body', 'drop'],
-  maxItems: 40, maxN: 100000, nameLen: 24,
+  maxItems: 80, maxN: 100000, nameLen: 24,
 };
 
 /* ---------- Validation (everything a client sends goes through here on the host) ---------- */
@@ -21,7 +21,8 @@ function efcWorldItem(it) {
     if (typeof it[k] !== 'number' || !isFinite(it[k]) || it[k] < 0 || it[k] > EFC_W.maxN) return null;
     o[k] = Math.round(it[k]);
   }
-  return o;
+  const item = efcCall('item:def', o.id);
+  return item && o.n <= (item.stack || 1) ? o : null;
 }
 /* A list of items, or null when it is not an array, too long, or holds one bad item (the whole payload is refused). */
 function efcWorldItems(a) {
@@ -29,6 +30,30 @@ function efcWorldItems(a) {
   const out = [];
   for (const it of a) { const o = efcWorldItem(it); if (!o) return null; out.push(o); }
   return out;
+}
+function efcWorldGrid(kind, items) {
+  return efcCall('grid:import', efcCall('grid:container', kind), items);
+}
+function efcWorldLayout(kind, raw) {
+  const empty = efcCall('grid:container', kind);
+  if (!raw || raw.cols !== empty.cols || raw.rows !== empty.rows ||
+      !Array.isArray(raw.entries) || raw.entries.length > EFC_W.maxItems) return null;
+  let grid = empty;
+  for (const e of raw.entries) {
+    if (!e || typeof e.rotated !== 'boolean') return null;
+    const item = efcWorldItem(e.item);
+    grid = item && efcCall('grid:place', grid, item, e.x, e.y, e.rotated);
+    if (!grid) return null;
+  }
+  return grid;
+}
+function efcWorldSetGrid(c, grid, rev) {
+  c.grid = grid;
+  c.rev = rev;
+  c.items = grid.entries.map(entry => entry.item);
+}
+function efcWorldSendGrid(c, grid) {
+  efcNetToAll('w:upd', { id: c.id, grid, rev: c.rev + 1 });
 }
 /* A position inside the map bounds (1 m margin), or null. y must be finite and plausible. */
 function efcWorldPos(p) {
@@ -57,9 +82,10 @@ function efcWorldSpawn(kind, pos, items, name) {
   if (!efcIsHost() || !EFC_W.kinds.includes(kind)) return null;
   const p = efcWorldPos(pos), list = efcWorldItems(items || []);
   if (!p || !list) return null;
+  const grid = efcWorldGrid(kind, list); if (!grid) return null;
   const yaw = typeof pos.yaw === 'number' && isFinite(pos.yaw) ? pos.yaw : 0;
   let id; do id = (EFC_W.next++).toString(36); while (EFC_W.map.has(id));
-  const c = { id, kind, x: p.x, y: p.y, z: p.z, yaw, name: efcWorldName(name), items: list };
+  const c = { id, kind, x: p.x, y: p.y, z: p.z, yaw, name: efcWorldName(name), grid, rev: 0 };
   efcNetToAll('w:add', { c });
   return id;
 }
@@ -75,19 +101,21 @@ function efcWorldHostBegin() {
     const y = typeof m.y === 'number' && isFinite(m.y) ? groundHeight(m.x, m.z, m.y + 0.3) : groundHeight(m.x, m.z, gy0(m.x, m.z) + 0.3); // m.y: raised spots (mezzanine, upper floor)
     const p = efcWorldPos({ x: m.x, y, z: m.z }); if (!p) continue;
     const items = efcWorldItems(efcCall('loot:roll', m.table || m.kind, rng) || []) || [];
-    list.push({ id: (EFC_W.next++).toString(36), kind: m.kind, x: p.x, y: p.y, z: p.z, yaw: +m.yaw || 0, name: '', items });
+    let grid = efcCall('grid:container', m.kind);
+    for (const item of items) grid = efcCall('grid:import', grid, [item]) || grid;
+    list.push({ id: (EFC_W.next++).toString(36), kind: m.kind, x: p.x, y: p.y, z: p.z, yaw: +m.yaw || 0, name: '', grid, rev: 0 });
   }
   efcNetToAll('w:all', { list, seed: EFC_W.seed });
 }
 /* Host: take item idx (whose id must be `item`) from container id for the sender. Exactly one of two racing takers wins. */
 efcNetOnHost('w:take', (d, from) => {
   if (!d || typeof d.id !== 'string' || !Number.isInteger(d.idx) || typeof d.item !== 'string') return;
-  const c = EFC_W.map.get(d.id); if (!c) return;
+  const c = EFC_W.map.get(d.id); if (!c || d.rev !== c.rev) return;
   const it = c.items[d.idx]; if (!it || it.id !== d.item) return;
   if (!efcWorldNear(c, efcWorldActor(from), efcWorldReach())) return;
-  const items = c.items.slice(); items.splice(d.idx, 1);
-  if (c.kind === 'drop' && !items.length) efcNetToAll('w:del', { id: c.id });
-  else efcNetToAll('w:upd', { id: c.id, items });
+  const taken = efcCall('grid:take', c.grid, d.idx);
+  if (c.kind === 'drop' && !taken.grid.entries.length) efcNetToAll('w:del', { id: c.id });
+  else efcWorldSendGrid(c, taken.grid);
   efcNetTo(from, 'w:give', { item: efcClone(it), id: c.id });
 });
 /* Host: put an item into a container near the sender, otherwise into a new 'drop' at the given position (the sender's own position
@@ -97,8 +125,8 @@ efcNetOnHost('w:put', (d, from) => {
   const item = efcWorldItem(d.item); if (!item) return;
   const e = efcWorldActor(from), c = typeof d.id === 'string' ? EFC_W.map.get(d.id) : null;
   if (c && efcWorldNear(c, e, efcWorldReach()) && c.items.length < EFC_W.maxItems) {
-    efcNetToAll('w:upd', { id: c.id, items: c.items.concat([item]) });
-    return;
+    const addition = efcCall('grid:import', c.grid, [item]);
+    if (addition) { efcWorldSendGrid(c, addition); return; }
   }
   let p = efcWorldPos(d);
   if (e && e.pos && (!p || !efcWorldNear(p, e, efcWorldReach()))) p = efcWorldPos(e.pos);
@@ -115,7 +143,11 @@ efcNetOnHost('w:hello', (d, from) => { efcNetTo(from, 'w:all', efcWorldSnapshot(
 function efcWorldClean(c) {
   if (!c || typeof c.id !== 'string' || !EFC_W.kinds.includes(c.kind)) return null;
   const p = efcWorldPos(c); if (!p) return null;
-  return { id: c.id, kind: c.kind, x: p.x, y: p.y, z: p.z, yaw: +c.yaw || 0, name: efcWorldName(c.name), items: efcWorldItems(c.items) || [] };
+  const grid = efcWorldLayout(c.kind, c.grid);
+  if (!grid || !Number.isSafeInteger(c.rev) || c.rev < 0) return null;
+  const cleaned = { id: c.id, kind: c.kind, ...p, yaw: +c.yaw || 0, name: efcWorldName(c.name) };
+  efcWorldSetGrid(cleaned, grid, c.rev);
+  return cleaned;
 }
 function efcWorldClear() {
   const ids = Array.from(EFC_W.map.keys());
@@ -142,8 +174,10 @@ efcNetOnClient('w:del', (d) => {
   efcEmit('world:changed', d.id);
 });
 efcNetOnClient('w:upd', (d) => {
-  const c = d && EFC_W.map.get(d.id); if (!c) return;
-  c.items = efcWorldItems(d.items) || [];
+  const c = d && EFC_W.map.get(d.id);
+  if (!c || !Number.isSafeInteger(d.rev) || d.rev <= c.rev) return;
+  const grid = efcWorldLayout(c.kind, d.grid); if (!grid) return;
+  efcWorldSetGrid(c, grid, d.rev);
   efcWorldMeshSet(c);
   efcEmit('world:changed', c.id);
 });
@@ -166,7 +200,7 @@ efcProvide('world:scavenge', (id, actor) => {
   const c = EFC_W.map.get(id);
   if (!efcIsHost() || !actor?.alive || actor.squad !== 's' || !c?.items.length ||
       !['crate', 'locker', 'bag'].includes(c.kind) || !efcWorldNear(c, actor, EFC.cfg.interactR)) return false;
-  efcNetToAll('w:upd', { id, items: c.items.slice(1) });
+  efcWorldSendGrid(c, efcCall('grid:take', c.grid, 0).grid);
   return true;
 });
 efcProvide('world:list', () => Array.from(EFC_W.map.values()));
@@ -182,7 +216,7 @@ efcProvide('world:near', (p, r) => {
 efcProvide('world:take', (id, idx) => {
   const c = EFC_W.map.get(id), it = c && c.items[idx];
   if (!it) return false;
-  efcNetToHost('w:take', { id, idx, item: it.id });
+  efcNetToHost('w:take', { id, idx, item: it.id, rev: c.rev });
   return true;
 });
 efcProvide('world:put', (id, item) => {

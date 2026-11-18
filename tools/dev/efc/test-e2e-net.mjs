@@ -22,10 +22,21 @@ const foe = await host.evaluate(() => { const r = [...NET.remotes.values()].find
 ok(foe && foe.allied === false, 'players of different squads are hostile', foe);
 
 // the guest takes an item: granted once, and the host's copy of the container changes
+const grids = page => page.evaluate(() => (efcCall('world:list') || [])
+  .map(c => [c.id, c.rev, c.grid]).sort((a, b) => a[0].localeCompare(b[0])));
+const originalGrids = await grids(host);
+ok(originalGrids.length > 0 && originalGrids.every(([, rev, grid]) => Number.isSafeInteger(rev) && rev >= 0 && grid?.cols > 0) &&
+  JSON.stringify(originalGrids) === JSON.stringify(await grids(guest)), 'host and guest see identical initial container grids');
 const tgt = await guest.evaluate(() => { const c = (efcCall('world:list') || []).find((x) => x.items.length && x.kind !== 'body'); PL.ent.pos.set(c.x + 0.8, c.y, c.z); PL.ent.vel.set(0, 0, 0); return { id: c.id, n: c.items.length, first: c.items[0], carried: efcCall('inv:all', EFC.inv).reduce((s, it) => s + (it.n || 1), 0) }; });
 await stepBoth(both, 0.6, KEEP); await settle(200);
+const beforeTake = (await grids(host)).find(([id]) => id === tgt.id);
 await guest.evaluate((t) => efcCall('world:take', t.id, 0), tgt);
 await settle(300); await stepBoth(both, 0.6, KEEP); await settle(300); await stepBoth(both, 0.4, KEEP);
+const nextHost = await grids(host), nextGuest = await grids(guest);
+const current = nextHost.find(([id]) => id === tgt.id), remote = nextGuest.find(([id]) => id === tgt.id);
+ok(current && beforeTake && JSON.stringify(current) === JSON.stringify(remote) && current[1] === beforeTake[1] + 1 &&
+  JSON.stringify(current[2].entries) === JSON.stringify(beforeTake[2].entries.slice(1)),
+  'shared grid updates retain coordinates of items left behind');
 const after = async (pg, id) => pg.evaluate((id) => { const c = (efcCall('world:list') || []).find((x) => x.id === id); return { left: c ? c.items.length : -1, carried: efcCall('inv:all', EFC.inv).reduce((s, it) => s + (it.n || 1), 0) }; }, id);
 const ga = await after(guest, tgt.id), ha = await after(host, tgt.id);
 ok(ga.carried > tgt.carried && ga.left === tgt.n - 1, 'the guest received the item it took', { before: tgt.carried, after: ga.carried, left: ga.left });

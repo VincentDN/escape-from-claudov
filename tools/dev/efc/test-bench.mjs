@@ -53,7 +53,8 @@ try {
   assert.equal(await dialog.getByRole('status').textContent(), 'Starter stash and loadout restored.');
   assert.ok(await page.evaluate(() => {
     const starter = JSON.stringify(efcStashStarter());
-    return JSON.stringify(efcStash()) === starter && localStorage.getItem(EFC_STASH_KEY) === starter;
+    const { grids, ...saved } = JSON.parse(localStorage.getItem(EFC_STASH_KEY));
+    return JSON.stringify(efcStash()) === starter && JSON.stringify(saved) === starter && grids.stash.length === 1;
   }));
   assert.equal(await dialog.getByRole('link', { name: 'Module index' }).getAttribute('href'), 'showcase/modules/');
   const modules = await page.request.get(new URL('showcase/modules/', process.env.EFC_TEST_URL).href);

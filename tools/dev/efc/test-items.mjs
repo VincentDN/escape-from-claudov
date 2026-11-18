@@ -58,7 +58,7 @@ function makeCtx(store) {
   ok(C('grid:move', one, 0, 0, 0, true) === null, 'rotation cannot cross bottom edge');
   const tall = C('grid:import', C('grid:new', 2, 5), [rifle]);
   ok(tall.entries[0].rotated, 'imports rotate if needed');
-  ok(C('grid:container', 'pack', 'pack_s').cols === 4 && C('grid:container', 'pockets').rows === 2, 'container dimensions');
+  ok(C('grid:container', 'pack', 'pack_s').cols === 4 && C('grid:container', 'pockets').rows === 3, 'container dimensions');
   const withAmmo = C('grid:add', one, ammo);
   const fullStack = C('grid:add', withAmmo, ammo);
   ok(fullStack.entries[1].item.n === 60 && fullStack.entries[2].item.n === 20, 'stacks fill before allocating a new cell');
@@ -69,6 +69,24 @@ function makeCtx(store) {
   const taken = C('grid:take', split, 1, 5);
   ok(taken.item.n === 5 && taken.grid.entries[1].item.n === 45, 'partial take');
   ok(C('grid:add', C('grid:place', C('grid:new', 1, 1), ammo, 0, 0), ammo) === null, 'overflow cannot partially merge');
+  for (const def of C('item:all')) {
+    ok(C('grid:import', C('grid:container', 'drop'), [{ id: def.id, n: 1 }]), 'drop fits ' + def.id);
+  }
+}
+
+/* ---------- legacy stash migration ---------- */
+{
+  const key = 'efc_stash_v1';
+  const original = { v: 1, items: [{ id: 'loot_wrench', n: 1 }], freeKit: true,
+    loadout: { slots: { primary: { id: 'w_mp5', n: 1, mag: 9, res: 13 } }, bag: [{ id: 'armor_t3', n: 1 }, { id: 'ammo_rifle', n: 20 }] } };
+  const ls = new Map([[key, JSON.stringify(original)]]);
+  const first = makeCtx(ls).ctx.call('stash:get');
+  const saved = ls.get(key), migrated = JSON.parse(saved);
+  ok(first.v === 2 && first.freeKit && first.loadout.slots.primary.mag === 9 && first.loadout.slots.primary.res === 13, 'v1 migration preserves preference and weapon ammo');
+  ok(first.items.some(it => it.id === 'armor_t3') && first.items.some(it => it.id === 'ammo_rifle'), 'migration banks overflow without deleting paid gear');
+  ok(migrated.grids.stash[0].entries.length === first.items.length && migrated.grids.loadout.pockets.entries.length === first.loadout.bag.length, 'v2 storage includes layouts');
+  const second = makeCtx(ls).ctx.call('stash:get');
+  ok(JSON.stringify(first) === JSON.stringify(second) && ls.get(key) === saved, 'reloading v2 does not migrate again');
 }
 
 /* ---------- inventory ---------- */

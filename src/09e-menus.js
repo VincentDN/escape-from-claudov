@@ -716,7 +716,7 @@ document.addEventListener('click', (e) => {
 
 /* Fond des menus : visible tant qu'on est dans les menus (la boucle de jeu l'appelle à chaque image) */
 let menuBgOn = false;
-function menuBgShow(on) { if (on !== menuBgOn) { menuBgOn = on; $('menuBg').style.display = on ? 'block' : 'none'; document.body.classList.toggle('mbg', on); if (on) mbgShown(); else efcOpeningHide(); } } // fond animé : 09w-fond.js
+function menuBgShow(on) { if (on !== menuBgOn) { menuBgOn = on; $('menuBg').style.display = on ? 'block' : 'none'; if (!on) efcOpeningHide(); } }
 
 /* ---------- Initialisation ---------- */
 function menuInit() {
@@ -751,7 +751,6 @@ function menuInit() {
   $('perf').classList.toggle('hidden', !Settings.perf);
   newsInit();
   musicInit();
-  mbgInit(); // fond animé des menus (09w-fond.js)
   netInit();
   acctInit(); socInit();
   // Escape From Claudov: no what's-new window and no energy-saving question; English unless the player chose French in Settings

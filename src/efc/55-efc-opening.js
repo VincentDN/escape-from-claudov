@@ -1,12 +1,14 @@
 /* Partisan opening scene behind the native menu. The engine owns navigation and audio. */
-const EFC_OPENING = { frame: null, ready: false };
+const EFC_OPENING = { frame: null, ready: false, screen: null, paused: null };
 const EFC_DEV = { taps: 0, health: false, timer: false, aggro: false };
+function efcOpeningMotion() { return !matchMedia('(prefers-reduced-motion: reduce)').matches; }
 function efcOpeningHide() {
   if (EFC_OPENING.frame) EFC_OPENING.frame.hidden = true;
+  EFC_OPENING.screen = null;
   $('menuBg').classList.remove('intro-ready');
 }
 function efcOpeningScene() {
-  if (UI.screen !== 'main' || UI.busy || Settings.gfxSafe || (window.EFC_TEST && !window.EFC_TEST_OPENING) || location.protocol === 'file:' || location.hash === '#bench') {
+  if (Settings.gfxSafe || (window.EFC_TEST && !window.EFC_TEST_OPENING) || location.protocol === 'file:' || location.hash === '#bench') {
     efcOpeningHide();
     return false;
   }
@@ -16,24 +18,28 @@ function efcOpeningScene() {
     frame.id = 'efcIntroFrame';
     frame.title = 'Partisan workbench scene';
     frame.tabIndex = -1;
+    frame.setAttribute('aria-hidden', 'true');
     frame.src = 'showcase/intro/';
     EFC_OPENING.frame = frame;
     bg.append(frame);
   }
   EFC_OPENING.frame.hidden = false;
   if (!EFC_OPENING.ready) return false;
-  bg.classList.remove('gl');
   bg.classList.add('intro-ready');
-  MBG.live = false; MBG.drawn = '';
-  return true;
+  const paused = MAPL.state === 'loading' || UI.busy;
+  if (EFC_OPENING.screen !== UI.screen || EFC_OPENING.paused !== paused) {
+    EFC_OPENING.screen = UI.screen;
+    EFC_OPENING.paused = paused;
+    EFC_OPENING.frame.contentWindow.postMessage({ type: 'claudov-opening-screen', screen: UI.screen, paused }, location.origin);
+  }
 }
 addEventListener('message', event => {
   if (event.origin === location.origin && event.source === EFC_OPENING.frame?.contentWindow && event.data?.type === 'claudov-opening-ready') EFC_OPENING.ready = true;
 });
 addEventListener('pointermove', event => {
   const frame = EFC_OPENING.frame;
-  if (!mbgMotion() || !EFC_OPENING.ready || !frame || frame.hidden) return;
-  frame.contentWindow.postMessage({ type: 'claudov-opening-look', x: event.clientX / innerWidth * 2 - 1, y: event.clientY / innerHeight * 2 - 1 }, location.origin);
+  if (!efcOpeningMotion() || !EFC_OPENING.ready || !frame || frame.hidden) return;
+  frame.contentWindow.postMessage({ type: 'claudov-opening-look', x: event.clientX / Math.max(1, innerWidth) * 2 - 1, y: event.clientY / Math.max(1, innerHeight) * 2 - 1 }, location.origin);
 }, { passive: true });
 
 function efcDevActive(cheat) { return !MATCH.online && MATCH.state === 'playing' && EFC_DEV[cheat]; }

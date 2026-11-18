@@ -22,13 +22,9 @@ const ok = (c, m) => { if (!c) { fails++; console.log('ECHEC :', m); } else cons
   await page.waitForTimeout(300);
   const v = await page.evaluate(() => {
     const cards = document.querySelectorAll('#skList .sk-card').length;
-    if (SKV.live) {
-      // aperçu animé : dessiné dans la toile du jeu après le fond (09u-tenues.js), relu juste après l'image, avant que le navigateur ne la
-      // compose ; le soldat : des pixels nettement plus clairs que le studio, sombre
-      MBG.drawn = ''; MBG.acc = 1; frame(performance.now() + 100);
-      const gl = renderer.getContext(), r = SKV.host.getBoundingClientRect(), cr = renderer.domElement.getBoundingClientRect(), bs = renderer.getDrawingBufferSize(new THREE.Vector2());
-      const sx = bs.x / cr.width, sy = bs.y / cr.height, x = Math.round((r.left - cr.left) * sx), y = Math.round((cr.bottom - r.bottom) * sy), w = Math.round(r.width * sx), h = Math.round(r.height * sy);
-      const d = new Uint8Array(w * h * 4); gl.readPixels(x, y, w, h, gl.RGBA, gl.UNSIGNED_BYTE, d); let n = 0;
+    if (!SKV.fail && SKV.W > 0) {
+      const { cv, ctx } = SKV, w = cv.width, h = cv.height;
+      const d = ctx.getImageData(0, 0, w, h).data; let n = 0;
       for (let i = 0; i < d.length; i += 16) if (d[i] + d[i + 1] + d[i + 2] > 150) n++;
       return { live: true, w, h, frac: n / (d.length / 16), cards };
     }
@@ -46,9 +42,10 @@ const ok = (c, m) => { if (!c) { fails++; console.log('ECHEC :', m); } else cons
     const c = await page.evaluate(() => {
       const prev = SKV.view; skinView('tempest');
       for (let i = 0; i < 20; i++) { SKV.acc = 1 / 30; skinLiveDraw(); }
-      const gl = renderer.getContext(), r = SKV.host.getBoundingClientRect(), cr = renderer.domElement.getBoundingClientRect(), bs = renderer.getDrawingBufferSize(new THREE.Vector2());
-      const sx = bs.x / cr.width, sy = bs.y / cr.height, x = Math.round((r.left - cr.left) * sx), y = Math.round((cr.bottom - r.bottom) * sy), w = Math.round(r.width * sx), h = Math.round(r.height * sy);
-      const shot = () => { SKV.acc = 0; skinLiveDraw(); const d = new Uint8Array(w * h * 4); gl.readPixels(x, y, w, h, gl.RGBA, gl.UNSIGNED_BYTE, d); return d; };
+      const shot = () => {
+        SKV.acc = 0; skinLiveDraw();
+        return SKV.ctx.getImageData(0, 0, SKV.cv.width, SKV.cv.height).data;
+      };
       const A = shot(), C = skinLiveModel('tempest').cloth, P = C.sim.p;
       for (let i = 0; i < C.sim.n; i++) P[i * 3] += 0.6;
       const B = shot(); let n = 0;

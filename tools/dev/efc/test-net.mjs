@@ -63,7 +63,7 @@ try {
     const r = NET.remotes.get(oid);
     const bots = entities.filter((e) => e.netBot || e.remoteBot);
     return { state: MATCH.state, mode: MATCH.mode, cfgMode: NET.cfg.mode, mySquad: PL.ent.squad, myTeam: PL.ent.team, remote: !!r && r.isRemote && entities.includes(r), rSquad: r && r.squad, rTeam: r && r.team,
-      bots: bots.length, botsW: bots.every((e) => e.squad === 'w'), allBots: entities.filter((e) => !e.isPlayer && !e.isRemote).every((e) => e.netBot) };
+      bots: bots.length, botsW: bots.filter(e => e.squad === 'w').length, botsS: bots.filter(e => e.squad === 's').length, allBots: entities.filter((e) => !e.isPlayer && !e.isRemote).every((e) => e.netBot) };
   }, otherId);
   const bh = await sb(host, gid), bg = await sb(guest, h0.me);
   ok(bh.state === 'playing' && bh.cfgMode === 'raid' && bh.mode === 'raid', '(b) host playing a raid', bh);
@@ -74,8 +74,8 @@ try {
   ok(bg.remote && bg.rSquad === 0, '(b) guest sees the host as remote in squad 1', bg);
   // since P1 the raid fields the map's Warden number (plus one per extra squad), not every bot
   const want = await host.evaluate(() => (typeof efcWardenNumber === 'function' ? efcWardenNumber(2) : null));
-  ok(bh.bots > 0 && bh.botsW && (want == null ? bh.allBots : bh.bots === want), '(b) the host fields the raid\'s Warden number, squad w', { ...bh, want });
-  ok(bg.bots > 0 && bg.botsW, '(b) guest copies of host bots carry squad w', bg);
+  ok(bh.botsW > 0 && bh.botsW + bh.botsS === bh.bots && (want == null ? bh.allBots : bh.bots === want), '(b) the host stays within the raid bot budget', { ...bh, want });
+  ok(bg.botsW === bh.botsW && bg.botsS === bh.botsS, '(b) guest copies carry the host bot factions', bg);
   const so = [await host.evaluate((gid) => [efcCall('squad:of', gid), efcCall('squad:of', NET.me)], gid), await guest.evaluate((hid) => [efcCall('squad:of', hid), efcCall('squad:of', NET.me)], h0.me)];
   ok(JSON.stringify(so) === '[[1,0],[0,1]]', "(b) service 'squad:of' gives lobby squads on both machines", so);
 

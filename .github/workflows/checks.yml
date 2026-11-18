@@ -1,0 +1,40 @@
+name: Claudov checks
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --prefix "$RUNNER_TEMP/efc-playwright" --no-audit --no-fund playwright
+          "$RUNNER_TEMP/efc-playwright/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Run the full suite twice
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/efc-checks"
+          export NODE_PATH="$RUNNER_TEMP/efc-playwright/node_modules"
+          export EFC_TEST_URL=http://127.0.0.1:8231/
+          python3 -m http.server 8231 --bind 127.0.0.1 --directory dist >"$RUNNER_TEMP/efc-checks/server.log" 2>&1 &
+          trap 'kill "$!"' EXIT
+          for check_pass in 1 2; do
+            export EFC_TEST_LOG_DIR="$RUNNER_TEMP/efc-checks/pass-$check_pass"
+            bash tools/dev/efc/run-all.sh | tee "$RUNNER_TEMP/efc-checks/pass-$check_pass.log"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: efc-checks
+          path: ${{ runner.temp }}/efc-checks

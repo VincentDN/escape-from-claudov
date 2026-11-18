@@ -129,6 +129,34 @@ function rampHeight(r, x, z) {
 
 /* ---------- Requêtes de collision ---------- */
 const HASH = new Map(), HCELL = 4;
+const EFC_RUNTIME_BOXES = new Map(), EFC_RUNTIME_CELLS = new Map();
+function efcRuntimeBoxAdd(id, box) {
+  efcRuntimeBoxRemove(id);
+  const entry = { box, cells: [], stamp: 0 };
+  EFC_RUNTIME_BOXES.set(id, entry);
+  for (let x = Math.floor(box.x0 / HCELL); x <= Math.floor(box.x1 / HCELL); x++)
+    for (let z = Math.floor(box.z0 / HCELL); z <= Math.floor(box.z1 / HCELL); z++) {
+      const key = x * 1000 + z;
+      let bucket = EFC_RUNTIME_CELLS.get(key);
+      if (!bucket) EFC_RUNTIME_CELLS.set(key, bucket = new Set());
+      bucket.add(entry);
+      entry.cells.push(key);
+    }
+}
+function efcRuntimeBoxRemove(id) {
+  const entry = EFC_RUNTIME_BOXES.get(id);
+  if (!entry) return;
+  for (const key of entry.cells) {
+    const bucket = EFC_RUNTIME_CELLS.get(key);
+    bucket.delete(entry);
+    if (!bucket.size) EFC_RUNTIME_CELLS.delete(key);
+  }
+  EFC_RUNTIME_BOXES.delete(id);
+}
+function efcRuntimeBoxesClear() {
+  EFC_RUNTIME_BOXES.clear();
+  EFC_RUNTIME_CELLS.clear();
+}
 function buildHash() {
   for (let i = 0; i < COL.length; i++) {
     const c = COL[i];
@@ -146,14 +174,19 @@ let _qn = 0, _qstamp = new Uint32Array(0);
 function queryBegin() {
   _qarr.length = 0;
   if (_qstamp.length < COL.length) _qstamp = new Uint32Array(COL.length + 256);
-  if (++_qn === 0xffffffff) { _qstamp.fill(0); _qn = 1; }
+  if (++_qn === 0xffffffff) { _qstamp.fill(0); for (const entry of EFC_RUNTIME_BOXES.values()) entry.stamp = 0; _qn = 1; }
 }
 function queryCell(a) { for (let k = 0; k < a.length; k++) { const i = a[k]; if (_qstamp[i] !== _qn) { _qstamp[i] = _qn; _qarr.push(COL[i]); } } }
+function efcQueryRuntimeCell(key) {
+  const bucket = EFC_RUNTIME_CELLS.get(key);
+  if (bucket) for (const entry of bucket) if (entry.stamp !== _qn) { entry.stamp = _qn; _qarr.push(entry.box); }
+}
 function queryBoxes(x0, z0, x1, z1) {
   queryBegin();
   for (let x = Math.floor(x0 / HCELL); x <= Math.floor(x1 / HCELL); x++)
     for (let z = Math.floor(z0 / HCELL); z <= Math.floor(z1 / HCELL); z++) {
-      const a = HASH.get(x * 1000 + z); if (a) queryCell(a);
+      const key = x * 1000 + z, a = HASH.get(key); if (a) queryCell(a);
+      if (EFC_RUNTIME_BOXES.size) efcQueryRuntimeCell(key);
     }
   return _qarr;
 }
@@ -301,8 +334,9 @@ function queryBoxesRay(x0, z0, x1, z1) {
   let tmx = Math.abs(dx) < 1e-9 ? 1e9 : ((sx > 0 ? (cx + 1) * HCELL - x0 : x0 - cx * HCELL) / Math.abs(dx));
   let tmz = Math.abs(dz) < 1e-9 ? 1e9 : ((sz > 0 ? (cz + 1) * HCELL - z0 : z0 - cz * HCELL) / Math.abs(dz));
   for (let n = 0; n < 400; n++) {
-    const a = HASH.get(cx * 1000 + cz);
+    const key = cx * 1000 + cz, a = HASH.get(key);
     if (a) queryCell(a);
+    if (EFC_RUNTIME_BOXES.size) efcQueryRuntimeCell(key);
     if (cx === ex && cz === ez) break;
     if (tmx < tmz) { if (tmx > 1) break; tmx += tdx; cx += sx; } else { if (tmz > 1) break; tmz += tdz; cz += sz; }
   }

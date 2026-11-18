@@ -79,6 +79,15 @@ function efcWmMats() {
   }
 }
 
+/* The closed body stays solid when a lid or door opens. Rotate its footprint into the engine's AABB grid. */
+function efcWorldCollisionSet(c) {
+  if (c.kind !== 'crate' && c.kind !== 'locker') return;
+  const [w, h, d, material] = c.kind === 'crate' ? [1.04, 0.58, 0.64, 'wood'] : [0.62, 1.9, 0.56, 'metal'];
+  const sin = Math.abs(Math.sin(c.yaw)), cos = Math.abs(Math.cos(c.yaw));
+  const x = (w * cos + d * sin) / 2, z = (w * sin + d * cos) / 2;
+  efcRuntimeBoxAdd('loot:' + c.id, { x0: c.x - x, x1: c.x + x, y0: c.y, y1: c.y + h, z0: c.z - z, z1: c.z + z, m: material });
+}
+
 /* Creates or refreshes the mesh of container c (after an add or an item change). */
 function efcWorldMeshSet(c) {
   if (typeof scene === 'undefined' || typeof THREE === 'undefined') return;
@@ -90,11 +99,12 @@ function efcWorldMeshSet(c) {
     m = new THREE.Mesh(efcWmGeo(c.kind, open), open ? EFC_WM.matEmpty : EFC_WM.mat);
     m.castShadow = true; m.receiveShadow = true; m.matrixAutoUpdate = false; m.name = 'efc-container-' + c.id;
     m.position.set(c.x, c.y, c.z); m.rotation.set(0, c.yaw || 0, 0); m.updateMatrix(); m.updateMatrixWorld(true);
-    scene.add(m); EFC_WM.meshes.set(c.id, m);
+    scene.add(m); EFC_WM.meshes.set(c.id, m); efcWorldCollisionSet(c);
   } else { m.geometry = efcWmGeo(c.kind, open); m.material = open ? EFC_WM.matEmpty : EFC_WM.mat; }
   m.userData.efcOpen = open; m.userData.efcKind = c.kind;
 }
 function efcWorldMeshDel(id) {
+  efcRuntimeBoxRemove('loot:' + id);
   const m = EFC_WM.meshes.get(id); if (!m) return;
   scene.remove(m); EFC_WM.meshes.delete(id); // geometries and materials are shared and kept
 }

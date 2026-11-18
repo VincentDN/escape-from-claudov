@@ -250,6 +250,34 @@ function computeComponents() {
   NAV.comp = comp; NAV.mainComp = big;
 }
 
+/* The static path graph stays intact. Reject only nodes and sampled segments touched by current raid boxes. */
+function efcNavRuntimeClear(x, y, z) {
+  if (!EFC_RUNTIME_BOXES.size) return true;
+  const r = NAV_R;
+  for (let cx = Math.floor((x - r) / HCELL); cx <= Math.floor((x + r) / HCELL); cx++)
+    for (let cz = Math.floor((z - r) / HCELL); cz <= Math.floor((z + r) / HCELL); cz++) {
+      const bucket = EFC_RUNTIME_CELLS.get(cx * 1000 + cz);
+      if (!bucket) continue;
+      for (const { box } of bucket) {
+        if (box.y1 <= y + 0.3 || box.y0 >= y + 1.7) continue;
+        const bx = clamp(x, box.x0, box.x1), bz = clamp(z, box.z0, box.z1);
+        if ((x - bx) ** 2 + (z - bz) ** 2 < r * r) return false;
+      }
+    }
+  return true;
+}
+
+function efcNavRuntimeEdge(from, to) {
+  const nx = NAV.nx, ny = NAV.ny, nz = NAV.nz;
+  if (!efcNavRuntimeClear(nx[to], ny[to], nz[to])) return false;
+  const steps = Math.ceil(hyp(nx[from] - nx[to], nz[from] - nz[to]) / 0.45);
+  for (let i = 1; i < steps; i++) {
+    const t = i / steps;
+    if (!efcNavRuntimeClear(lerp(nx[from], nx[to], t), lerp(ny[from], ny[to], t), lerp(nz[from], nz[to], t))) return false;
+  }
+  return true;
+}
+
 function navNode(x, y, z) {
   const cx0 = Math.floor(x - NAV.x0), cz0 = Math.floor(z - NAV.z0);
   let best = -1, bd = 1e9;
@@ -261,7 +289,7 @@ function navNode(x, y, z) {
       for (const id of NAV.cells[cz * NAV.W + cx]) {
         if (NAV.comp[id] !== NAV.mainComp) continue;
         const dy = NAV.ny[id] - y;
-        if (dy > 0.9) continue;
+        if (dy > 0.9 || !efcNavRuntimeClear(NAV.nx[id], NAV.ny[id], NAV.nz[id])) continue;
         const d = Math.abs(dy) * 3 + hyp(NAV.nx[id] - x, NAV.nz[id] - z);
         if (d < bd) { bd = d; best = id; }
       }
@@ -298,7 +326,7 @@ function findPath(from, to, sid = -1) {
     if (cl[n] === gen) continue; cl[n] = gen;
     if (n === e) { found = true; break; }
     for (let j = NAV.adjStart[n]; j < NAV.adjStart[n + 1]; j++) {
-      const m = NAV.adj[j]; if (cl[m] === gen) continue;
+      const m = NAV.adj[j]; if (cl[m] === gen || (EFC_RUNTIME_BOXES.size && !efcNavRuntimeEdge(n, m))) continue;
       const ng = g[n] + NAV.adjCost[j];
       if (st[m] !== gen || ng < g[m]) {
         st[m] = gen; g[m] = ng; fr[m] = n; kd[m] = NAV.adjKind[j]; NAV.lead[m] = NAV.adjLead[j];
@@ -323,7 +351,7 @@ function navWalkable(a, b) {
     if (cx < 0 || cz < 0 || cx >= NAV.W || cz >= NAV.H) return false;
     let ok = false;
     for (const id of NAV.cells[cz * NAV.W + cx]) { if (Math.abs(NAV.ny[id] - h) <= 0.5) { h = NAV.ny[id]; ok = true; break; } }
-    if (!ok) return false;
+    if (!ok || !efcNavRuntimeClear(x, h, z)) return false;
     if (VOID.on && groundHeight(x, z, h + 0.05, 0.3) <= VOID.floor + 1) return false; // un raccourci ne passe pas au-dessus du vide (coin d'une case du bord)
   }
   return Math.abs(h - b.y) < 0.5;

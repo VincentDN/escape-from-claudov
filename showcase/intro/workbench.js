@@ -12,14 +12,22 @@ import {loaderError} from '../shared/loader.js';
 const TABLE={top:.86,x:[-.95,.95],z:[.24,1.04]};
 const RIFLE_AT=new T.Vector3(.04,0,.47);// x/z on the table; y comes from the rifle's own thickness
 // Camera behind and above the right shoulder, looking down at the rifle.
-const SHOT={position:new T.Vector3(-.56,1.86,0),target:new T.Vector3(-.06,.84,.42)};
-const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const shot=(x,y,z,tx,ty,tz)=>({position:new T.Vector3(x,y,z),target:new T.Vector3(tx,ty,tz)});
+const SHOTS={
+ main:shot(-.56,1.86,0,-.06,.84,.42),
+ hideout:shot(-.9,1.56,.28,-.18,.94,.74),
+ deploy:shot(-.13,1.6,.27,.2,.83,.79),
+ studio:shot(-.76,1.8,-.32,-.12,1,.64),
+ general:shot(-.32,1.69,-.35,-.12,1,.54),
+};
+const menuShots={raid:'deploy',solo:'deploy',multi:'deploy',deploy:'deploy',arsenal:'studio',skins:'studio',classes:'studio'};
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const stage=document.querySelector('#stage'),status=document.querySelector('#status');
 const renderer=new T.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
 renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;stage.append(renderer.domElement);
 const scene=new T.Scene();scene.background=new T.Color(0x07090a);scene.fog=new T.Fog(0x07090a,2.2,5);
-const camera=new T.PerspectiveCamera(42,1,.05,20);camera.position.copy(SHOT.position);camera.lookAt(SHOT.target);
+const camera=new T.PerspectiveCamera(42,1,.05,20);camera.position.copy(SHOTS.main.position);camera.lookAt(SHOTS.main.target);
 
 // ---------- Lighting: one warm work lamp, a cold fill, a dim HDR for the metal ----------
 scene.add(new T.HemisphereLight(0x4a5a66,0x120d08,.35));
@@ -159,9 +167,9 @@ function drapeFlag(time){
    const h=s-FLAG.flat-arc,k=h/(FLAG.height-FLAG.flat);// 0 at the edge, 1 at the bottom hem
    y=TABLE.top+.002-FLAG.bend-h;
    // Folds from the weight of the cloth, plus a slow sway (off under reduced motion).
-   const sway=reduceMotion?0:Math.sin(time*1.1+u*5)*.008*k+Math.sin(time*.7+u*11)*.003*k;
+   const sway=reducedMotion.matches?0:Math.sin(time*1.1+u*5)*.008*k+Math.sin(time*.7+u*11)*.003*k;
    z=edge-FLAG.bend-Math.sin(u*Math.PI*5)*.012*k-.01*k*k-sway;
-   x+=reduceMotion?0:Math.sin(time*.9+v*4)*.004*k;
+   x+=reducedMotion.matches?0:Math.sin(time*.9+v*4)*.004*k;
   }
   p.setXYZ(i,x,y,z);
  }
@@ -174,7 +182,7 @@ const op=buildOperator({...DEFAULT_OPERATOR,headgear:'none',gloves:'none',pack:'
 op.root.traverse(m=>{if(m.isMesh)m.castShadow=m.receiveShadow=true;});scene.add(op.root);
 const LEAN={hips:.1,spine:.16,chest:.18,neck:.08,head:.42};
 function pose(time){
- const breath=reduceMotion?0:Math.sin(time*1.4)*.012;
+ const breath=reducedMotion.matches?0:Math.sin(time*1.4)*.012;
  for(const [joint,x] of Object.entries(LEAN))op.joints[joint].rotation.x=x+(joint==='chest'?breath:0);
  op.joints.head.rotation.y=-.1+look.x*.12;
  for(const side of ['R','L']){op.joints['upperLeg'+side].rotation.x=-.08;op.joints['lowerLeg'+side].rotation.x=.14;}
@@ -220,10 +228,19 @@ function placeRifle(){
 }
 
 // The real Claudov menu owns input. Receive its pointer position without intercepting clicks.
-const look={x:0,y:0},want={x:0,y:0},currentTarget=SHOT.target.clone();
+const look={x:0,y:0},want={x:0,y:0},currentTarget=SHOTS.main.target.clone();
+const basePosition=SHOTS.main.position.clone(),baseTarget=SHOTS.main.target.clone();
+let desiredShot=SHOTS.main,paused=false;
 addEventListener('message',event=>{
- if(event.source!==parent||event.origin!==location.origin||event.data?.type!=='claudov-opening-look')return;
- want.x=event.data.x;want.y=event.data.y;
+ if(event.source!==parent||event.origin!==location.origin)return;
+ const data=event.data;
+ if(data?.type==='claudov-opening-screen'){
+  const name=data.screen;
+  desiredShot=SHOTS[Object.hasOwn(SHOTS,name)?name:menuShots[name]]||SHOTS.general;
+  paused=data.paused===true;
+ }else if(data?.type==='claudov-opening-look'&&Number.isFinite(data.x)&&Number.isFinite(data.y)){
+  want.x=T.MathUtils.clamp(data.x,-1,1);want.y=T.MathUtils.clamp(data.y,-1,1);
+ }
 });
 function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;
  camera.fov=w/h<1?60:42;camera.updateProjectionMatrix();}
@@ -233,15 +250,17 @@ const clock=new T.Clock();
 let lastFrame=-Infinity;
 function frame(now){
  requestAnimationFrame(frame);
- if(document.hidden||frameElement?.hidden||!stage.clientWidth||!stage.clientHeight||now-lastFrame<1000/30)return;
+ if(paused||document.hidden||frameElement?.hidden||!stage.clientWidth||!stage.clientHeight||now-lastFrame<1000/30)return;
  lastFrame=now;
- const dt=Math.min(clock.getDelta(),.05),time=clock.elapsedTime;
- const k=1-Math.exp(-dt*4);look.x+=(want.x-look.x)*k;look.y+=(want.y-look.y)*k;
+ const dt=Math.min(clock.getDelta(),.05),reduce=reducedMotion.matches,time=reduce?0:clock.elapsedTime;
+ const k=reduce?1:1-Math.exp(-dt*4);
+ look.x+=( (reduce?0:want.x)-look.x)*k;look.y+=( (reduce?0:want.y)-look.y)*k;
+ basePosition.lerp(desiredShot.position,k);baseTarget.lerp(desiredShot.target,k);
  pose(time);placeRifle();drapeFlag(time);drawLcd(time);
- radio.userData.dial.material.emissiveIntensity=1.3+Math.random()*.15;
- const sway=reduceMotion?0:Math.sin(time*.6)*.006;
- camera.position.set(SHOT.position.x+look.x*.05,SHOT.position.y-look.y*.03+sway,SHOT.position.z);
- currentTarget.set(SHOT.target.x+look.x*.1,SHOT.target.y-look.y*.06,SHOT.target.z);
+ radio.userData.dial.material.emissiveIntensity=reduce?1.35:1.3+Math.random()*.15;
+ const sway=reduce?0:Math.sin(time*.6)*.006;
+ camera.position.copy(basePosition);camera.position.x+=look.x*.045;camera.position.y+=sway-look.y*.028;
+ currentTarget.copy(baseTarget);currentTarget.x+=look.x*.08;currentTarget.y-=look.y*.045;
  camera.lookAt(currentTarget);
  renderer.render(scene,camera);
 }

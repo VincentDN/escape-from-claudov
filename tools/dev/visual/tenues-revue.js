@@ -13,7 +13,7 @@ const VUES = [
   fs.mkdirSync(out, { recursive: true });
   const { browser, page, logs } = await openGame({ w: 1500, h: 1050, settings: { quality: 'high', map: 'sable' }, noMap: true, noHdri: true, page: process.env.PAGE });
   await page.evaluate(() => uiOpen('skins', ['main']));
-  await page.waitForFunction(() => MBG.live && SKV.live, null, { timeout: 120000, polling: 500 });
+  await page.waitForFunction(() => SKV.W > 0 && !SKV.dirty && !SKV.fail, null, { timeout: 120000, polling: 500 });
   const skins = process.env.TENUES ? process.env.TENUES.split(',') : await page.evaluate(() => SKIN_ALL);
   const box = await page.evaluate((visee) => {
     GPUX.halt = true; // boucle du jeu suspendue : chaque image est rendue ici, à pas fixe

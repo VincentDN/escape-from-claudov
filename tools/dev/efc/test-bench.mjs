@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { openGame, startSolo } from './harness.mjs';
 
-const { browser, page, errors } = await openGame({ w: 1280, h: 720, noMap: true, init: 'window.EFC_TEST_OPENING = true;' });
+const { browser, page, errors } = await openGame({ w: 960, h: 540, noMap: true, init: 'window.EFC_TEST_OPENING = true;' });
 try {
   if (!process.env.EFC_TEST_URL) throw new Error('Serve dist over HTTP and set EFC_TEST_URL');
   await page.waitForSelector('#menuBg.intro-ready', {timeout: 120000});
@@ -10,8 +10,24 @@ try {
   assert.ok(await page.getByRole('button', {name: 'Raid Solo raid against the Wardens'}).isVisible());
   assert.equal(await page.getByRole('link', {name: 'Opening Scene', exact: true}).count(), 0);
   assert.equal(await page.getByRole('link', {name: 'Weapon Workbench', exact: true}).count(), 0);
-  await page.evaluate(() => uiGo('hideout'));
-  assert.ok(await page.locator('#efcIntroFrame').isHidden());
+  const frame = page.frameLocator('#efcIntroFrame');
+  await frame.locator('body').evaluate(() => {
+    window.menuMessages = [];
+    addEventListener('message', event => {
+      if (event.source === parent && event.data?.type?.startsWith('claudov-opening-')) window.menuMessages.push(event.data);
+    });
+  });
+  for (const screen of ['hideout', 'options', 'raid', 'deploy']) {
+    await page.evaluate(view => uiGo(view), screen);
+    await page.waitForFunction(view => EFC_OPENING.screen === view && !EFC_OPENING.frame.hidden, screen);
+    assert.ok(await frame.locator('canvas').isVisible());
+  }
+  await page.mouse.move(820, 240);
+  await page.waitForFunction(() => {
+    const events = EFC_OPENING.frame.contentWindow.menuMessages;
+    return events.some(e => e.screen === 'hideout') && events.some(e => e.screen === 'deploy') &&
+      events.some(e => e.type === 'claudov-opening-look' && e.x > 0);
+  });
   await page.evaluate(() => uiGo('main'));
   await page.waitForSelector('#menuBg.intro-ready');
   const build = page.getByRole('button', { name: /^Build [0-9a-f]+/ });
@@ -47,9 +63,9 @@ try {
   assert.match(await page.evaluate(() => MUS.url), /campaign-acoustic-guitars\.mp3$/);
   await page.waitForFunction(() => MUS.el?.els.some(audio => !audio.paused));
   await page.evaluate(() => uiGo('hideout'));
-  await page.waitForFunction(() => EFC_OPENING.frame.hidden);
   await page.evaluate(() => mapEnsure(Settings.map));
   await startSolo(page);
+  await page.waitForFunction(() => EFC_OPENING.frame.hidden);
   const state = await page.evaluate(() => {
     const p = PL.ent, hp = p.health, left = MATCH.timeLeft;
     p.protT = 0;
@@ -74,7 +90,7 @@ try {
   assert.deepEqual(errors, []);
   await page.goto(new URL('showcase/intro/', process.env.EFC_TEST_URL).href, {waitUntil: 'commit'});
   await page.waitForURL(process.env.EFC_TEST_URL, {waitUntil: 'commit'});
-  console.log('root scene, menu navigation, seven-tap developer door, solo cheats, soundtrack and legacy redirect passed');
+  console.log('persistent scene, menu shots, pointer input, seven-tap developer door, solo cheats, soundtrack and legacy redirect passed');
 } finally {
   await browser.close();
 }

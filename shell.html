@@ -2612,6 +2612,31 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 .efc-stats .st span { color: var(--dim); font-size: var(--fs-xs); letter-spacing: var(--track); text-transform: uppercase; }
 .efc-stats .st b { font-family: var(--hud); font-size: 28px; }
 .efc-sum .efc-list { max-height: 34vh; }
+/* Shared operator inventory, in the Hideout and during raids. */
+.efc-ho.efc-op-layout, .efc-op-layout {
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(180px,.82fr) minmax(0,1fr); gap: 16px; min-height: 0;
+}
+.efc-op-layout > .efc-col { min-width: 0; min-height: 0; overflow: auto; }
+.efc-op-layout .efc-it.efc-thr.noslot {
+  grid-template-columns: 53px minmax(0,1fr) 2.1em 3.3em 3.6em; gap: 5px; padding-inline: 5px;
+}
+.efc-op-layout .efc-it.efc-thr:not(.noslot) {
+  grid-template-columns: 72px minmax(0,1fr) auto; column-gap: 7px;
+}
+.efc-op-layout .efc-it .efc-th { width: 100%; max-height: 46px; }
+.efc-op-model { display: flex; flex-direction: column; align-items: stretch; min-height: 0; padding: 12px; gap: 8px; }
+.efc-op-model canvas { display: block; width: 100%; height: min(45vh, 430px); object-fit: contain; background: #171a14; cursor: grab; touch-action: none; }
+.efc-op-model canvas:active { cursor: grabbing; }
+.efc-op-hands { min-height: 1.5em; margin: 0; color: var(--paper); }
+.efc-op-grid { display: grid; position: relative; max-width: 100%; aspect-ratio: var(--cols) / var(--rows);
+  grid-template-columns: repeat(var(--cols),minmax(0,1fr)); grid-template-rows: repeat(var(--rows),minmax(0,1fr));
+  background-image: linear-gradient(to right,#d1b05d38 1px,transparent 1px),linear-gradient(to bottom,#d1b05d38 1px,transparent 1px);
+  background-size: calc(100% / var(--cols)) calc(100% / var(--rows)); border: 1px solid #d1b05d38; margin-bottom: 8px; }
+.efc-op-grid > span { min-width: 0; overflow: hidden; padding: 2px; color: var(--paper); background: #383b27; border: 1px solid #ad994e; font-size: 11px; line-height: 1.1; }
+.efc-op-grids { max-height: 34vh; overflow: auto; flex-shrink: 0; }
+.efc-box.efc-op-box { width: min(94vw,1280px); }
+.efc-op-vicinity { margin: 0; padding-left: 1.25rem; }
+@media (max-width:760px) { .efc-ho.efc-op-layout, .efc-op-layout { grid-template-columns: minmax(0,1fr); overflow: auto; } }
 @media (max-width: 760px) { .efc-ho, .efc-box.efc-two { grid-template-columns: 1fr; } }
 </style>
 <!--SOCLE_UI-->
@@ -2819,9 +2844,10 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
   </section>
   <section class="scr" id="scr-hideout">
     <header class="shead"><button class="back" type="button" data-back>Back</button><div><h2>Hideout</h2><p id="efcHoSub">Pick what you take into the raid. What you carry out is yours to keep.</p></div></header>
-    <div class="efc-ho">
+    <div class="efc-ho efc-op-layout">
       <div class="efc-col card"><p class="lbl">Stash</p><div class="efc-list" id="efcHoStash" role="list" aria-label="Stash"></div></div>
-      <div class="efc-col card"><p class="lbl">Loadout</p><div class="efc-list" id="efcHoLoad" role="list" aria-label="Loadout"></div><div class="efc-tot" id="efcHoTot"></div></div>
+      <div id="efcOpHideout" class="efc-op-model card"></div>
+      <div class="efc-col card"><p class="lbl">Loadout</p><div id="efcOpHideoutGrids" class="efc-op-grids"></div><div class="efc-list" id="efcHoLoad" role="list" aria-label="Loadout"></div><div class="efc-tot" id="efcHoTot"></div></div>
     </div>
     <footer class="sfoot"><span class="chip" id="efcHoNote" role="status"></span><button class="deploy" id="efcHoGo" type="button">Start raid</button></footer>
   </section>
@@ -2977,16 +3003,23 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 <div id="padHints" class="hidden" aria-hidden="true"></div>
 <!-- Escape From Claudov, in raid (src/efc/50-efc-ui-raid.js): inventory (Tab) and loot panel (hold F at a container). The match goes on behind them. -->
 <div id="efcInv" class="efc-ov hidden" role="dialog" aria-modal="true" aria-labelledby="efcInvTitle">
-  <div class="efc-box">
+  <div class="efc-box efc-op-box">
     <header class="efc-bh"><h2 id="efcInvTitle">Inventory</h2><span id="efcInvW"></span><span class="efc-keys">Tab or Esc to close</span></header>
-    <div class="efc-list" id="efcInvList"></div>
+    <div class="efc-op-layout">
+      <div class="efc-col" id="efcOpVicinity"></div>
+      <div class="efc-op-model" id="efcOpRaid"></div>
+      <div class="efc-col"><div id="efcOpRaidGrids" class="efc-op-grids"></div><div class="efc-list" id="efcInvList"></div></div>
+    </div>
   </div>
 </div>
 <div id="efcLoot" class="efc-ov hidden" role="dialog" aria-modal="true" aria-labelledby="efcLootTitle">
-  <div class="efc-box efc-two">
+  <div class="efc-box efc-op-box">
     <header class="efc-bh"><h2 id="efcLootTitle">Container</h2><span id="efcLootW"></span><span class="efc-keys">Click, Enter or F to take. Tab or Esc to close</span></header>
-    <div class="efc-col"><p class="lbl" id="efcLootName">Contents</p><div class="efc-list" id="efcLootList"></div><div id="efcLootArrange" hidden><p>Drag or use arrows and Enter. R to rotate. Ctrl+click or Ctrl+Enter to split.</p><div id="efcLootGrid" role="group" aria-label="Container cells"></div></div><div class="btns"><button class="btn" id="efcLootArrangeToggle" aria-controls="efcLootArrange" aria-expanded="false" type="button" hidden>Arrange contents</button><button class="btn primary" id="efcLootAll" type="button">Take all</button></div></div>
-    <div class="efc-col"><p class="lbl">Your bag</p><div class="efc-list" id="efcLootBag"></div></div>
+    <div class="efc-op-layout">
+      <div class="efc-col"><p class="lbl" id="efcLootName">Contents</p><div class="efc-list" id="efcLootList"></div><div id="efcLootArrange" hidden><p>Drag or use arrows and Enter. R to rotate. Ctrl+click or Ctrl+Enter to split.</p><div id="efcLootGrid" role="group" aria-label="Container cells"></div></div><div class="btns"><button class="btn" id="efcLootArrangeToggle" aria-controls="efcLootArrange" aria-expanded="false" type="button" hidden>Arrange contents</button><button class="btn primary" id="efcLootAll" type="button">Take all</button></div></div>
+      <div class="efc-op-model" id="efcOpLoot"></div>
+      <div class="efc-col"><p class="lbl">Your bag</p><div id="efcOpLootEquipment" class="efc-op-grids"></div><div class="efc-list" id="efcLootBag"></div></div>
+    </div>
   </div>
 </div>
 <!-- Escape From Claudov: raid summary on event raid:over (src/efc/50-efc-ui-summary.js) -->

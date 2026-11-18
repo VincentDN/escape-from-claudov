@@ -74,9 +74,11 @@ function skinPvPlace(S, key) {
    affiché restait celui de la première image (une cape figée, collée au bassin, que les bras traversaient) */
 function skinSkel(M) { renderer.info.render.frame++; M.root.updateMatrixWorld(true); M.skel.update(); }
 /* Rend la tenue skin vue par rel (0 allié, 1 ennemi), caméra à l'azimut a, dans ctx (dw x dh) ; la vitrine ne montre qu'elle */
-function skinDraw(ctx, dw, dh, skin, rel, a) {
+function skinDraw(ctx, dw, dh, skin, rel, a, key = skinPvGunKey()) {
   const S = vwScene(), M = skinPvModel(skin), m = skinPvMat(skin), live = VW.model && VW.model.visible ? VW.model : null;
-  skinPvPlace(M, skinPvGunKey());
+  skinPvPlace(M, key || skinPvGunKey());
+  const gunVisible = M.gun.visible;
+  M.gun.visible = !!key;
   skinTone(skin, rel, m.color); skinRelColor(rel, m.userData.skU.tag.value);
   skinSkel(M);
   if (live) live.visible = false;
@@ -84,7 +86,7 @@ function skinDraw(ctx, dw, dh, skin, rel, a) {
   S.cam.aspect = dw / dh; S.cam.updateProjectionMatrix();
   const d = 1.08 / Math.tan(THREE.MathUtils.degToRad(VW_FOV) / 2) * Math.max(1, 0.62 / (dw / dh));
   vwCamPlace(S.cam, a + Math.PI / 2, 0.06, d, SK_AIM);
-  try { vwDraw(ctx, dw, dh, dw, dh); } finally { S.scene.remove(M.root); if (live) live.visible = true; }
+  try { vwDraw(ctx, dw, dh, dw, dh); } finally { S.scene.remove(M.root); M.gun.visible = gunVisible; if (live) live.visible = true; }
 }
 /* Vignette d'une tenue (vue de trois quarts depuis sa droite, par un allié), dans la file des vignettes d'armes (thumbsStep : clés « skin:... ») ; SKTH.gun : l'arme
    tenue sur les vignettes, qui sont refaites quand la classe choisie en change (skinThumbsCheck) */

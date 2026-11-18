@@ -5,7 +5,7 @@ const { host, guest } = rig;
 const keep = 'PL.ent.protT = 1; PL.ent.health = 100;';
 const snapshot = () => ({
   role: NET.role, left: MATCH.timeLeft, state: efcCall('raid:state').state,
-  loot: efcCall('world:list').map(c => [c.id, c.items]).sort((a, b) => a[0].localeCompare(b[0])),
+  loot: efcCall('world:list').map(c => [c.id, c.rev, c.grid, c.items]).sort((a, b) => a[0].localeCompare(b[0])),
   bots: entities.filter(e => e.remoteBot || e.netBot)
     .map(e => ({ id: e.peer || e.netId, squad: e.squad, alive: e.alive, health: e.health, pos: e.pos.toArray() }))
     .sort((a, b) => a.id.localeCompare(b.id)),
@@ -16,6 +16,7 @@ try {
   await launch(host);
   await Promise.all([waitInMatch(host), waitInMatch(guest)]);
   await stepBoth([host, guest], 2, keep);
+  await guest.waitForFunction(() => efcCall('world:list').some(c => c.items.length), null, { polling: 100, timeout: 30000 });
   const target = await guest.evaluate(() => {
     const c = efcCall('world:list').find(c => c.items.length);
     PL.ent.pos.set(c.x + 0.8, c.y, c.z);

@@ -44,7 +44,7 @@ function botNearNode(b) {
     const cx = cx0 + dx, cz = cz0 + dz; if (cx < 0 || cz < 0 || cx >= NAV.W || cz >= NAV.H) continue;
     const cell = NAV.cells[cz * NAV.W + cx];
     for (let i = 0; i < cell.length; i++) {
-      const id = cell[i], dy = NAV.ny[id] - b.pos.y; if (dy > 0.6 || dy < -0.8 || NAV.comp[id] !== NAV.mainComp) continue;
+      const id = cell[i], dy = NAV.ny[id] - b.pos.y; if (dy > 0.6 || dy < -0.8 || NAV.comp[id] !== NAV.mainComp || !efcNavRuntimeClear(NAV.nx[id], NAV.ny[id], NAV.nz[id])) continue;
       const ex = NAV.nx[id] - b.pos.x, ez = NAV.nz[id] - b.pos.z, d = Math.sqrt(ex * ex + ez * ez); if (d >= bd) continue;
       if (d > 0.3 && botRoom(b, ex / d, ez / d, d) < d - 0.05) continue;
       bd = d; best = id;

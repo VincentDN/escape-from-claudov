@@ -17,7 +17,7 @@ function modeFfa() { return MATCH.mode === 'ffa' || MATCH.mode === 'raid'; }
 /* Alliés : même équipe, sauf en match à mort où chacun joue pour soi ; en raid, même escouade (efcSquadOf, src/efc/11-efc-squad.js) */
 function allied(a, b) {
   if (a === b) return true;
-  if (MATCH.mode === 'raid') { const s = efcSquadOf(a); return s !== undefined && s === efcSquadOf(b); }
+  if (MATCH.mode === 'raid') { const s = efcSquadOf(a); const t = efcSquadOf(b); return s !== undefined && (s === t || (s === 's' && t === 'w') || (s === 'w' && t === 's')); }
   return MATCH.mode !== 'ffa' && a.team === b.team;
 }
 /* Un bruit (tir, explosion) est-il celui d'un adversaire de b ? En raid, un bruit sans auteur connu (joueur distant) est hostile */

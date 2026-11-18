@@ -1,5 +1,19 @@
 [
   {
+    "version": "0.2.0",
+    "date": "2026-11-18",
+    "changes": [
+      {"t": "improved", "x": "Les points d'insertion sont à couvert et le nombre de Gardiens dépend de la taille de la carte.", "x_en": "Insertion points are hidden from view, and Warden numbers scale with map size."},
+      {"t": "improved", "x": "De nouveaux sons accompagnent les tirs, les rechargements et la manipulation de l'équipement.", "x_en": "New sounds accompany shots, reloads, and equipment handling."},
+      {"t": "new", "x": "Le menu principal s'ouvre sur un établi en trois dimensions.", "x_en": "The main menu opens on a 3D workbench."},
+      {"t": "new", "x": "Les armes et les objets ont des vignettes dans la réserve, l'inventaire et les conteneurs.", "x_en": "Weapons and items have thumbnails in the stash, inventory, and loot containers."},
+      {"t": "improved", "x": "Les Gardiens adaptent leur allure et leur posture à la situation.", "x_en": "Wardens adapt their pace and posture to the situation."},
+      {"t": "new", "x": "Vous pouvez vous pencher pour regarder et tirer depuis un couvert.", "x_en": "Lean to look and shoot from behind cover."},
+      {"t": "new", "x": "Le menu a son propre thème musical et le port a une ambiance sonore.", "x_en": "The menu has its own theme, and the harbour has ambient audio."},
+      {"t": "new", "x": "Une dotation gratuite comprend un SKS et 30 cartouches.", "x_en": "The free loadout includes an SKS and 30 rounds."}
+    ]
+  },
+  {
     "version": "0.1.0",
     "date": "2026-11-13",
     "changes": [

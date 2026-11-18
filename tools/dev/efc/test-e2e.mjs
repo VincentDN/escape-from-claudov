@@ -19,12 +19,12 @@ const r0 = await page.evaluate(() => {
   const r = efcCall('raid:state'), w = efcCall('world:list') || [], md = efcCall('map:data');
   const ins = md.inserts.map((p) => Math.hypot(p.x - PL.ent.pos.x, p.z - PL.ent.pos.z));
   return { mode: MATCH.mode, state: r.state, extracts: r.extracts.length, inv: !!EFC.inv, prim: EFC.inv && EFC.inv.slots.primary && EFC.inv.slots.primary.id, gun: PL.weapons[0] && PL.weapons[0].def.key,
-    cont: w.length, filled: w.filter((c) => c.items.length).length, stashLoadoutEmpty: !efcCall('stash:get').loadout.slots.primary, squadW: entities.filter((e) => !e.isPlayer).every((e) => e.squad === 'w'), insertDist: Math.round(Math.min(...ins)), squad: PL.ent.squad };
+    cont: w.length, configured: md.containers.length, filled: w.filter((c) => c.items.length).length, stashLoadoutEmpty: !efcCall('stash:get').loadout.slots.primary, squadW: entities.filter((e) => !e.isPlayer).every((e) => e.squad === 'w'), insertDist: Math.round(Math.min(...ins)), squad: PL.ent.squad };
 });
 check(r0.mode === 'raid' && r0.state === 'live' && r0.extracts === 3, 'raid is live with three extracts', r0);
 check(r0.inv && r0.prim === st0.prim && r0.gun === st0.prim.replace(/^w_/, ''), 'the raid kit is the hideout loadout and the engine weapon matches it', { prim: r0.prim, gun: r0.gun });
 check(r0.stashLoadoutEmpty, 'the loadout left the stash (it is at risk)');
-check(r0.cont >= 8 && r0.filled >= r0.cont * 0.6, 'containers were placed and filled by the loot tables', { cont: r0.cont, filled: r0.filled });
+check(r0.configured > 0 && r0.cont === r0.configured && r0.filled >= r0.cont * 0.6, 'containers were placed and filled by the loot tables', { cont: r0.cont, configured: r0.configured, filled: r0.filled });
 check(r0.squadW && r0.squad === 0, 'bots are Wardens (squad w), the player is squad 0');
 check(r0.insertDist <= 6, 'the player was inserted at an insert point', r0.insertDist);
 
@@ -88,7 +88,8 @@ await simRun(page, 1, KEEP);
 const d = await page.evaluate(() => {
   const foe = entities.find((e) => !e.isPlayer), pos = { x: PL.ent.pos.x, z: PL.ent.pos.z }, carried = efcCall('inv:all', EFC.inv).length;
   PL.ent.protT = 0;
-  applyDamage(PL.ent, 999, foe, 'M4A1', false, new V3(1, 0, 0));
+  // A regular Warden cannot one-shot a full-health player with a body hit.
+  applyDamage(PL.ent, 999, foe, 'M4A1', true, new V3(1, 0, 0));
   return { alive: PL.ent.alive, pos, carried };
 });
 await simRun(page, 14, '');

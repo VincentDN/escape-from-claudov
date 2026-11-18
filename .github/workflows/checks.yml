@@ -17,8 +17,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install Playwright and Chromium
+      - name: Install Playwright, Chromium and FFmpeg
         run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
           npm install --prefix "$RUNNER_TEMP/efc-playwright" --no-audit --no-fund playwright
           "$RUNNER_TEMP/efc-playwright/node_modules/.bin/playwright" install --with-deps chromium
       - name: Run the full suite twice

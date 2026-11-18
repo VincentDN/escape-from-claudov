@@ -123,7 +123,7 @@ async function huntRun(want, paced, sawIt, secs) {
     W.efcPatrol = null; W.holdT = 0; W.stealth = false; W.chaseE = null; W.goal = null;
     W.lastKnown.copy(pt); W.lastSeenT = now - 1; W.warnT = now + 30; W.tactic = 'hunt'; setPath(W, W.lastKnown); W.decideT = 99;
     window.SAW = sawIt;
-    recStart(W, want, (b) => b.tactic !== 'hunt' || b.lastKnown.distanceTo(b.pos) > 16); // (combat hunt: sights up within 15 m)
+    recStart(W, want, (b) => b.tactic === 'hunt' && b.lastKnown.distanceTo(b.pos) > 16); // (combat hunt: sights up within 15 m)
   }, [want, paced, sawIt]);
   await simRun(page, secs, each + ' W.decideT = 99; if (SAW) W.efcSawT = MATCH.time;');
   return page.evaluate(() => recEnd());

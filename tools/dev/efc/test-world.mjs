@@ -59,6 +59,17 @@ const r = await page.evaluate(() => {
   out.guestTake = L().find((c) => c.id === rid).items.length === 0 && given.length === g0 + 1;
   out.crateStays = !!L().find((c) => c.id === rid);
   out.emptyLook = scene.getObjectByName('efc-container-' + rid).userData.efcOpen === true;
+  const placementId = efcCall('world:spawn', 'crate', { x: P.pos.x, y: P.pos.y, z: P.pos.z },
+    [{ id: 'loot_wrench', n: 1 }, { id: 'ammo_rifle', n: 30 }], '');
+  const placed = L().find(c => c.id === placementId);
+  efcCall('world:place', placementId, 0, 4, 3, true);
+  EFC.netHost['w:place']({ id: placementId, idx: 1, x: 4, y: 3, rotated: false, rev: 0 }, 'p2');
+  out.placeRace = placed.rev === 1 && placed.grid.entries[0].x === 4 && placed.grid.entries[0].rotated &&
+    placed.grid.entries[1].x !== 4;
+  efcCall('world:place', placementId, 1, 4, 3, false, 10);
+  out.occupiedSplit = placed.rev === 1 && placed.items[1].n === 30;
+  efcCall('world:place', placementId, 1, 6, 3, false, 10);
+  out.splitStack = placed.rev === 2 && placed.items[1].n === 20 && placed.items[2].n === 10;
   // an unknown guest, a garbage request
   EFC.netHost['w:take']({ id: c0.id, idx: 0, item: c0.items[0]?.id, rev: c0.rev }, 'nobody');
   EFC.netHost['w:take']({ id: c0.id, idx: 'x' }, 'local');

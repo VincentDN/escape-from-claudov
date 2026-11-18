@@ -66,6 +66,7 @@ raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 
 | `world:body` | WORLD | `({x,y,z}, items, name)` | Any machine; routed to the host, which spawns a `body` container |
 | `world:list` | WORLD | `() -> Container[]` | Replicated copy on every machine |
 | `world:near` | WORLD | `({x,y,z}, r) -> Container or null` | Nearest within r |
+| `world:place` | WORLD | `(id, idx, x, y, rotated?, count?) -> boolean` | Sends a revision-checked placement or split request. Host validates reach and occupancy before broadcasting. |
 | `world:take` | WORLD | `(id, idx)` | Asks the host; on success the taker gets event `loot:give` |
 | `world:put` | WORLD | `(idOrNull, item)` | Puts into a container, or drops at the local player's feet (`drop` container) |
 | `raid:state` | RAID | `() -> { state, t, left, extracts, hold, holdId }` | `state`: `'idle'|'live'|'out'|'dead'|'mia'` |

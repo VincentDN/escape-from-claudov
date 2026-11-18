@@ -4,10 +4,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
-import { openGame, startSolo, simRun, REPO } from './harness.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require('playwright');
+import { openGame, startSolo, simRun, REPO, launchEfcBrowser } from './harness.mjs';
 
 let fails = 0;
 const check = (name, ok, info) => { console.log((ok ? 'PASS ' : 'FAIL ') + name + (info !== undefined ? ' ' + JSON.stringify(info) : '')); if (!ok) fails++; };
@@ -49,7 +46,7 @@ check('(1) every credits entry has a file and a source with url and licence', cr
 check('(1) four beds/menu loops, four stings', files.filter((f) => LOOPS.test(f)).length === 4 && files.filter((f) => f.startsWith('sting-')).length === 4);
 
 // ---------- (2) game ----------
-const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
+const browser = await launchEfcBrowser(['--autoplay-policy=no-user-gesture-required']);
 const { page, errors } = await openGame({ browser, settings: { map: 'claudov', mode: 'raid' } });
 const ev = (fn, arg) => page.evaluate(fn, arg);
 const KEEP = 'PL.ent.health = 100;';

@@ -36,7 +36,17 @@ const stand = await page.evaluate((RESPAWN) => {
   return used;
 }, RESPAWN);
 console.log('stand-ins:', stand.join(', ') || 'none');
-await startSolo(page);
+await page.evaluate(() => {
+  // Drive this match solely through simRun, with repeatable spawn and patrol decisions.
+  GPUX.halt = true;
+  let seed = 0x19731117;
+  Math.random = () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  LOCK.fallback = true;
+  startMatch({});
+});
 // (a) after start
 const a = await page.evaluate(() => {
   MATCH.timeLeft = 1e5; T.inv = true;

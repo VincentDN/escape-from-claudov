@@ -4,13 +4,10 @@
 // node tools/dev/efc/test-sounds.mjs   (needs a build: python3 build.py)
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
-import { openGame, startSolo, simRun, REPO } from './harness.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require('playwright');
+import { openGame, startSolo, simRun, REPO, launchEfcBrowser } from './harness.mjs';
 let fails = 0, passes = 0;
 const ok = (c, msg) => { if (c) passes++; else { fails++; console.error('FAIL ' + msg); } };
-const launch = () => chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
+const launch = () => launchEfcBrowser(['--autoplay-policy=no-user-gesture-required']);
 
 /* In the page: start audio, load the game packs, wait until each is ready or failed */
 const bootAudio = () => (async () => {

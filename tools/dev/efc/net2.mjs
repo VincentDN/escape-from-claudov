@@ -9,13 +9,10 @@
 //   await Promise.all([waitInMatch(rig.host), waitInMatch(rig.guest)]);
 //   await stepBoth([rig.host, rig.guest], 2);                 // 2 game seconds on each page, in 0.2 s slices
 //   ... rig.errors (page errors, both pages) ... await rig.close();
-import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
-import { REPO } from './harness.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require('playwright');
+import { REPO, launchEfcBrowser } from './harness.mjs';
 const DIST = path.join(REPO, 'dist');
 const FAKEPEER = fs.readFileSync(path.join(REPO, 'tools/dev/efc/fakepeer.js'), 'utf8');
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json', '.css': 'text/css', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.wasm': 'application/wasm', '.bin': 'application/octet-stream', '.glb': 'model/gltf-binary', '.webmanifest': 'application/manifest+json' };
@@ -68,7 +65,7 @@ export async function openNetPage(context, base, o, errors) {
 /* Starts the server, a browser and two pages (host, guest). o: { map, settings, browser, init }. Returns { browser, host, guest, errors, base, close }. */
 export async function openPair(o = {}) {
   const server = await startServer();
-  const browser = o.browser || await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const browser = o.browser || await launchEfcBrowser();
   const context = await browser.newContext({ bypassCSP: true, viewport: { width: o.w || 480, height: o.h || 270 } });
   const errors = [], settings = Object.assign({ map: o.map || 'simoun' }, o.settings || {});
   const host = await openNetPage(context, server.base, { name: 'Host', settings, init: o.init }, errors);

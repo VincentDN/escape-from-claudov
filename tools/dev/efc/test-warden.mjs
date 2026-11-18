@@ -99,7 +99,10 @@ const c0 = await page.evaluate(() => {
       if (NAV.comp[id] !== NAV.mainComp) continue;
       const d = hyp(NAV.nx[id] - p.x, NAV.nz[id] - p.z); if (d < 14 || d > 16) continue;
       eye.set(NAV.nx[id], NAV.ny[id] + 1.6, NAV.nz[id]);
-      if (!lineClear(eye, at.set(p.x, p.y + 1.5, p.z)) || !ws.some((w) => lineClear(eye, entChest(w, at)))) continue;
+      const guard = ws.find(w => lineClear(entEye(w, at), eye));
+      if (!guard || !lineClear(eye, at.set(p.x, p.y + 1.5, p.z))) continue;
+      // The detection fixture starts with one guard facing the visible approach.
+      guard.yaw = guard.lookYaw = Math.atan2(guard.pos.x - eye.x, guard.pos.z - eye.z);
       window.SPOT = [NAV.nx[id], NAV.ny[id], NAV.nz[id]]; window.CP = p.i; window.FAR = far.map((q) => q.i);
       // the Wardens of those posts that are at home (not off on a patrol or a chase near the spot)
       window.FARW = entities.filter((e) => e.alive && FAR.includes(e.efcPost) && hyp(e.pos.x - P[e.efcPost].x, e.pos.z - P[e.efcPost].z) < P[e.efcPost].r + 5);
@@ -110,7 +113,7 @@ const c0 = await page.evaluate(() => {
 });
 ok(!!c0, '(c) found a spot 15 m from a post in view, with posts more than 45 m away', c0);
 if (c0) {
-  await page.evaluate(() => { T.tFirst = -1; T.farT = 0; T.n = 0; });
+  await page.evaluate(() => { PL.ent.pos.set(...SPOT); PL.ent.vel.set(0, 0, 0); T.tFirst = -1; T.farT = 0; T.n = 0; });
   await simRun(page, 10, `PL.ent.pos.set(...SPOT); PL.ent.vel.set(0, 0, 0); T.n++;
     if (T.tFirst < 0 && entities.some((e) => e.alive && e.efcPost === CP && e.visible && e.target === PL.ent)) T.tFirst = T.n / 30;
     T.farT += FARW.filter((e) => e.alive && e.visible && e.target === PL.ent).length;`);

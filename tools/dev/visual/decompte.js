@@ -16,7 +16,7 @@ const fails = [];
 const ok = (c, msg, extra) => { console.log((c ? 'ok    ' : 'ÉCHEC ') + msg + (extra !== undefined ? '  ' + JSON.stringify(extra) : '')); if (!c) fails.push(msg); };
 (async () => {
   const lang = process.env.LANGUE === 'en' ? 'en' : 'fr';
-  const { browser, page, logs } = await openGame({ page: process.argv[2], w: 640, h: 360, countdown: true, settings: { quality: 'low', lang, map: 'sable', mode: 'tdm' }, noHdri: true, noMap: true });
+  const { browser, page, logs } = await openGame({ page: process.argv[2], w: 640, h: 360, countdown: true, settings: { quality: 'low', lang, map: 'sable', mode: 'raid' }, noHdri: true, noMap: true });
   const ev = (f, a) => page.evaluate(f, a);
   const wait = (ms) => page.waitForTimeout(ms);
   // rendu 3D coupé (la logique seule : la boucle d'images tourne vite en rendu logiciel) ; espions sur les sons du décompte et les annonces
@@ -39,7 +39,7 @@ const ok = (c, msg, extra) => { console.log((c ? 'ok    ' : 'ÉCHEC ') + msg + (
   });
   const T = lang === 'en' ? { kick: 'Match begins in', go: 'Move out!', wait: 'Waiting for the host' } : { kick: 'La partie commence dans', go: 'En avant !', wait: "En attente de l'hôte" };
 
-  console.log('Solo, match à mort par équipe, décompte du jeu (5 s)');
+  console.log('Raid solo, décompte du jeu (5 s)');
   await ev(() => { Settings.limit = 75; saveSettings(); });
   await launch();
   await page.waitForFunction('CD.shown > 0', null, { timeout: 120000 }).catch(() => {}); // (les premières images sont lentes en rendu logiciel : on attend le premier chiffre)

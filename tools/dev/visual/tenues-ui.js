@@ -88,7 +88,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('ECHEC :', m); } else cons
   const fr = await page.evaluate(() => SKIN_DEFI.filter((s) => s !== skinMine()).filter((s) => SOLDIER_GEOS[s + 'hi'] || SOLDIER_GEOS[s + 'lo'] || GEAR.maps[s + 'tp'] || SKV.models[s]));
   ok(fr.length === 0, `tenues de défi que rien ne montre : libérées (${fr.join(', ') || 'toutes'})`);
   // en partie : tenues des bots selon leur arme, relation au joueur
-  await page.evaluate(() => { Settings.mode = 'tdm'; startMatch({}); });
+  await page.evaluate(() => { Settings.mode = 'raid'; startMatch({}); });
   await page.waitForTimeout(500);
   const b = await page.evaluate(() => entities.filter((e) => !e.isPlayer && !e.off).map((e) => ({ cat: e.weapon.cat, skin: e.skin, look: e.model.lod.skin, rel: e.model.lod.rel, team: e.team })));
   const want = { ar: 'assault', pistol: 'assault', smg: 'smg', sniper: 'sniper', shotgun: 'shotgun' };

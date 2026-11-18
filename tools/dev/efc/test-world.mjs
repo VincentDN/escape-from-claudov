@@ -1,7 +1,7 @@
 // WORLD package test: host-owned containers, services, take/put rules, validation, snapshot round trip, raid gate on ground weapons.
 // node tools/dev/efc/test-world.mjs ; SHOT=/tmp/efc-world.png also renders and saves one screenshot of containers near the player.
 import { openGame, startSolo, simRun } from './harness.mjs';
-const { browser, page, errors } = await openGame({ settings: { map: 'simoun', mode: 'tdm' }, w: 960, h: 540 });
+const { browser, page, errors } = await openGame({ settings: { map: 'simoun', mode: 'raid' }, w: 960, h: 540 });
 await startSolo(page);
 await simRun(page, 1, 'PL.ent.health = 100;');
 const fails = [];
@@ -121,8 +121,8 @@ const r = await page.evaluate(() => {
   out.dropRaid = dropWeapon(def, 5, 5, P.pos.clone(), q, v) === null;
   updateDrops(1 / 30);
   out.dropRaidList = DROP.list.length === 0 && DROP.cur === null;
-  MATCH.mode = 'tdm';
-  out.dropTdm = dropWeapon(def, 5, 5, P.pos.clone(), q, v) !== null;
+  MATCH.mode = 'ffa';
+  out.dropClassic = dropWeapon(def, 5, 5, P.pos.clone(), q, v) !== null;
   clearDrops();
   MATCH.mode = 'raid';
   return out;

@@ -442,7 +442,7 @@ async function netPubFetch() {
     const r = await fetch(u, { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
-    NETP.list = (Array.isArray(d.salons) ? d.salons : []).filter((s) => s && s.v === NET_PROTO && /^[A-Z0-9]{5}$/.test(s.c) && MAPS.some((m) => m.id === s.m && m.ok) && MODES[s.o]);
+    NETP.list = (Array.isArray(d.salons) ? d.salons : []).filter((s) => s && s.v === NET_PROTO && /^[A-Z0-9]{5}$/.test(s.c) && MAPS.some((m) => m.id === s.m && m.ok) && s.o === 'raid');
     const hello = netHello(); srvRead(d); // salons publics permanents et salons créés (SRV.list null : serveur de jeu d'avant, sans eux)
     if (NET.status === hello) netStatus(netHello()); // l'invite d'accueil suit (elle ne s'affiche pas comme un message)
     NETP.joueurs = Math.max(0, d.joueurs | 0); NETP.err = false;
@@ -789,12 +789,11 @@ function netClientMsg(m) {
 function netPhase(ph) { return ph === 'playing' || ph === 'loading' ? ph : 'lobby'; }
 function netCfg(c) {
   c = c || {};
-  const map0 = mapById(c.map).id, map = c.mode === 'raid' && efcCall('map:raidable', map0) === false ? mapById(EFC.cfg.raidMap).id : map0, mode = c.mode === 'raid' || (MODE_IDS.includes(c.mode) && (c.mode !== 'dom' || MAP_DEFS[map].dom)) ? c.mode : 'tdm'; // la domination demande une carte à points
-  const raid = mode === 'raid' ? efcNetRaidCfg() : null; // raid (Escape From Claudov) : durée de EFC.cfg.raidMinutes, pas de limite d'éliminations
-  const L = raid ? null : MODES[mode].limits, limit = raid ? raid.limit : L.includes(+c.limit) ? +c.limit : L[1];
-  const time = raid ? raid.time : [5, 10, 15].includes(+c.time) ? +c.time : 10;
+  const requested = mapById(c.map).id;
+  const map = efcCall('map:raidable', requested) === false ? mapById(EFC.cfg.raidMap).id : requested;
+  const { limit, time } = efcNetRaidCfg();
   const diff = [0, 1, 2].includes(+c.diff) ? +c.diff : 2;
-  return { bots: +c.bots ? 1 : 0, diff, limit, time, map, mode, pub: +c.pub ? 1 : 0 };
+  return { bots: +c.bots ? 1 : 0, diff, limit, time, map, mode: 'raid', pub: +c.pub ? 1 : 0 };
 }
 
 /* ---------- Entrée et sortie de partie ---------- */
@@ -1353,7 +1352,7 @@ const NET_PAGES = {
     return { head: _t('Rejoindre un salon'), rows };
   },
   lobby: () => {
-    const setup = NET.role === 'host' && NET.phase === 'lobby', m = mapById(NET.cfg.map), MD = MODES[NET.cfg.mode] || MODES.tdm, rows = [];
+    const setup = NET.role === 'host' && NET.phase === 'lobby', m = mapById(NET.cfg.map), MD = MODES[NET.cfg.mode] || MODES.raid, rows = [];
     rows.push( // la carte et les paramètres sont dans l'encart, sous le menu ; l'état du salon, au-dessus des joueurs
       { k: 'link', key: 'map', label: _t('Carte'), page: 'map', disabled: !setup },
       { k: 'link', key: 'setup', label: _t('Paramètres de partie'), page: 'setup' }, // l'invité y voit les règles, sans les changer

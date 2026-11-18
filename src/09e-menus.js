@@ -452,13 +452,12 @@ function syncSettings() { syncOptions(); }
    niveau, limite, durée, et en ligne la visibilité du salon. Tous les choix sont visibles ; gauche et droite passent au voisin, un clic choisit.
    o = { map, mode, diff, bots (en ligne : 0 ou 1), limit, time, online, edit, pubOk, pub, set(clé, valeur) } ; edit faux : lecture seule (invité d'un salon). */
 function matchRows(o) {
-  const MD = MODES[o.mode] || MODES.tdm, ffa = o.mode === 'ffa', diffs = DIFF.map((d, i) => [i, d.name]), set = (k) => (v) => o.set(k, v), dis = !o.edit;
-  const teams = !o.online ? MD.teams : ffa ? (o.bots ? _t('Jusqu\u0027à 8 joueurs, complétés par des bots') : _t('Chacun pour soi, joueurs humains seulement'))
+  const MD = MODES[o.mode] || MODES.raid, ffa = o.mode === 'ffa', diffs = DIFF.map((d, i) => [i, d.name]), set = (k) => (v) => o.set(k, v), dis = !o.edit;
+  const teams = o.mode === 'raid' || !o.online ? MD.teams : ffa ? (o.bots ? _t('Jusqu\u0027à 8 joueurs, complétés par des bots') : _t('Chacun pour soi, joueurs humains seulement'))
     : o.bots ? _t('6 contre 6, complétés par des bots') : _t('Deux équipes, joueurs humains seulement');
   const rows = [];
   if (dis) rows.push({ k: 'note', text: o.note || _t('Réglés par l\u0027hôte') });
   rows.push(
-    { k: 'seg', full: true, wide: true, key: 'mode', label: _t('Mode'), items: MODE_IDS.filter((id) => id !== 'dom' || MAP_DEFS[o.map].dom).map((id) => [id, MODES[id].btn]), get: () => o.mode, set: set('mode'), disabled: dis },
     { k: 'note', cls: 'hint', text: MD.hint },
     { k: 'info', label: _t('Joueurs'), value: teams },
     { k: 'seg', full: true, wide: o.online, key: 'bots', label: o.online ? _t('Bots') : _t('Difficulté des bots'), items: o.online ? [['off', _t('Aucun')], ...diffs] : diffs, get: () => (o.online && !o.bots ? 'off' : o.diff), set: set('bots'), disabled: dis });
@@ -481,9 +480,9 @@ function mapCards(selId, pick) {
 /* L'encart de la carte, sous le menu (comme les anciens Call of Duty) : son illustration, son nom, le mode, la limite et la durée de la partie.
    o : les paramètres de la partie (matchRows) */
 function mapPreview(m, o) {
-  const MD = MODES[o.mode] || MODES.tdm, art = m.ok && MAP_ART[m.id], mode = o.mode === 'ffa' ? MD.btn : MD.name;
+  const MD = MODES[o.mode] || MODES.raid, art = m.ok && MAP_ART[m.id], mode = o.mode === 'ffa' ? MD.btn : MD.name;
   return (art ? `<img class="mapart" alt="" decoding="async" src="${art}">` : '<span class="mapart none"></span>')
-    + `<div class="pv-t"><b>${esc(m.name)}</b><span class="pv-m">${esc(mode)}</span><span class="pv-i">${esc(o.limit + ' ' + MD.unit + ' · ' + o.time + ' min')}</span></div>`;
+    + `<div class="pv-t"><b>${esc(m.name)}</b><span class="pv-m">${esc(mode)}</span><span class="pv-i">${esc((o.mode === 'raid' ? '' : o.limit + ' ' + MD.unit + ' · ') + o.time + ' min')}</span></div>`;
 }
 /* Le joueur, en tête de son équipe : son nom (celui du compte) et son niveau */
 function lobbyMe(tags) {
@@ -492,7 +491,7 @@ function lobbyMe(tags) {
 }
 /* Scène du Solo : les deux équipes, vous et les bots, avec les noms qu'ils porteront (BOT_NAMES) ; chacun pour soi, les sept bots en jeu (modeRoster) */
 function soloStage() {
-  const ffa = Settings.mode === 'ffa', MD = MODES[Settings.mode] || MODES.tdm;
+  const ffa = Settings.mode === 'ffa', MD = MODES[Settings.mode] || MODES.raid;
   const me = lobbyMe([]), bot = (n, i) => ({ k: 'player', key: 'b' + i, label: n, bot: true }); // (leur niveau est dans le résumé des paramètres)
   if (ffa) {
     const all = [...BOT_NAMES[0], ...BOT_NAMES[1]], idx = all.map((n, i) => i), cut = all.length - FFA_BOTS;
@@ -508,11 +507,11 @@ function soloSet(k, v) {
   if (k === 'mode') Settings.mode = v; else if (k === 'bots') Settings.difficulty = v; else if (k === 'limit') Settings[MODES[Settings.mode].key] = v; else Settings.minutes = v;
   saveSettings();
 }
-function soloCfg() { const MD = MODES[Settings.mode] || MODES.tdm; return { map: Settings.map, mode: Settings.mode, diff: Settings.difficulty, limit: Settings[MD.key], time: Settings.minutes, online: false, edit: true, set: soloSet }; }
+function soloCfg() { return { map: Settings.map, mode: 'raid', diff: Settings.difficulty, ...efcNetRaidCfg(), online: false, edit: true, set: soloSet }; }
 const SOLO_PAGES = {
   solo: () => {
     const m = mapById(Settings.map);
-    if (!MODES[Settings.mode] || (Settings.mode === 'dom' && !MAP_DEFS[m.id].dom)) Settings.mode = 'tdm';
+    Settings.mode = 'raid';
     const MD = MODES[Settings.mode];
     const rows = [ // la carte et les paramètres sont dans l'encart, sous le menu
       { k: 'link', key: 'map', label: _t('Carte'), page: 'map' },
@@ -532,6 +531,9 @@ function renderSolo() { lmRender(LM.scr.solo); $('soloGo').title = netInLobby() 
 function menuLaunch(F) {
   if (UI.busy) return;
   if (!F.online && netInLobby()) netQuit(); // une partie solo quitte le salon (menu principal : « Salon XXXX » disparaît)
+  F.raid = true;
+  const map = mapById(F.map || Settings.map).id;
+  F.map = efcCall('map:raidable', map) === false ? EFC.cfg.raidMap : map;
   UI.busy = true; UI.flow = F;
   uiHide(); if (UI.screen === 'deploy') UI.screen = UI.stack.pop() || 'main';
   menuLoading(F).then((ok) => {
@@ -548,7 +550,7 @@ function menuLaunch(F) {
 /* Écran de chargement : vraie progression de la carte (09a-loading.js) ; en ligne, attente des autres joueurs */
 async function menuLoading(F) {
   const m = mapById(F.map || Settings.map), bar = $('mlBar'), msg = $('mlMsg');
-  $('mlName').textContent = m.name; $('mlDesc').textContent = m.desc; $('mlMode').textContent = (F.online ? MODES[NET.cfg.mode] || MODES.tdm : MODES[Settings.mode] || MODES.tdm).name + ' · ' + (F.online ? _t('en ligne') : _t('solo'));
+  $('mlName').textContent = m.name; $('mlDesc').textContent = m.desc; $('mlMode').textContent = (F.online ? MODES[NET.cfg.mode] || MODES.raid : MODES[Settings.mode] || MODES.raid).name + ' · ' + (F.online ? _t('en ligne') : _t('solo'));
   // illustration en fond, avec un lent travelling avant relancé à chaque chargement
   const art = $('mlMap'); setMapArt(art, m); art.style.animation = 'none'; void art.offsetWidth; art.style.animation = '';
   $('mlWait').classList.add('hidden'); $('mlBack').classList.add('hidden'); $('mlRep').classList.add('hidden'); $('mlSafe').classList.add('hidden');

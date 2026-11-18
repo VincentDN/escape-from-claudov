@@ -551,12 +551,8 @@ Nouvelle version du jeu disponible. Elle se chargera à la fin de la partie. ⇒
 Aucun message. Appuyez sur T pour écrire. ⇒ No messages. Press T to write.
 
 # 09i-modes.js
-Match à mort par équipe ⇒ Team deathmatch
-Par équipe ⇒ Team
-6 contre 6 (vous et 5 alliés) ⇒ 6 vs 6 (you and 5 allies)
 Limite d'éliminations ⇒ Kill limit
 éliminations ⇒ kills
-Deux équipes de six. Le premier camp à la limite d'éliminations l'emporte. ⇒ Two teams of six. The first side to reach the kill limit wins.
 Match à mort ⇒ Deathmatch
 Chacun pour soi ⇒ Free for all
 Match à mort, chacun pour soi ⇒ Deathmatch, free for all

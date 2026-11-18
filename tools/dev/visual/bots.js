@@ -5,11 +5,11 @@
    Mesure aussi les murs : part du temps vivant où le décor reprend plus de la moitié du déplacement voulu (`murs.partDuTemps`), nombre de
    ces chocs par minute et par bot, durée de la pire série continue (`murs.serieMax`, quelques secondes au plus : un bot ne reste pas le nez
    contre une cloison, 07e-humain.js) ; et l'usage des mouvements (`mouvements` : sprint, accroupi, glissade, en l'air, nombre de sauts et de
-   glissades). DIFF=0 à 2 (défaut 2, Vétéran) règle le niveau des bots, MODE=tdm, ffa ou dom le mode. */
+   glissades). DIFF=0 à 2 (défaut 2, Vétéran) règle le niveau des bots. */
 const { openGame } = require('./common');
 (async () => {
   const secs = +(process.argv[2] || 90);
-  const { browser, page, logs } = await openGame({ page: process.argv[3], w: 480, h: 270, settings: { quality: 'low', difficulty: +(process.env.DIFF || 2), map: process.env.MAP || 'sable', mode: process.env.MODE || 'tdm' }, noHdri: true });
+  const { browser, page, logs } = await openGame({ page: process.argv[3], w: 480, h: 270, settings: { quality: 'low', difficulty: +(process.env.DIFF || 2), map: process.env.MAP || 'sable', mode: process.env.MODE || 'raid' }, noHdri: true });
   const r = await page.evaluate((secs) => {
     LOCK.fallback = true; startMatch({});
     // le joueur, invulnérable, reste au fond de sa base (hors de portée)

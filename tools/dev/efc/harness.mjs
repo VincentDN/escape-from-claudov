@@ -6,19 +6,28 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 export const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const GAME_URL = process.env.EFC_TEST_URL || 'file://' + path.join(REPO, 'dist/index.html');
+
+export function launchEfcBrowser(extraArgs = []) {
+  return chromium.launch({
+    executablePath: process.env.EFC_CHROMIUM || undefined,
+    args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', ...extraArgs],
+  });
+}
+
 /* o.settings: merged into the saved settings (map, mode, difficulty...). o.w, o.h: viewport. o.init: script run before the page.
    Returns { browser, page, errors }. The page is at the main menu with the map built. */
 export async function openGame(o = {}) {
-  const settings = Object.assign({ quality: 'low', sv: 7, dynres: false, eco: false, map: 'simoun', mode: 'tdm', difficulty: 1 }, o.settings || {});
-  const browser = o.browser || await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const settings = Object.assign({ quality: 'low', sv: 7, dynres: false, eco: false, map: 'simoun', mode: 'raid', difficulty: 1 }, o.settings || {});
+  const browser = o.browser || await launchEfcBrowser();
   const page = await browser.newPage({ bypassCSP: true, viewport: { width: o.w || 480, height: o.h || 270 } });
   await page.addInitScript(`try{if(!localStorage.getItem('dc_settings'))localStorage.setItem('dc_settings', ${JSON.stringify(JSON.stringify(settings))})}catch(e){}; window.MATCH_COUNTDOWN = 0; window.EFC_TEST = true;`);
   if (o.init) await page.addInitScript(o.init);
   const errors = [];
   page.on('pageerror', (e) => errors.push('[pageerror] ' + e.message + '\n' + (e.stack || '').split('\n').slice(0, 4).join('\n')));
   page.on('console', (m) => { if (m.type() === 'error' && !/ERR_FAILED|ERR_INTERNET|net::|Failed to load resource/.test(m.text())) errors.push('[console] ' + m.text()); });
-  await page.route('**/*', (r) => (/^file:/.test(r.request().url()) ? r.continue() : r.abort()));
-  await page.goto('file://' + path.join(REPO, 'dist/index.html'));
+  await page.route('**/*', (r) => ((GAME_URL.startsWith('file:') ? r.request().url().startsWith('file:') : new URL(r.request().url()).origin === new URL(GAME_URL).origin) ? r.continue() : r.abort()));
+  await page.goto(GAME_URL);
   await page.waitForFunction(() => typeof MATCH !== 'undefined' && MATCH.state === 'menu', null, { timeout: 300000, polling: 300 });
   if (!o.noMap) await page.evaluate(() => mapEnsure(Settings.map));
   return { browser, page, errors };

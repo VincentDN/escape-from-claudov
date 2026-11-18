@@ -412,7 +412,7 @@ async function acctMatchEnd(result, show) {
   if (!m.token) return;
   const me = PL.ent, dur = Math.max(0, Math.floor(MATCH.time - m.t0));
   const r = await acctApi('match-end', { token: m.token, summary: {
-    map: m.map, mode: m.mode || 'tdm', result, online: m.online, duration: dur, kills: me.kills, deaths: me.deaths, assists: me.assists,
+    map: m.map, mode: m.mode || 'raid', result, online: m.online, duration: dur, kills: me.kills, deaths: me.deaths, assists: me.assists,
     headshots: Math.min(PL.hsKills || 0, me.kills), shots: PL.shots, hits: Math.min(PL.hits, PL.shots), score: Math.max(0, me.score | 0), streak: Math.min(PL.bestStreak || 0, me.kills),
   } });
   if (!r.ok || !r.data) return;

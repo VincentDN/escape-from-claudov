@@ -9,7 +9,7 @@ let fails = 0;
 const ok = (c, m) => { if (!c) { fails++; console.log('ECHEC :', m); } else console.log('ok    :', m); };
 (async () => {
   const { browser, page, logs } = await openGame({ settings: { quality: 'low', lang: 'fr', skin: 'raptor' } });
-  await page.evaluate(() => { Settings.mode = 'tdm'; startMatch({}); });
+  await page.evaluate(() => { Settings.mode = 'raid'; startMatch({}); });
   await page.waitForTimeout(500);
   const r = await page.evaluate(() => {
     const out = {}, me = PL.ent, foe = entities.find((e) => !e.isPlayer && !e.off && !allied(me, e)), N = (id) => WEAPONS[id].name;
@@ -38,7 +38,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('ECHEC :', m); } else cons
     out.uav = snap(); reset();
     me.alive = true; domChanged({ owner: me.team, n: [1, 1], x: me.pos.x, y: me.pos.y, z: me.pos.z, name: 'A' }, -1);
     out.cap = snap(); reset();
-    MATCH.mode = 'ffa'; defisMatchEnd('win', 2); defisMatchEnd('loss', 4); MATCH.mode = 'tdm'; defisMatchEnd('win', 1);
+    MATCH.mode = 'ffa'; defisMatchEnd('win', 2); defisMatchEnd('loss', 4); MATCH.mode = 'raid'; defisMatchEnd('win', 1);
     out.end = snap(); out.maps = ARS.chMaps.slice(); reset();
     // cartes françaises (Gilet jaune) : parties terminées, victoires et éliminations sur Val-Blanc, Kervénec ou French Dream seulement
     const map0 = CURMAP.id;

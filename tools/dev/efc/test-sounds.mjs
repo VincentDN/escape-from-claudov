@@ -4,13 +4,10 @@
 // node tools/dev/efc/test-sounds.mjs   (needs a build: python3 build.py)
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
-import { openGame, startSolo, simRun, REPO } from './harness.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require('playwright');
+import { openGame, startSolo, simRun, REPO, launchEfcBrowser } from './harness.mjs';
 let fails = 0, passes = 0;
 const ok = (c, msg) => { if (c) passes++; else { fails++; console.error('FAIL ' + msg); } };
-const launch = () => chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
+const launch = () => launchEfcBrowser(['--autoplay-policy=no-user-gesture-required']);
 
 /* In the page: start audio, load the game packs, wait until each is ready or failed */
 const bootAudio = () => (async () => {
@@ -77,6 +74,20 @@ const bootAudio = () => (async () => {
   // ---------- 2. reload choreography timing, one weapon per family ----------
   await startSolo(page);
   await simRun(page, 1, 'PL.ent.health = 100;');
+  const holster = await page.evaluate(() => {
+    const player = PL.ent, arms = player.arms;
+    EFC_SND.log = [];
+    const target = arms.slots.findIndex((_, i) => i !== arms.cur);
+    const started = ctlSwitch(player, target);
+    const repeated = ctlSwitch(player, target);
+    efcEmit('tick', 1 / 30);
+    const takes = EFC_SND.log.filter((event) => event.kind === 'stow').map((event) => event.id);
+    EFC_SND.log = null;
+    arms.switching = 0;
+    return { mode: MATCH.mode, started, repeated, takes };
+  });
+  ok(holster.mode === 'raid' && holster.started && !holster.repeated && holster.takes.join() === 'hf_handle,hf_hit',
+    'Raid switch plays the holster once ' + JSON.stringify(holster));
   const T = await page.evaluate(() => {
     const rec = [], orig = efcHandlingPlay;
     efcHandlingPlay = (kind, delay, pos, fam) => { const r = orig(kind, delay, pos, fam); rec.push({ kind, delay: delay || 0, ts: VM.rlS, played: r, at: rec.at }); return r; };
@@ -169,7 +180,10 @@ const bootAudio = () => (async () => {
   const F = await page.evaluate(() => {
     const ids = [], orig = sfxPlay;
     sfxPlay = (id, ...a) => { ids.push(id); return orig(id, ...a); };
-    const def = WEAPONS.m4; vmEquip(def); const T = RELOAD.rifle.empty, D = { empty: true };
+    const def = WEAPONS.m4;
+    armsW(PL.ent).def = def; // fallback bank selection reads the equipped weapon
+    vmEquip(def);
+    const T = RELOAD.rifle.empty, D = { empty: true };
     for (let i = 0; i <= 240 * T.dur; i++) vmChoreo('reload', Math.min(1, i / 240 / T.dur), D, VM.curDef, VM.cur);
     sfxGun('sniper', null, PL.ent); sfxWhiz(PL.ent.pos.clone()); sfxCasing('wood', null, AU.ctx.currentTime);
     sfxPlay = orig;

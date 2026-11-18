@@ -77,7 +77,7 @@ try {
     for (const e of [P, ...entities.filter((x) => !x.isPlayer)]) {
       for (let a = 0; a < 32 && !dir; a++) {
         const b = e.pos, dx = Math.sin((a * Math.PI) / 16), dz = Math.cos((a * Math.PI) / 16); tried++;
-        if (rayWorld(b.x, b.y + 1.3, b.z, dx, 0, dz, 26, 1) || rayWorld(b.x, b.y + 0.6, b.z, dx, 0, dz, 26, 1)) continue;
+        if (rayWorld(b.x, b.y + 1.62, b.z, dx, 0, dz, 26, 1) || rayWorld(b.x, b.y + 1.3, b.z, dx, 0, dz, 26, 1) || rayWorld(b.x, b.y + 0.6, b.z, dx, 0, dz, 26, 1)) continue;
         const g = rayWorld(b.x + dx * 25, b.y + 1, b.z + dz * 25, 0, -1, 0, 3);
         if (g && Math.abs(g.t - 1) < 0.3) { base = b.clone(); dir = [dx, dz]; }
       }
@@ -93,7 +93,10 @@ try {
       let t = 0, shots = 0, hits = 0, last = 100, first = -1;
       while (tgt.alive && tgt.health > 0 && t < 10) {
         P.pos.copy(base); P.vel.set(0, 0, 0); P.health = 100; tgt.pos.copy(tp); tgt.vel && tgt.vel.set(0, 0, 0);
-        const ex = tp.x - base.x, ez = tp.z - base.z, ey = tp.y + 1.25 - (base.y + PL.eyeH);
+        poseSoldier(tgt, 0); // Move joint-based hitboxes with the teleported target before firing.
+        hitSpheres(tgt);
+        const aim = HS[1].c;
+        const ex = aim.x - base.x, ez = aim.z - base.z, ey = aim.y - (base.y + PL.eyeH);
         PL.yaw = Math.atan2(-ex, -ez); PL.pitch = Math.atan2(ey, Math.hypot(ex, ez));
         camera.position.set(base.x, base.y + PL.eyeH, base.z); camera.rotation.set(PL.pitch, PL.yaw, 0, 'YXZ'); camera.updateMatrixWorld();
         if (!out.aim0) { const f = camFwd(new V3()); out.aim0 = { f: f.toArray().map((x) => +x.toFixed(3)), want: new V3(ex, ey, ez).normalize().toArray().map((x) => +x.toFixed(3)) }; }

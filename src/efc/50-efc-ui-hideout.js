@@ -26,6 +26,9 @@ function efcHoRender() {
     });
     $('efcHoTot').innerHTML = efcUiTotHtml(lo);
   }
+  const equipped = st?.loadout.slots.primary || st?.loadout.slots.sidearm;
+  efcOperatorPanel('efcOpHideout', equipped && WEAPONS[efcUiDef(equipped.id).weapon?.wkey]);
+  efcOperatorEquipment('efcOpHideoutGrids', st?.loadout);
   $('efcHoNote').textContent = EFC_HO.note;
   const first = root.querySelector('#efcHoStash .efc-it') || root.querySelector('#efcHoLoad .efc-it:not(.empty)');
   if (first) first.dataset.focus = ''; // where uiGo puts the focus on arrival (src/09e-menus.js)

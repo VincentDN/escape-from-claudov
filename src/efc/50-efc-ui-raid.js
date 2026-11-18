@@ -54,6 +54,9 @@ function efcUirRenderInv() {
     },
   });
   $('efcInvW').innerHTML = efcUiTotHtml(inv);
+  efcOperatorPanel('efcOpRaid', efcOperatorRaidWeapon());
+  efcOperatorEquipment('efcOpRaidGrids', inv);
+  efcOperatorVicinity();
   efcUiFocusBack(root, mark);
 }
 function efcUirRenderLoot() {
@@ -66,6 +69,9 @@ function efcUirRenderLoot() {
   const bag = (EFC.inv && EFC.inv.bag) || [];
   $('efcLootBag').innerHTML = bag.length ? bag.map((it, i) => efcThumbRow(it, { key: 'b-' + i, data: { put: i }, title: 'Put in the container' })).join('') : '<p class="efc-none">The bag is empty.</p>';
   $('efcLootW').innerHTML = efcUiTotHtml(EFC.inv);
+  efcOperatorPanel('efcOpLoot', efcOperatorRaidWeapon());
+  $('efcOpLootGrid').innerHTML = efcOperatorGrid(c?.grid, efcUirName(c));
+  efcOperatorEquipment('efcOpLootEquipment', EFC.inv);
   efcUiFocusBack(root, mark);
 }
 
@@ -164,7 +170,10 @@ function efcUirKey(e) {
   if (EFC_UIR.panel) {
     const root = $(EFC_UIR.panel === 'loot' ? 'efcLoot' : 'efcInv');
     if (c === 'Tab' || c === 'Escape') { stop(); if (down && !e.repeat) efcUirClose(); return; }
-    if (c.startsWith('Arrow')) { stop(); if (down) efcUiNav(root, c); return; }
+    if (c.startsWith('Arrow')) {
+      if (e.target.matches?.('.efc-op-model canvas') && (c === 'ArrowLeft' || c === 'ArrowRight')) return;
+      stop(); if (down) efcUiNav(root, c); return;
+    }
     if (c === 'KeyF') {
       stop(); if (!down || e.repeat || EFC_UIR.panel !== 'loot') return;
       const a = document.activeElement, t = a && a.dataset && a.dataset.take !== undefined ? +a.dataset.take : EFC_UIR.sel;
@@ -191,7 +200,7 @@ efcOn('raid:over', () => { efcUirClose(true); EFC_UIR.on = false; EFC_UIR.hold =
 efcOn('tick', efcUirTick);
 efcOn('died', (v) => { if (typeof PL !== 'undefined' && v === PL.ent) { efcUirClose(true); EFC_UIR.hold = null; efcUirPrompt(''); } });
 efcOn('inv:changed', () => { if (EFC_UIR.panel) efcUirRender(); });
-efcOn('world:changed', (id) => { if (EFC_UIR.panel === 'loot' && (id == null || id === EFC_UIR.cid)) efcUirRender(); });
+efcOn('world:changed', (id) => { if (EFC_UIR.panel === 'inv') efcOperatorVicinity(); else if (EFC_UIR.panel === 'loot' && (id == null || id === EFC_UIR.cid)) efcUirRender(); });
 efcOn('ui:init', () => {
   $('efcInv').addEventListener('click', efcUirClick); $('efcLoot').addEventListener('click', efcUirClick);
   $('efcLootList').addEventListener('focusin', (e) => { const b = e.target.closest('[data-take]'); if (b) { EFC_UIR.sel = +b.dataset.take; for (const x of $('efcLootList').querySelectorAll('.efc-it')) x.classList.toggle('sel', x === b); } });

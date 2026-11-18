@@ -1,0 +1,1 @@
+three.js r169 (MIT), vendored so the site has no CDN dependency. Update via tools/vendor-three.mjs

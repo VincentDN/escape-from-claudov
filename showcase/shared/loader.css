@@ -1,0 +1,181 @@
+/* The one loader (docs/ui-style-guide.md): a small Nokia LCD, backlit paper and dark ink in the phone's green body,
+   with the pixel chase spinner, a message with stepping dots and an optional battery-segment progress bar. Pure CSS,
+   so it shows before any script runs; shared/loader.js changes its text, progress, error and visibility.
+   Card:  <div class="nk-loader" role="status" aria-live="polite"><span class="nk-spin" aria-hidden="true"></span>
+          <span class="nk-text">Raising the island</span></div>
+   Cover: the card inside <div class="nk-cover">…</div> fills its container (a whole page that is still loading).
+   nk-fixed centres the card in the window instead of its positioned container. */
+:root {
+  --nk-paper: #b5c79a;
+  --nk-paper-lo: #9fb184;
+  --nk-ink: #16200f;
+  --nk-ink-2: #16200f99;
+  --nk-ink-3: #16200f59;
+  --nk-ink-4: #16200f1f;
+  --nk-body: #272d24;
+  --nk-body-lo: #161a14;
+}
+.nk-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 45%, #272d24 0, #161a14 70%),
+    #161a14;
+}
+.nk-loader {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  z-index: 60;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  min-width: 180px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 12px 16px 12px 14px;
+  border-radius: 3px;
+  color: var(--nk-ink);
+  /* the LCD: backlight falling off to the edges, and the faint grid of its pixels */
+  background:
+    repeating-linear-gradient(0deg, #16200f0d 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, #16200f0d 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at 50% 40%, var(--nk-paper) 40%, var(--nk-paper-lo));
+  /* the glass edge, the phone body round it, and its shadow */
+  box-shadow:
+    inset 0 0 0 1px #16200f40,
+    inset 0 2px 6px #16200f33,
+    0 0 0 5px var(--nk-body),
+    0 0 0 6px #3a4234,
+    0 10px 28px #000a;
+  font: 700 12px/1.4 ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: left;
+  pointer-events: none;
+}
+.nk-loader.nk-fixed {
+  position: fixed;
+}
+.nk-cover .nk-loader {
+  position: relative;
+  inset: auto;
+  transform: none;
+}
+.nk-cover[hidden],
+.nk-loader[hidden],
+.nk-bar[hidden] {
+  display: none !important;
+}
+/* the chase: eight pixel blocks round a three-by-three grid, one dark head and a fading tail, stepping clockwise */
+.nk-spin {
+  position: relative;
+  flex: none;
+  width: 17px;
+  height: 17px;
+}
+.nk-spin::before {
+  content: '';
+  position: absolute;
+  left: -6px; /* a shadow under its own box is not drawn: every block is a shadow one cell away */
+  top: -6px;
+  width: 5px;
+  height: 5px;
+  box-shadow: 6px 6px 0 var(--nk-ink), 12px 6px 0 var(--nk-ink-4), 18px 6px 0 var(--nk-ink-4), 18px 12px 0 var(--nk-ink-4), 18px 18px 0 var(--nk-ink-4), 12px 18px 0 var(--nk-ink-4), 6px 18px 0 var(--nk-ink-3), 6px 12px 0 var(--nk-ink-2);
+  animation: nk-chase 0.8s step-end infinite;
+}
+@keyframes nk-chase {
+  0.0% { box-shadow: 6px 6px 0 var(--nk-ink), 12px 6px 0 var(--nk-ink-4), 18px 6px 0 var(--nk-ink-4), 18px 12px 0 var(--nk-ink-4), 18px 18px 0 var(--nk-ink-4), 12px 18px 0 var(--nk-ink-4), 6px 18px 0 var(--nk-ink-3), 6px 12px 0 var(--nk-ink-2); }
+  12.5% { box-shadow: 6px 6px 0 var(--nk-ink-2), 12px 6px 0 var(--nk-ink), 18px 6px 0 var(--nk-ink-4), 18px 12px 0 var(--nk-ink-4), 18px 18px 0 var(--nk-ink-4), 12px 18px 0 var(--nk-ink-4), 6px 18px 0 var(--nk-ink-4), 6px 12px 0 var(--nk-ink-3); }
+  25.0% { box-shadow: 6px 6px 0 var(--nk-ink-3), 12px 6px 0 var(--nk-ink-2), 18px 6px 0 var(--nk-ink), 18px 12px 0 var(--nk-ink-4), 18px 18px 0 var(--nk-ink-4), 12px 18px 0 var(--nk-ink-4), 6px 18px 0 var(--nk-ink-4), 6px 12px 0 var(--nk-ink-4); }
+  37.5% { box-shadow: 6px 6px 0 var(--nk-ink-4), 12px 6px 0 var(--nk-ink-3), 18px 6px 0 var(--nk-ink-2), 18px 12px 0 var(--nk-ink), 18px 18px 0 var(--nk-ink-4), 12px 18px 0 var(--nk-ink-4), 6px 18px 0 var(--nk-ink-4), 6px 12px 0 var(--nk-ink-4); }
+  50.0% { box-shadow: 6px 6px 0 var(--nk-ink-4), 12px 6px 0 var(--nk-ink-4), 18px 6px 0 var(--nk-ink-3), 18px 12px 0 var(--nk-ink-2), 18px 18px 0 var(--nk-ink), 12px 18px 0 var(--nk-ink-4), 6px 18px 0 var(--nk-ink-4), 6px 12px 0 var(--nk-ink-4); }
+  62.5% { box-shadow: 6px 6px 0 var(--nk-ink-4), 12px 6px 0 var(--nk-ink-4), 18px 6px 0 var(--nk-ink-4), 18px 12px 0 var(--nk-ink-3), 18px 18px 0 var(--nk-ink-2), 12px 18px 0 var(--nk-ink), 6px 18px 0 var(--nk-ink-4), 6px 12px 0 var(--nk-ink-4); }
+  75.0% { box-shadow: 6px 6px 0 var(--nk-ink-4), 12px 6px 0 var(--nk-ink-4), 18px 6px 0 var(--nk-ink-4), 18px 12px 0 var(--nk-ink-4), 18px 18px 0 var(--nk-ink-3), 12px 18px 0 var(--nk-ink-2), 6px 18px 0 var(--nk-ink), 6px 12px 0 var(--nk-ink-4); }
+  87.5% { box-shadow: 6px 6px 0 var(--nk-ink-4), 12px 6px 0 var(--nk-ink-4), 18px 6px 0 var(--nk-ink-4), 18px 12px 0 var(--nk-ink-4), 18px 18px 0 var(--nk-ink-4), 12px 18px 0 var(--nk-ink-3), 6px 18px 0 var(--nk-ink-2), 6px 12px 0 var(--nk-ink); }
+  100% { box-shadow: 6px 6px 0 var(--nk-ink), 12px 6px 0 var(--nk-ink-4), 18px 6px 0 var(--nk-ink-4), 18px 12px 0 var(--nk-ink-4), 18px 18px 0 var(--nk-ink-4), 12px 18px 0 var(--nk-ink-4), 6px 18px 0 var(--nk-ink-3), 6px 12px 0 var(--nk-ink-2); }
+}
+.nk-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* the dots step on after the message, as on the phone's "please wait" */
+.nk-text::after {
+  content: '...';
+  display: inline-block;
+  width: 3ch;
+  clip-path: inset(0 100% 0 0);
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  animation: nk-dots 1.2s steps(4, jump-none) infinite;
+}
+@keyframes nk-dots {
+  to { clip-path: inset(0); }
+}
+/* progress, when the page knows it: battery segments filling from the left */
+.nk-bar {
+  display: block;
+  flex: 1 0 100%;
+  box-sizing: border-box;
+  height: 6px;
+  margin: 6px 0 0 29px; /* under the message, past the spinner */
+  max-width: calc(100% - 29px);
+  box-shadow: inset 0 0 0 1px var(--nk-ink-3);
+  padding: 1px;
+}
+.nk-bar i {
+  display: block;
+  height: 100%;
+  width: calc(var(--p, 0) * 100%);
+  background: repeating-linear-gradient(90deg, var(--nk-ink) 0 4px, transparent 4px 6px);
+}
+/* an error: no spinner, no dots, the message stays */
+.nk-loader[data-state='error'] .nk-spin,
+.nk-loader[data-state='error'] .nk-text::after {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nk-spin::before,
+  .nk-text::after {
+    animation: none;
+  }
+  .nk-text::after {
+    width: 3ch;
+  }
+}
+/* ID-level page status rules must not move loader cards into a corner. */
+#status.nk-loader, #loading.nk-loader {
+  top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%);
+  width: min(380px, calc(100vw - 48px)); z-index: 60; padding: 18px;
+}
+.nk-cover > .nk-loader { width: min(380px, calc(100vw - 48px)); }
+.nk-progress-text { flex: 1 0 100%; margin: 8px 0 0 29px; font: 11px/1.4 system-ui, sans-serif; text-transform: none; letter-spacing: 0; }
+.nk-bar { height: 10px; }
+.nk-bar.indeterminate i { width: 32%; animation: nk-progress 1.4s ease-in-out infinite alternate; }
+@keyframes nk-progress { to { transform: translateX(210%); } }
+@media (prefers-reduced-motion: reduce) { .nk-bar.indeterminate i { animation: none; width: 45%; } }
+
+/* Reserve every loading phase before JavaScript adds progress; only the text scrolls. */
+.nk-loader {
+  display: grid;
+  grid-template-columns: 17px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 10px 32px;
+  gap: 8px 12px;
+  width: min(380px, calc(100vw - 48px));
+  min-width: 0;
+  height: 160px;
+  padding: 18px;
+}
+.nk-spin { grid-column: 1; grid-row: 1; }
+.nk-text { grid-column: 2; grid-row: 1; max-height: 100%; overflow: auto; }
+.nk-bar { grid-column: 2; grid-row: 2; width: 100%; max-width: none; margin: 0; }
+.nk-progress-text { grid-column: 2; grid-row: 3; margin: 0; }
+.nk-loader[data-state='error'] .nk-spin { display: block; visibility: hidden; }
+.nk-loader[data-state='error'] .nk-text { grid-row: 1 / -1; }
+@media (prefers-reduced-motion: reduce) { .nk-text::after { clip-path: none; } }

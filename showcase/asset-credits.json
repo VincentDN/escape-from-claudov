@@ -1,0 +1,916 @@
+{
+  "version": 1,
+  "policy": "CC0 or CC BY 4.0 only for downloaded assets, unless the owner records an explicit exception here. Every shipped file under assets/ must be listed in `assets`.",
+  "assets": [
+    {
+      "id": "ak-74m-zenitco",
+      "label": "AK-74M Zenitco",
+      "path": "assets/models/weapons/ak-74m-zenitco.glb",
+      "kind": "weapon",
+      "status": "real",
+      "license": "CC BY 4.0",
+      "author": "D_U",
+      "source": "https://sketchfab.com/3d-models/low-poly-ak-74m-zenitco-35ad8e37a513453cbbbd04064fa5fb79",
+      "attribution_required": true,
+      "budget": {
+        "triangles": 30000
+      },
+      "notes": "Loose rounds and spare magazines stripped (tools/assets/strip-loose-parts.mjs)."
+    },
+    {
+      "id": "ak-15k",
+      "label": "AK-15K",
+      "path": "assets/models/weapons/ak-15k.glb",
+      "kind": "weapon",
+      "status": "real",
+      "license": "CC BY 4.0",
+      "author": "D_U",
+      "source": "https://sketchfab.com/3d-models/low-poly-ak-15-k-68725380dd654391bb6b751e888e2c44",
+      "attribution_required": true,
+      "budget": {
+        "triangles": 30000
+      },
+      "notes": "Loose rounds and spare magazines stripped."
+    },
+    {
+      "id": "hdr-studio",
+      "label": "Studio (HDR)",
+      "path": "assets/lighting/studio.hdr",
+      "kind": "lighting",
+      "status": "real",
+      "license": "Original (CC0 by the project)",
+      "author": "Partisan Project",
+      "source": "tools/assets/generate-studio-hdr.py",
+      "attribution_required": false
+    },
+    {
+      "id": "music-duce",
+      "label": "The Duce Puts On His Uniform",
+      "path": "assets/audio/duce-uniform.mp3",
+      "kind": "music",
+      "status": "real",
+      "license": "Supplied by the project owner; recorded as rights-cleared in the earlier README",
+      "author": "(1940 Greek war song, recording supplied by owner)",
+      "source": "Owner",
+      "attribution_required": false,
+      "notes": "Owner to re-confirm recording rights before the Pages site is promoted."
+    },
+    {
+      "id": "music-abdulena",
+      "label": "Abdulena",
+      "path": "assets/audio/abdulena.mp3",
+      "kind": "music",
+      "status": "real",
+      "license": "Supplied by the project owner",
+      "author": "(supplied by owner)",
+      "source": "Owner",
+      "attribution_required": false,
+      "notes": "Owner to re-confirm recording rights before the Pages site is promoted."
+    },
+    {
+      "id": "foley-manifest",
+      "label": "Handling foley manifest",
+      "path": "assets/audio/foley/manifest.json",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-click-bolt-0042_94s",
+      "label": "Foley click: bolt-0042_94s",
+      "path": "assets/audio/foley/click/bolt-0042_94s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-click-bolt-0065_15s",
+      "label": "Foley click: bolt-0065_15s",
+      "path": "assets/audio/foley/click/bolt-0065_15s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-click-revolver-0435_23s",
+      "label": "Foley click: revolver-0435_23s",
+      "path": "assets/audio/foley/click/revolver-0435_23s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-click-bolt-0039_83s",
+      "label": "Foley click: bolt-0039_83s",
+      "path": "assets/audio/foley/click/bolt-0039_83s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-click-pump-0164_97s",
+      "label": "Foley click: pump-0164_97s",
+      "path": "assets/audio/foley/click/pump-0164_97s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-click-sar-0500_12s",
+      "label": "Foley click: sar-0500_12s",
+      "path": "assets/audio/foley/click/sar-0500_12s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-clunk-bolt-0125_61s",
+      "label": "Foley clunk: bolt-0125_61s",
+      "path": "assets/audio/foley/clunk/bolt-0125_61s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-clunk-bolt-0076_36s",
+      "label": "Foley clunk: bolt-0076_36s",
+      "path": "assets/audio/foley/clunk/bolt-0076_36s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-clunk-pump-0157_58s",
+      "label": "Foley clunk: pump-0157_58s",
+      "path": "assets/audio/foley/clunk/pump-0157_58s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-clunk-revolver-0413_02s",
+      "label": "Foley clunk: revolver-0413_02s",
+      "path": "assets/audio/foley/clunk/revolver-0413_02s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-clunk-revolver-0398_20s",
+      "label": "Foley clunk: revolver-0398_20s",
+      "path": "assets/audio/foley/clunk/revolver-0398_20s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-clunk-bolt-0129_86s",
+      "label": "Foley clunk: bolt-0129_86s",
+      "path": "assets/audio/foley/clunk/bolt-0129_86s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-ratchet-pump-0138_38s",
+      "label": "Foley ratchet: pump-0138_38s",
+      "path": "assets/audio/foley/ratchet/pump-0138_38s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-ratchet-bow-0232_15s",
+      "label": "Foley ratchet: bow-0232_15s",
+      "path": "assets/audio/foley/ratchet/bow-0232_15s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-ratchet-bow-0208_12s",
+      "label": "Foley ratchet: bow-0208_12s",
+      "path": "assets/audio/foley/ratchet/bow-0208_12s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-ratchet-bolt-0058_78s",
+      "label": "Foley ratchet: bolt-0058_78s",
+      "path": "assets/audio/foley/ratchet/bolt-0058_78s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-ratchet-bolt-0060_64s",
+      "label": "Foley ratchet: bolt-0060_64s",
+      "path": "assets/audio/foley/ratchet/bolt-0060_64s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-ratchet-sar-0532_41s",
+      "label": "Foley ratchet: sar-0532_41s",
+      "path": "assets/audio/foley/ratchet/sar-0532_41s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-slide-bolt-0083_05s",
+      "label": "Foley slide: bolt-0083_05s",
+      "path": "assets/audio/foley/slide/bolt-0083_05s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-slide-bolt-0068_16s",
+      "label": "Foley slide: bolt-0068_16s",
+      "path": "assets/audio/foley/slide/bolt-0068_16s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-slide-bolt-0074_49s",
+      "label": "Foley slide: bolt-0074_49s",
+      "path": "assets/audio/foley/slide/bolt-0074_49s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-slide-bolt-0025_12s",
+      "label": "Foley slide: bolt-0025_12s",
+      "path": "assets/audio/foley/slide/bolt-0025_12s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-slide-pump-0167_72s",
+      "label": "Foley slide: pump-0167_72s",
+      "path": "assets/audio/foley/slide/pump-0167_72s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-slide-sar-0494_73s",
+      "label": "Foley slide: sar-0494_73s",
+      "path": "assets/audio/foley/slide/sar-0494_73s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-hit-bolt-0075_79s",
+      "label": "Foley hit: bolt-0075_79s",
+      "path": "assets/audio/foley/hit/bolt-0075_79s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-hit-bolt-0039_37s",
+      "label": "Foley hit: bolt-0039_37s",
+      "path": "assets/audio/foley/hit/bolt-0039_37s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-hit-bolt-0043_31s",
+      "label": "Foley hit: bolt-0043_31s",
+      "path": "assets/audio/foley/hit/bolt-0043_31s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-hit-bolt-0029_02s",
+      "label": "Foley hit: bolt-0029_02s",
+      "path": "assets/audio/foley/hit/bolt-0029_02s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-hit-sapistol-0280_34s",
+      "label": "Foley hit: sapistol-0280_34s",
+      "path": "assets/audio/foley/hit/sapistol-0280_34s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-hit-pump-0142_41s",
+      "label": "Foley hit: pump-0142_41s",
+      "path": "assets/audio/foley/hit/pump-0142_41s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-handle-sar-0494_00s",
+      "label": "Foley handle: sar-0494_00s",
+      "path": "assets/audio/foley/handle/sar-0494_00s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-handle-sar-0505_05s",
+      "label": "Foley handle: sar-0505_05s",
+      "path": "assets/audio/foley/handle/sar-0505_05s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-handle-sar-0504_10s",
+      "label": "Foley handle: sar-0504_10s",
+      "path": "assets/audio/foley/handle/sar-0504_10s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-handle-sar-0499_49s",
+      "label": "Foley handle: sar-0499_49s",
+      "path": "assets/audio/foley/handle/sar-0499_49s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-handle-sar-0527_74s",
+      "label": "Foley handle: sar-0527_74s",
+      "path": "assets/audio/foley/handle/sar-0527_74s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-handle-sar-0554_24s",
+      "label": "Foley handle: sar-0554_24s",
+      "path": "assets/audio/foley/handle/sar-0554_24s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-long-bolt-0034_58s",
+      "label": "Foley long: bolt-0034_58s",
+      "path": "assets/audio/foley/long/bolt-0034_58s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-long-bolt-0069_49s",
+      "label": "Foley long: bolt-0069_49s",
+      "path": "assets/audio/foley/long/bolt-0069_49s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-long-bolt-0019_58s",
+      "label": "Foley long: bolt-0019_58s",
+      "path": "assets/audio/foley/long/bolt-0019_58s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-long-bolt-0052_26s",
+      "label": "Foley long: bolt-0052_26s",
+      "path": "assets/audio/foley/long/bolt-0052_26s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-long-sar-0495_80s",
+      "label": "Foley long: sar-0495_80s",
+      "path": "assets/audio/foley/long/sar-0495_80s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "foley-long-sar-0552_84s",
+      "label": "Foley long: sar-0552_84s",
+      "path": "assets/audio/foley/long/sar-0552_84s.wav",
+      "kind": "sfx",
+      "status": "real",
+      "license": "Supplied by the project owner; checked and cleared by the owner",
+      "author": "(owner-supplied recording)",
+      "source": "Owner (earlier workbench sfx/cuts)",
+      "attribution_required": false,
+      "notes": "Restored from the earlier workbench's shipped 42-take bank; checked and cleared by the owner (statement 2026-10-01, ADR 0009). The old sfx README classified these cuts from a longer recording, so keep the owner's clearance on file."
+    },
+    {
+      "id": "muzzle-set",
+      "label": "low-poly Muzzle Device Set",
+      "path": "assets/models/weapons/muzzle-set.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "DU1701",
+      "source": "https://sketchfab.com/3d-models/07f62ec5ca604446848d1a0238b11f1d",
+      "budget": {
+        "triangles": 4000
+      }
+    },
+    {
+      "id": "collimator-set",
+      "label": "low-poly Collimator Set",
+      "path": "assets/models/weapons/collimator-set.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "DU1701",
+      "source": "https://sketchfab.com/3d-models/288373d26dd84db2898920222ac3e430",
+      "budget": {
+        "triangles": 13000
+      }
+    },
+    {
+      "id": "eotech",
+      "label": "EOTech HWS XPS2 Sight (Low-Poly)",
+      "path": "assets/models/weapons/eotech.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "GoldbergR",
+      "source": "https://sketchfab.com/3d-models/5c8f29d9895e48e183a085fefabf0e14",
+      "budget": {
+        "triangles": 4000
+      }
+    },
+    {
+      "id": "scope-zf4",
+      "label": "ZF-4 Scope (Low-Poly)",
+      "path": "assets/models/weapons/scope-zf4.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "GoldbergR",
+      "source": "https://sketchfab.com/3d-models/bd60e97c17fc42bbb9e1622caffc2a03",
+      "budget": {
+        "triangles": 3000
+      }
+    },
+    {
+      "id": "grip-rvg",
+      "label": "Low-Poly Magpul RVG",
+      "path": "assets/models/weapons/grip-rvg.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "notcplkerry",
+      "source": "https://sketchfab.com/3d-models/86b3580a65c441db9d3401712c5c9b6d",
+      "budget": {
+        "triangles": 1000
+      }
+    },
+    {
+      "id": "grip-afg",
+      "label": "Low-Poly Magpul AFG",
+      "path": "assets/models/weapons/grip-afg.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "notcplkerry",
+      "source": "https://sketchfab.com/3d-models/a92a52cbb5854f7c8e33507f579073f7",
+      "budget": {
+        "triangles": 2000
+      }
+    },
+    {
+      "id": "peq15",
+      "label": "low-poly AN/PEQ 15",
+      "path": "assets/models/weapons/peq15.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "DU1701",
+      "source": "https://sketchfab.com/3d-models/522f6a04c34946dbb168022187645c1a",
+      "budget": {
+        "triangles": 5000
+      }
+    },
+    {
+      "id": "peq2",
+      "label": "low-poly AN/PEQ 2",
+      "path": "assets/models/weapons/peq2.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "DU1701",
+      "source": "https://sketchfab.com/3d-models/820ee672677a4f8daab617f1723820a2",
+      "budget": {
+        "triangles": 3000
+      }
+    },
+    {
+      "id": "light-surefire",
+      "label": "SureFire 660 Weapon Light with Pressure Switch",
+      "path": "assets/models/weapons/light-surefire.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "haoliu95",
+      "source": "https://sketchfab.com/3d-models/09bba490e5e44ac6a412cc363eb2b41e",
+      "budget": {
+        "triangles": 6000
+      }
+    },
+    {
+      "id": "g3-bipod",
+      "label": "HK G3 Steel Bipod (Low-Poly)",
+      "path": "assets/models/weapons/g3-bipod.glb",
+      "kind": "weapon",
+      "status": "real",
+      "author": "GoldbergR",
+      "source": "https://sketchfab.com/3d-models/b525a696d09d48a484db53c2002d02fb",
+      "budget": {
+        "triangles": 1000
+      }
+    },
+    {
+      "id": "stg44-2044-a",
+      "label": "StG 44 (2044), rebuild A: LLM-Rebuild",
+      "path": "assets/models/weapons/stg44-2044-a.glb",
+      "kind": "weapon",
+      "status": "real",
+      "generator": "tools/assets/build-stg44-2044-a.py",
+      "budget": {
+        "triangles": 51000
+      },
+      "note": "Over the 30,000-triangle weapon budget (about 46,700 fitted with one magazine and stock); a hero test, to be cut down if it ships."
+    },
+    {
+      "id": "stg44-2044-b",
+      "label": "StG 44 (2044), rebuild B: Neuro-Bash",
+      "path": "assets/models/weapons/stg44-2044-b.glb",
+      "kind": "weapon",
+      "status": "real",
+      "generator": "tools/assets/build-stg44-2044-b.py",
+      "budget": {
+        "triangles": 27000
+      }
+    },
+    {
+      "id": "stg44-2044-astra-a",
+      "label": "StG 44 (2044) · Magnific · Tripo P2 A",
+      "path": "assets/models/weapons/stg44-2044-astra-a.glb",
+      "kind": "weapon",
+      "status": "real",
+      "budget": {
+        "triangles": 30000
+      }
+    },
+    {
+      "id": "stg44-2044-astra-b",
+      "label": "StG 44 (2044) · Magnific · Tripo P2 B",
+      "path": "assets/models/weapons/stg44-2044-astra-b.glb",
+      "kind": "weapon",
+      "status": "real",
+      "budget": {
+        "triangles": 30000
+      }
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "att-optics",
+      "label": "Optics (red dot, micro dot, holographic, 4x scope)",
+      "slot": "optic",
+      "status": "placeholder",
+      "target": "Real CC0 optic meshes",
+      "candidates": [
+        "byzmod3d Low Poly Weapon Pack (OpenGameArt, CC0)",
+        "chilly-durango Low Poly Firearms (itch.io, CC0) as geometry reference"
+      ],
+      "blocked_by": "Sandbox network blocks OpenGameArt/itch.io; owner downloads into assets-incoming/ then runs tools/assets/import-asset.py"
+    },
+    {
+      "id": "att-muzzle",
+      "label": "Muzzle devices (DTK-1, AK-74 brake, compensator, suppressor)",
+      "slot": "muzzle",
+      "status": "placeholder",
+      "target": "Real CC0 muzzle meshes",
+      "candidates": [
+        "byzmod3d Low Poly Weapon Pack (CC0)"
+      ],
+      "blocked_by": "same"
+    },
+    {
+      "id": "att-foregrips",
+      "label": "Foregrips (vertical, angled, hand stop)",
+      "slot": "foregrip",
+      "status": "placeholder",
+      "target": "Real CC0 foregrip meshes",
+      "candidates": [
+        "byzmod3d pack",
+        "chilly-durango pack (reference)"
+      ],
+      "blocked_by": "same"
+    },
+    {
+      "id": "att-magazines",
+      "label": "Magazines (30, 45, 60, drum)",
+      "slot": "magazine",
+      "status": "placeholder",
+      "target": "Real CC0 magazine meshes (WP-A1 exit: at least the magazine)",
+      "candidates": [
+        "byzmod3d pack"
+      ],
+      "blocked_by": "same"
+    },
+    {
+      "id": "att-grips-stocks",
+      "label": "Pistol grips, stocks, side-rail light/laser",
+      "slot": "grip/stock/side",
+      "status": "placeholder",
+      "target": "Real CC0 meshes",
+      "candidates": [
+        "byzmod3d pack",
+        "chilly-durango pack"
+      ],
+      "blocked_by": "same"
+    },
+    {
+      "id": "wpn-g3a3",
+      "label": "G3A3",
+      "status": "pending",
+      "target": "Third rifle, Stage 1",
+      "candidates": [
+        "3DCADBrowser G3A3 (licence: verify)",
+        "Sketchfab \"G3\"/\"CETME\" CC0/CC BY substitute"
+      ],
+      "blocked_by": "licence check + network"
+    },
+    {
+      "id": "wpn-m16",
+      "label": "M16 / modernized M16",
+      "status": "pending",
+      "target": "Stage 2",
+      "candidates": [
+        "byzmod3d pack m16.obj (CC0)",
+        "Gintoki1234 M16 A4 (CC BY 4.0)"
+      ],
+      "blocked_by": "network"
+    },
+    {
+      "id": "wpn-rpk",
+      "label": "Modernized RPK",
+      "status": "pending",
+      "target": "Stage 2",
+      "candidates": [
+        "D_U Sketchfab catalogue (CC BY 4.0, matches current art style)"
+      ],
+      "blocked_by": "network; no confirmed free source"
+    },
+    {
+      "id": "wpn-mk14",
+      "label": "Mk14 EBR",
+      "status": "pending",
+      "target": "Stage 2",
+      "candidates": [
+        "notcplkerry (licence: verify)",
+        "samanthacford Low Poly MK14 (licence: verify)"
+      ],
+      "blocked_by": "licence check + network"
+    },
+    {
+      "id": "wpn-spear",
+      "label": "SIG Spear (MCX-SPEAR)",
+      "status": "pending",
+      "target": "Stage 2",
+      "candidates": [
+        "none free found; paid options exist (owner decision)"
+      ],
+      "blocked_by": "no free source: needs a paid-asset decision or a code-built placeholder"
+    },
+    {
+      "id": "wpn-stg44",
+      "label": "STG44 (modernized)",
+      "status": "pending",
+      "target": "Stage 3",
+      "candidates": [
+        "byzmod3d pack stg44.obj (CC0)"
+      ],
+      "blocked_by": "network"
+    },
+    {
+      "id": "wpn-ppsh",
+      "label": "PPSh-41 (modernized)",
+      "status": "pending",
+      "target": "Stage 3",
+      "candidates": [
+        "victorcstr mini pack of WW2 weapons (licence: verify)"
+      ],
+      "blocked_by": "licence check + network"
+    },
+    {
+      "id": "wpn-bren",
+      "label": "Bren (modernized)",
+      "status": "pending",
+      "target": "Stage 3: source only",
+      "candidates": [
+        "bigmack WWII Mega Gun Pack",
+        "jimhatama World Wars Weapons Pack",
+        "marmok1932 Soviet Weapons Pack (none confirmed)"
+      ],
+      "blocked_by": "no confirmed source"
+    },
+    {
+      "id": "wpn-chauchat",
+      "label": "Chauchat (modernized)",
+      "status": "pending",
+      "target": "Stage 3: source only",
+      "candidates": [
+        "none surfaced; likely commission or from-scratch build"
+      ],
+      "blocked_by": "no confirmed source"
+    },
+    {
+      "id": "audio-foley",
+      "label": "More handling foley (optional)",
+      "status": "pending",
+      "target": "Extra takes beyond the restored 42 (fabric, buckles, tray)",
+      "candidates": [
+        "freesound.org CC0 search",
+        "Kenney/Sonniss GDC bundles (check licence)"
+      ],
+      "blocked_by": "optional; each new take needs a register row first"
+    }
+  ]
+}

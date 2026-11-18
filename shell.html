@@ -163,6 +163,7 @@ body.sk-live #ui[data-screen="skins"] .ui-shade { background: none; } /* écran 
 .msep { height: 1px; margin: 8px 0 8px 24px; width: min(320px, 70%); background: linear-gradient(90deg, var(--line-2), transparent); }
 .mbtn { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; background: none; border: 0; padding: 10px 28px 10px 24px; transition: background var(--t2) var(--ease); }
 .mbtn::before { content: ""; position: absolute; left: 0; top: 12%; bottom: 12%; width: 4px; background: var(--acc); transform: scaleY(0); transition: transform var(--t2) var(--ease); }
+a.mbtn { text-decoration: none; }
 .mbtn b { font-family: var(--stencil); font-weight: 400; font-size: clamp(30px, 4.6vh, 46px); line-height: 1; letter-spacing: .02em; color: var(--paper); text-shadow: 0 2px 14px rgba(0,0,0,.5); transition: color var(--t1); }
 .mbtn.m2 b { font-size: clamp(24px, 3.5vh, 34px); }
 .mbtn span { font-size: 17px; color: var(--dim); letter-spacing: .02em; }
@@ -2634,6 +2635,8 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
         <button class="mbtn" type="button" id="efcMmSquad" data-go="multi"><b>Squad raid</b><span>Online, up to 8 players in squads</span></button>
         <div class="msep" aria-hidden="true"></div>
         <button class="mbtn m2" type="button" id="efcMmHideout" data-go="hideout"><b>Hideout</b><span id="efcMmStash">Stash and loadout</span></button>
+        <a class="mbtn m2" href="showcase/intro/"><b>Opening Scene</b></a>
+        <a class="mbtn m2" href="showcase/workbench/stg44/"><b>Weapon Workbench</b></a>
         <button class="mbtn m2" type="button" id="efcMmSettings" data-go="options"><b>Settings</b><span>Game, audio, video, controls</span></button>
         <button class="mbtn hidden" type="button" data-go="play" tabindex="-1"><b>Jouer</b><span id="mmPlay">Seul, entre amis ou en ligne</span></button>
         <button class="mbtn m2 hidden" type="button" data-go="classes" tabindex="-1"><b>Classes</b><span>Armes, accessoires et camouflages</span></button>

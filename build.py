@@ -267,6 +267,19 @@ print("CSP :",len(inline),"scripts en ligne,",("relais "+host) if relay else "Pe
 os.makedirs("dist", exist_ok=True)
 open("dist/index.html","w",encoding="utf-8").write(html)
 with open("dist/version.json","w",encoding="utf-8") as f: f.write(json.dumps({"build":build_id,"version":log[0]["version"]})+"\n")
+# The Partisan opening scene and StG 44 viewer load as standalone modules on demand.
+shutil.copytree("showcase", "dist/showcase", dirs_exist_ok=True)
+showcase_foley={}
+for path in sorted(glob.glob("assets/sfx/handling/hf_*.mp3")):
+    filename=os.path.basename(path)
+    category=filename[3:].rsplit("-",1)[0]
+    folder="dist/showcase/assets/audio/foley/"+category
+    os.makedirs(folder,exist_ok=True)
+    shutil.copyfile(path,folder+"/"+filename)
+    showcase_foley.setdefault(category,[]).append(filename)
+with open("dist/showcase/assets/audio/foley/manifest.json","w",encoding="utf-8") as f:
+    json.dump(showcase_foley,f)
+
 # Serveur de jeu (serveur/, voir serveur/README.md) : son code est publié avec le jeu dans dist/serveur/ (le serveur s'y met à
 # jour seul, riposte-maj), et serveur/installer.sh, le script à coller à la création du serveur, est refait ici : il embarque
 # le même code. Version : condensat des fichiers. Absent (copie publique du code,

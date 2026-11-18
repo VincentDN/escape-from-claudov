@@ -734,13 +734,31 @@ function netOldConnClose() { const c = NET.oldConn; NET.oldConn = null; if (c) {
 function netAdoptBots() {
   const pool = entities.filter((e) => !e.isPlayer && !e.isRemote && !e.netBot), ffa = MATCH.mode === 'ffa' || efcNetIsRaid();
   for (const r of [...NET.remotes.values()].filter((e) => e.remoteBot)) {
-    const b = pool.find((x) => ffa || x.team === r.team), id = r.peer, seq = NET.seen.get(id) || 0, was = { alive: r.alive, pos: r.pos.clone(), yaw: r.yaw };
+    const id = r.peer, seq = NET.seen.get(id) || 0, raid = efcNetIsRaid();
+    const localId = Number(id.split('~b').at(-1));
+    const b = (raid && pool.find(x => x.id === localId)) || pool.find(x => ffa || x.team === r.team);
+    const was = { alive: r.alive, pos: r.pos.clone(), yaw: r.yaw, health: r.health, weapon: r.weapon, respawnT: r.efcNetRespawn };
     netHeliDrop(r); netRemoveById(id, true);
     if (!b) continue; // plus de bot libre dans cette équipe : il quitte la partie
     pool.splice(pool.indexOf(b), 1);
+    if (raid) {
+      b.off = b.efcOff = false;
+      b.squad = r.squad;
+      if (b.squad === 's' && !b.efcScav) efcEmit('scav:assign', [b]);
+      if (was.weapon && b.weapon.key !== was.weapon.key) {
+        b.weapon = was.weapon;
+        setSoldierGun(b.model, was.weapon.key);
+      }
+    }
     netBotOn(b);
     Object.assign(b, { netId: id, name: r.name, kills: r.kills, deaths: r.deaths, score: r.score, assists: r.assists, netQ: { seq: seq + 50, list: [] } });
-    if (was.alive) { b.pos.copy(was.pos); b.yaw = b.lookYaw = was.yaw; }
+    if (was.alive || raid) { b.pos.copy(was.pos); b.yaw = b.lookYaw = was.yaw; }
+    if (raid) {
+      b.alive = was.alive; b.health = was.health;
+      b.model.root.visible = was.alive;
+      b.efcDeaths = b.deaths;
+      b.respawnT = was.alive ? 0 : was.respawnT ?? EFC.cfg.wardenRespawn;
+    }
   }
 }
 /* Hélicoptère d'un soldat qui quitte ma partie (l'ancien hôte, ou un de ses bots repris) : il s'écrase */
@@ -923,6 +941,7 @@ function netApply(id, P) {
   e.net.lean = clamp(numOr(s[12]), -0.4, 0.4); // penché (lissé par updateRemote)
   const alive = !!s[9];
   e.health = clamp(numOr(s[11]), 0, 100);
+  if (e.remoteBot && efcNetIsRaid()) e.efcNetRespawn = Number.isFinite(P.wr) ? clamp(P.wr, 0, EFC.cfg.wardenRespawn) : undefined;
   if (P.ak && typeof P.ak === 'object') NET.ak.set(id, P.ak); // événements appliqués par cet expéditeur, par expéditeur (netAckOf) : lu avant ses événements, qui le suivent dans le même état
   e.kills = P.k | 0; e.deaths = P.d | 0; e.assists = P.a | 0; e.score = P.sc | 0;
   if (P.dr) fpvNet(e, P.dr);
@@ -1186,7 +1205,11 @@ function netPresence(e, now) {
   const mk = mechaPub(e); if (mk) p.mk = mk; // mecha posé (08f-mecha.js)
   if (e.out) p.o = 1; // raid fini pour ce soldat (RAID le pose) : les autres le retirent du jeu (efcNetOut)
   { const wp = efcWardenPub(e); if (wp) p.wp = wp; } // raid: a Warden's posture and head yaw (41-efc-warden-pose.js)
-  if (!me) { p.b = 1; if (e.squad === 's') p.scav = 1; }
+  if (!me) {
+    p.b = 1;
+    if (e.squad === 's') p.scav = 1;
+    if (efcNetIsRaid() && !e.alive && Number.isFinite(e.respawnT)) p.wr = r(e.respawnT, 1);
+  }
   else { // accusé (netPredHealth, netTradeOpen) : dernier événement appliqué de chaque expéditeur des 3 dernières secondes, avant une touche en attente
     let ak = null;
     for (const [id, t] of NET.seenT) { if (now - t > 3000) { NET.seenT.delete(id); continue; } (ak || (ak = {}))[id] = NET.seen.get(id) || 0; }

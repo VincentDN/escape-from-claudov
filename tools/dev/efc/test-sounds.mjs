@@ -74,6 +74,20 @@ const bootAudio = () => (async () => {
   // ---------- 2. reload choreography timing, one weapon per family ----------
   await startSolo(page);
   await simRun(page, 1, 'PL.ent.health = 100;');
+  const holster = await page.evaluate(() => {
+    const player = PL.ent, arms = player.arms;
+    EFC_SND.log = [];
+    const target = arms.slots.findIndex((_, i) => i !== arms.cur);
+    const started = ctlSwitch(player, target);
+    const repeated = ctlSwitch(player, target);
+    efcEmit('tick', 1 / 30);
+    const takes = EFC_SND.log.filter((event) => event.kind === 'stow').map((event) => event.id);
+    EFC_SND.log = null;
+    arms.switching = 0;
+    return { mode: MATCH.mode, started, repeated, takes };
+  });
+  ok(holster.mode === 'tdm' && holster.started && !holster.repeated && holster.takes.join() === 'hf_handle,hf_hit',
+    'TDM switch plays the holster once ' + JSON.stringify(holster));
   const T = await page.evaluate(() => {
     const rec = [], orig = efcHandlingPlay;
     efcHandlingPlay = (kind, delay, pos, fam) => { const r = orig(kind, delay, pos, fam); rec.push({ kind, delay: delay || 0, ts: VM.rlS, played: r, at: rec.at }); return r; };

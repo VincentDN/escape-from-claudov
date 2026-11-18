@@ -7,7 +7,7 @@
 const EFC_SND = {
   on: true, // false: the engine's previous sounds (the audition page compares both)
   log: null, // array: every played layer is recorded { kind, id, t } (tests)
-  prevInv: null, busy: false, panelEv: false, sw: 0, last: {},
+  prevInv: null, busy: false, panelEv: false, last: {},
 };
 
 /* Weapon mass (kg, roughly the real weapon unloaded) by engine weapon id; bots only give their family */
@@ -133,7 +133,7 @@ efcOn('inv:changed', () => {
   if (k) efcInvSound(k);
 });
 efcOn('loot:give', () => { efcInvSound('inv_take'); });
-efcOn('raid:begin', () => { EFC_SND.prevInv = efcSndInvSnap(EFC.inv); EFC_SND.busy = false; EFC_SND.sw = 0; });
+efcOn('raid:begin', () => { EFC_SND.prevInv = efcSndInvSnap(EFC.inv); EFC_SND.busy = false; });
 /* Panel open and close: the UI's 'ui:panel'(open, kind, containerId) event when it emits one, else its busy state polled each step */
 efcOn('ui:panel', (open) => { EFC_SND.panelEv = true; efcInvSound(open ? 'inv_open' : 'inv_close'); });
 efcOn('tick', () => {
@@ -142,8 +142,9 @@ efcOn('tick', () => {
     if (busy !== EFC_SND.busy) efcInvSound(busy ? 'inv_open' : 'inv_close');
     EFC_SND.busy = busy;
   }
-  // holster: the engine only sounds the draw of the new weapon; a switch that starts puts the old one away first
-  const A = typeof PL !== 'undefined' && PL.ent && PL.ent.arms, sw = A ? A.switching || 0 : 0;
-  if (sw > 0 && !(EFC_SND.sw > 0) && typeof sfxMech === 'function') sfxMech('stow');
-  EFC_SND.sw = sw;
 });
+
+// Runs once when the local player's controller accepts a weapon switch.
+function efcSndHolster() {
+  if (typeof sfxMech === 'function') sfxMech('stow');
+}

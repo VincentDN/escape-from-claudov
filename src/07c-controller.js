@@ -173,7 +173,10 @@ function ctlSwitch(ent, i, again) {
   const A = ent.arms;
   if ((i === A.cur && !again) || i < 0 || i >= A.slots.length || A.switching > 0 || ent.busy) return false;
   A.reload = null; A.boltT = 0; A.switching = SWITCH.dur; A.switchTo = i;
-  if (ent.isPlayer) { VM.action = null; VM.lowerTarget = 1; }
+  if (ent.isPlayer) {
+    VM.action = null; VM.lowerTarget = 1;
+    if (typeof efcSndHolster === 'function') efcSndHolster();
+  }
   kcEvent('vma', { sid: ent.kcI, name: 'switch', dur: SWITCH.dur, data: { to: A.slots[i].def.key, from: A.slots[A.cur].def.key } }); // from : l'arme du début d'une relecture (kcStartWeapon)
   return true;
 }

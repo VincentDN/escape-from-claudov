@@ -22,6 +22,7 @@ ItemDef   { id, name, kind: 'weapon'|'ammo'|'armor'|'pack'|'med'|'loot', w (kg),
             med:    { heal, time } }    // health restored, seconds to use
 Item      { id, n }                     // n: count. Weapons also carry { mag, res } (rounds in the magazine, reserve rounds)
 Inventory { slots: { primary: Item|null, sidearm: Item|null, armor: Item|null, pack: Item|null }, bag: Item[] }
+Grid      { cols, rows, entries: [{ item: Item, x, y, rotated: boolean }] }
 Container { id, kind: 'crate'|'locker'|'bag'|'body'|'drop', x, y, z, yaw, name, items: Item[] }
 MapData   { inserts:  [{ x, z, yaw }],                       // one per squad, members spawn around it
             extracts: [{ id, name, x, z, r, openAt }],        // openAt: raid seconds before it opens
@@ -40,6 +41,11 @@ raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 
 | `map:data` | core | `() -> MapData or null` | From `MAP_DEFS.<id>.efc`, else derived from the map's points of interest |
 | `item:def` | ITEMS | `(id) -> ItemDef` | |
 | `item:all` | ITEMS | `() -> ItemDef[]` | |
+| `grid:container` | ITEMS | `(kind, equippedItemId?) -> Grid or null` | Uses the item's storage dimensions for equipped armour or a backpack |
+| `grid:new` / `grid:size` | ITEMS | `(cols, rows) -> Grid or null` / `(item, rotated?) -> [cols, rows] or null` | Zero-based coordinates and 90-degree rotation |
+| `grid:place` / `grid:move` | ITEMS | `(grid, itemOrIndex, x, y, rotated?) -> Grid or null` | Immutable operations; out-of-bounds and occupied cells are refused |
+| `grid:import` / `grid:add` | ITEMS | `(grid, items)` / `(grid, item) -> Grid or null` | Import preserves stacks and order; add merges stacks before placing overflow |
+| `grid:take` / `grid:split` | ITEMS | `(grid, index, count?) -> { grid, item } or null` / `(grid, index, count, x, y, rotated?) -> Grid or null` | The original grid is unchanged on success or failure |
 | `inv:new` | ITEMS | `() -> Inventory` | Empty |
 | `inv:weight` / `inv:cap` / `inv:value` | ITEMS | `(inv) -> number` | Weight counts the bag only; equipped slots are free |
 | `inv:add` | ITEMS | `(inv, item) -> boolean` | Stacks, then appends; false when over the carry limit. Auto-equips into an empty matching slot |

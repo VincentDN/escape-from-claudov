@@ -5,7 +5,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const FILES = ['00-efc-core.js', '20-efc-items.js', '21-efc-inventory.js', '22-efc-stash.js', '23-efc-vitals.js', '24-efc-loot-tables.js'];
+const FILES = ['00-efc-core.js', '20-efc-items.js', '21-efc-inventory.js', '22-efc-stash.js', '23-efc-vitals.js', '24-efc-loot-tables.js', '25-efc-grid.js'];
 let fails = 0, passes = 0;
 const ok = (c, msg) => { if (c) passes++; else { fails++; console.error('FAIL ' + msg); } };
 const near = (a, b) => Math.abs(a - b) < 1e-9;
@@ -44,6 +44,31 @@ function makeCtx(store) {
   ok(all.filter((d) => d.kind === 'loot').length >= 12, 'valuables');
   ok(['rifle', 'smg', 'sniper', 'shotgun', 'pistol'].every((f) => all.some((d) => d.kind === 'ammo' && d.ammo.fam === f && d.stack > 1)), 'ammo per family, stackable');
   ok(all.every((d) => d.w > 0 && d.value > 0 && d.name), 'weights, values and names');
+}
+
+/* ---------- grid geometry ---------- */
+{
+  const { ctx } = makeCtx(), C = ctx.call;
+  const rifle = { id: 'w_mp5', n: 1 }, ammo = { id: 'ammo_rifle', n: 40 };
+  const base = C('grid:new', 5, 3);
+  const one = C('grid:place', base, rifle, 0, 0);
+  ok(one.entries.length === 1 && base.entries.length === 0, 'placement is immutable');
+  ok(C('grid:place', one, ammo, 4, 1) === null, 'overlap refused');
+  ok(C('grid:move', one, 0, 1, 0) === null, 'right edge refused');
+  ok(C('grid:move', one, 0, 0, 0, true) === null, 'rotation cannot cross bottom edge');
+  const tall = C('grid:import', C('grid:new', 2, 5), [rifle]);
+  ok(tall.entries[0].rotated, 'imports rotate if needed');
+  ok(C('grid:container', 'pack', 'pack_s').cols === 4 && C('grid:container', 'pockets').rows === 2, 'container dimensions');
+  const withAmmo = C('grid:add', one, ammo);
+  const fullStack = C('grid:add', withAmmo, ammo);
+  ok(fullStack.entries[1].item.n === 60 && fullStack.entries[2].item.n === 20, 'stacks fill before allocating a new cell');
+  const split = C('grid:split', fullStack, 1, 10, 4, 2);
+  ok(split.entries[1].item.n === 50 && split.entries.at(-1).item.n === 10, 'split consumes from source and places new stack');
+  ok(C('grid:split', fullStack, 1, 10, 0, 0) === null && fullStack.entries[1].item.n === 60, 'failed split keeps source unchanged');
+  ok(C('grid:split', fullStack, 1, 60, 4, 2) === null && C('grid:take', fullStack, 1, 61) === null, 'invalid counts refused');
+  const taken = C('grid:take', split, 1, 5);
+  ok(taken.item.n === 5 && taken.grid.entries[1].item.n === 45, 'partial take');
+  ok(C('grid:add', C('grid:place', C('grid:new', 1, 1), ammo, 0, 0), ammo) === null, 'overflow cannot partially merge');
 }
 
 /* ---------- inventory ---------- */

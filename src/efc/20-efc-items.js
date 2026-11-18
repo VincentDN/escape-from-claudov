@@ -62,8 +62,21 @@ function efcWeaponItems() {
   return out;
 }
 
+const EFC_GRID_ITEM_SIZES = {
+  ammo: [1, 1], armor: [3, 3], pack: [3, 3], med: [1, 1], loot: [1, 1],
+  med_kit: [2, 2], loot_wrench: [2, 1], loot_bearing: [2, 2], loot_coil: [2, 2],
+  loot_board: [2, 1], loot_ledger: [2, 1], loot_sextant: [2, 2],
+};
+const EFC_GRID_STORAGE = {
+  armor_t1: [3, 2], armor_t2: [4, 2], armor_t3: [5, 2],
+  pack_s: [4, 4], pack_m: [5, 5], pack_l: [6, 6],
+};
 const EFC_ITEMS = {};
-for (const d of efcWeaponItems().concat(EFC_ITEM_LIST)) EFC_ITEMS[d.id] = d;
+for (const d of efcWeaponItems().concat(EFC_ITEM_LIST)) {
+  d.size = d.weapon ? (d.weapon.slot === 'sidearm' ? [2, 1] : [5, 2]) : EFC_GRID_ITEM_SIZES[d.id] || EFC_GRID_ITEM_SIZES[d.kind];
+  if (EFC_GRID_STORAGE[d.id]) d.storage = EFC_GRID_STORAGE[d.id];
+  EFC_ITEMS[d.id] = d;
+}
 
 function efcItemDef(id) { return typeof id === 'string' && Object.prototype.hasOwnProperty.call(EFC_ITEMS, id) ? EFC_ITEMS[id] : undefined; }
 function efcStackMax(id) { const d = efcItemDef(id); return d && d.stack > 1 ? d.stack : 1; }

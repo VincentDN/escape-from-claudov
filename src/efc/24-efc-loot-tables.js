@@ -6,7 +6,7 @@ const EFC_LOOT = {
   crate: { rolls: [2, 4], e: [
     [14, 'ammo_rifle', 15, 45], [12, 'ammo_smg', 20, 60], [6, 'ammo_shotgun', 6, 16], [5, 'ammo_sniper', 4, 10], [10, 'ammo_pistol', 12, 36],
     [10, 'loot_wrench'], [9, 'loot_bearing'], [7, 'loot_coil'], [6, 'loot_gauge'], [5, 'loot_valves'], [2, 'loot_sextant'], [1, 'loot_chrono'],
-    [4, 'pack_s'], [2, 'pack_m'], [0.6, 'pack_l'], [3, 'armor_t1'], [1.2, 'armor_t2'], [0.3, 'armor_t3'] ] },
+    [9, 'P:common'], [4, 'pack_s'], [2, 'pack_m'], [0.6, 'pack_l'], [3, 'armor_t1'], [1.2, 'armor_t2'], [0.3, 'armor_t3'] ] },
   locker: { rolls: [1, 3], e: [
     [12, 'loot_tobacco', 1, 3], [10, 'med_bandage', 1, 2], [3, 'med_kit'], [8, 'ammo_pistol', 10, 30], [5, 'ammo_smg', 15, 40],
     [7, 'loot_ledger'], [5, 'loot_board'], [4, 'loot_stamp'], [3, 'loot_keys'], [1.2, 'loot_chrono'], [0.6, 'loot_dispatch'],
@@ -16,7 +16,7 @@ const EFC_LOOT = {
     [5, 'loot_valves'], [4, 'loot_ledger'], [2, 'loot_keys'], [0.5, 'loot_dispatch'] ] },
   medical: { rolls: [1, 3], e: [[20, 'med_bandage', 1, 4], [8, 'med_kit'], [2, 'loot_gauge']] },
   weapons: { rolls: [1, 3], e: [
-    [8, 'W:smg'], [7, 'W:ar'], [4, 'W:shotgun'], [2, 'W:sniper'], [8, 'W:pistol'],
+    [14, 'P:all'], [8, 'W:smg'], [7, 'W:ar'], [4, 'W:shotgun'], [2, 'W:sniper'], [8, 'W:pistol'],
     [10, 'ammo_rifle', 20, 60], [10, 'ammo_smg', 30, 90], [5, 'ammo_shotgun', 8, 24], [4, 'ammo_sniper', 5, 15], [8, 'ammo_pistol', 15, 45],
     [3, 'armor_t1'], [1.5, 'armor_t2'], [0.4, 'armor_t3'] ] },
 };
@@ -40,7 +40,14 @@ function efcLootWeapon(rng, id, lo, hi) {
   it.mag = Math.max(1, Math.round(it.mag * k)); it.res = Math.round(it.res * k * 0.5);
   return it;
 }
+function efcLootPart(rng, common, weapon) {
+  const parts = (efcCall('weaponmods:parts') || [])
+    .filter(d => (!common || d.value < 2000) && (!weapon || efcCall('weaponmods:fit', weapon, d.id)))
+    .map(d => [3400 / d.value, d.id]);
+  return parts.length ? efcItemNorm({ id: efcPickW(rng, parts)[1], n: 1 }) : null;
+}
 function efcLootEntry(rng, e) {
+  if (e[1].startsWith('P:')) return efcLootPart(rng, e[1] === 'P:common');
   if (e[1].startsWith('W:')) { const ids = efcWeaponIds([e[1].slice(2)]); return ids.length ? efcLootWeapon(rng, efcPick(rng, ids), 0.2, 1) : null; }
   const lo = e[2] || 1, hi = e[3] || lo;
   return efcItemNorm({ id: e[1], n: lo + Math.floor(efcRand(rng) * (hi - lo + 1)) });
@@ -52,10 +59,14 @@ function efcLootWarden(rng, elite) {
   const cats = elite ? (efcRand(rng) < 0.3 ? ['sniper'] : ['ar']) : (efcRand(rng) < 0.25 ? ['pistol'] : efcRand(rng) < 0.5 ? ['smg', 'shotgun'] : ['ar', 'smg']);
   const ids = efcWeaponIds(cats), wid = ids.length ? efcPick(rng, ids) : null;
   if (wid) {
-    add(efcLootWeapon(rng, wid, elite ? 0.4 : 0.1, elite ? 1 : 0.7));
+    const weapon = efcLootWeapon(rng, wid, elite ? 0.4 : 0.1, elite ? 1 : 0.7);
+    const mounted = efcRand(rng) < (elite ? 0.58 : 0.18) && efcLootPart(rng, !elite, weapon);
+    if (mounted) weapon.mods = { parts: [mounted.id], finish: 'stock' };
+    add(weapon);
     const aid = efcAmmoFor(wid), k = elite ? 0.4 + efcRand(rng) * 0.6 : 0.1 + efcRand(rng) * 0.35; // share of one full stack
     add(efcItemNorm({ id: aid, n: Math.max(1, Math.round(efcStackMax(aid) * k)) }));
   }
+  if (efcRand(rng) < (elite ? 0.35 : 0.1)) add(efcLootPart(rng, !elite));
   if (efcRand(rng) < (elite ? 0.6 : 0.25)) add(efcItemNorm({ id: elite && efcRand(rng) < 0.4 ? 'med_kit' : 'med_bandage', n: 1 }));
   if (efcRand(rng) < (elite ? 0.5 : 0.12)) add(efcItemNorm({ id: elite ? (efcRand(rng) < 0.3 ? 'armor_t3' : 'armor_t2') : 'armor_t1', n: 1 }));
   if (efcRand(rng) < (elite ? 0.5 : 0.15)) add(efcLootEntry(rng, efcPickW(rng, elite ? [[4, 'loot_keys'], [3, 'loot_sextant'], [2, 'loot_chrono'], [1, 'loot_dispatch']] : [[5, 'loot_tobacco', 1, 2], [3, 'loot_ledger'], [1, 'loot_keys']])));

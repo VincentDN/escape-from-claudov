@@ -22,7 +22,12 @@ function efcWorldItem(it) {
     o[k] = Math.round(it[k]);
   }
   const item = efcCall('item:def', o.id);
-  return item && o.n <= (item.stack || 1) ? o : null;
+  if (!item || o.n > (item.stack || 1)) return null;
+  if (item.kind === 'weapon') {
+    const mods = efcCall('weaponmods:normalize', it, it.mods);
+    if (mods) o.mods = mods;
+  }
+  return o;
 }
 /* A list of items, or null when it is not an array, too long, or holds one bad item (the whole payload is refused). */
 function efcWorldItems(a) {

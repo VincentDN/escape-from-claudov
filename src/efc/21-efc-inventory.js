@@ -7,8 +7,8 @@ const EFC_SLOTS = ['primary', 'sidearm', 'armor', 'pack'];
 
 function efcInvNew() { return { slots: { primary: null, sidearm: null, armor: null, pack: null }, bag: [] }; }
 function efcInvOk(inv) { return !!(inv && inv.slots && Array.isArray(inv.bag)); }
-function efcItemWeight(it) { const d = it && efcItemDef(it.id); return d ? d.w * (it.n || 1) : 0; }
-function efcItemValue(it) { const d = it && efcItemDef(it.id); return d ? d.value * (it.n || 1) : 0; }
+function efcItemWeight(it) { const d = it && efcItemDef(it.id); return d ? (d.w + ((it.mods && efcCall('weaponmods:partTotal', it, 'w')) || 0)) * (it.n || 1) : 0; }
+function efcItemValue(it) { const d = it && efcItemDef(it.id); return d ? (d.value + ((it.mods && efcCall('weaponmods:partTotal', it, 'value')) || 0)) * (it.n || 1) : 0; }
 function efcBagWeight(bag) { let w = 0; for (const it of bag) w += efcItemWeight(it); return Math.round(w * 1000) / 1000; }
 function efcInvWeight(inv) { return efcInvOk(inv) ? efcBagWeight(inv.bag) : 0; }
 function efcPackCap(pack) { const d = pack && efcItemDef(pack.id); return d && d.pack ? d.pack.cap : 0; }
@@ -95,15 +95,19 @@ function efcInvWeaponItems(inv) {
   const f = (s) => { const it = inv.slots[s], d = it && efcItemDef(it.id); return d && d.kind === 'weapon' ? efcWeaponFill(it) : null; };
   return [f('primary'), f('sidearm')];
 }
-/* The argument for the engine's makeArms(ids): an array of bare engine weapon keys (strings), primary first, then sidearm, empty
-   slots omitted, e.g. ['ak47', 'm9'], ['m9'] or []. A bare key is the weapon with no attachments and no camouflage (makeArms resolves
-   it to WEAPONS[key]); makeArms fills the magazine and reserve itself, the raid code then applies Item.mag / Item.res. */
+/* The makeArms argument: bare weapon keys or derived defs, with empty slots omitted. */
 function efcInvWeapons(inv) {
   const out = [];
-  for (const it of efcInvWeaponItems(inv)) if (it) { const k = efcItemDef(it.id).weapon.wkey; if (typeof WEAPONS === 'undefined' || WEAPONS[k]) out.push(k); }
+  for (const it of efcInvWeaponItems(inv)) if (it) {
+    const key = efcItemDef(it.id).weapon.wkey;
+    const def = it.mods && efcCall('weaponmods:definition', it);
+    if (typeof WEAPONS === 'undefined' || WEAPONS[key]) out.push(def || key);
+  }
   return out;
 }
 
+efcProvide('item:weight', efcItemWeight);
+efcProvide('item:value', efcItemValue);
 efcProvide('inv:new', efcInvNew);
 efcProvide('inv:weight', efcInvWeight);
 efcProvide('inv:cap', efcInvCap);

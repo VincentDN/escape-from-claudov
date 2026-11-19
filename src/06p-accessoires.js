@@ -74,7 +74,7 @@ for (const id in ATT) ATT[id].id = id;
 function attName(id, def) { return id === 'xmag' && def && def.tube ? _t('Tube étendu') : ATT[id].name; }
 /* Un accessoire va-t-il sur cette arme ? (famille et emplacement ouvert) */
 function attFits(base, id) {
-  const a = ATT[id]; if (!a || !base.slots.includes(a.slot) || !a.fam.includes(base.fam)) return false;
+  const a = ATT[id]; if (!a || !base.slots.includes(a.slot) || !a.fam.includes(base.fam) || (a.models && !a.models.includes(base.model))) return false;
   return !(base.noAtt && base.noAtt.includes(id));
 }
 function attMax(base) { return base.cat === 'pistol' ? ATT_MAX.secondary : ATT_MAX.primary; }

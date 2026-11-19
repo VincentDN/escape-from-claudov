@@ -72,8 +72,8 @@ const EFC_GRID_STORAGE = {
   pack_s: [4, 4], pack_m: [5, 5], pack_l: [6, 6],
 };
 const EFC_ITEMS = {};
-for (const d of efcWeaponItems().concat(EFC_ITEM_LIST)) {
-  d.size = d.weapon ? (d.weapon.slot === 'sidearm' ? [2, 1] : [5, 2]) : EFC_GRID_ITEM_SIZES[d.id] || EFC_GRID_ITEM_SIZES[d.kind];
+for (const d of efcWeaponItems().concat(EFC_ITEM_LIST, efcCall('weaponmods:parts') || [])) {
+  d.size ||= d.weapon ? (d.weapon.slot === 'sidearm' ? [2, 1] : [5, 2]) : EFC_GRID_ITEM_SIZES[d.id] || EFC_GRID_ITEM_SIZES[d.kind];
   if (EFC_GRID_STORAGE[d.id]) d.storage = EFC_GRID_STORAGE[d.id];
   EFC_ITEMS[d.id] = d;
 }
@@ -88,7 +88,10 @@ function efcItemNorm(item) {
   const out = { id: d.id, n: Math.max(1, Math.floor(Number.isFinite(+item.n) ? +item.n : 1)) };
   if (d.stack > 1) out.n = Math.min(out.n, 1e6); else out.n = 1;
   if (d.kind === 'weapon') {
-    const W = typeof WEAPONS !== 'undefined' ? WEAPONS[d.weapon.wkey] : null, mag = W ? W.mag : 0, res = W ? Math.floor(W.reserve / 2) : 0;
+    const mods = efcCall('weaponmods:normalize', item, item.mods);
+    if (mods) out.mods = mods;
+    const W = efcCall('weaponmods:definition', out) || (typeof WEAPONS !== 'undefined' ? WEAPONS[d.weapon.wkey] : null);
+    const mag = W ? W.mag : 0, res = W ? Math.floor(W.reserve / 2) : 0;
     out.mag = Number.isFinite(+item.mag) && item.mag !== null ? Math.max(0, Math.min(mag || 999, Math.floor(+item.mag))) : mag;
     out.res = Number.isFinite(+item.res) && item.res !== null ? Math.max(0, Math.floor(+item.res)) : res;
   }

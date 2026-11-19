@@ -17,11 +17,12 @@ function efcHoRender() {
       const g = items.filter((x) => (EFC_UI_KINDS.some((k) => k[0] === x.d.kind) ? x.d.kind : 'loot') === kind);
       if (!g.length) continue;
       g.sort((a, b) => String(a.d.name).localeCompare(String(b.d.name)));
-      h += `<p class="efc-gh">${label}</p>` + g.map((x) => efcThumbRow(x.it, { key: 'st-' + x.it.id + '-' + x.i, data: { stash: x.i }, title: 'Move to the loadout' })).join('');
+      h += `<p class="efc-gh">${label}</p>` + g.map((x) => efcThumbRow(x.it, { key: 'st-' + x.it.id + '-' + x.i, data: { stash: x.i }, title: 'Move to the loadout', acts: efcHoModActs(x.it) })).join('');
     }
     $('efcHoStash').innerHTML = h || '<p class="efc-none">The stash is empty.</p>';
     const lo = st.loadout;
     $('efcHoLoad').innerHTML = efcThumbInvHtml(lo, {
+      slotActs: (slot, it) => efcHoModActs(it),
       bagActs: (i, it) => (EFC_UI_EQUIP[efcUiDef(it.id).kind] ? [['equip', 'Equip']] : []),
     });
     $('efcHoTot').innerHTML = efcUiTotHtml(lo);
@@ -31,6 +32,9 @@ function efcHoRender() {
   if (first) first.dataset.focus = ''; // where uiGo puts the focus on arrival (src/09e-menus.js)
   efcUiFocusBack(root, mark);
 }
+function efcHoModActs(item) {
+  return efcCall('weaponmods:slots', item)?.length ? [['bench', 'Workbench']] : [];
+}
 function efcHoMove(fn) {
   const ok = fn();
   EFC_HO.note = ok === false ? 'That did not fit. Check the carry limit or free the slot first.' : '';
@@ -39,7 +43,9 @@ function efcHoMove(fn) {
 function efcHoClick(e) {
   const b = e.target.closest && e.target.closest('button'); if (!b || b.disabled) return;
   const ds = b.dataset;
-  if (ds.act === 'equip') {
+  if (ds.act === 'bench') {
+    efcCall('weaponmods:open', ds.stash !== undefined ? +ds.stash : ds.slot);
+  } else if (ds.act === 'equip') {
     const i = +ds.bag;
     efcHoMove(() => {
       if (efcHas('stash:equip')) return efcCall('stash:equip', i);

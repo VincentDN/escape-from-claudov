@@ -59,6 +59,17 @@ const r = await page.evaluate(() => {
   out.guestTake = L().find((c) => c.id === rid).items.length === 0 && given.length === g0 + 1;
   out.crateStays = !!L().find((c) => c.id === rid);
   out.emptyLook = scene.getObjectByName('efc-container-' + rid).userData.efcOpen === true;
+  const placementId = efcCall('world:spawn', 'crate', { x: P.pos.x, y: P.pos.y, z: P.pos.z },
+    [{ id: 'loot_wrench', n: 1 }, { id: 'ammo_rifle', n: 30 }], '');
+  const placed = L().find(c => c.id === placementId);
+  efcCall('world:place', placementId, 0, 4, 3, true);
+  EFC.netHost['w:place']({ id: placementId, idx: 1, x: 4, y: 3, rotated: false, rev: 0 }, 'p2');
+  out.placeRace = placed.rev === 1 && placed.grid.entries[0].x === 4 && placed.grid.entries[0].rotated &&
+    placed.grid.entries[1].x !== 4;
+  efcCall('world:place', placementId, 1, 4, 3, false, 10);
+  out.occupiedSplit = placed.rev === 1 && placed.items[1].n === 30;
+  efcCall('world:place', placementId, 1, 6, 3, false, 10);
+  out.splitStack = placed.rev === 2 && placed.items[1].n === 20 && placed.items[2].n === 10;
   // an unknown guest, a garbage request
   EFC.netHost['w:take']({ id: c0.id, idx: 0, item: c0.items[0]?.id, rev: c0.rev }, 'nobody');
   EFC.netHost['w:take']({ id: c0.id, idx: 'x' }, 'local');
@@ -140,6 +151,55 @@ ok(r.meshes === r.n, 'one mesh per container');
 // a few game seconds in raid mode with the world live: no page errors
 const ran = await simRun(page, 3, 'PL.ent.health = 100;');
 ok(ran >= 2.9, 'logic runs in raid mode');
+
+// The raid panel arranges the actual host grid and keeps the original take list available.
+await page.evaluate(() => {
+  efcSumHide(); // The lifecycle fixture above emitted raid:over without leaving the match.
+  EFC_DEV.aggro = true;
+  GPUX.halt = true; // This panel fixture needs DOM input and host state, not a live render loop.
+  const p = PL.ent.pos;
+  const id = efcCall('world:spawn', 'crate', p, [{ id: 'loot_wrench', n: 1 }, { id: 'ammo_rifle', n: 30 }], 'Test crate');
+  EFC_UIR.on = true;
+  efcUirOpen('loot', id);
+});
+await page.locator('#efcLootArrangeToggle').focus();
+await page.keyboard.press('Enter');
+const cell = (i) => page.locator(`#efcLootGrid [data-cell="${i}"]`);
+const readGrid = () => page.evaluate(() => efcUirCont().grid);
+await page.keyboard.press('Enter');
+await page.keyboard.press('KeyR');
+await page.keyboard.press('ArrowDown');
+await page.keyboard.press('ArrowDown');
+await page.keyboard.press('ArrowRight');
+await page.keyboard.press('Enter');
+const moved = (await readGrid()).entries[0];
+ok(moved.x === 1 && moved.y === 2 && moved.rotated, 'loot grid places a rotated item with the keyboard');
+ok(await cell(17).evaluate(button => button === document.activeElement), 'loot grid preserves focused cell after the host update');
+
+const ammo = (await readGrid()).entries[1];
+const ammoCell = cell(ammo.y * 8 + ammo.x);
+await ammoCell.click({ modifiers: ['Control'] });
+ok(await page.locator('#efcLootGrid .efc-placement.blocked').count() === 1, 'an occupied split previews as blocked');
+await cell(38).click();
+const split = (await readGrid()).entries;
+ok(split.length === 3 && split[1].item.n === 15 && split[2].item.n === 15 && split[2].x === 6 && split[2].y === 4,
+  'loot grid splits and places half of the stack');
+await cell(38).dragTo(cell(39));
+const dragged = (await readGrid()).entries[2];
+ok(dragged.x === 7 && dragged.y === 4, 'loot grid supports drag and drop');
+
+await cell(39).click();
+await page.evaluate(() => {
+  const c = efcUirCont();
+  efcCall('world:place', c.id, 0, 2, 2, true);
+});
+ok(await page.locator('#efcLootGrid .efc-placement').count() === 0, 'a host update cancels a stale grid selection');
+ok(await page.locator('#efcLootList [data-take]').count() === 3, 'the take list remains in sync with the grid');
+await page.keyboard.press('Escape');
+ok(!await page.locator('#efcLootArrange').isVisible() && await page.locator('#efcLoot').isVisible() &&
+  await page.locator('#efcLootArrangeToggle').evaluate(button => button === document.activeElement),
+  'Escape returns keyboard focus to the loot panel');
+await page.evaluate(() => { efcUirClose(true); GPUX.halt = false; });
 
 if (process.env.SHOT) {
   await page.evaluate(() => {

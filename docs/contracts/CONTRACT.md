@@ -57,7 +57,7 @@ raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 
 | `inv:weapons` | ITEMS | `(inv) -> array` | The argument `makeArms()` expects, built from the primary and sidearm slots; fists/knife-only fallback handled by the engine |
 | `stash:get` | ITEMS | `() -> { items: Item[], loadout: Inventory }` | Stored as version 2 under `efc_stash_v1`; v1 saves migrate once and overflow moves to the stash |
 | `stash:grids` / `grid:loadout` | ITEMS | `() -> { stash: Grid[], loadout: object }` / `(inv) -> object or null` | Indexed layouts for the flat list API; gear determines vest/pack capacity; all stash items span as many pages as needed |
-| `stash:toLoadout` / `stash:toStash` | ITEMS | `(stashIdx)` / `(slotOrBagIdx) -> boolean` | Save after each move |
+| `stash:toLoadout` / `stash:toStash` | ITEMS | `(stashIdx, count?)` / `(slotOrBagIdx, count?) -> boolean` | Moves the whole stack by default. Partial moves validate the count and carry capacity. Save before publishing changes. |
 | `raid:kit` | ITEMS | `() -> Inventory` | Moves the loadout out of the stash (it is now at risk) and returns it. Never returns an unarmed kit: adds the free fallback pistol |
 | `raid:commit` | ITEMS | `(result, inv)` | `'extracted'`: everything goes to the stash. Otherwise it is lost |
 | `loot:roll` | ITEMS | `(table, rng) -> Item[]` | Tables: `crate`, `locker`, `bag`, `weapons`, `medical`, `warden`, `warden_elite` |
@@ -66,6 +66,7 @@ raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 
 | `world:body` | WORLD | `({x,y,z}, items, name)` | Any machine; routed to the host, which spawns a `body` container |
 | `world:list` | WORLD | `() -> Container[]` | Replicated copy on every machine |
 | `world:near` | WORLD | `({x,y,z}, r) -> Container or null` | Nearest within r |
+| `world:place` | WORLD | `(id, idx, x, y, rotated?, count?, expectedRevision?) -> boolean` | Sends a revision-checked placement or split request. Rejects a locally stale selection when the caller supplies its revision. Host validates reach and occupancy before broadcasting. |
 | `world:take` | WORLD | `(id, idx)` | Asks the host; on success the taker gets event `loot:give` |
 | `world:put` | WORLD | `(idOrNull, item)` | Puts into a container, or drops at the local player's feet (`drop` container) |
 | `raid:state` | RAID | `() -> { state, t, left, extracts, hold, holdId }` | `state`: `'idle'|'live'|'out'|'dead'|'mia'` |

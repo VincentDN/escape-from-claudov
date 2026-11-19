@@ -118,6 +118,20 @@ efcNetOnHost('w:take', (d, from) => {
   else efcWorldSendGrid(c, taken.grid);
   efcNetTo(from, 'w:give', { item: efcClone(it), id: c.id });
 });
+/* Move or split in one host transaction. A stale preview cannot overwrite a newer layout. */
+efcNetOnHost('w:place', (d, from) => {
+  if (!d || typeof d.id !== 'string' || !Number.isInteger(d.idx) || typeof d.rotated !== 'boolean') return;
+  const c = EFC_W.map.get(d.id);
+  if (!c || c.kind === 'drop' || d.rev !== c.rev || !efcWorldNear(c, efcWorldActor(from), efcWorldReach())) return;
+  const entry = c.grid.entries[d.idx];
+  if (!entry) return;
+  let grid;
+  if (d.count === undefined) grid = efcCall('grid:move', c.grid, d.idx, d.x, d.y, d.rotated);
+  else if (Number.isInteger(d.count) && c.grid.entries.length < EFC_W.maxItems) {
+    grid = efcCall('grid:split', c.grid, d.idx, d.count, d.x, d.y, d.rotated);
+  }
+  if (grid) efcWorldSendGrid(c, grid);
+});
 /* Host: put an item into a container near the sender, otherwise into a new 'drop' at the given position (the sender's own position
    when the given one is invalid or out of reach). */
 efcNetOnHost('w:put', (d, from) => {
@@ -217,6 +231,12 @@ efcProvide('world:take', (id, idx) => {
   const c = EFC_W.map.get(id), it = c && c.items[idx];
   if (!it) return false;
   efcNetToHost('w:take', { id, idx, item: it.id, rev: c.rev });
+  return true;
+});
+efcProvide('world:place', (id, idx, x, y, rotated, count, expectedRevision) => {
+  const c = EFC_W.map.get(id), entry = c?.grid.entries[idx];
+  if (!entry || c.kind === 'drop' || (expectedRevision !== undefined && c.rev !== expectedRevision)) return false;
+  efcNetToHost('w:place', { id, idx, x, y, rotated: rotated ?? entry.rotated, count, rev: c.rev });
   return true;
 });
 efcProvide('world:put', (id, item) => {

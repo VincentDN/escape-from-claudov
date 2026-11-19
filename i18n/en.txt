@@ -1783,3 +1783,6 @@ Freeze raid timer ⇒ =
 Module index ⇒ =
 Build __BUILD_ID__ ⇒ =
 Close ⇒ =
+Drag or use arrows and Enter. R to rotate. Ctrl+click or Ctrl+Enter to split. ⇒ =
+Container cells ⇒ =
+Arrange contents ⇒ =

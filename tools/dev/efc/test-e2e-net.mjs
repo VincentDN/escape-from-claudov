@@ -29,6 +29,26 @@ ok(originalGrids.length > 0 && originalGrids.every(([, rev, grid]) => Number.isS
   JSON.stringify(originalGrids) === JSON.stringify(await grids(guest)), 'host and guest see identical initial container grids');
 const tgt = await guest.evaluate(() => { const c = (efcCall('world:list') || []).find((x) => x.items.length && x.kind !== 'body'); PL.ent.pos.set(c.x + 0.8, c.y, c.z); PL.ent.vel.set(0, 0, 0); return { id: c.id, n: c.items.length, first: c.items[0], carried: efcCall('inv:all', EFC.inv).reduce((s, it) => s + (it.n || 1), 0) }; });
 await stepBoth(both, 0.6, KEEP); await settle(200);
+const placement = await guest.evaluate(id => {
+  const c = efcCall('world:list').find(c => c.id === id), entry = c?.grid.entries[0];
+  if (!entry) return null;
+  for (let y = c.grid.rows - 1; y >= 0; y--) for (let x = c.grid.cols - 1; x >= 0; x--) {
+    if (x === entry.x && y === entry.y) continue;
+    if (!efcGridFits(c.grid, entry.item, x, y, entry.rotated, 0)) continue;
+    efcCall('world:place', c.id, 0, x, y, entry.rotated);
+    return { id, x, y, rev: c.rev + 1 };
+  }
+  return null;
+}, tgt.id);
+ok(placement, 'guest can request a legal placement in the shared container');
+if (placement) {
+  const seesPlacement = ({ id, x, y, rev }) => {
+    const c = efcCall('world:list').find(c => c.id === id), entry = c?.grid.entries[0];
+    return c?.rev === rev && entry?.x === x && entry?.y === y;
+  };
+  await Promise.all([host, guest].map(page => page.waitForFunction(seesPlacement, placement, { polling: 100 })));
+  ok(true, 'host and guest agree on the requested placement');
+}
 const beforeTake = (await grids(host)).find(([id]) => id === tgt.id);
 await guest.evaluate((t) => efcCall('world:take', t.id, 0), tgt);
 await settle(300); await stepBoth(both, 0.6, KEEP); await settle(300); await stepBoth(both, 0.4, KEEP);

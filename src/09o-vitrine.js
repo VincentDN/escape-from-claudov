@@ -134,7 +134,8 @@ function thumbsWant(key) {
    de contexte d'un Pixel au README) : les armes des classes passent en tête de file (thumbsStart), prêtes avant qu'on lance une partie */
 // (UI.screen reste « deploy » pendant toute la partie : seul l'état de la partie dit si l'on est au choix de la classe d'avant le déploiement)
 const thumbsDeploy = () => MATCH.state === 'menu' && UI.screen === 'deploy';
-const thumbsAllowed = () => !UI.busy && MAPL.state !== 'loading' && (MATCH.state === 'paused' || (MATCH.state === 'menu' && (!thumbsDeploy() || !COARSE)));
+// The opening scene shares this page's GPU. Its main menu has no thumbnails, and synchronous readbacks interrupt animation.
+const thumbsAllowed = () => !UI.busy && MAPL.state !== 'loading' && (MATCH.state === 'paused' || (MATCH.state === 'menu' && (!thumbsDeploy() || !COARSE) && (UI.screen !== 'main' || !efcOpeningEnabled())));
 /* Lance (ou reprend) la construction des vignettes manquantes, une par tâche, tant qu'aucune partie ne se prépare : les armes des classes
    d'abord (montées, puis nues : ce que montre le choix de la classe), les autres armes, puis les tenues (les plus longues à dessiner ;
    l'écran Tenues fait passer devant celles qu'il montre) */

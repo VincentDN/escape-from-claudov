@@ -2,13 +2,16 @@
 const EFC_OPENING = { frame: null, ready: false, screen: null, paused: null };
 const EFC_DEV = { taps: 0, health: false, timer: false, aggro: false };
 function efcOpeningMotion() { return !matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function efcOpeningEnabled() {
+  return !Settings.gfxSafe && (!window.EFC_TEST || window.EFC_TEST_OPENING) && location.protocol !== 'file:' && location.hash !== '#bench';
+}
 function efcOpeningHide() {
   if (EFC_OPENING.frame) EFC_OPENING.frame.hidden = true;
   EFC_OPENING.screen = null;
   $('menuBg').classList.remove('intro-ready');
 }
 function efcOpeningScene() {
-  if (Settings.gfxSafe || (window.EFC_TEST && !window.EFC_TEST_OPENING) || location.protocol === 'file:' || location.hash === '#bench') {
+  if (!efcOpeningEnabled()) {
     efcOpeningHide();
     return false;
   }

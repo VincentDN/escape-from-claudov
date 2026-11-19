@@ -24,7 +24,7 @@ const menuShots={raid:'deploy',solo:'deploy',multi:'deploy',deploy:'deploy',arse
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const stage=document.querySelector('#stage'),status=document.querySelector('#status');
 const renderer=new T.WebGLRenderer({antialias:true});
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFShadowMap;renderer.shadowMap.autoUpdate=false;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
 renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;stage.append(renderer.domElement);
 const scene=new T.Scene();scene.background=new T.Color(0x07090a);scene.fog=new T.Fog(0x07090a,2.2,5);
 const camera=new T.PerspectiveCamera(42,1,.05,20);camera.position.copy(SHOTS.main.position);camera.lookAt(SHOTS.main.target);
@@ -32,7 +32,7 @@ const camera=new T.PerspectiveCamera(42,1,.05,20);camera.position.copy(SHOTS.mai
 // ---------- Lighting: one warm work lamp, a cold fill, a dim HDR for the metal ----------
 scene.add(new T.HemisphereLight(0x4a5a66,0x120d08,.35));
 const lamp=new T.SpotLight(0xffc98a,26,4,.62,.55,2);lamp.position.set(.42,1.62,.78);lamp.target.position.set(.02,TABLE.top,.6);
-lamp.castShadow=true;lamp.shadow.mapSize.set(1024,1024);lamp.shadow.bias=-.0004;lamp.shadow.normalBias=.01;scene.add(lamp,lamp.target);
+lamp.castShadow=true;lamp.shadow.mapSize.set(2048,2048);lamp.shadow.bias=-.0004;lamp.shadow.normalBias=.01;scene.add(lamp,lamp.target);
 const fill=new T.DirectionalLight(0x6f8fb0,.35);fill.position.set(-1.5,2,-1);scene.add(fill);
 new RGBELoader().load('../assets/lighting/studio.hdr',hdr=>{hdr.mapping=T.EquirectangularReflectionMapping;scene.environment=hdr;scene.environmentIntensity=.28;});
 
@@ -245,23 +245,19 @@ addEventListener('message',event=>{
 function resize(){
  const w=stage.clientWidth,h=stage.clientHeight;
  if(!w||!h)return;
- // The backdrop is shaded and composited under the UI. Cap its pixel cost on large/HiDPI displays.
- renderer.setPixelRatio(Math.min(devicePixelRatio,1.5,Math.sqrt(1_440_000/(w*h))));
- renderer.setSize(w,h,false);
+ // Match Partisan's drawing buffer, including on high-density displays.
+ renderer.setDrawingBufferSize(w,h,Math.min(devicePixelRatio,2));
  camera.aspect=w/h;camera.fov=w/h<1?60:42;camera.updateProjectionMatrix();
 }
 addEventListener('resize',resize);resize();
 
-const clock=new T.Clock();
-const frameInterval=1000/30;
-let nextFrame=0,lastShadow=-Infinity;
+let lastFrame;
 function frame(now){
  requestAnimationFrame(frame);
- if(paused||document.hidden||frameElement?.hidden||!stage.clientWidth||!stage.clientHeight)return;
- // Advance from the scheduled deadline so small rAF jitter does not drop a whole refresh.
- if(now+2<nextFrame)return;
- nextFrame=nextFrame&&now-nextFrame<frameInterval?nextFrame+frameInterval:now+frameInterval;
- const dt=Math.min(clock.getDelta(),.1),reduce=reducedMotion.matches,time=reduce?0:clock.elapsedTime;
+ if(paused||document.hidden||frameElement?.hidden){lastFrame=undefined;return;}
+ const dt=lastFrame===undefined?0:Math.min((now-lastFrame)/1000,.1);
+ lastFrame=now;
+ const reduce=reducedMotion.matches,time=reduce?0:now/1000;
  const k=reduce?1:1-Math.exp(-dt*4);
  look.x+=( (reduce?0:want.x)-look.x)*k;look.y+=( (reduce?0:want.y)-look.y)*k;
  basePosition.lerp(desiredShot.position,k);baseTarget.lerp(desiredShot.target,k);
@@ -272,13 +268,10 @@ function frame(now){
  camera.position.copy(basePosition);camera.position.x+=look.x*.045*parallax;camera.position.y+=sway-look.y*.028*parallax;
  currentTarget.copy(baseTarget);currentTarget.x+=look.x*.08*parallax;currentTarget.y-=look.y*.045*parallax;
  camera.lookAt(currentTarget);
- // Slow pose changes need fewer shadow passes than camera updates.
- if(!reduce&&now-lastShadow>=1000/12){renderer.shadowMap.needsUpdate=true;lastShadow=now;}
  renderer.render(scene,camera);
 }
 loadRifle().then(()=>{
  status.hidden=true;
- renderer.shadowMap.needsUpdate=true;
  renderer.render(scene,camera);
  parent.postMessage({type:'claudov-opening-ready'},location.origin);
  requestAnimationFrame(frame);

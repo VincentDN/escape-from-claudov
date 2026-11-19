@@ -2585,6 +2585,15 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 .efc-box.efc-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); width: min(1180px, calc(100vw - 32px)); height: min(640px, calc(100vh - 48px)); }
 .efc-two .efc-bh { grid-column: 1 / -1; }
 .efc-two .efc-col { display: flex; flex-direction: column; min-height: 0; gap: 8px; }
+#efcLootArrangeToggle[hidden] { display: none; }
+#efcLootArrange { overflow: auto; flex: 0 1 auto; }
+#efcLootArrange p { margin: 4px 0 8px; font-size: var(--fs-xs); color: var(--dim); }
+#efcLootGrid { display: grid; grid-template-columns: repeat(var(--cols), minmax(18px, 1fr)); grid-auto-rows: 28px; position: relative; max-width: 460px; }
+#efcLootGrid button { min-width: 0; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; background: var(--panel); color: var(--paper); border: 1px solid var(--line); font-size: 12px; }
+#efcLootGrid button[data-entry] { background: var(--acc-soft); }
+#efcLootGrid button:focus-visible { z-index: 1; outline-offset: -2px; }
+#efcLootGrid .efc-placement { position: absolute; inset: 0; pointer-events: none; border: 2px solid var(--ally); }
+#efcLootGrid .efc-placement.blocked { border-color: var(--danger); }
 .efc-two .efc-it { grid-template-columns: minmax(0, 1fr) 3.2em 4.6em 5.4em; }
 .efc-bh { display: flex; align-items: baseline; gap: 18px; }
 .efc-bh h2 { margin: 0; font-family: var(--stencil); font-weight: 400; font-size: 34px; line-height: 1; }
@@ -2976,7 +2985,7 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 <div id="efcLoot" class="efc-ov hidden" role="dialog" aria-modal="true" aria-labelledby="efcLootTitle">
   <div class="efc-box efc-two">
     <header class="efc-bh"><h2 id="efcLootTitle">Container</h2><span id="efcLootW"></span><span class="efc-keys">Click, Enter or F to take. Tab or Esc to close</span></header>
-    <div class="efc-col"><p class="lbl" id="efcLootName">Contents</p><div class="efc-list" id="efcLootList"></div><div class="btns"><button class="btn primary" id="efcLootAll" type="button">Take all</button></div></div>
+    <div class="efc-col"><p class="lbl" id="efcLootName">Contents</p><div class="efc-list" id="efcLootList"></div><div id="efcLootArrange" hidden><p>Drag or use arrows and Enter. R to rotate. Ctrl+click or Ctrl+Enter to split.</p><div id="efcLootGrid" role="group" aria-label="Container cells"></div></div><div class="btns"><button class="btn" id="efcLootArrangeToggle" aria-controls="efcLootArrange" aria-expanded="false" type="button" hidden>Arrange contents</button><button class="btn primary" id="efcLootAll" type="button">Take all</button></div></div>
     <div class="efc-col"><p class="lbl">Your bag</p><div class="efc-list" id="efcLootBag"></div></div>
   </div>
 </div>

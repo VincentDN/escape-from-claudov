@@ -30,6 +30,7 @@ function efcUirClose(silent) {
   const { panel, cid } = EFC_UIR;
   if (!panel) return;
   EFC_UIR.panel = null; EFC_UIR.cid = null; EFC_UIR.all = null;
+  efcContainerDraw(null);
   $('efcInv').classList.add('hidden'); $('efcLoot').classList.add('hidden');
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   for (const k in KEYS) KEYS[k] = false;
@@ -66,7 +67,9 @@ function efcUirRenderLoot() {
   const bag = (EFC.inv && EFC.inv.bag) || [];
   $('efcLootBag').innerHTML = bag.length ? bag.map((it, i) => efcThumbRow(it, { key: 'b-' + i, data: { put: i }, title: 'Put in the container' })).join('') : '<p class="efc-none">The bag is empty.</p>';
   $('efcLootW').innerHTML = efcUiTotHtml(EFC.inv);
-  efcUiFocusBack(root, mark);
+  const gridFocused = $('efcLootGrid').contains(document.activeElement);
+  efcContainerDraw(c);
+  if (!gridFocused) efcUiFocusBack(root, mark);
 }
 
 /* ---------- Actions ---------- */
@@ -163,6 +166,7 @@ function efcUirKey(e) {
   const down = e.type === 'keydown', c = e.code, stop = () => { e.preventDefault(); e.stopImmediatePropagation(); };
   if (EFC_UIR.panel) {
     const root = $(EFC_UIR.panel === 'loot' ? 'efcLoot' : 'efcInv');
+    if (EFC_UIR.panel === 'loot' && efcContainerKey(e)) { stop(); return; }
     if (c === 'Tab' || c === 'Escape') { stop(); if (down && !e.repeat) efcUirClose(); return; }
     if (c.startsWith('Arrow')) { stop(); if (down) efcUiNav(root, c); return; }
     if (c === 'KeyF') {

@@ -233,9 +233,9 @@ efcProvide('world:take', (id, idx) => {
   efcNetToHost('w:take', { id, idx, item: it.id, rev: c.rev });
   return true;
 });
-efcProvide('world:place', (id, idx, x, y, rotated, count) => {
+efcProvide('world:place', (id, idx, x, y, rotated, count, expectedRevision) => {
   const c = EFC_W.map.get(id), entry = c?.grid.entries[idx];
-  if (!entry || c.kind === 'drop') return false;
+  if (!entry || c.kind === 'drop' || (expectedRevision !== undefined && c.rev !== expectedRevision)) return false;
   efcNetToHost('w:place', { id, idx, x, y, rotated: rotated ?? entry.rotated, count, rev: c.rev });
   return true;
 });

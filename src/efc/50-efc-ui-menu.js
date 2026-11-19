@@ -56,18 +56,18 @@ function efcUiTotHtml(inv) {
 function efcUiFocusMark(root) {
   const a = document.activeElement; if (!a || !root.contains(a)) return null;
   const list = a.closest('.efc-list'), row = a.closest('.efc-row'), its = list ? [...list.querySelectorAll('.efc-it:not(.empty)')] : [];
-  return { key: a.dataset.key, act: a.dataset.act || '', list: list ? list.id : '', i: its.indexOf(row ? row.querySelector('.efc-it') : a) };
+  return { element: a, key: a.dataset.key, act: a.dataset.act || '', list: list ? list.id : '', i: its.indexOf(row ? row.querySelector('.efc-it') : a) };
 }
 function efcUiFocusBack(root, m) {
-  if (!m) return;
-  let t = m.key ? [...root.querySelectorAll('.efc-it, .efc-act')].find((e) => e.dataset.key === m.key && (e.dataset.act || '') === m.act) : null;
+  if (!m || (m.element?.isConnected && document.activeElement === m.element)) return;
+  let t = m.key ? [...root.querySelectorAll('[data-key]')].find((e) => e.dataset.key === m.key && (e.dataset.act || '') === m.act) : null;
   if (!t && m.list && $(m.list)) { const its = [...$(m.list).querySelectorAll('.efc-it:not(.empty)')]; t = its[Math.min(Math.max(m.i, 0), its.length - 1)]; }
   if (!t) t = root.querySelector('.efc-it:not(.empty), button:not(:disabled)');
   if (t) t.focus({ preventScroll: false });
 }
 /* Arrow keys in a panel: up and down along a list (then on to the buttons after it), left and right along a row, or across to the other list */
 function efcUiNav(root, code) {
-  const vis = (e) => !e.disabled && e.tabIndex >= 0 && e.getClientRects().length > 0, all = [...root.querySelectorAll('button')].filter(vis), a = document.activeElement;
+  const vis = (e) => !e.disabled && e.tabIndex >= 0 && e.getClientRects().length > 0, all = [...root.querySelectorAll('button, .efc-op-model canvas')].filter(vis), a = document.activeElement;
   if (!all.length) return;
   if (!a || !root.contains(a) || !all.includes(a)) { all[0].focus(); return; }
   const row = a.closest('.efc-row'), list = a.closest('.efc-list');

@@ -2,18 +2,21 @@
    value, and for weapons the calibre, magazine and loaded rounds, shown beside the hovered or focused item row (or the selected row of
    the loot panel) in the hideout, the in-raid panels and the summary. It never takes the pointer and follows re-renders of the lists. */
 const EFC_PV = { el: null, row: null };
+const EFC_PV_ITEM = '.efc-it[data-efc-id], .efc-op-item[data-efc-id], .efc-op-slot[data-efc-id]';
+const EFC_PV_DESC = { weapon: 'Can be equipped in its matching weapon slot.', ammo: 'Replenishes matching weapons.', armor: 'Absorbs incoming torso damage.',
+  pack: 'Increases carrying capacity.', attachment: 'Fits a compatible weapon mounting point.', med: 'Can be used to recover health.', loot: 'Extract it to add it to your stash.' };
 /* Real-world calibre of each engine weapon (the game itself only knows five ammunition families) */
 const EFC_PV_CAL = {
   stg44: '7.92×33 mm Kurz', m4: '5.56×45 mm', famas: '5.56×45 mm', ak47: '7.62×39 mm', sks: '7.62×39 mm', scarh: '7.62×51 mm', l96: '7.62×51 mm', svd: '7.62×54 mmR', m82: '.50 BMG',
   mp5: '9×19 mm', m9: '9×19 mm', glock18: '9×19 mm', mp7: '4.6×30 mm', ump45: '.45 ACP', vector: '.45 ACP', usp: '.45 ACP', deagle: '.50 AE',
   m1014: '12 gauge', rem870: '12 gauge', aa12: '12 gauge',
 };
-const EFC_PV_KIND = { weapon: 'Weapon', ammo: 'Ammunition', armor: 'Armour', pack: 'Pack', med: 'Medical', loot: 'Valuable' };
+const EFC_PV_KIND = { weapon: 'Weapon', ammo: 'Ammunition', armor: 'Armour', pack: 'Pack', med: 'Medical', attachment: 'Attachment', loot: 'Valuable' };
 
 function efcPvEl() {
   if (EFC_PV.el) return EFC_PV.el;
   const el = document.createElement('div'); el.id = 'efcPrev'; el.className = 'efc-prev'; el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = '<div class="efc-prev-im"><img alt="" data-efc-var="big"></div><div class="efc-prev-h"><b></b><span></span></div><dl></dl>';
+  el.innerHTML = '<div class="efc-prev-im"><img alt="" data-efc-var="big"></div><div class="efc-prev-h"><b></b><span></span></div><p class="efc-prev-desc"></p><dl></dl>';
   document.body.appendChild(el);
   const st = document.createElement('style'); st.id = 'efcPrevCss';
   st.textContent = `
@@ -26,6 +29,7 @@ function efcPvEl() {
 .efc-prev-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 10px 0 6px; }
 .efc-prev-h b { font-size: 20px; font-weight: 700; }
 .efc-prev-h span { color: var(--dim, #a9a594); font-size: var(--fs-xs, 12px); letter-spacing: .08em; text-transform: uppercase; }
+.efc-prev-desc { margin: 0 0 8px; color: var(--dim); }
 .efc-prev dl { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 4px 12px; margin: 0; font-size: var(--fs-s, 14px); }
 .efc-prev dt { color: var(--dim, #a9a594); }
 .efc-prev dd { margin: 0; font-variant-numeric: tabular-nums; }
@@ -36,10 +40,11 @@ function efcPvEl() {
 /* The item a row carries (set by efcThumbRow) */
 function efcPvItem(row) {
   const ds = row.dataset; if (!ds.efcId) return null;
-  return { id: ds.efcId, n: +ds.efcN || 1, mag: ds.efcMag != null ? +ds.efcMag : null, res: ds.efcRes != null ? +ds.efcRes : null };
+  return { id: ds.efcId, n: +ds.efcN || 1, mag: ds.efcMag != null ? +ds.efcMag : null, res: ds.efcRes != null ? +ds.efcRes : null, condition: ds.efcCondition != null ? +ds.efcCondition : null };
 }
 function efcPvStats(it, d) {
   const out = [['Weight', efcUiKg(efcUiItemW(it))], ['Value', efcUiVal(efcUiItemV(it)), 'v']];
+  if (it.condition !== null && Number.isFinite(it.condition)) out.push(['Condition', String(it.condition)]);
   if (d.kind === 'weapon' && d.weapon) {
     const W = typeof WEAPONS !== 'undefined' ? WEAPONS[d.weapon.wkey] : null, am = efcUiDef('ammo_' + d.weapon.fam);
     out.push(['Calibre', EFC_PV_CAL[d.weapon.wkey] || am.name || '?'], ['Ammunition', am.name || d.weapon.fam]);
@@ -61,6 +66,9 @@ function efcPvShow(row) {
   else { img.src = efcCall('thumb:get', it.id, 'slot') || efcCall('thumb:get', it.id) || efcThumbSil(d.kind); img.dataset.pend = ''; }
   el.querySelector('.efc-prev-h b').textContent = d.name;
   el.querySelector('.efc-prev-h span').textContent = EFC_PV_KIND[d.kind] || '';
+  const desc = el.querySelector('.efc-prev-desc');
+  desc.textContent = d.desc || EFC_PV_DESC[d.kind] || '';
+  desc.hidden = !desc.textContent;
   el.querySelector('dl').innerHTML = efcPvStats(it, d).map(([k, v, c]) => `<dt>${esc(k)}</dt><dd${c ? ` class="${c}"` : ''}>${esc(v)}</dd>`).join('');
   el.classList.add('show');
   efcPvPlace();
@@ -69,7 +77,7 @@ function efcPvShow(row) {
 function efcPvPlace() {
   const el = EFC_PV.el, row = EFC_PV.row; if (!el || !row) return;
   if (!row.isConnected) { efcPvHide(); return; }
-  const r = row.getBoundingClientRect(), list = (row.closest('.efc-list') || row).getBoundingClientRect(), w = el.offsetWidth, h = el.offsetHeight;
+  const r = row.getBoundingClientRect(), list = (row.closest('.efc-list, .efc-op-grid, .efc-op-slots') || row).getBoundingClientRect(), w = el.offsetWidth, h = el.offsetHeight;
   const right = innerWidth - list.right, left = list.left;
   let x = right >= left ? list.right + 12 : list.left - w - 12;
   x = Math.max(8, Math.min(innerWidth - w - 8, x));
@@ -79,14 +87,14 @@ function efcPvPlace() {
 function efcPvHide() { EFC_PV.row = null; if (EFC_PV.el) EFC_PV.el.classList.remove('show'); }
 /* After a list is drawn again: the focused row, else the loot panel's selected row, else nothing */
 function efcPvRefresh() {
-  const a = document.activeElement, f = a && a.closest && a.closest('.efc-it[data-efc-id]');
+  const a = document.activeElement, f = a && a.closest && a.closest(EFC_PV_ITEM);
   const sel = !f && document.querySelector('.efc-ov:not(.hidden) .efc-it.sel[data-efc-id]');
   const row = f || sel || (EFC_PV.row && EFC_PV.row.isConnected ? EFC_PV.row : null);
   if (row && row.getClientRects().length) efcPvShow(row); else efcPvHide();
 }
-function efcPvRowOf(t) { return t && t.closest ? t.closest('.efc-it[data-efc-id]') : null; }
+function efcPvRowOf(t) { return t && t.closest ? t.closest(EFC_PV_ITEM) : null; }
 /* The row under the pointer, if it is on screen (a row of a hidden screen keeps :hover) */
-function efcPvHovered() { return [...document.querySelectorAll('.efc-it[data-efc-id]:hover')].find((r) => r.getClientRects().length) || null; }
+function efcPvHovered() { return [...document.querySelectorAll(EFC_PV_ITEM.split(', ').map(selector => selector + ':hover').join(', '))].find((r) => r.getClientRects().length) || null; }
 addEventListener('mouseover', (e) => { const r = efcPvRowOf(e.target); if (r && r !== EFC_PV.row) efcPvShow(r); }, { passive: true });
 addEventListener('mouseout', (e) => { const r = efcPvRowOf(e.target); if (r && r === EFC_PV.row && efcPvRowOf(e.relatedTarget) !== r) setTimeout(efcPvRefreshOut, 0); }, { passive: true });
 function efcPvRefreshOut() { const h = efcPvHovered(); if (h) efcPvShow(h); else { EFC_PV.row = null; efcPvRefresh(); } }

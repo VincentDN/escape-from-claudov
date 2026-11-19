@@ -26,6 +26,10 @@ function efcHoRender() {
     });
     $('efcHoTot').innerHTML = efcUiTotHtml(lo);
   }
+  const equipped = st?.loadout.slots.primary || st?.loadout.slots.sidearm;
+  efcOperatorPanel('efcOpHideout', equipped && WEAPONS[efcUiDef(equipped.id).weapon?.wkey], st?.loadout);
+  efcOperatorStash();
+  efcOperatorEquipment('efcOpHideoutGrids', st?.loadout);
   $('efcHoNote').textContent = EFC_HO.note;
   const first = root.querySelector('#efcHoStash .efc-it') || root.querySelector('#efcHoLoad .efc-it:not(.empty)');
   if (first) first.dataset.focus = ''; // where uiGo puts the focus on arrival (src/09e-menus.js)
@@ -35,6 +39,7 @@ function efcHoMove(fn) {
   const ok = fn();
   EFC_HO.note = ok === false ? 'That did not fit. Check the carry limit or free the slot first.' : '';
   efcHoRender();
+  return ok !== false;
 }
 function efcHoClick(e) {
   const b = e.target.closest && e.target.closest('button'); if (!b || b.disabled) return;

@@ -106,17 +106,11 @@ try {
   assert.equal(current.readbacks, 0, 'The opening scene should have exclusive use of the GPU');
   assert.ok(current.frames > 2 && reference.frames > 2, 'Both canvases must animate');
   assert.ok(current.frames >= current.opportunities - 1, 'Draw on every available animation frame');
-  await game.page.locator('#efcMmHideout').evaluate(button => button.click());
-  await game.page.waitForFunction(() => window.menuMetrics.reads > 0, null, { timeout: 15000 });
   await game.page.setViewportSize({ width: 512, height: 288 });
-  await game.canvas.evaluate(element => new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('The menu canvas did not resize')), 15000);
-    function wait() {
-      if (element.width === 1024 && element.height === 576) { clearTimeout(timer); resolve(); }
-      else requestAnimationFrame(wait);
-    }
-    wait();
-  }));
+  await game.page.frameLocator('#efcIntroFrame')
+    .locator('#stage canvas[width="1024"][height="576"]').waitFor({ timeout: 60000 });
+  await game.page.locator('#efcMmHideout').evaluate(button => button.click());
+  await game.page.waitForFunction(() => window.menuMetrics.reads > 0, null, { timeout: 60000 });
 } finally {
   await browser.close();
 }

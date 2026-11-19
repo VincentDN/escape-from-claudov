@@ -19,6 +19,7 @@ try {
       center = new V3(x, y, z); from = a; to = b; break;
     }
     if (!center) throw new Error('No clear test lane');
+    const oldPath = findPath(from, to).map(p => p.toArray());
     const id = efcWorldSpawn('crate', center, [], 'Collision fixture');
     p.pos.copy(from); p.vel.set(0, 0, 0); p.vy = 0; p.onGround = true;
     p.yaw = -Math.PI / 2; p.input = makeInput(); p.input.mz = 1;
@@ -30,9 +31,11 @@ try {
     const direct = navWalkable(from, to);
     const alternate = findPath(from, to);
     const valid = !!alternate?.length && alternate.every(pt => efcNavRuntimeClear(pt.x, pt.y, pt.z));
+    efcWorldMeshDel(id);
+    const restored = JSON.stringify(findPath(from, to).map(p => p.toArray())) === JSON.stringify(oldPath);
     efcEmit('match:left');
     const after = rayWorld(from.x, center.y + 0.4, center.z, 1, 0, 0, 4);
-    return { id, original, counted, stopped, material, direct, valid, left: EFC_RUNTIME_BOXES.size, clear: !after };
+    return { id, original, counted, stopped, material, direct, valid, restored, left: EFC_RUNTIME_BOXES.size, clear: !after };
   });
   assert.ok(result.original > 0);
   assert.equal(result.counted, result.original + 1);
@@ -40,6 +43,7 @@ try {
   assert.equal(result.material, 'wood');
   assert.equal(result.direct, false);
   assert.equal(result.valid, true);
+  assert.equal(result.restored, true);
   assert.equal(result.left, 0);
   assert.equal(result.clear, true);
   assert.deepEqual(errors, []);

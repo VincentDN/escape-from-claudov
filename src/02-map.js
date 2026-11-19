@@ -130,10 +130,12 @@ function rampHeight(r, x, z) {
 /* ---------- Requêtes de collision ---------- */
 const HASH = new Map(), HCELL = 4;
 const EFC_RUNTIME_BOXES = new Map(), EFC_RUNTIME_CELLS = new Map();
+let efcRuntimeBoxRevision = 0;
 function efcRuntimeBoxAdd(id, box) {
   efcRuntimeBoxRemove(id);
   const entry = { box, cells: [], stamp: 0 };
   EFC_RUNTIME_BOXES.set(id, entry);
+  efcRuntimeBoxRevision++;
   for (let x = Math.floor(box.x0 / HCELL); x <= Math.floor(box.x1 / HCELL); x++)
     for (let z = Math.floor(box.z0 / HCELL); z <= Math.floor(box.z1 / HCELL); z++) {
       const key = x * 1000 + z;
@@ -152,8 +154,10 @@ function efcRuntimeBoxRemove(id) {
     if (!bucket.size) EFC_RUNTIME_CELLS.delete(key);
   }
   EFC_RUNTIME_BOXES.delete(id);
+  efcRuntimeBoxRevision++;
 }
 function efcRuntimeBoxesClear() {
+  if (EFC_RUNTIME_BOXES.size) efcRuntimeBoxRevision++;
   EFC_RUNTIME_BOXES.clear();
   EFC_RUNTIME_CELLS.clear();
 }

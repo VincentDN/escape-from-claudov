@@ -230,6 +230,7 @@ function navLeaps() {
 
 /* Déchargement de la carte */
 function navUnload() {
+  EFC_NAV_EDGE_CACHE.graph = EFC_NAV_EDGE_CACHE.states = null;
   for (const k of ['cells', 'nx', 'ny', 'nz', 'adjStart', 'adj', 'adjCost', 'adjKind', 'adjLead', 'kind', 'lead', 'g', 'f', 'from', 'stamp', 'closed', 'comp']) NAV[k] = null;
   NAV.count = 0;
 }
@@ -278,6 +279,20 @@ function efcNavRuntimeEdge(from, to) {
   return true;
 }
 
+/* A* revisits the same edges across bots and replans. Resample only after a map
+   rebuild or a runtime collider change. The graph itself is never modified. */
+const EFC_NAV_EDGE_CACHE = { graph: null, revision: -1, states: null };
+function efcNavEdgeStates() {
+  if (!EFC_RUNTIME_BOXES.size) return null;
+  const c = EFC_NAV_EDGE_CACHE;
+  if (c.graph !== NAV.adj) {
+    c.graph = NAV.adj;
+    c.states = new Uint8Array(NAV.adj.length);
+  } else if (c.revision !== efcRuntimeBoxRevision) c.states.fill(0);
+  c.revision = efcRuntimeBoxRevision;
+  return c.states;
+}
+
 function navNode(x, y, z) {
   const cx0 = Math.floor(x - NAV.x0), cz0 = Math.floor(z - NAV.z0);
   let best = -1, bd = 1e9;
@@ -318,7 +333,7 @@ function findPath(from, to, sid = -1) {
   const s = sid >= 0 ? sid : navNode(from.x, from.y, from.z), e = navNode(to.x, to.y, to.z);
   if (s < 0 || e < 0) return null;
   const gen = ++NAV.gen, g = NAV.g, f = NAV.f, fr = NAV.from, st = NAV.stamp, cl = NAV.closed, kd = NAV.kind;
-  const ex = NAV.nx[e], ey = NAV.ny[e], ez = NAV.nz[e];
+  const ex = NAV.nx[e], ey = NAV.ny[e], ez = NAV.nz[e], edgeStates = efcNavEdgeStates();
   HEAP.n = 0; st[s] = gen; g[s] = 0; f[s] = hyp(NAV.nx[s] - ex, NAV.nz[s] - ez); fr[s] = -1; heapPush(s);
   let iter = 0, found = false;
   while (HEAP.n > 0 && iter++ < 30000) {
@@ -326,9 +341,13 @@ function findPath(from, to, sid = -1) {
     if (cl[n] === gen) continue; cl[n] = gen;
     if (n === e) { found = true; break; }
     for (let j = NAV.adjStart[n]; j < NAV.adjStart[n + 1]; j++) {
-      const m = NAV.adj[j]; if (cl[m] === gen || (EFC_RUNTIME_BOXES.size && !efcNavRuntimeEdge(n, m))) continue;
+      const m = NAV.adj[j]; if (cl[m] === gen) continue;
       const ng = g[n] + NAV.adjCost[j];
       if (st[m] !== gen || ng < g[m]) {
+        if (edgeStates) {
+          const state = edgeStates[j] || (edgeStates[j] = efcNavRuntimeEdge(n, m) ? 1 : 2);
+          if (state === 2) continue;
+        }
         st[m] = gen; g[m] = ng; fr[m] = n; kd[m] = NAV.adjKind[j]; NAV.lead[m] = NAV.adjLead[j];
         f[m] = ng + hyp3(NAV.nx[m] - ex, NAV.nz[m] - ez, (NAV.ny[m] - ey)) * 1.05;
         if (HEAP.n < HEAP.a.length) heapPush(m);

@@ -268,6 +268,8 @@ function efcThumbProp(def) {
   else efcTpLoot(g, def && def.id);
   return g;
 }
+// Fresh geometry for the equipped-item overlays in the operator preview.
+efcProvide('thumb:gearProp', (def) => def?.kind === 'armor' || def?.kind === 'pack' ? efcThumbProp(def) : null);
 /* Triangle count of a built object (the test keeps props between 50 and 300) */
 function efcThumbTris(obj) {
   let n = 0;

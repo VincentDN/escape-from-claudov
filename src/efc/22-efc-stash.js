@@ -71,28 +71,40 @@ function efcFreeKit() {
   if (w) { w.res = EFC_FREE_ROUNDS; w.free = true; kit.slots.primary = w; }
   return kit;
 }
-/* Stash entry -> loadout (equipped when its slot is empty, otherwise the bag within the carry limit) */
-function efcStashToLoadout(idx) {
-  const st = efcStash();
-  if (!Number.isInteger(idx) || !st.items[idx]) return false;
-  if (!efcInvAdd(st.loadout, st.items[idx])) return false;
-  st.items.splice(idx, 1); efcStashSave();
+function efcStashMoveCount(item, count) {
+  const n = count === undefined ? item?.n : count;
+  return item && Number.isInteger(n) && n > 0 && n <= item.n ? n : 0;
+}
+function efcStashPublish(st) {
+  if (!efcStashWrite(st)) return false;
+  efcStashCur = st;
   return true;
 }
+/* Stash entry -> loadout (equipped when its slot is empty, otherwise the bag within the carry limit) */
+function efcStashToLoadout(idx, count) {
+  const st = efcStash(), item = Number.isInteger(idx) && st.items[idx];
+  const n = efcStashMoveCount(item, count);
+  if (!n) return false;
+  const next = efcClone(st);
+  if (!efcInvAdd(next.loadout, { ...item, n })) return false;
+  if (n === item.n) next.items.splice(idx, 1);
+  else next.items[idx].n -= n;
+  return efcStashPublish(next);
+}
 /* Loadout slot name or bag index -> stash */
-function efcStashToStash(where) {
+function efcStashToStash(where, count) {
   const st = efcStash(), inv = st.loadout;
-  let it = null;
-  if (typeof where === 'string' && EFC_SLOTS.includes(where)) { it = inv.slots[where]; inv.slots[where] = null; }
-  else if (Number.isInteger(where)) {
-    if (inv.bag[where]) it = efcInvRemove(inv, where);
-  }
-  if (!it) return false;
-  if (!it.free) efcStackInto(st.items, it);
+  const slot = EFC_SLOTS.includes(where);
+  const item = slot ? inv.slots[where] : Number.isInteger(where) && inv.bag[where];
+  const n = efcStashMoveCount(item, count);
+  if (!n) return false;
+  const next = efcClone(st);
+  if (slot) next.loadout.slots[where] = null;
+  else efcInvRemove(next.loadout, where, n);
+  if (!item.free) efcStackInto(next.items, { ...item, n });
   // without a pack the loadout bag may now be over the limit: move the overflow to the stash
-  efcStashBankOverflow(st);
-  efcStashSave();
-  return true;
+  if (slot) efcStashBankOverflow(next);
+  return efcStashPublish(next);
 }
 /* The raid kit. opt { free: true | false } (or a bare boolean) overrides the stored choice (stash.freeKit). The free kit leaves the
    stored loadout untouched in the stash; otherwise the kit is a copy of the loadout, which leaves the stash (it is at risk), and a bag

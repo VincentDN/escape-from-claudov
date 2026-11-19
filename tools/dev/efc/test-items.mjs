@@ -218,6 +218,24 @@ function makeCtx(store) {
     ok(!threw && s && Array.isArray(s.items) && s.loadout && Array.isArray(s.loadout.bag), 'corrupt storage recovered: ' + bad.slice(0, 30));
     if (bad.includes('zzz')) ok(s.items.length === 1 && s.items[0].n === 1 && !s.loadout.slots.primary, 'invalid entries dropped, pistol not kept in primary');
   }
+  const partial = makeCtx(), P = partial.ctx.call;
+  const initial = P('stash:get');
+  const source = initial.items.findIndex(it => it.id === 'ammo_rifle');
+  ok(P('stash:toLoadout', source, 12), 'stash can send part of a stack to the loadout');
+  const sent = P('stash:get'), received = sent.loadout.bag.findIndex(it => it.id === 'ammo_rifle');
+  ok(sent.items[source].n === initial.items[source].n - 12 && sent.loadout.bag[received].n === 12, 'partial send conserves rounds');
+  ok(P('stash:toStash', received, 5) && P('stash:get').loadout.bag[received].n === 7, 'loadout can return part of a stack');
+  const afterReturn = JSON.stringify(P('stash:get'));
+  for (const count of [0, 0.5, 1000, NaN]) ok(!P('stash:toLoadout', source, count), 'invalid transfer count refused: ' + count);
+  ok(!P('stash:toStash', 'primary', 2) && JSON.stringify(P('stash:get')) === afterReturn, 'invalid slot count leaves both inventories unchanged');
+  const persisted = partial.ctx.localStorage.getItem('efc_stash_v1');
+  const restored = makeCtx(new Map([['efc_stash_v1', persisted]])).ctx.call('stash:get');
+  const rounds = items => items.filter(it => it.id === 'ammo_rifle').reduce((total, it) => total + it.n, 0);
+  ok(rounds(restored.items) === rounds(initial.items) - 7 && rounds(restored.loadout.bag) === 7, 'split moves survive reload');
+  partial.ctx.localStorage.setItem = () => { throw new Error('disk full'); };
+  ok(!P('stash:toStash', received, 1) && !P('stash:toLoadout', source, 1) && JSON.stringify(P('stash:get')) === afterReturn,
+    'failed persistence rolls back both transfer directions');
+
   const T = makeCtx(); T.ctx.localStorage.getItem = () => { throw new Error('denied'); }; T.ctx.localStorage.setItem = () => { throw new Error('denied'); };
   let threw = false; try { T.ctx.call('stash:get'); T.ctx.call('raid:kit'); } catch (e) { threw = true; } ok(!threw, 'storage that throws');
 }

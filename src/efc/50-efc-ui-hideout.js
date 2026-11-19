@@ -17,7 +17,7 @@ function efcHoRender() {
       const g = items.filter((x) => (EFC_UI_KINDS.some((k) => k[0] === x.d.kind) ? x.d.kind : 'loot') === kind);
       if (!g.length) continue;
       g.sort((a, b) => String(a.d.name).localeCompare(String(b.d.name)));
-      h += `<p class="efc-gh">${label}</p>` + g.map((x) => efcThumbRow(x.it, { key: 'st-' + x.it.id + '-' + x.i, data: { stash: x.i }, title: 'Move to the loadout' })).join('');
+      h += `<p class="efc-gh">${label}</p>` + g.map((x) => efcThumbRow(x.it, { key: 'st-' + x.it.id + '-' + x.i, data: { stash: x.i }, title: x.it.n > 1 ? 'Move to the loadout (Ctrl+click moves half)' : 'Move to the loadout' })).join('');
     }
     $('efcHoStash').innerHTML = h || '<p class="efc-none">The stash is empty.</p>';
     const lo = st.loadout;
@@ -48,9 +48,14 @@ function efcHoClick(e) {
       if (efcHas('stash:save')) efcCall('stash:save');
       return r;
     });
-  } else if (ds.stash !== undefined) efcHoMove(() => efcCall('stash:toLoadout', +ds.stash));
-  else if (ds.slot !== undefined) efcHoMove(() => efcCall('stash:toStash', ds.slot));
-  else if (ds.bag !== undefined) efcHoMove(() => efcCall('stash:toStash', +ds.bag));
+  } else if (ds.slot !== undefined) efcHoMove(() => efcCall('stash:toStash', ds.slot));
+  else if (ds.stash !== undefined || ds.bag !== undefined) {
+    const fromStash = ds.stash !== undefined, i = +(ds.stash ?? ds.bag);
+    const state = e.ctrlKey ? efcCall('stash:get') : null;
+    const item = fromStash ? state?.items[i] : state?.loadout.bag[i];
+    const count = e.ctrlKey ? Math.floor((item?.n || 0) / 2) : undefined;
+    efcHoMove(() => efcCall(fromStash ? 'stash:toLoadout' : 'stash:toStash', i, count));
+  }
 }
 
 efcOn('ui:screen', (name, fresh) => { if (name === 'hideout') { if (fresh) EFC_HO.note = ''; efcHoRender(); } });

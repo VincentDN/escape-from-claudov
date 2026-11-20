@@ -32,3 +32,6 @@ audio-out/
 
 # agent worktrees
 /.claude/worktrees/
+
+# intro flag texture (tools/dev/efc/brand-kotwica.mjs)
+!showcase/intro/*.png

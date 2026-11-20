@@ -29,4 +29,13 @@ What remains under its own terms:
      *Background Drones Vol 1* by Tsorthan Grove (https://opengameart.org/content/background-drones-vol-1)
    - Claudov harbour chains: *Chain winch sounds* by bart (https://opengameart.org/content/chain-winch-sounds)
 
+6. **Kotwica emblem** (`assets/brand/kotwica.svg`): the anchor sign of Polska Walcząca, the Polish Underground State (1942). The
+   drawing used here is *Kotwica jako symbol Polski Walczącej* by Paweł Kruczyński, from Wikimedia Commons
+   (https://commons.wikimedia.org/wiki/File:Kotwica_jako_symbol_Polski_Walcz%C4%85cej.svg), licensed **CC BY-SA 4.0**
+   (https://creativecommons.org/licenses/by-sa/4.0/); file page read on 20 November 2026. The site icons (`assets/icon/`,
+   `showcase/assets/img/favicon.svg`) and the intro flag texture (`showcase/intro/polish-resistance-flag.png`) are adaptations
+   (placed on a red tile, and on a white and red flag) made by `tools/dev/efc/brand-kotwica.mjs`, and are shared under the same
+   CC BY-SA 4.0 licence. In Poland the sign is protected by the Act of 10 June 2014 on the protection of the Sign of Fighting Poland:
+   use it respectfully.
+
 The raid StG 44 model is a reduced derivative of the Partisan Project Neuro-Bash showcase asset, cleared by Vincent De Nil for this repository. See `showcase/asset-credits.json` and `docs/weapon-port.md`.

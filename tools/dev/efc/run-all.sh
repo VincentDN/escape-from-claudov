@@ -26,6 +26,7 @@ run node tools/dev/efc/test-panel-event.mjs
 run node tools/dev/efc/test-thumbs.mjs
 run node tools/dev/efc/test-sounds.mjs
 run node tools/dev/efc/test-bench.mjs
+run node tools/dev/efc/test-artlab.mjs
 run node tools/dev/efc/test-sks.mjs
 run node tools/dev/efc/test-warden-pace.mjs
 run node tools/dev/efc/test-lean.mjs

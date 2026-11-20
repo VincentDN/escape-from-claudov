@@ -1193,7 +1193,15 @@ function setupComposer() {
   composer = new THREE.EffectComposer(renderer, msaaTarget); // densité 1 : les tailles données au composeur sont en pixels (RS)
   // la seconde cible ne sert qu'avec l'occlusion ambiante : pas d'anticrénelage sinon (voir applyQuality)
   composer.renderTarget2.samples = 0;
-  { const cr = composer.render.bind(composer); composer.render = (dt) => { RENDER.clip = true; try { cr(dt); } finally { RENDER.clip = false; } }; }
+  const renderComposer = composer.render.bind(composer);
+  composer.render = (dt) => {
+    // Scene passes draw into readBuffer. Start every frame on the MSAA target,
+    // while still allowing post-processing passes to swap buffers within it.
+    composer.readBuffer = composer.renderTarget1;
+    composer.writeBuffer = composer.renderTarget2;
+    RENDER.clip = true;
+    try { renderComposer(dt); } finally { RENDER.clip = false; }
+  };
   prePass = new DepthPrepass(scene, camera);
   worldPass = new ScenePass(scene, camera); worldPass.clear = NO_PREPASS; worldPass.deferResolve = true; // la pré-passe efface l'image ; sans elle, c'est la passe du monde
   prePass.enabled = !NO_PREPASS;

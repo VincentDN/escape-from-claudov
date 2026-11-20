@@ -1,4 +1,4 @@
-# Third track: tasks C1 to C9
+# Third track: tasks C1 to C14
 
 Written 20 November 2026 for the agent that finished tracks T and A. Everything from `docs/HANDOFF.md` sections 1 to 4 and 7
 still applies (branching, build, tests, rules that are not negotiable, how to report), with these updates:
@@ -16,6 +16,23 @@ push, and write what is left and the question in your last commit body. Do not g
 **Proof rule.** Every task ends with automated checks that prove the behaviour, and where something is visual, a contact sheet or
 screenshot committed under `docs/` (not only `/tmp`). Say plainly what the tests cannot prove (feel, audio quality, real GPU frame
 rates).
+
+## Order (owner, 20 November 2026)
+
+Work in this order. Each line is one or more mergeable branches.
+
+1. **C1** raid-start weapon check
+2. **C9** omnimovement (moved up by the owner: right after C1)
+3. **C2** Partisan modern weapons, batch 1
+4. **C11** full-screen map and extraction flares
+5. **C12** dirty lens and light effects
+6. **C13** real weapon foley for every action
+7. **C3** remaining modern Partisan weapons and attachments
+8. **C4**, **C5**, **C6** enemy types, AI upgrade, rival raiders
+9. **C7** optimisation part 1, **C8** raid balance
+10. **C14** Second World War weapons (owner: in, but after the modern ones)
+
+**C10** (menu fonts) is small and touches only the menus: do it whenever a short slot is free, ideally before C9's long run.
 
 ---
 
@@ -52,17 +69,14 @@ For each weapon:
 - Tests: one `test-<weapon>.mjs` per weapon (or one shared parametrised test): builds in both views, fires, reloads, aims,
   time to kill at 25 m, mounts at least one attachment; thumbnails and end-to-end raid tests pass.
 
-## C3. Partisan weapons, batch 2 (large; after C2)
+## C3. Remaining modern Partisan weapons and attachments (large; after C13)
 
-Same as C2 for **MK14, SPEAR, PPSh-41, Bren, Chauchat**, plus the attachments not yet in the game (for example the GP-25
-under-barrel launcher, ZF4 scope, AK suppressor and rail, iron sight set).
+Same as C2 for **MK14 and SPEAR**, plus every attachment not yet in the game (for example the GP-25 under-barrel launcher,
+ZF4 scope, AK suppressor and rail, iron sight set, G3 drum and bipod).
 
-- Bren and Chauchat are light machine guns: heavy, slow to aim, a bipod that can be deployed on a ledge or prone (if prone
-  exists only after C9, make the bipod work on ledges and leave a hook for prone).
-- PPSh-41 and Chauchat are period pieces in a modern port town: make them rare finds with a value to match, and say so in
-  `docs/weapons.md`.
 - The GP-25 launcher needs a grenade projectile: reuse the engine's grenade physics and explosion code.
-- **Owner question to raise, not decide**: whether the historical weapons belong in the game at all, or only as valuables.
+- Attachments go into the loot tables with rarity by quality, and into A9's mount rules for every weapon they physically fit.
+- The Second World War weapons are not in this task: they are C14.
 
 ## C4. Three new enemy types (medium to large)
 
@@ -137,7 +151,7 @@ Use rival raiders (C6) as stand-in players to run many scripted raids and tune t
   numbers and every change made. Changes go in data (`EFC.cfg`, loot tables), not in code paths.
 - Raise anything that needs the owner's taste (for example how punishing death should feel) as a question instead of tuning it.
 
-## C9. Omnimovement (very large; last; two branches)
+## C9. Omnimovement (very large; second, right after C1; two branches)
 
 P8 in `docs/plans/2026-11-14-polish-pass.md`: movement in the manner of recent Call of Duty and Battlefield titles, built from the
 engine's own code. Nothing copied from those games.
@@ -161,3 +175,93 @@ derived; find it before you start):
 
 Tests: a state-machine test of every transition in every direction, collision checks per stance, the two-client rig showing the
 same stance remotely, and contact sheets of every stance in first and third person in `docs/omnimovement/`.
+
+## C10. Clean, modern menu fonts (small)
+
+The owner wants the stencil look gone. The menus use **Saira Stencil One** through the CSS variable `--stencil` (about 25 uses
+in `shell.html`), with **Barlow Condensed** for the HUD (`--hud`), both loaded from Google Fonts in `shell.html`.
+
+- Replace the stencil face with a clean, modern sans serif with an open licence (SIL Open Font License), for example Inter,
+  Barlow (not condensed) or IBM Plex Sans. Pick one family, two or three weights, and use it for headings and menu text; keep a
+  condensed face for dense HUD numbers only if it reads better there. Rename the variable to something neutral (`--display`) and
+  update every use, including any in `src/efc/*.js`.
+- Self-host the font files under `assets/fonts/` with their licence files instead of loading from Google Fonts, so the game works
+  offline and the page sets no third-party requests; update `build.py` and the page's Content Security Policy if needed.
+  Record the fonts in `NOTICE.md`.
+- Check every screen: main menu over the bench, raid screen, hideout and operator inventory, lobby, settings, summary, credits,
+  HUD. Nothing may overflow or truncate after the swap (Inter is wider than a condensed face).
+- Tests: `test-ui.mjs`, `test-bench.mjs`; screenshots of the main menu, hideout and HUD committed in `docs/fonts/`.
+
+## C11. Full-screen map and extraction flares (medium; after C2)
+
+**Map.** `M` opens a full-screen map in a raid; `M` or `Escape` closes it; the match keeps running and the player cannot fire
+while it is open (as the inventory does).
+
+- A top-down render of the current map, made once per map load with the game's renderer (the engine already draws a tactical
+  map for killstreaks, `drawTacMap` and `#tacmap` in `src/08b-killstreaks.js`, and a minimap in `src/09ga-minicarte.js`: reuse
+  what fits).
+- On it: the player's position and facing, squadmates, the insert used, every extract with its name, distance and state (open,
+  closed with the time until it opens), and named points of interest from the map's zones (warehouses, dry dock, housing,
+  checkpoint and so on). Never enemies or loot.
+- Zoom with the mouse wheel, pan by dragging, a legend, keyboard operable, readable at 1280 by 720.
+
+**Extraction flares.** Open extracts must be easy to find in the world.
+
+- A tall column of green smoke rising from each open extract, visible from most of the map, drifting with the wind, lit by the
+  sky, fading at the top; plus a small hissing flare on the ground at its base with a green light that pulses. Respect the
+  fog so it reads as distant.
+- A closed extract shows nothing; the late extract's flare ignites when it opens, with a short sound cue.
+- Performance: one soft particle system or a few camera-facing cards per extract, drawn after the fog, within the frame budget
+  at every quality level; lowest quality falls back to a simple glowing column.
+- Tests: the map opens and closes with `M`, shows the right extract states at the right times, and blocks firing; flares exist
+  only for open extracts and appear when the late one opens; draw calls added per flare within budget. Screenshots of the map
+  and of a flare seen from across Claudov in `docs/map/`.
+
+## C12. Dirty lens and light effects (medium; after C11)
+
+When the player looks toward a strong light source (the sun, lamps, the extraction flares), the camera should react like a
+real lens.
+
+- **Lens flare**: ghosts and a halo along the line from the light through the screen centre, sized and faded by how directly
+  the light is in view and whether it is blocked (occlusion test against the depth buffer or a ray).
+- **Dirty lens**: a subtle dust and smudge texture over the screen that only shows where bright light hits it. Generate the
+  texture procedurally in code, or use a CC0 texture with its source recorded; never a texture from a search engine.
+- **Bloom on bright sources**, and soft light shafts from the sun through gaps where cheap enough (the engine has a sun-ray
+  pass; read `src/01-core.js` and the final shader before adding a new one).
+- All of it in the existing post-processing chain, gated by the quality setting, off at the lowest quality, and with a setting
+  to turn the lens dirt off. Aiming down an optic may reduce or change the effect.
+- Tests: the effect strength rises when the camera faces the sun and falls to zero when the light is occluded or behind;
+  frame cost measured on the A1 route at each quality; before and after screenshots in `docs/lens/`.
+
+## C13. Real weapon foley for every action (medium to large; after C12)
+
+The owner likes the handling sounds of the Partisan Project workbench and wants that quality for **every** weapon action in
+Claudov, with more variety.
+
+- Start from what exists: `docs/audio-events.md` (every handling and firing event per weapon family) and `docs/handling-foley.md`
+  (the current 44 ElevenLabs takes and the unshipped Partisan references worth auditioning). Fill every gap: each family and each
+  event (magazine out, magazine in, bolt or charging handle, bolt release, pump, shell insert, safety and fire selector, draw,
+  holster, aim in, aim out, inspect, dry fire, attachment mount and unmount at the workbench, bipod deploy) gets at least four
+  takes so repeats never sound identical.
+- Generate alternatives and variants with **ElevenLabs Sound Effects** through the ElevenLabs MCP connector on the owner's
+  account, using Partisan's workbench takes as the reference for character (describe them in the prompt; do not upload
+  anything you are not allowed to). Ask the owner before spending credits beyond a budget he sets; report the credits used.
+  Record each generated take in the credits file the same way `docs/handling-foley.md` does (generated with ElevenLabs on the
+  owner's account), and confirm the owner's ElevenLabs plan allows commercial use of generated sound effects before shipping.
+  If the agent does not have the ElevenLabs connector, stop after the shot list and ask the owner to run the generation.
+- Edit and level every take with the existing pipeline (`tools/sfx/`, `tools/build_sfx.py`): trimmed, transient-aligned, levels
+  within 2 dB of the pack median, no clipping. Map them in `src/efc/45-efc-sounds.js` with heavier weapons pitched lower.
+- Extend the audition page (`#sounds`) so the owner can hear every event, old against new, per weapon.
+- Tests: `test-sounds.mjs` extended so every event of every weapon resolves to at least four takes, timing matches the reload
+  choreography, and the added download stays under a budget you state.
+
+## C14. Second World War weapons (large; last)
+
+The owner decided the historical weapons go in, after the modern ones: **PPSh-41, Bren and Chauchat**, plus the plain StG 44 if
+it differs from the raid version.
+
+- Same port as C2 (`docs/weapon-port.md`).
+- They are period pieces in a modern port town: rare finds, priced to match, carried only by the Heavy (Bren) or found in
+  specific places (an armoury cage, a collector's locker); write the reasoning in `docs/weapons.md`.
+- Bren and Chauchat are light machine guns: heavy, slow to aim, with a bipod that deploys on a ledge or prone (prone exists
+  after C9).

@@ -1,6 +1,6 @@
 # Escape From Claudov: roadmap
 
-Single status page for the whole project. Updated 20 November 2026. Detail lives in the files linked from each line; this page
+Single status page for the whole project. Updated 20 November 2026, with the owner's decisions of that day. Detail lives in the files linked from each line; this page
 says what is done, what is assigned to whom, and what only the owner can do.
 
 ## Done and merged on `main`
@@ -13,21 +13,27 @@ says what is done, what is assigned to whom, and what only the owner can do.
 | Handoff A1 to A9 | Performance route (`#bench`), StG 44 in raids, Scavengers, host migration, container collision, grid inventory data, grid interactions, operator inventory screen, attachments and the hideout workbench | `docs/HANDOFF-ASTRA.md` |
 | Other | Raid-only game (team deathmatch retired), Partisan opening scene and StG 44 studio in `showcase/`, ElevenLabs and CC0 handling takes, Partisan radio tracks | git log |
 
-## Open: third track, tasks C1 to C9
+## Open: third track, tasks C1 to C14
 
-Detailed in [`docs/HANDOFF-CODEX.md`](HANDOFF-CODEX.md). Order matters; each task ends on its own mergeable branch.
+Detailed in [`docs/HANDOFF-CODEX.md`](HANDOFF-CODEX.md), in this order (owner, 20 November 2026). Each task ends on its own
+mergeable branch.
 
-| Task | What | Size | Depends on |
+| Order | Task | What | Size |
 | --- | --- | --- | --- |
-| C1 | Raid-start weapon check (P9), from the T7 proposal | medium | |
-| C2 | Partisan weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3 | large | weapon-port guide |
-| C3 | Partisan weapons, batch 2: MK14, SPEAR, PPSh-41, Bren, Chauchat, and the remaining attachments | large | C2 |
-| C4 | Three new enemy types: Marksman, Breacher, Heavy | medium to large | |
-| C5 | AI behaviour upgrade for every hostile: squad tactics, cover, grenades, investigation, retreat | large | C4 |
-| C6 | Rival raiders: AI squads that insert, loot, fight and extract | large | C5 |
-| C7 | Optimisation, part 1: what can be measured without a GPU | medium | |
-| C8 | Raid balance from scripted raids | medium | C6 |
-| C9 | Omnimovement (P8): dives, slides, prone in every direction, weapon canting | very large, two parts | C1 |
+| 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
+| 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
+| 3 | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3 | large |
+| 4 | C11 | `M` opens a full-screen map with extracts and points of interest; green smoke flares over open extracts | medium |
+| 5 | C12 | Dirty lens, lens flare and bloom when looking at light sources | medium |
+| 6 | C13 | Real weapon foley for every action, with ElevenLabs alternatives and variants | medium to large |
+| 7 | C3 | Remaining modern weapons (MK14, SPEAR) and every remaining attachment | large |
+| 8 | C4 | Marksman, Breacher and Heavy enemy types | medium to large |
+| 9 | C5 | AI behaviour upgrade for every hostile | large |
+| 10 | C6 | Rival raider squads | large |
+| 11 | C7 | Optimisation, part 1 (what can be measured without a GPU) | medium |
+| 12 | C8 | Raid balance from scripted raids | medium |
+| 13 | C14 | Second World War weapons: PPSh-41, Bren, Chauchat (in, but after the modern ones) | large |
+| any | C10 | Clean, modern menu fonts instead of the stencil face | small |
 
 ## Waiting on the owner
 
@@ -39,8 +45,8 @@ These cannot be done by an agent in a cloud sandbox:
    send the JSON report (`docs/perf.md`). Optimisation part 2 starts from it.
 3. **A real-internet raid.** All network tests run two pages in one browser. Two machines on different networks, one raid,
    loot, die, extract, and the host leaving mid-raid: note what breaks.
-4. **Soldier animations.** Rebake from your own Mixamo account with `tools/dev/anim/cuire.mjs`; until then soldiers use the
-   engine's procedural poses.
+4. **Soldier animations.** Download the Mixamo animations from your own account; step by step in
+   [`outbound/TODO_VINCENT_MIXAMO.md`](../outbound/TODO_VINCENT_MIXAMO.md). Until then soldiers use the engine's procedural poses.
 5. **Repository settings.** Make `main` the default branch and allow it in the Pages environment, so pushes to `main` deploy.
 6. **Public-server squads.** The engine's public lobby server is not in this repository; squads work in private lobbies only.
    Decide whether a server is in scope at all.

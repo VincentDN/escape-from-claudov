@@ -123,7 +123,7 @@ const FEEL = {
   mp5: { kick: 0.85, rot: 0.75, roll: 0.6, shake: 0.12, fov: 0.6, flash: 0.85, spring: [350, 26], smoke: 0.1, punch: 1.2, spark: 3 },
   l96: { kick: 1.8, rot: 1.5, roll: 0.8, shake: 0.8, fov: 4.5, flash: 1.9, spring: [95, 9], smoke: 1.0, punch: 1.1, spark: 9 },
   m1014: { kick: 2.3, rot: 2.0, roll: 1.2, shake: 0.85, fov: 5.5, flash: 2.4, spring: [120, 10], smoke: 1.0, punch: 1.1, spark: 12 },
-  ak47: { kick: 1.5, rot: 1.3, roll: 0.5, shake: 0.25, fov: 1.5, flash: 1.3, spring: [245, 19], smoke: 0.25, punch: 1.35, spark: 6 },
+  ak47: { kick: 1.5, rot: 1.3, ironKick: 0.42, roll: 0.5, shake: 0.25, fov: 1.5, flash: 1.3, spring: [245, 19], smoke: 0.25, punch: 1.35, spark: 6 },
   scarh: { kick: 1.65, rot: 1.4, roll: 0.45, shake: 0.3, fov: 1.8, flash: 1.4, spring: [235, 19], smoke: 0.3, punch: 1.4, spark: 7 },
   famas: { kick: 0.95, rot: 0.9, roll: 0.4, shake: 0.14, fov: 0.8, flash: 0.95, spring: [320, 24], smoke: 0.15, punch: 1.15, spark: 4 },
   mp7: { kick: 0.7, rot: 0.6, roll: 0.5, shake: 0.1, fov: 0.5, flash: 0.7, spring: [370, 27], smoke: 0.08, punch: 1.15, spark: 3 },
@@ -138,7 +138,7 @@ const FEEL = {
   deagle: { kick: 2.5, rot: 2.4, roll: 0.5, shake: 0.9, fov: 4.2, flash: 2.4, spring: [260, 18], smoke: 0.6, punch: 2.2, spark: 12 },
   m9: { kick: 1.5, rot: 1.5, roll: 0.3, shake: 0.5, fov: 2.6, flash: 1.6, spring: [360, 24], smoke: 0.25, punch: 1.8, spark: 8 },
   stg44: { kick: 1.6, rot: 1.5, roll: 0.45, shake: 0.35, fov: 1.6, flash: 1.2, spring: [185, 17], smoke: 0.32, punch: 1.35, spark: 6 },
-  sks: { kick: 2.0, rot: 1.8, roll: 0.6, shake: 0.5, fov: 2.6, flash: 1.5, spring: [130, 10], smoke: 0.45, punch: 1.45, spark: 6 }, // recul lourd, retour lent
+  sks: { kick: 2.0, rot: 1.8, ironKick: 0.30, roll: 0.6, shake: 0.5, fov: 2.6, flash: 1.5, spring: [130, 10], smoke: 0.45, punch: 1.45, spark: 6 }, // recul lourd, retour lent
 };
 /* Grenades au choix (demande du propriétaire, après la 5.0) : chaque classe en porte un seul type, deux à chaque vie (NADE_COUNT). fuse : mèche,
    à partir de la cuillère (s) ; name : nom court (atelier, HUD) ; long : nom entier ; icon : tracé SVG 24 x 24 ; desc : l'effet en une ou deux

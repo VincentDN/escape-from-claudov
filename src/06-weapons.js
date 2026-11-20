@@ -343,10 +343,17 @@ function vmEquip(def) {
 }
 
 function vmKick(def, ads) {
-  const r = def.recoil, a = (ads ? 0.55 : 1) * RECOIL.vis; // (RECOIL.vis : le coup se voit plus, 07ca-recul.js)
+  const r = def.recoil;
   const F = def.feel || FEEL.m4;
-  VM.rec.vz += r.kick * 22 * a * F.kick; VM.rec.vrx += r.rot * 18 * a * F.rot; VM.rec.vry += (Math.random() - 0.5) * r.rot * 10 * a; VM.rec.vrz += (Math.random() - 0.5) * r.rot * 14 * (1 + F.roll);
-  VM.rec.vy += r.kick * 4 * F.kick;
+  // Keep the receiver from swinging across the sight picture. This scales the rendered weapon only.
+  const ironSight = ads && !def.scope && !def.att?.some(id => ATT[id]?.slot === 'optic');
+  const ironKick = ironSight ? (F.ironKick ?? 0.55) : 1;
+  const a = (ads ? 0.55 : 1) * RECOIL.vis * ironKick;
+  VM.rec.vz += r.kick * 22 * a * F.kick;
+  VM.rec.vrx += r.rot * 18 * a * F.rot;
+  VM.rec.vry += (Math.random() - 0.5) * r.rot * 10 * a;
+  VM.rec.vrz += (Math.random() - 0.5) * r.rot * 14 * (1 + F.roll) * ironKick;
+  VM.rec.vy += r.kick * 4 * F.kick * ironKick;
   // attaque : le premier déplacement est immédiat (l'arme part dès l'image du tir au lieu de prendre de la vitesse)
   VM.rec.z += r.kick * 0.35 * a * F.kick; VM.rec.rx += r.rot * 0.25 * a * F.rot;
   VM.flashT = VM.flashT0 = def.silent ? 0 : def.pellets || def.bolt ? 0.065 : 0.05; VM.trigT = 0.085;

@@ -100,6 +100,7 @@ raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 
 | WARDEN | `src/07-bots.js`, `src/07b-tactics.js`, `src/07c-controller.js`, `src/07d-squad.js`, `src/07e-humain.js` | `40-efc-wardens.js` |
 | UI | `shell.html`, `src/09e-menus.js`, `src/09ea-liste.js`, `src/08a-binds.js`, `i18n/en.txt` | `50-efc-ui-*.js` |
 | MAP | `src/02-map.js`, `src/02z-load.js`, `assets/maps/` | `60-efc-claudov*.js` |
+| ARTLAB (L0) | none | `47-efc-artlab*.js` (also `tools/dev/efc/test-artlab.mjs`, `tools/dev/efc/artlab-contact-sheet.mjs`, `docs/artlab/`) |
 
 Everything else is the lead's. If you need a change outside your files, do not make it: describe it in your handoff note.
 

@@ -3,9 +3,10 @@
 Extraction shooter vertical slice built on the Riposte: Frontline 5.6.0 engine (three.js, browser, no bundler).
 Owner: Vincent De Nil. The plan, work packages and ownership rules are in [docs/PLAN.md](docs/PLAN.md). Read it first.
 
-**Joining now?** Read [docs/HANDOFF.md](docs/HANDOFF.md) first: the current state, how to build and test, and the tasks open
-for incoming agents.
-The second track, for larger multi-file work, is [docs/HANDOFF-ASTRA.md](docs/HANDOFF-ASTRA.md).
+**Joining now?** Read [docs/ROADMAP.md](docs/ROADMAP.md) for the status of everything, then
+[docs/HANDOFF.md](docs/HANDOFF.md) sections 1 to 4 and 7 for how to branch, build, test and report. The open tasks are in
+[docs/HANDOFF-CODEX.md](docs/HANDOFF-CODEX.md) (C1 to C9). The earlier tracks, now done, are in `docs/HANDOFF.md` (T1 to T7) and
+[docs/HANDOFF-ASTRA.md](docs/HANDOFF-ASTRA.md) (A1 to A9).
 
 ## Hard rules
 

@@ -1,5 +1,7 @@
 # Handoff briefing for incoming agents
 
+> **Status, 20 November 2026: T1 to T7 are done and merged.** Open work is in `docs/ROADMAP.md` and `docs/HANDOFF-CODEX.md`.
+
 Written 17 November 2026 for agents joining after the first build. Read this file, then `AGENTS.md`. You are working on
 **Escape From Claudov**, an extraction shooter that runs in the browser, built on the open-source engine of Riposte: Frontline.
 Owner: Vincent De Nil. Live build: https://vincentdn.github.io/escape-from-claudov/

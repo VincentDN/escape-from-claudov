@@ -1,5 +1,7 @@
 # Second track: tasks A1 to A9
 
+> **Status, 20 November 2026: A1 to A9 are done and merged.** Open work is in `docs/ROADMAP.md` and `docs/HANDOFF-CODEX.md`.
+
 Written 18 November 2026, after the first handoff (`docs/HANDOFF.md`, tasks T1 to T7) was finished and merged. This track is for
 an agent that can take on larger, multi-file work. Read `docs/HANDOFF.md` sections 1 to 4 and 7 first: how to branch, build,
 test and report, and the rules that are not negotiable. They all apply here, with these changes:

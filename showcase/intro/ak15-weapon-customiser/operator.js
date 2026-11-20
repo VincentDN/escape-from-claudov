@@ -52,7 +52,7 @@ export const OPERATOR_SECTIONS=[
  ]},
  {id:'insignia',label:'Insignia',camera:'arm',controls:[
   {id:'armband',label:'Armband',type:'swatch',options:[{id:'none',label:'None',color:null},...swatch(ARMBAND)]},
-  {id:'patch',label:'Shoulder patch',type:'choice',options:[choice('none','None'),choice('star','Star'),choice('stripes','Tricolour'),choice('shield','Shield')]}
+  {id:'patch',label:'Shoulder patch',type:'choice',options:[choice('none','None'),choice('star','Star'),choice('stripes','Tricolour'),choice('shield','Shield'),choice('pl','White and red armband')]}
  ]}
 ];
 
@@ -304,6 +304,9 @@ export function buildOperator(state){
   const at=[-(.052*thick*shell+.012),-.09*s,0],rot=g=>g.rotateY(-Math.PI/2).translate(...at);
   if(o.patch==='star')add('upperArmR',mat('#a3262a',.7),rot(star(.028,.006).translate(0,0,0)));
   if(o.patch==='stripes')['#c8102e','#f2f0ea','#1f4e9a'].forEach((c,i)=>add('upperArmR',mat(c,.7),rot(box(.05,.014,.004,[0,.014-i*.014,0]))));
+  // Escape From Claudov: the white and red armband of the Polish resistance, round the upper arm the camera sees
+  if(o.patch==='pl'){const y=.13*s,h=.02*s,r=f=>(.052-.009*f)*thick*shell+.009;// hugs the sleeve, which tapers towards the elbow
+   add('upperArmR',mat('#ece9e1',.85),limb(r(y/L.upperArm),r((y+h)/L.upperArm),h,12,y));add('upperArmR',mat('#c8102e',.85),limb(r((y+h)/L.upperArm),r((y+2*h)/L.upperArm),h,12,y+h));}
   if(o.patch==='shield'){add('upperArmR',mat('#1f3a5f',.7),rot(box(.045,.055,.004)));add('upperArmR',mat('#d4b02a',.7),rot(box(.03,.008,.006)));}
  }
 

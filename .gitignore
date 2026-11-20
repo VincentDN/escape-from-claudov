@@ -35,3 +35,4 @@ audio-out/
 
 # intro flag texture (tools/dev/efc/brand-kotwica.mjs)
 !showcase/intro/*.png
+!outbound/**/*.png

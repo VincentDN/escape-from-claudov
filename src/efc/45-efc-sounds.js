@@ -45,6 +45,11 @@ const EFC_HANDLING = {
   inv_equip: [['hf_clunk', 0, 0.7, 1], ['hf_click', 0.04, 0.5, 1.05]],
   inv_unequip: [['hf_click', 0, 0.5, 1], ['hf_handle', 0.03, 0.5, 0.95]],
   inv_drop: [['hf_clunk', 0, 0.7, 0.85]],
+  inv_rotate: [['hf_slide', 0, 0.55, 1.05]],
+  inv_refuse: [['hf_click', 0, 0.50, 0.78]],
+  inv_split: [['hf_handle', 0, 0.55, 1.1], ['hf_click', 0.04, 0.32, 1.1]],
+  inv_mount: [['hf_slide', 0, 0.45, 1.03], ['hf_click', 0.045, 0.7, 1.04]],
+  inv_search: [['hf_handle', 0, 0.5, 0.9], ['hf_ratchet', 0.08, 0.35, 1]],
   inv_med: [['hf_handle', 0, 0.6, 1.1], ['hf_handle', 0.22, 0.45, 0.95]],
 };
 /* Event dose, the engine's MECH_GAIN for the kinds it has (the takes are levelled like the engine's foley pack) */
@@ -92,13 +97,19 @@ function efcHandlingPlay(kind, delay, pos, fam) {
   return true;
 }
 /* Inventory and looting sound (respects the effects volume and mute: it goes through the game's mix like every effect) */
-function efcInvSound(key) {
+function efcInvSound(key, rate = 1) {
   if (!EFC_SND.on || typeof AU === 'undefined' || !AU.ready || !efcHandlingReady(key)) return false;
   const t = AU.ctx.currentTime;
   if (t - (EFC_SND.last[key] || -1) < 0.05) return false; EFC_SND.last[key] = t; // 'take all' and quick clicks
-  efcHandlingLayers(key, auOut(null, 0.02, 1), t, { rate: 1 });
+  efcHandlingLayers(key, auOut(null, 0.02, 1), t, { rate });
   return true;
 }
+efcOn('ui:inventory-gesture', (kind, item) => {
+  const def = item && efcCall('item:def', item.id);
+  const key = { pick: def?.kind === 'weapon' ? 'pickup' : 'inv_take', place: 'inv_drop', rotate: 'inv_rotate',
+    refuse: 'inv_refuse', split: 'inv_split', equip: 'inv_equip', mount: 'inv_mount' }[kind];
+  if (key) efcInvSound(key, efcSndWeightRate(def ? def.w * (item.n || 1) : 1));
+});
 
 /* ---------- Inventory diff: what the last inv:changed did ---------- */
 function efcSndInvSnap(inv) {
@@ -135,7 +146,10 @@ efcOn('inv:changed', () => {
 efcOn('loot:give', () => { efcInvSound('inv_take'); });
 efcOn('raid:begin', () => { EFC_SND.prevInv = efcSndInvSnap(EFC.inv); EFC_SND.busy = false; });
 /* Panel open and close: the UI's 'ui:panel'(open, kind, containerId) event when it emits one, else its busy state polled each step */
-efcOn('ui:panel', (open) => { EFC_SND.panelEv = true; efcInvSound(open ? 'inv_open' : 'inv_close'); });
+efcOn('ui:panel', (open, kind) => {
+  EFC_SND.panelEv = true;
+  efcInvSound(open ? (kind === 'loot' ? 'inv_search' : 'inv_open') : 'inv_close');
+});
 efcOn('tick', () => {
   if (!EFC_SND.panelEv) {
     const busy = !!efcCall('ui:busy');

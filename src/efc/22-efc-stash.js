@@ -23,7 +23,7 @@ function efcInvSanitize(raw) {
   if (!raw || typeof raw !== 'object') return inv;
   const slots = raw.slots && typeof raw.slots === 'object' ? raw.slots : {};
   for (const s of EFC_SLOTS) { const it = efcItemNorm(slots[s]); if (it && efcSlotFor(it.id) === s) inv.slots[s] = it; }
-  if (Array.isArray(raw.bag)) for (const r of raw.bag) { const it = efcItemNorm(r); if (it) efcStackInto(inv.bag, it); }
+  if (Array.isArray(raw.bag)) efcGridStoredItems(inv.bag, raw.bag);
   return inv;
 }
 function efcStashLoad() {
@@ -31,7 +31,7 @@ function efcStashLoad() {
   try { const s = localStorage.getItem(EFC_STASH_KEY); raw = s ? JSON.parse(s) : null; } catch (e) { raw = null; }
   if (!raw || typeof raw !== 'object' || ![1, 2].includes(raw.v) || !Array.isArray(raw.items)) return efcStashStarter();
   const st = { v: 2, items: [], loadout: efcInvSanitize(raw.loadout), freeKit: raw.freeKit === true };
-  for (const r of raw.items) { const it = efcItemNorm(r); if (it) efcStackInto(st.items, it); }
+  efcGridStoredItems(st.items, raw.items);
   efcStashBankOverflow(st);
   if (raw.v === 1) efcStashWrite(st);
   return st;
@@ -139,6 +139,10 @@ function efcRaidCommit(result, inv) {
 
 efcProvide('stash:get', efcStashGet);
 efcProvide('stash:grids', () => efcStashGrids(efcStash()));
+efcProvide('stash:place', (source, cell, preview) => {
+  const st = efcStash(), next = efcGridTransfer(st.items, st.loadout, source, cell);
+  return !!next && (preview || efcStashPublish({ ...st, items: next.stash, loadout: next.inv }));
+});
 efcProvide('stash:toLoadout', efcStashToLoadout);
 efcProvide('stash:toStash', efcStashToStash);
 efcProvide('stash:save', efcStashSave);

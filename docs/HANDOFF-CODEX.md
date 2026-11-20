@@ -43,21 +43,19 @@ Work in this order. Each line is one or more mergeable branches.
 L0, the art style lab (`#artlab`, `src/efc/47-efc-artlab*.js`, `docs/artlab/README.md`), is merged into `beta` and live at
 `/beta/#artlab`. It owns its two files; do not restyle the game from it until the owner sends the chosen settings.
 
-- **X1, inventory test failures (fix first, as part of C0).** `node tools/dev/efc/test-ui.mjs` fails 2 checks on `beta`:
-  "efcGridSize is not a function or its return value is not iterable" in `efcGridLoadout`. They fail with or without L0.
-- **X2, anti-aliasing on alternate frames (own branch, `codex/x2-msaa-swap`).** In `src/01-core.js` only `finalPass` swaps
-  buffers, so the composer alternates between `renderTarget1` (MSAA) and `renderTarget2` (no MSAA when AO is off): measured
-  `{"rt1":4,"rt2":0,"swaps":["ShaderPass"]}` at medium quality. Likely fix: `finalPass.needsSwap = false`. Prove it with a
-  test that every frame renders into the MSAA target, and before/after stills; check the L0 lab pass still runs last.
+- **X1, inventory test failures.** Fixed on `beta` in `42541ff`. The complete UI test passed with valid mock catalogue entries.
+- **X2, anti-aliasing on alternate frames (`codex/x2-msaa-swap`).** Fixed on `beta` in `74e6eff`. The composer starts every frame
+  on its MSAA target and still swaps buffers inside each frame. The Art Lab test checks both enabled and disabled passes.
 - **X3, menu button for the lab (with C10).** Add an "Art lab" entry to the main menu (UI package) that opens `#artlab`.
 
 ## C0. Finish the grid inventory (medium; first, before C1)
 
 The owner played the grid inventory (A6 to A8) and wants it finished before anything else. Three things:
 
-Beta has a cursor-following item preview in the shared operator panels and Ctrl-click half-stack transfers in the hideout.
-The container arranger still owns exact in-container placement and rotation. Exact transfers between panels, saved placement
-in the stash and carried grids, and full action foley are open.
+The shared drag interaction now previews exact cells in the stash, carried grids, and open world containers. Positions in
+the stash and carried grids are saved. R rotates, Ctrl-drag splits, and dropping outside the raid panel sends the item to the
+ground. With an item focused, Enter picks it up, the arrows move the placement, Shift+arrow switches grids, and Enter commits.
+Shared container changes are revision-checked on the host. The original container arranger remains available.
 
 1. **Visual drag and drop everywhere.** The player picks an item up with the mouse and sees it follow the cursor at its real
    grid size, drawn with its thumbnail; the cells under it light up green where it fits and red where it does not; releasing

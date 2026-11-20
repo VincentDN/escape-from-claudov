@@ -121,9 +121,10 @@ efcProvide('inv:weapons', efcInvWeapons);
 efcProvide('inv:weaponItems', efcInvWeaponItems);
 
 /* The host granted the local player an item from a container: keep it, or put it back and say why */
-efcOn('loot:give', (item, containerId) => {
+efcOn('loot:give', (item, containerId, cell) => {
   if (!item) return;
-  if (efcInvOk(EFC.inv) && efcInvAdd(EFC.inv, item)) { efcEmit('inv:changed'); return; }
+  const placed = cell ? efcCall('inv:receiveAt', EFC.inv, item, cell) : efcInvAdd(EFC.inv, item);
+  if (placed) { efcEmit('inv:changed'); return; }
   efcCall('world:put', containerId === undefined ? null : containerId, efcItemNorm(item) || item);
   if (typeof hudMsg === 'function') hudMsg('Too heavy, no room in your pack', 'none', 1.8);
   efcEmit('inv:changed');

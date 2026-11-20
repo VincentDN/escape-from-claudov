@@ -9,8 +9,9 @@ defineGun('sks', 'rifle', (c) => {
   prof(g, M.metal, [[-0.205, 0.062, 0.003], [0.046, 0.062, 0.004], [0.056, 0.05, 0.006], [0.056, 0.004, 0.004], [-0.205, 0.004, 0.003]], 0.038, 0, 0.003, 0.003);
   prof(g, M.metal, [[-0.12, 0.068, 0.003], [0.03, 0.068, 0.008], [0.05, 0.062, 0.003], [0.05, 0.058, 0.002], [-0.12, 0.058, 0.002]], 0.034, 0, 0.004, 0.004);
   cy(g, M.dark, 0, 0.064, 0.052, 0.004, 0.008);
-  cy(g, M.metal, 0.026, 0.05, -0.06, 0.0042, 0.022, 0, 0, Math.PI / 2);
-  part(g, new THREE.SphereGeometry(1, 8, 6), M.metal, 0.038, 0.05, -0.06, 0.0065, 0.0065, 0.0065);
+  const checkHandle = new THREE.Group(); g.add(checkHandle); info.efcCheckHandle = checkHandle;
+  cy(checkHandle, M.metal, 0.026, 0.05, -0.06, 0.0042, 0.022, 0, 0, Math.PI / 2);
+  part(checkHandle, new THREE.SphereGeometry(1, 8, 6), M.metal, 0.038, 0.05, -0.06, 0.0065, 0.0065, 0.0065);
   rb(g, M.dark, 0.0195, 0.052, -0.1, 0.0012, 0.014, 0.06, 0.0005);
   // hausse tangente : bloc devant le boîtier, planchette couchée à curseur, cran de mire (ligne de mire de l'AK-47)
   info.sightY = 0.088; info.adsZ = 0.012;

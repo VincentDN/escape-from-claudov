@@ -519,6 +519,7 @@ function updateViewmodel(dt, S) {
   m.mag.position.copy(m.magHome); m.mag.rotation.set(0, 0, 0); if (!m.tubeFed) m.mag.visible = true;
   if (m.bolt) { m.bolt.position.set(0.02, 0.045, 0.07); m.bolt.rotation.set(0, 0, 0); }
   if (m.pump) m.pump.position.z = 0;
+  if (m.efcCheckHandle) m.efcCheckHandle.position.z = 0;
   VM.rlT = null; VM.rlD = null; VM.slideHold = false;
   // enchaînement et annulation : quand une chorégraphie en remplace une autre (ou s'interrompt), l'écart entre l'ancienne pose
   // et la nouvelle devient l'écart d'un ressort amorti (VM_ANIM.annul) lancé avec une part de la vitesse qu'avait l'arme :

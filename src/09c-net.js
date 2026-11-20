@@ -982,6 +982,7 @@ function netApply(id, P) {
 }
 function netEventIn(e, ev) {
   if (!ev || typeof ev !== 'object') return;
+  if (ev.k === 'weaponCheck') { efcWeaponCheckRemote(e, ev); return; }
   const dir = new V3(clamp(numOr(ev.x), -1e3, 1e3), 0, clamp(numOr(ev.z), -1e3, 1e3));
   if (ev.k === 'hit') {
     const tgt = netLocal(ev.to);

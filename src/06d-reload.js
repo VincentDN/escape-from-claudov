@@ -326,6 +326,7 @@ function vmChoreo(name, tFrac, D, def, m) {
   if (name === 'reload') { const R = RELOAD[def.rig || def.fam]; T = R && (D.empty ? R.empty : R.norm); }
   else if (name === 'bolt' && RELOAD.boltAction) T = RELOAD.boltAction;
   else if (name === 'inspect') T = def.fam === 'pistol' ? INSPECT_PISTOL : INSPECT_LONG;
+  else if (name === 'raidCheck') T = EFC_WEAPON_CHECK_TIMELINES[D.kind];
   else if (RELOAD.shotgun && (name === 'shellStart' || name === 'shell' || name === 'shellEnd')) T = RELOAD.shotgun[name === 'shellEnd' && !D.empty ? 'shellEndQuick' : name];
   if (!T) return null;
   const R = vmRythme(T), ts = R ? keyM(R, tFrac * T.dur)[0] : tFrac * T.dur; // horloge de la chorégraphie, déformée par son allure
@@ -335,6 +336,11 @@ function vmChoreo(name, tFrac, D, def, m) {
   VM.slideHold = !!(T.slideHoldUntil && ts < T.slideHoldUntil);
   // culasse : la poignée se lève et recule ; sa boule sert d'ancre à la main droite
   if (T.bolt && m.bolt) { const b = keyN(T.bolt, ts); m.bolt.rotation.z = b[0]; m.bolt.position.z = 0.07 + b[1]; VM.boltRot = b[0]; VM.boltPull = b[1]; } else { VM.boltRot = 0; VM.boltPull = 0; }
+  if (name === 'raidCheck') {
+    const travel = env(ts, 0.43, 0.67, 0.91, 1.12);
+    if (D.kind === 'sks' && m.efcCheckHandle) m.efcCheckHandle.position.z = 0.036 * travel;
+    if (D.kind === 'pump' && m.pump) m.pump.position.z = 0.041 * travel;
+  }
   for (let i = 0; i < T.ev.length; i++) {
     const e = T.ev[i], key = 'e' + i;
     if (!D[key] && ts >= e[0]) { D[key] = 1; vmFire(e[1], m, D, def); }
@@ -393,10 +399,12 @@ function vmRightHand(m) {
   const keys = T.rh, n = keys.length, ts = VM.rlS;
   while (_tmpR.length < n) _tmpR.push([0, 0, 0, 0, 0]);
   _tmpR.length = n; vmBoltKnob(_bk);
+  if (VM.action === 'raidCheck' && m.efcCheckHandle) _bk.set(0.038, 0.05, -0.06 + m.efcCheckHandle.position.z);
   for (let i = 0; i < n; i++) {
     const k = keys[i], row = _tmpR[i];
     _lhG.set(k[1], k[2], k[3]);
     if (k[4] === 5) _lhG.add(_bk);
+    else if (k[4] === 6) _lhG.add(m.gripR);
     row[0] = k[0]; row[1] = _lhG.x; row[2] = _lhG.y; row[3] = _lhG.z; row[4] = k[5];
   }
   const v = keyM(_tmpR, ts);
@@ -473,4 +481,5 @@ const VM_HX = { L: { G: new V3(), out: new V3(), fb: 0, pose: 'support', frame: 
 function vmResetHandling(m) {
   VM.rlT = null; VM.rlD = null; VM.slideHold = false; VM.camK.fill(0); VM.chocO.fill(0); VM.chocV.fill(0); VM_HX.L.on = VM_HX.R.on = false;
   if (m) { m.mag.position.copy(m.magHome); m.mag.quaternion.identity(); m.mag.visible = !m.tubeFed; if (m.spare) m.spare.visible = false; }
+  if (m?.efcCheckHandle) m.efcCheckHandle.position.z = 0;
 }

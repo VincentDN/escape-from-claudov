@@ -284,6 +284,7 @@ const OPT_TABS = [
     ['select', 'padRun', _t('Course à la manette'), [['click', _t('Appui sur le bâton gauche (L3)')], ['auto', _t('Bâton poussé à fond')]]],
     ['check', 'padVib', _t('Vibrations de la manette')],
     ['head', _t('Interface')],
+    ['check', 'efcWeaponCheck', 'Raid-start weapon check'],
     ['select', 'lang', _t('Langue'), [['auto', _t('Automatique')], ['en', 'English'], ['fr', 'Français']], langApply, 'menu'],
     ['check', 'allyMarks', _t('Marqueurs d\u0027alliés (au-dessus de leur tête)')],
     ['check', 'nadeArc', _t('Trajectoire des grenades (en tenant une grenade)')],

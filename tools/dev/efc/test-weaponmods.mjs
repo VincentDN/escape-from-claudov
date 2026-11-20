@@ -25,7 +25,8 @@ try {
     efcStashSave();
     uiGo('hideout');
   });
-  await page.locator('#efcHoStash [data-act=bench]').first().click();
+  await page.locator('#efcOpStash [data-efc-id="w_stg44"]').click();
+  await page.locator('[data-op-stash-bench]').click();
   const bench = page.locator('.efc-bench');
   await bench.locator('[data-part-slot=optic]').selectOption('part_red');
   await bench.locator('[data-part-slot=mag]').selectOption('part_stg40');
@@ -60,7 +61,9 @@ try {
   assert.deepEqual(raid, [['red', 'stg40'], 40, true, true, ['holo', 'stg40'], true]);
   if (process.env.EFC_RAID_SHOT) await page.screenshot({ path: process.env.EFC_RAID_SHOT, timeout: 120000 });
   await page.evaluate(() => { GPUX.halt = true; efcUirOpen('inv'); });
-  await page.locator('#efcInv [data-op-detach="optic"]').click();
+  const detach = page.locator('#efcInv [data-op-detach="optic"]');
+  await detach.waitFor({ state: 'visible' });
+  await detach.evaluate(button => button.click());
   assert.deepEqual(await page.evaluate(() => [
     curW().def.att, EFC.inv.bag.some(it => it.id === 'part_holo'), efcCall('ui:busy'),
   ]), [['stg40'], true, true]);

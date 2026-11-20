@@ -159,6 +159,8 @@ function efcOperatorVicinity(id, excluded) {
 
 function efcOperatorStash() {
   const st = efcCall('stash:grids');
+  const view = EFC_OPERATOR_VIEWS.get('efcOpHideout');
+  if (view?.selected?.dataset.opSource === 'stash') efcOperatorSelect(view, null);
   $('efcOpStash').innerHTML = (st?.stash || []).map((grid, index) =>
     efcOperatorGrid(grid, st.stash.length > 1 ? 'Stash ' + (index + 1) : 'Stash', 'stash', 'stash')).join('');
 }
@@ -283,6 +285,11 @@ function efcOperatorSelect(view, button) {
   view.selected?.setAttribute('aria-pressed', 'false');
   view.selected = button;
   button?.setAttribute('aria-pressed', 'true');
+  if (view.hideout) {
+    const source = button && efcOperatorGetSource(view, button);
+    const action = view.root.querySelector('[data-op-stash-bench]');
+    if (action) action.hidden = !(source?.kind === 'stash' && efcCall('weaponmods:slots', source.item)?.length);
+  }
 }
 
 function efcOperatorInteractions(view) {
@@ -290,6 +297,11 @@ function efcOperatorInteractions(view) {
   const item = event => event.target.closest('[data-op-source]');
   const target = event => event.target.closest('[data-op-target]');
   root.addEventListener('click', event => {
+    if (event.target.closest('[data-op-stash-bench]')) {
+      const source = view.selected?.isConnected && efcOperatorGetSource(view, view.selected);
+      if (source?.kind === 'stash') efcCall('weaponmods:open', source.key);
+      return;
+    }
     if (event.target.closest('[data-op-bench]')) { efcCall('weaponmods:open', 'primary'); return; }
     const detach = event.target.closest('[data-op-detach]');
     if (detach) { efcCall('weaponmods:detachCarried', 'primary', detach.dataset.opDetach); return; }

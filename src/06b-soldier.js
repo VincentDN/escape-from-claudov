@@ -356,6 +356,12 @@ function poseSoldier(e, dt) {
   const arcK = Math.sin(Math.PI * clamp(S.aimW, 0, 1)) * (1 - sw) * (isP ? 0.6 : 1);
   gunP.add(_tmpG.set(0.01, 0.035, -0.08).applyQuaternion(_qT).multiplyScalar(arcK));
   _qG.slerpQuaternions(_qB, _qA, aw).slerp(_qS, sw);
+  const check = efcWeaponCheckPose(e);
+  if (check) {
+    _qL.setFromEuler(_eu.set(0.13 * check.tilt, 0.22 * check.tilt, -0.46 * check.tilt));
+    _qG.multiply(_qL);
+    gunP.add(_tmpG.set(-0.025, 0.025, 0.05).applyQuaternion(_qT).multiplyScalar(check.tilt));
+  }
   // en l'air : l'arme se relève un peu, à la réception elle s'enfonce avec le buste
   gunP.y += land * 0.08 + airW * 0.02;
   // ---- rechargement : l'arme bascule vers le corps, la main gauche fait le trajet chargeur, porte-chargeurs, insertion
@@ -399,6 +405,15 @@ function poseSoldier(e, dt) {
     }
   }
   if (handL) wL.lerp(handL, clamp(S.relAt || 0, 0, 1));
+  const checkRight = check?.kind === 'bolt' || check?.kind === 'sks';
+  if (checkRight) {
+    const z = check.kind === 'sks' ? -0.04 : 0.09;
+    wR.lerp(_tmpG.set(0.075, 0.035, z).applyQuaternion(_qG).add(gunP), check.reach);
+  } else if (check) {
+    const mg = S.grips.magP;
+    const contact = check.kind === 'pump' ? _tmpG.copy(S.grips.L).add(_tmpH.set(0, 0, 0.04)) : _tmpG.set(mg[0] - 0.03, mg[1] - 0.07, mg[2]);
+    wL.lerp(contact.applyQuaternion(_qG).add(gunP), check.reach);
+  }
   // lancer de grenade : bras droit armé derrière la tête puis projeté vers l'avant, buste en torsion
   if (e.throwT > 0) {
     e.throwT -= dt;
@@ -408,10 +423,11 @@ function poseSoldier(e, dt) {
   const elbowOut = 0.9 + 0.35 * run;
   _qW.copy(_qG).multiply(HF[1].q);
   // coude droit : en visée il s'écarte à peine et reste plus bas que l'épaule (bras fléchi vers le bas, pas à l'horizontale)
-  armToGrip(L[J_SHR], wR, _tmpH.copy(S.grips.R).applyQuaternion(_qG).add(gunP), _qW, _pz.c.set(elbowOut - 0.1 * aw, -0.45 - 0.25 * aw, 0.12).applyQuaternion(_qT).add(L[J_SHR]), e.throwT > 0 ? 0 : 1, L[J_ELR], L[J_HAR], lerp(0.75, 0.45, aw));
+  armToGrip(L[J_SHR], wR, _tmpH.copy(S.grips.R).applyQuaternion(_qG).add(gunP), _qW, _pz.c.set(elbowOut - 0.1 * aw, -0.45 - 0.25 * aw, 0.12).applyQuaternion(_qT).add(L[J_SHR]), e.throwT > 0 ? 0 : checkRight ? 1 - check.reach : 1, L[J_ELR], L[J_HAR], lerp(0.75, 0.45, aw));
   _qW.copy(_qG).multiply(HF[0].q);
   // coude gauche : sous le garde-main, plus bas que l'épaule
-  (HF[0].axis && !isP ? armToGripRoll : armToGrip)(L[J_SHL], wL, gripW, _qW, _pz.c.set(-elbowOut * 0.9 + 0.3 * aw, -0.6 - 0.35 * aw, -0.05).applyQuaternion(_qT).add(L[J_SHL]), 1 - clamp(S.relAt || 0, 0, 1) * (handL ? 1 : 0), L[J_ELL], L[J_HAL], lerp(0.75, 0.4, aw), HF[0]);
+  const supportRelease = handL ? clamp(S.relAt || 0, 0, 1) : check && !checkRight ? check.reach : 0;
+  (HF[0].axis && !isP ? armToGripRoll : armToGrip)(L[J_SHL], wL, gripW, _qW, _pz.c.set(-elbowOut * 0.9 + 0.3 * aw, -0.6 - 0.35 * aw, -0.05).applyQuaternion(_qT).add(L[J_SHL]), 1 - supportRelease, L[J_ELL], L[J_HAL], lerp(0.75, 0.4, aw), HF[0]);
   // ---- jambes : appui (pied fixe au sol) puis balancé (pied levé en arc), talon puis pointe ; repliées en l'air
   const lift0 = lerp(0.13, 0.26, run) * (1 - c * 0.5);
   const blP = isP ? 0.3 : 1; // pistolet : tir de face (isocèle), pieds presque à la même hauteur

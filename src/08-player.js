@@ -105,8 +105,9 @@ addEventListener('blur', () => { for (const k in KEYS) KEYS[k] = false; PL.held 
 
 /* ---------- Actions ---------- */
 function busy() { return PL.switching > 0 || PL.knifeT > 0 || PL.nadeState || !PL.ent.alive || !!KS.mode || !!PILOT.d || !!MECHA_P.me; }
-function startReload() { PL.ent.busy = busy(); ctlStartReload(PL.ent); }
+function startReload() { efcWeaponCheckCancel(); PL.ent.busy = busy(); ctlStartReload(PL.ent); }
 function switchWeapon(i) {
+  efcWeaponCheckCancel();
   if (PL.knifeT > 0 || PL.nadeState || !PL.ent.alive || KS.mode) return;
   if (PL.knifeOut) { knifeStow(i); return; }
   PL.ent.busy = false; ctlSwitch(PL.ent, i);
@@ -335,6 +336,7 @@ function updatePlayer(dt, now) {
   if (!canShoot) PL.runShot = false;
   I.mz = fw; I.mx = st; I.sprint = run && !lockMove && !(canShoot && (PL.held || PL.runShot)); I.crouch = PL.crouchToggle || !!KEYS.ControlLeft; I.jump = !!KEYS.Space && !lockMove;
   I.ads = PL.adsWant && !hold; I.fire = (PL.held || PL.runShot) && !hold; I.firePressed = PL.queued && !hold;
+  efcWeaponCheckTick(I, hold);
   if (hold) PL.queued = false; // un tir demandé pendant le décompte ne part pas au départ (une gâchette tenue, si)
   e.busy = busy(); e.blockSprint = !!PL.nadeState; e.sprintBusyOk = KS_PHONE.has(KS.mode);
   e.yaw = PL.yaw; e.pitch = PL.pitch;

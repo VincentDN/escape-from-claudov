@@ -50,9 +50,15 @@ export async function openNetPage(context, base, o, errors) {
     window.MATCH_COUNTDOWN = 0; window.EFC_TEST = true; window.NET_RELAY_URL = ''; window.EFC_NET_NAME = ${JSON.stringify(name)};`);
   await page.addInitScript(FAKEPEER);
   if (o.init) await page.addInitScript(o.init);
-  await page.goto(base + 'index.html');
+  await page.goto(base + 'index.html', { waitUntil: 'domcontentloaded', timeout: 120000 });
   await page.waitForFunction(() => typeof MATCH !== 'undefined' && MATCH.state === 'menu', null, { timeout: 300000, polling: 300 });
-  await page.evaluate(() => mapEnsure(Settings.map));
+  await page.evaluate(() => {
+    // These tests exercise the real map data and simulation. Shader compilation and
+    // satellite rendering compete with the second client under software rendering.
+    GPUX.halt = true;
+    mapCompile = async () => buildMinimapStatic();
+    return mapEnsure(Settings.map);
+  });
   await page.evaluate(() => {
     GPUX.halt = true; // no rendering: the main loop returns at once (timers, menus and the network keep running)
     if (!HOSTBG.wk) HOSTBG.wk = { test: true }; // no background-tab ticker: the test alone steps the game

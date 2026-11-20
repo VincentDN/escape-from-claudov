@@ -1,4 +1,4 @@
-# Third track: tasks C1 to C14
+# Third track: tasks C1 to C15
 
 Written 20 November 2026 for the agent that finished tracks T and A. Everything from `docs/HANDOFF.md` sections 1 to 4 and 7
 still applies (branching, build, tests, rules that are not negotiable, how to report), with these updates:
@@ -24,13 +24,14 @@ Work in this order. Each line is one or more mergeable branches.
 1. **C1** raid-start weapon check
 2. **C9** omnimovement (moved up by the owner: right after C1)
 3. **C2** Partisan modern weapons, batch 1
-4. **C11** full-screen map and extraction flares
-5. **C12** dirty lens and light effects
-6. **C13** real weapon foley for every action
-7. **C3** remaining modern Partisan weapons and attachments
-8. **C4**, **C5**, **C6** enemy types, AI upgrade, rival raiders
-9. **C7** optimisation part 1, **C8** raid balance
-10. **C14** Second World War weapons (owner: in, but after the modern ones)
+4. **C15** minimal HUD and the magazine check
+5. **C11** full-screen map and extraction flares
+6. **C12** dirty lens and light effects
+7. **C13** real weapon foley for every action
+8. **C3** remaining modern Partisan weapons and attachments
+9. **C4**, **C5**, **C6** enemy types, AI upgrade, rival raiders
+10. **C7** optimisation part 1, **C8** raid balance
+11. **C14** Second World War weapons (owner: in, but after the modern ones)
 
 **C10** (menu fonts) is small and touches only the menus: do it whenever a short slot is free, ideally before C9's long run.
 
@@ -192,7 +193,7 @@ in `shell.html`), with **Barlow Condensed** for the HUD (`--hud`), both loaded f
   HUD. Nothing may overflow or truncate after the swap (Inter is wider than a condensed face).
 - Tests: `test-ui.mjs`, `test-bench.mjs`; screenshots of the main menu, hideout and HUD committed in `docs/fonts/`.
 
-## C11. Full-screen map and extraction flares (medium; after C2)
+## C11. Full-screen map and extraction flares (medium; after C15)
 
 **Map.** `M` opens a full-screen map in a raid; `M` or `Escape` closes it; the match keeps running and the player cannot fire
 while it is open (as the inventory does).
@@ -247,7 +248,7 @@ Claudov, with more variety.
   account, using Partisan's workbench takes as the reference for character (describe them in the prompt; do not upload
   anything you are not allowed to). Ask the owner before spending credits beyond a budget he sets; report the credits used.
   Record each generated take in the credits file the same way `docs/handling-foley.md` does (generated with ElevenLabs on the
-  owner's account), and confirm the owner's ElevenLabs plan allows commercial use of generated sound effects before shipping.
+  owner's account). The owner has confirmed his ElevenLabs plan covers using the generated sounds in the game (20 November 2026).
   If the agent does not have the ElevenLabs connector, stop after the shot list and ask the owner to run the generation.
 - Edit and level every take with the existing pipeline (`tools/sfx/`, `tools/build_sfx.py`): trimmed, transient-aligned, levels
   within 2 dB of the pack median, no clipping. Map them in `src/efc/45-efc-sounds.js` with heavier weapons pitched lower.
@@ -265,3 +266,28 @@ it differs from the raid version.
   specific places (an armoury cage, a collector's locker); write the reasoning in `docs/weapons.md`.
 - Bren and Chauchat are light machine guns: heavy, slow to aim, with a bipod that deploys on a ledge or prone (prone exists
   after C9).
+
+## C15. Minimal HUD and the magazine check (medium; right after C2)
+
+The owner wants a minimal HUD: **the ammunition count is no longer shown on screen.** To know how many rounds are left, the
+player **holds R**: the character pulls the magazine out and looks at it, and the round count appears while it is held.
+
+- **Tap R** reloads, as now. **Hold R** (longer than about 0.3 s; tune it) starts the check instead: the magazine comes out and
+  is held up in view, a small readout shows the rounds in it, and releasing R puts it back. The check takes time and cannot be
+  done while firing, aiming down sights or sprinting; any of those cancels it. The chamber round counts separately where the
+  weapon has one ("29 + 1").
+- **Show the count roughly, not exactly**, unless the owner prefers exact: for example "full", "nearly full", "about half",
+  "low", "nearly empty" by feel, and the exact number only for small magazines (shotguns, the SKS, pistols) where you can see
+  the rounds. Make the style a setting with the rough style as default, and say in the report what you chose.
+- **Per weapon family**: detachable magazines (rifles, SMGs, pistols) as above; fixed magazines and tubes (SKS, pump shotguns)
+  open the action or tilt the weapon to look instead; belt or drum weapons show the drum. Reuse the inspect and reload
+  choreography (`src/06d-reload.js`) and the handling foley.
+- **The rest of the HUD goes minimal too**: no ammo counter, no reserve count, no weapon name banner; keep the crosshair,
+  hit markers, the compass or extract list only while the extraction is being held or the map is open, and the damage
+  direction indicator. Remove nothing the player needs for safety (low health still shows through the screen effects).
+  Write the final list of what the HUD shows in `docs/hud.md`; anything you are unsure about is a question for the owner.
+- **Reserve ammunition** is known from the inventory screen only (A8), as rounds in the bag.
+- **Other players** see the magazine come out in third person, replicated through the existing animation path.
+- **Tests**: tap reloads and hold checks, with the timing threshold; the count shown matches the magazine; the check cancels on
+  fire, aim and sprint; no ammo text exists in the HUD during a raid; the third-person check reaches the other client in the
+  two-client rig. Screenshots of the check in first person for a rifle, a pistol and a pump shotgun in `docs/hud/`.

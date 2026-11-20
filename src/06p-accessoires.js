@@ -130,7 +130,7 @@ function deriveDef(base, att, camo, key) {
   const d = Object.assign({}, base);
   d.base = base; d.key = key; d.att = att; d.camo = camo;
   d.dmg = base.dmg.map((v) => v * m.dmg); d.range = base.range.map((v) => v * m.rng); d.rpm = base.rpm * m.rpm;
-  d.mag = base.tube ? base.mag + m.tubeAdd : Math.round(base.mag * m.magx);
+  d.mag = base.tube ? base.mag + m.tubeAdd : att.map(id => ATT[id].rounds).find(Number.isInteger) ?? Math.round(base.mag * m.magx);
   if (base.reload) { d.reload = base.reload * m.reload; d.reloadEmpty = base.reloadEmpty * m.reload; }
   d.spread = [base.spread[0] * m.hip, base.spread[1] * m.adsAcc];
   d.recoil = { v: base.recoil.v * m.vrec, h: base.recoil.h * m.hrec, kick: base.recoil.kick * m.kick, rot: base.recoil.rot * m.kick };
@@ -158,7 +158,7 @@ function deriveDef(base, att, camo, key) {
 /* Montage des accessoires sur le modèle construit (c : contexte de buildGunModel, voir 06j-modeles.js) */
 function attachAll(c) {
   const A = c.A;
-  for (const slot of ['optic', 'muzzle', 'under', 'side', 'mag']) if (A[slot] && ATT_BUILD[A[slot]]) ATT_BUILD[A[slot]](c);
+  for (const slot of ATT_SLOTS) if (A[slot] && ATT_BUILD[A[slot]]) ATT_BUILD[A[slot]](c);
 }
 const ATT_BUILD = {};
 /* Fenêtre d'une optique : verre peint en transparence, rendu après le reste */

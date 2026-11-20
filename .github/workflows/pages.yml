@@ -47,3 +47,20 @@ jobs:
           path: production/dist
       - id: deploy
         uses: actions/deploy-pages@v4
+      - name: Verify published production and beta builds
+        env:
+          SITE_URL: ${{ steps.deploy.outputs.page_url }}
+        run: |
+          for prefix in '' 'beta/'; do
+            expected=$(jq -r .build "production/dist/${prefix}version.json")
+            for attempt in {1..12}; do
+              actual=$(curl -fsSL --max-time 8 "${SITE_URL%/}/${prefix}version.json?build=$expected" | jq -r .build) || actual=''
+              if [[ "$actual" == "$expected" ]]; then break; fi
+              sleep 5
+            done
+            if [[ "$actual" != "$expected" ]]; then
+              echo "::error::Expected ${prefix:-production/} build $expected, got ${actual:-no response}"
+              exit 1
+            fi
+            echo "Verified ${prefix:-production/} build $actual"
+          done

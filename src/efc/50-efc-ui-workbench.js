@@ -25,6 +25,10 @@ function efcBenchPreview() {
   const frame = dialog.querySelector('iframe');
   if (frame && location.protocol !== 'file:') {
     frame.contentWindow?.postMessage({ type: 'efc:bench-preview', parts, finish: session.finish }, location.origin);
+  } else if (def && (EFC_PARTISAN_WEAPON_MODELS.has(def.id) || def.id === 'stg44')) {
+    const image = dialog.querySelector('.efc-bench-stage img');
+    const url = efcCall('thumb:weaponVariant', session.item.id, def.key);
+    if (image && url) image.src = url;
   }
 }
 function efcBenchOptions() {
@@ -122,7 +126,8 @@ function efcBenchOpen(where) {
   finish.replaceChildren(...Object.entries(efcCall('weaponmods:finishOptions')).map(([id, label]) => efcBenchOption(id, label)));
   finish.value = mods.finish;
   const stage = dialog.querySelector('.efc-bench-stage');
-  if (location.protocol !== 'file:') {
+  const useRaidPreview = EFC_PARTISAN_WEAPON_MODELS.has(def.weapon.wkey) || [...available].some(id => ATT[efcUiDef(id).part.key]?.partisan);
+  if (location.protocol !== 'file:' && !useRaidPreview) {
     const frame = document.createElement('iframe');
     frame.title = def.name + ' workbench preview';
     frame.addEventListener('load', efcBenchPreview);

@@ -51,7 +51,7 @@ function efcWeaponItems() {
   for (const wkey of Object.keys(WEAPONS)) {
     const W = WEAPONS[wkey], cat = EFC_AMMO_BY_CAT[W.cat] ? W.cat : 'ar', base = EFC_WEAPON_BASE[cat];
     const dmg = W.stats && Number.isFinite(W.stats.dmg) ? W.stats.dmg : 0.5;
-    const w = wkey === 'm82' ? 12.9 : wkey === 'stg44' ? 4.6 : base[0];
+    const w = W.mass ?? (wkey === 'm82' ? 12.9 : wkey === 'stg44' ? 4.6 : base[0]);
     const d = {
       id: 'w_' + wkey, name: W.name || wkey, kind: 'weapon', w, value: Math.round((base[1] * (0.7 + dmg * 0.6)) / 50) * 50,
       weapon: { wkey, fam: EFC_AMMO_BY_CAT[cat], slot: cat === 'pistol' ? 'sidearm' : 'primary' },

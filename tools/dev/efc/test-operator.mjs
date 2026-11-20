@@ -25,8 +25,24 @@ try {
   assert.match(await page.locator('#efcPrev').textContent(), /Weight/);
   await page.mouse.move(4, 4);
   const stashTarget = page.locator('#efcOpHideoutGrids [data-op-target="carried"]').first();
-  await stash.dragTo(stashTarget);
+  const sourceRect = await stash.boundingBox(), targetRect = await stashTarget.boundingBox();
+  await page.mouse.move(sourceRect.x + sourceRect.width / 2, sourceRect.y + sourceRect.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(targetRect.x + targetRect.width / 2, targetRect.y + targetRect.height / 2, { steps: 4 });
+  const ghost = page.locator('.efc-op-ghost');
+  assert.equal(await ghost.getAttribute('data-efc-id'), 'med_kit');
+  assert.equal(await stashTarget.getAttribute('data-op-drop'), 'valid');
+  assert.ok(Math.abs((await ghost.boundingBox()).width - sourceRect.width) < 1);
+  await page.mouse.up();
+  assert.equal(await ghost.count(), 0);
   assert.ok(await page.evaluate(() => efcCall('stash:get').loadout.bag.some(item => item.id === 'med_kit')));
+
+  const rifleAmmo = page.locator('#efcOpStash [data-efc-id="ammo_rifle"]').first();
+  const previousAmmo = Number(await rifleAmmo.getAttribute('data-efc-n'));
+  await rifleAmmo.click({ modifiers: ['Control'] });
+  assert.equal(Number(await rifleAmmo.getAttribute('data-efc-n')), Math.ceil(previousAmmo / 2));
+  assert.equal(await page.evaluate(() => efcCall('stash:get').loadout.bag.filter(item => item.id === 'ammo_rifle')
+    .reduce((total, item) => total + item.n, 0)), Math.floor(previousAmmo / 2));
 
   const quick = page.locator('#scr-hideout [data-op-target="quick"][data-op-key="0"]');
   await page.locator('#efcOpHideoutGrids [data-efc-id="med_kit"]').dragTo(quick);

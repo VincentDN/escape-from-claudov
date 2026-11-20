@@ -292,6 +292,20 @@ function efcOperatorSelect(view, button) {
   }
 }
 
+function efcOperatorDragPreview(pick) {
+  const rect = pick.button.getBoundingClientRect();
+  const ghost = pick.button.cloneNode(true);
+  ghost.inert = true;
+  ghost.classList.add('efc-op-ghost');
+  ghost.style.width = rect.width + 'px';
+  ghost.style.height = rect.height + 'px';
+  ghost.style.margin = '0';
+  pick.offsetX = pick.x - rect.left;
+  pick.offsetY = pick.y - rect.top;
+  pick.ghost = ghost;
+  document.body.append(ghost);
+}
+
 function efcOperatorInteractions(view) {
   const { root } = view;
   const item = event => event.target.closest('[data-op-source]');
@@ -307,6 +321,15 @@ function efcOperatorInteractions(view) {
     if (detach) { efcCall('weaponmods:detachCarried', 'primary', detach.dataset.opDetach); return; }
     const button = item(event), dest = target(event), pick = view.selected;
     if (event.detail && view.ignoreClick) return;
+    if (view.hideout && event.ctrlKey && button) {
+      const source = efcOperatorGetSource(view, button);
+      if ((source?.kind === 'stash' || source?.kind === 'bag') && source.item.n > 1) {
+        efcOperatorSelect(view, null);
+        const service = source.kind === 'stash' ? 'stash:toLoadout' : 'stash:toStash';
+        efcHoMove(() => efcCall(service, source.key, Math.floor(source.item.n / 2)));
+        return;
+      }
+    }
     if (pick && dest && dest !== pick && efcOperatorMove(view, efcOperatorGetSource(view, pick), dest)) {
       efcOperatorSelect(view, null);
     } else if (dest?.dataset.opTarget === 'quick') {
@@ -335,7 +358,14 @@ function efcOperatorInteractions(view) {
     const pick = view.pick;
     if (pick?.id !== event.pointerId) return;
     if (!pick.started && Math.hypot(event.clientX - pick.x, event.clientY - pick.y) < 5) return;
-    if (!pick.started) { pick.started = true; view.ignoreClick = true; efcOperatorSelect(view, pick.button); }
+    if (!pick.started) {
+      pick.started = true;
+      view.ignoreClick = true;
+      efcOperatorSelect(view, pick.button);
+      efcOperatorDragPreview(pick);
+    }
+    pick.ghost.style.left = event.clientX - pick.offsetX + 'px';
+    pick.ghost.style.top = event.clientY - pick.offsetY + 'px';
     const element = document.elementFromPoint(event.clientX, event.clientY)?.closest('[data-op-target]');
     const dest = element && root.contains(element) ? element : null;
     if (dest === pick.target) return;
@@ -348,6 +378,7 @@ function efcOperatorInteractions(view) {
     if (pick?.id !== event.pointerId) return;
     view.pick = null;
     pick.target?.removeAttribute('data-op-drop');
+    pick.ghost?.remove();
     if (!pick.started) return;
     if (type === 'pointerup') efcOperatorMove(view, efcOperatorGetSource(view, pick.button), pick.target);
     efcOperatorSelect(view, null);

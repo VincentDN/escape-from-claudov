@@ -39,3 +39,35 @@ What remains under its own terms:
    use it respectfully.
 
 The raid StG 44 model is a reduced derivative of the Partisan Project Neuro-Bash showcase asset, cleared by Vincent De Nil for this repository. See `showcase/asset-credits.json` and `docs/weapon-port.md`.
+
+**Q2 raid rifle geometry** (`assets/raid-models/partisan.json`): from Partisan Project. Geometry is baked, reoriented and quantized for Claudov. Third-party assets retain their original terms. Source files and recorded credits are listed below.
+
+- `ak-74m-zenitco.glb` — D_U · CC BY 4.0 · https://sketchfab.com/3d-models/low-poly-ak-74m-zenitco-35ad8e37a513453cbbbd04064fa5fb79
+- `ak-15k.glb` — D_U · CC BY 4.0 · https://sketchfab.com/3d-models/low-poly-ak-15-k-68725380dd654391bb6b751e888e2c44
+- `g3.glb` — DU1701 · https://sketchfab.com/3d-models/86ff01824c394e349cda876a827fa69c
+- `m16.glb` — TastyTony · https://sketchfab.com/3d-models/f7eddeb852f84094a7ba26e293223d10
+- `mk14.glb` — TastyTony · https://sketchfab.com/3d-models/0dc89b4028ef4a1bbc1ed2ec077f3d21
+- `spear.glb` — DU1701 · https://sketchfab.com/3d-models/36ac159795ae465e8a4d44068bbaf434
+- `stg44.glb` — DU1701 · https://sketchfab.com/3d-models/c343d3531806490e851976d4f0391c14
+- `ppsh41.glb` — DU1701 · https://sketchfab.com/3d-models/d610bf73066d4bb7a96834858772384a
+- `bren.glb` — TastyTony · https://sketchfab.com/3d-models/035555d607c142528e2eaf4c02af8c5b
+- `chauchat.glb` — TastyTony · https://sketchfab.com/3d-models/ae9d3c2b5c3542e0829aac8d0cb7d6e5
+- `rpk-762.glb` — DU1701 · https://sketchfab.com/3d-models/628d823c021f4bfa814a66674ac658dc
+- `stg44-2044-astra-a.glb`
+- `stg44-2044-astra-b.glb`
+
+**Partisan attachment geometry** (`assets/raid-models/partisan-parts.json`), including procedurally generated Workbench parts and derivatives of these source models.
+
+- `muzzle-set.glb` — DU1701 · https://sketchfab.com/3d-models/07f62ec5ca604446848d1a0238b11f1d
+- `collimator-set.glb` — DU1701 · https://sketchfab.com/3d-models/288373d26dd84db2898920222ac3e430
+- `eotech.glb` — GoldbergR · https://sketchfab.com/3d-models/5c8f29d9895e48e183a085fefabf0e14
+- `iron-sight-set.glb` — DU1701 · https://sketchfab.com/3d-models/dd89d27a54474b2aa3bf1cadc699c556
+- `grip-rvg.glb` — notcplkerry · https://sketchfab.com/3d-models/86b3580a65c441db9d3401712c5c9b6d
+- `grip-afg.glb` — notcplkerry · https://sketchfab.com/3d-models/a92a52cbb5854f7c8e33507f579073f7
+- `peq15.glb` — DU1701 · https://sketchfab.com/3d-models/522f6a04c34946dbb168022187645c1a
+- `peq2.glb` — DU1701 · https://sketchfab.com/3d-models/820ee672677a4f8daab617f1723820a2
+- `light-surefire.glb` — haoliu95 · https://sketchfab.com/3d-models/09bba490e5e44ac6a412cc363eb2b41e
+- `ak-grips.glb` — notcplkerry · https://sketchfab.com/3d-models/044c2b403fc341738b5af9f3b90fefc9
+- `ak74-drum.glb` — aayushsahaywork · https://sketchfab.com/3d-models/8ae00f51dc1649b8b5b592d153f3a3f4
+- `gp25.glb` — DU1701 · https://sketchfab.com/3d-models/8dbdec74bad944a9b7eca73b2a6269fa
+- `g3-bipod.glb` — GoldbergR · https://sketchfab.com/3d-models/b525a696d09d48a484db53c2002d02fb

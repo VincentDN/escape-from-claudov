@@ -2640,6 +2640,7 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 .efc-op-item > span:last-child { position: relative; display: block; overflow: hidden; white-space: nowrap;
   text-overflow: ellipsis; padding: 2px; background: #080a08aa; }
 .efc-op-item[aria-pressed="true"], .efc-op-slot[aria-pressed="true"] { outline: 2px solid var(--acc); outline-offset: -2px; }
+.efc-op-ghost { position: fixed; z-index: 9999; pointer-events: none; opacity: .84; }
 [data-op-drop="valid"] { outline: 2px solid var(--ally); outline-offset: -2px; }
 [data-op-drop="invalid"] { outline: 2px solid var(--danger); outline-offset: -2px; }
 .efc-op-section { margin-top: 8px; }

@@ -155,7 +155,8 @@ const _lowGeo = new WeakMap();
 function lowPolyGeometry(g) {
   if (_lowGeo.has(g)) return _lowGeo.get(g);
   const P = g.parameters || {}; let r = g;
-  if (g.userData.box) r = new THREE.BoxGeometry(...g.userData.box); // boîte arrondie (rgeo) : boîte simple
+  if (g.userData.efcPartisanLow) r = g.userData.efcPartisanLow(g);
+  else if (g.userData.box) r = new THREE.BoxGeometry(...g.userData.box); // boîte arrondie (rgeo) : boîte simple
   else if (g.userData.low) r = profLow(g); // profil extrudé (06jb-formes.js) : sans arêtes adoucies
   else if (g.userData.sec) r = secLow(g); // section le long du canon (06jb-formes.js) : de même
   else if (g.userData.ring) r = ringGeo(...g.userData.ring); // anneau d'axe z (06jb-formes.js) : 12 segments, sans arrondis

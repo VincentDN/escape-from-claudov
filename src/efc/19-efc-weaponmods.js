@@ -1,5 +1,6 @@
 /* A9 attachment items use the same game keys for stats, first-person models and network snapshots. */
-const EFC_MOD_WEAPONS = ['stg44', 'ak47'];
+const EFC_A9_WEAPONS = ['stg44', 'ak47'];
+const EFC_MOD_WEAPONS = [...EFC_A9_WEAPONS, ...EFC_PARTISAN_WEAPON_MODELS.keys()];
 const EFC_MOD_SLOTS = { optic: 'Optic', muzzle: 'Muzzle', under: 'Underbarrel', side: 'Side rail', mag: 'Magazine' };
 const EFC_MOD_FINISHES = { stock: 'Factory finish', foret: 'Forest', urbain: 'Urban', desert: 'Desert' };
 const EFC_MOD_FIELD = ['optic', 'side'];
@@ -17,10 +18,10 @@ const EFC_MOD_PARTS = Object.fromEntries([
   ['scout', 'Rail light', 0.11, 850, [1, 1], 'scout'],
   ['stg40', 'StG 44 extended magazine', 0.61, 1500, [1, 2], 'kurz40', ['stg44']],
   ['xmag', 'AK extended magazine', 0.51, 1450, [1, 2], 'ak45', ['ak47']],
-].map(([key, name, w, value, size, bench, weapons = EFC_MOD_WEAPONS]) => {
+].map(([key, name, w, value, size, bench, weapons = EFC_A9_WEAPONS]) => {
   const id = 'part_' + key;
   return [id, { id, name, kind: 'attachment', w, value, size, part: { key, bench, weapons } }];
-}));
+}).concat(EFC_PARTISAN_ITEM_PARTS));
 
 // Reuse the normal game model and stat paths for the additional catalogue entries.
 ATT.laser_old = { ...ATT.laser, id: 'laser_old', name: 'Older-pattern aiming laser', mods: { ...ATT.laser.mods, hip: 0.78 } };
@@ -32,7 +33,7 @@ ATT_BUILD.scout = ({ g, M, info }) => {
   cz(g, M.dark, s.x - 0.014, s.y, s.z, 0.012, 0.09);
   cz(g, M.metal, s.x - 0.014, s.y, s.z - 0.042, 0.017, 0.023);
 };
-WEAPONS.stg44.slots = Object.keys(EFC_MOD_SLOTS);
+WEAPONS.stg44.slots = [...new Set([...WEAPONS.stg44.slots, ...Object.keys(EFC_MOD_SLOTS)])];
 WEAPONS.stg44.noAtt = ['comp', 'brake', 'fmag', 'xmag'];
 ATT_BUILD.stg40 = (c) => { c.info.magExt = 1.6; };
 
@@ -47,15 +48,19 @@ function efcModFit(item, id) {
 function efcModNorm(item, raw) {
   const base = efcModBase(item);
   if (!base || item.free || !raw || typeof raw !== 'object') return null;
-  const ids = Array.isArray(raw.parts) ? raw.parts.slice(0, Object.keys(EFC_MOD_SLOTS).length) : [];
+  const ids = Array.isArray(raw.parts) ? raw.parts.slice(0, base.slots.length) : [];
   const parts = attNormalize(base, ids.filter(id => efcModFit(item, id)).map(id => EFC_MOD_PARTS[id].part.key)).map(key => 'part_' + key);
   const finish = typeof raw.finish === 'string' && Object.hasOwn(EFC_MOD_FINISHES, raw.finish) ? raw.finish : 'stock';
   return parts.length || finish !== 'stock' ? { parts, finish } : null;
 }
 function efcModSlots(item) {
-  if (!efcModBase(item) || item.free) return [];
+  const base = efcModBase(item);
+  if (!base || item.free) return [];
   const mounted = efcModNorm(item, item.mods)?.parts || [];
-  return Object.entries(EFC_MOD_SLOTS).map(([slot, label]) => {
+  const slots = Object.entries(EFC_PARTISAN_SLOT_LABELS).filter(([slot]) =>
+    (EFC_A9_WEAPONS.includes(base.id) && Object.hasOwn(EFC_MOD_SLOTS, slot)) ||
+    EFC_PARTISAN_ITEM_PARTS.some(([, def]) => def.part.weapons.includes(base.id) && ATT[def.part.key].slot === slot));
+  return slots.map(([slot, label]) => {
     const id = mounted.find(id => efcModFit(item, id) === slot);
     return { slot, label, item: id ? { id, n: 1 } : null, field: EFC_MOD_FIELD.includes(slot) };
   });

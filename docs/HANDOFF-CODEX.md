@@ -42,6 +42,10 @@ Work in this order. Each line is one or more mergeable branches.
 
 The owner played the grid inventory (A6 to A8) and wants it finished before anything else. Three things:
 
+Beta has a cursor-following item preview in the shared operator panels and Ctrl-click half-stack transfers in the hideout.
+The container arranger still owns exact in-container placement and rotation. Exact transfers between panels, saved placement
+in the stash and carried grids, and full action foley are open.
+
 1. **Visual drag and drop everywhere.** The player picks an item up with the mouse and sees it follow the cursor at its real
    grid size, drawn with its thumbnail; the cells under it light up green where it fits and red where it does not; releasing
    places it, releasing on an invalid spot returns it. This must work between every pair of places: stash, loadout slots,

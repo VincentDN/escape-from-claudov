@@ -38,7 +38,13 @@ function efcStgLoad() {
   return efcStgGeometries;
 }
 
-defineGun('stg44', 'rifle', ({ g, M, info, A }) => {
+defineGun('stg44', 'rifle', context => {
+  const { g, M, info, A } = context;
+  // Use the source body for swaps that need its original mesh groups and sockets.
+  if (Object.values(A).some(key => ATT[key]?.partisan)) {
+    efcPartisanBuild(EFC_PARTISAN_MODELS[EFC_PARTISAN_NEURO], context);
+    return;
+  }
   for (const { name, geo } of efcStgLoad()) {
     if (name.startsWith('mag_') || name === 'rear_sight' && A.optic || name === 'muzzle_device' && A.muzzle) continue;
     if (name === 'rail_teeth' && !A.optic || name === 'side_rail' && !A.side) continue;

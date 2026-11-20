@@ -7,6 +7,14 @@ const ok = (c, name, info) => { console.log((c ? 'ok   ' : 'FAIL ') + name + (in
 const count = (l) => l.reduce((s, it) => s + (it.n || 1), 0);
 const rig = await openPair({ map: MAP, init: 'try{localStorage.removeItem("efc_stash_v1")}catch(e){}' });
 const { host, guest } = rig, both = [host, guest];
+const importedBuild = await host.evaluate(() => {
+  const part = efcCall('weaponmods:parts').find(item => item.part.weapons.includes('ak74m')
+    && ATT[item.part.key].slot === 'optic');
+  const weapon = efcItemNorm({ id: 'w_ak74m', n: 1, mods: { parts: [part.id], finish: 'stock' } });
+  efcStash().loadout.slots.primary = weapon;
+  efcStashSave();
+  return efcCall('weaponmods:definition', weapon).key;
+});
 const code = await createLobby(host, { mode: 'raid', map: MAP });
 await joinLobby(guest, code);
 await guest.evaluate(() => netTeamSwap(NET.me)); await settle(500); // a new player joins the host's squad: move to the next one
@@ -20,6 +28,11 @@ ok(h0.n >= 8 && g0.n === h0.n && g0.ids === h0.ids && g0.items === h0.items, 'th
 ok(h0.squad !== g0.squad, 'the two players are in different squads', [h0.squad, g0.squad]);
 const foe = await host.evaluate(() => { const r = [...NET.remotes.values()].find((e) => !e.remoteBot && !e.netBot); return r ? { allied: allied(PL.ent, r), squad: r.squad } : null; });
 ok(foe && foe.allied === false, 'players of different squads are hostile', foe);
+const remoteWeapon = await guest.evaluate(() => {
+  const peer = [...NET.remotes.values()].find(entity => !entity.remoteBot && !entity.netBot);
+  return peer?.arms && armsW(peer)?.def.key;
+});
+ok(remoteWeapon === importedBuild, 'the guest reconstructs the host’s imported weapon and optic', { remoteWeapon, importedBuild });
 
 // the guest takes an item: granted once, and the host's copy of the container changes
 const grids = page => page.evaluate(() => (efcCall('world:list') || [])

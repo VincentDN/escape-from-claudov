@@ -259,6 +259,11 @@ function efcTpLoot(g, id) {
 }
 
 function efcTpAttachment(g, def) {
+  const partisan = ATT[def.part.key]?.partisan;
+  if (partisan) {
+    g.add(new THREE.Mesh(efcPartisanPartMesh(partisan).clone(), efcTpMat(0x383c37, 0.52)));
+    return;
+  }
   const iron = efcTpMat(0x383c37, 0.52), rubber = efcTpMat(0x171b16, 0.85), glass = efcTpMat(0x628b80, 0.22);
   const slot = ATT[def.part.key].slot;
   if (slot === 'optic') {

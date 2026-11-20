@@ -58,11 +58,11 @@ function efcThumbGunMat(m) {
   return c;
 }
 /* The object to draw for an item: { obj, gun, muzzle, own } (own: geometries to dispose after the render) */
-function efcThumbObject(def) {
+function efcThumbObject(def, weaponKey) {
   if (def.kind === 'weapon') {
     const wkey = def.weapon && def.weapon.wkey;
     if (!wkey || typeof buildWorldGun !== 'function' || typeof WEAPONS === 'undefined' || !WEAPONS[wkey]) return null;
-    const G = buildWorldGun(wkey);
+    const G = buildWorldGun(weaponKey || wkey);
     setGunLod(G.group, true);
     for (const m of G.group.children) if (m.isMesh) { m.material = efcThumbGunMat(m.material); m.castShadow = false; }
     return { obj: G.group, gun: true, muzzle: G.muzzle, own: false };
@@ -149,11 +149,11 @@ function efcThumbRState() {
 }
 const efcThumbKey = (id, v) => id + '|' + (EFC_TH_VAR[v] ? v : 'row');
 /* Draws one picture now; returns its url or '' on failure */
-function efcThumbRender(id, v) {
-  const def = efcCall('item:def', id), key = efcThumbKey(id, v); if (!def) return '';
+function efcThumbRender(id, v, weaponKey) {
+  const def = efcCall('item:def', id), key = efcThumbKey(weaponKey || id, v); if (!def) return '';
   let o = null;
   try {
-    o = efcThumbObject(def); if (!o || !o.obj) throw new Error('no model');
+    o = efcThumbObject(def, weaponKey); if (!o || !o.obj) throw new Error('no model');
     const S = efcThumbStudio(), [W, H] = efcThumbSize(def.kind, v), V = EFC_TH_VAR[v] || EFC_TH_VAR.row;
     S.scene.add(o.obj);
     const mirror = efcThumbFrame(o, W / H);
@@ -167,6 +167,7 @@ function efcThumbRender(id, v) {
   if (o && o.own && o.obj) o.obj.traverse((m) => { if (m.isMesh) m.geometry.dispose(); });
   return EFC_TH.url[key] || '';
 }
+efcProvide('thumb:weaponVariant', (id, key) => EFC_TH.url[efcThumbKey(key, 'big')] || efcThumbRender(id, 'big', key));
 
 /* ---------- Queue: one picture per animation frame (more if they are quick), never while a map loads ---------- */
 function efcThumbWant(key, first) {

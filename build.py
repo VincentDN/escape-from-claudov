@@ -29,6 +29,13 @@ js="\n".join(open(f,encoding="utf-8").read() for f in _files)
 js=re.sub(r"^export ","",open("api/_lib/filtre.js",encoding="utf-8").read(),flags=re.M)+"\n"+js
 def data_uri(path):
     return "data:image/"+("png" if path.endswith(".png") else "webp")+";base64,"+base64.b64encode(open(path,"rb").read()).decode("ascii")
+raid_models = open("assets/raid-models/partisan.json", encoding="utf-8").read().strip()
+raid_parts = open("assets/raid-models/partisan-parts.json", encoding="utf-8").read().strip()
+raid_models_name = "tex/partisan." + hashlib.sha1((raid_models + raid_parts).encode()).hexdigest()[:8] + ".js"
+os.makedirs("dist/tex", exist_ok=True)
+with open("dist/" + raid_models_name, "w", encoding="utf-8") as output:
+    output.write("const EFC_PARTISAN_MODELS = " + raid_models + ";\nconst EFC_PARTISAN_PARTS = " + raid_parts + ";\n")
+tags += '<script src="' + raid_models_name + '"></script>\n'
 js = "const EFC_BETA_PAGES = " + json.dumps(beta_pages) + ";\n" + js
 if beta_pages:
     # GitHub Pages project sites on the same account share an origin and browser storage.
@@ -103,7 +110,7 @@ if "</script" in three.lower(): raise SystemExit("assets/vendor/three-r147.js co
 socle_js("three",three)
 print("socle :",", ".join(f"{n} ({os.path.getsize('dist/'+n)//1024} Ko)" for n in socle.values()))
 for f in glob.glob("dist/tex/*.js"):
-    if "tex/"+os.path.basename(f) not in list(packs.values())+list(socle.values()): os.remove(f) # versions précédentes
+    if "tex/"+os.path.basename(f) not in list(packs.values())+list(socle.values())+[raid_models_name]: os.remove(f) # versions précédentes
 print("textures photo :",len(packs),"fichiers dans dist/tex,",sum(os.path.getsize("dist/"+n) for n in packs.values())//1024,"Ko")
 # Sons enregistrés (assets/sfx/<paquet>/*.mp3 et meta.json, produits par tools/build_sfx.py) : comme les textures, un petit script
 # par paquet à côté de la page, dist/sfx/<paquet>.<condensat>.js, qui appelle sfxPack(clé, données) (voir src/05a-sfx.js) ; le jeu

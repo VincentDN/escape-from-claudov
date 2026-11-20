@@ -26,25 +26,35 @@ function efcStgLoad() {
     geo.setAttribute('normal', new THREE.BufferAttribute(read(prim.attributes.NORMAL, 3).slice(), 3));
     geo.setIndex(new THREE.BufferAttribute(read(prim.indices, 1), 1));
     geo.rotateY(Math.PI / 2);
-    if (node.name === 'mag_25') geo.translate(0, -0.05, 0.105);
+    if (node.name.startsWith('mag_')) {
+      geo.computeBoundingBox();
+      const { min, max } = geo.boundingBox, height = node.name === 'mag_40' ? 0.26 : 0.205;
+      const scale = height / (max.y - min.y);
+      geo.scale(1, scale, 1).translate(0, max.y * (1 - scale) - 0.05, 0.105);
+    }
     geo.computeBoundingSphere();
     return { name: node.name, geo };
   }));
   return efcStgGeometries;
 }
 
-defineGun('stg44', 'rifle', ({ g, M, info }) => {
+defineGun('stg44', 'rifle', ({ g, M, info, A }) => {
   for (const { name, geo } of efcStgLoad()) {
-    if (name === 'mag_25') continue;
+    if (name.startsWith('mag_') || name === 'rear_sight' && A.optic || name === 'muzzle_device' && A.muzzle) continue;
+    if (name === 'rail_teeth' && !A.optic || name === 'side_rail' && !A.side) continue;
     const material = ['grip', 'handguard', 'stock_fixed'].includes(name) ? M.olive : M.metal;
     g.add(new THREE.Mesh(geo, material));
   }
   info.buildMag = parent => {
-    for (const { name, geo } of efcStgLoad()) if (name === 'mag_25') parent.add(new THREE.Mesh(geo, M.dark));
+    for (const { name, geo } of efcStgLoad()) if (name === (A.mag === 'stg40' ? 'mag_40' : 'mag_25')) parent.add(new THREE.Mesh(geo, M.dark));
   };
   info.magHome.set(0, 0.05, -0.105);
   info.magGrip = new V3(0, -0.085, 0);
   info.muzzle.position.set(0, 0.05, -0.6);
+  info.mount.optic = { y: 0.126, z: -0.2, len: 0.14, D: 0.22 };
+  info.mount.under = { y: 0.033, z: -0.24, len: 0.07 };
+  info.mount.side = { x: -0.028, y: 0.054, z: -0.32 };
+  info.mount.muzzle = { y: 0.05, z: -0.554, r: 0.012 };
   info.eject.position.set(0.035, 0.075, -0.04);
   info.sightY = 0.128; info.adsZ = 0.012;
   info.butt = [0, 0.05, 0.36];

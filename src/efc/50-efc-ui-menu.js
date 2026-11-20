@@ -2,7 +2,7 @@
    Credits, and the helpers the other UI files share (item rows, numbers, list keyboard navigation). Other packages are reached only through
    efcCall and events (docs/contracts/CONTRACT.md); every result may be undefined while a package is missing. */
 const EFC_UI = { map: null, raidL: null, depTitle: '' };
-const EFC_UI_KINDS = [['weapon', 'Weapons'], ['ammo', 'Ammunition'], ['armor', 'Armour'], ['pack', 'Packs'], ['med', 'Medical'], ['loot', 'Valuables']];
+const EFC_UI_KINDS = [['weapon', 'Weapons'], ['ammo', 'Ammunition'], ['armor', 'Armour'], ['pack', 'Packs'], ['med', 'Medical'], ['attachment', 'Attachments'], ['loot', 'Valuables']];
 const EFC_UI_SLOTS = [['primary', 'Primary'], ['sidearm', 'Sidearm'], ['armor', 'Armour'], ['pack', 'Pack']];
 const EFC_UI_EQUIP = { weapon: 1, armor: 1, pack: 1 }; // kinds that go into a slot
 const EFC_UI_SRC = 'https://github.com/VincentDN/escape-from-claudov';
@@ -11,8 +11,8 @@ const EFC_UI_SRC = 'https://github.com/VincentDN/escape-from-claudov';
 function efcUiDef(id) { return efcCall('item:def', id) || { id, name: String(id), kind: 'loot', w: 0, value: 0 }; }
 function efcUiKg(w) { return (Math.round((+w || 0) * 10) / 10).toFixed(1) + ' kg'; }
 function efcUiVal(v) { return Math.round(+v || 0).toLocaleString('en-US'); }
-function efcUiItemW(it) { return (efcUiDef(it.id).w || 0) * (it.n || 1); }
-function efcUiItemV(it) { return (efcUiDef(it.id).value || 0) * (it.n || 1); }
+function efcUiItemW(it) { return (it.mods && efcCall('item:weight', it)) ?? (efcUiDef(it.id).w || 0) * (it.n || 1); }
+function efcUiItemV(it) { return (it.mods && efcCall('item:value', it)) ?? (efcUiDef(it.id).value || 0) * (it.n || 1); }
 /* Totals of an inventory: the ITEMS services when present, else the same rules computed here (the bag weighs, equipped slots are free) */
 function efcUiInvTotals(inv) {
   if (!inv) return { w: 0, cap: EFC.cfg.bagBase, v: 0 };

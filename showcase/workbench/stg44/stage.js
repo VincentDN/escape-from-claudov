@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {addShowroom} from './showroom.js';
 
-export function buildStage(stageEl) {
+export function buildStage(stageEl, environmentReady) {
   const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true});
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -20,6 +20,7 @@ export function buildStage(stageEl) {
     scene.environment = new THREE.PMREMGenerator(renderer).fromEquirectangular(hdr).texture;
     scene.environmentIntensity = 0.55;
     hdr.dispose();
+    environmentReady?.();
   });
   return {renderer, scene, camera};
 }

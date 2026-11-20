@@ -39,7 +39,7 @@ export const RIFLES = {
   },
 };
 
-async function load(v, M) {
+export async function loadRifle(v, M) {
   const gltf = await new GLTFLoader().loadAsync(new URL(`../../assets/models/weapons/${RIFLES[v].file}`, import.meta.url).href);
   const root = gltf.scene;
   if (v === 'b') correctNeuroMagazines(root);
@@ -66,7 +66,7 @@ async function load(v, M) {
 
 // Loads both rebuilds so switching between them is instant.
 export async function loadRifles(M) {
-  const rifles = Object.fromEntries(await Promise.all(Object.keys(RIFLES).map(async id => [id, await load(id, M)])));
+  const rifles = Object.fromEntries(await Promise.all(Object.keys(RIFLES).map(async id => [id, await loadRifle(id, M)])));
   for (const id of ['astra-a', 'astra-b']) {
     for (const part of rifles.b.nodes('stock_adj')) {
       const stock = part.clone();

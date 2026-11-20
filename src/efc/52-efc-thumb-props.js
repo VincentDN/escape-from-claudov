@@ -258,6 +258,28 @@ function efcTpLoot(g, id) {
   }
 }
 
+function efcTpAttachment(g, def) {
+  const iron = efcTpMat(0x383c37, 0.52), rubber = efcTpMat(0x171b16, 0.85), glass = efcTpMat(0x628b80, 0.22);
+  const slot = ATT[def.part.key].slot;
+  if (slot === 'optic') {
+    efcTpBox(g, 0.52, 0.12, 0.29, iron, 0, 0.06, 0);
+    efcTpBox(g, 0.43, 0.29, 0.31, iron, 0, 0.27, 0);
+    efcTpBox(g, 0.035, 0.18, 0.22, glass, 0.224, 0.29, 0);
+    for (const z of [-0.151, 0.151]) efcTpBox(g, 0.58, 0.045, 0.025, rubber, 0, 0.053, z);
+  } else if (slot === 'muzzle') {
+    efcTpBox(g, 0.74, 0.23, 0.23, rubber, 0, 0.15, 0);
+    for (const x of [-0.34, -0.16, 0.16, 0.34]) efcTpBox(g, 0.05, 0.25, 0.25, iron, x, 0.15, 0);
+  } else if (slot === 'mag') {
+    efcTpBox(g, 0.26, 0.58, 0.17, iron, 0, 0.3, 0);
+    efcTpBox(g, 0.31, 0.06, 0.2, rubber, 0, 0.046, 0);
+    for (const y of [0.14, 0.31, 0.48]) efcTpBox(g, 0.28, 0.035, 0.19, rubber, 0, y, 0);
+  } else {
+    efcTpBox(g, 0.46, 0.1, 0.25, iron, 0, 0.38, 0);
+    efcTpBox(g, slot === 'side' ? 0.5 : 0.22, 0.31, 0.23, rubber, 0, 0.22, 0);
+    efcTpBox(g, 0.16, 0.12, 0.2, def.part.key === 'scout' ? glass : iron, 0.13, 0.26, 0);
+    for (const z of [-0.11, 0.11]) efcTpBox(g, 0.18, 0.045, 0.035, iron, 0, 0.12, z);
+  }
+}
 /* Prop for an item definition (any kind but weapon); an unknown item gets the generic prop of its kind */
 function efcThumbProp(def) {
   const g = new THREE.Group(), k = def && def.kind;
@@ -265,6 +287,7 @@ function efcThumbProp(def) {
   else if (k === 'armor') efcTpArmor(g, (def.armor && def.armor.tier) || 1);
   else if (k === 'pack') efcTpPack(g, def.id);
   else if (k === 'med') efcTpMed(g, def.id);
+  else if (k === 'attachment') efcTpAttachment(g, def);
   else efcTpLoot(g, def && def.id);
   return g;
 }

@@ -265,8 +265,8 @@ function frame(now){
  pose(time);placeRifle();drapeFlag(time);drawLcd(time);
  radio.userData.dial.material.emissiveIntensity=reduce?1.35:1.3+Math.random()*.15;
  const sway=reduce?0:Math.sin(time*.6)*.006*parallax;
- camera.position.copy(basePosition);camera.position.x+=look.x*.045*parallax;camera.position.y+=sway-look.y*.028*parallax;
- currentTarget.copy(baseTarget);currentTarget.x+=look.x*.08*parallax;currentTarget.y-=look.y*.045*parallax;
+ camera.position.copy(basePosition);camera.position.x+=look.x*.05*parallax;camera.position.y+=sway-look.y*.03*parallax;
+ currentTarget.copy(baseTarget);currentTarget.x+=look.x*.1*parallax;currentTarget.y-=look.y*.06*parallax;
  camera.lookAt(currentTarget);
  renderer.render(scene,camera);
 }

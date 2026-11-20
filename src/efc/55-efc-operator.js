@@ -129,7 +129,7 @@ function efcOperatorEquipment(id, inv) {
         ${item && field && swappable && efcHas('weaponmods:detachCarried')
           ? `<button type="button" class="efc-act" data-op-detach="${esc(slot)}">Detach</button>` : ''}</li>`;
     }).join('')}</ul></section>` : '';
-  const bench = primary && efcHas('weaponmods:open') && id === 'efcOpHideoutGrids'
+  const bench = attachments?.length && efcHas('weaponmods:open') && id === 'efcOpHideoutGrids'
     ? '<button type="button" class="efc-act" data-op-bench>Open workbench</button>' : '';
   $(id).innerHTML = `<p class="lbl">Equipment</p><div class="efc-op-slots">${equipment}</div>${mounts}${bench}`
     + Object.entries(grids || {}).map(([kind, grid]) =>

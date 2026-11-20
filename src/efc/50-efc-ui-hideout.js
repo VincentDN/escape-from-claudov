@@ -17,23 +17,31 @@ function efcHoRender() {
       const g = items.filter((x) => (EFC_UI_KINDS.some((k) => k[0] === x.d.kind) ? x.d.kind : 'loot') === kind);
       if (!g.length) continue;
       g.sort((a, b) => String(a.d.name).localeCompare(String(b.d.name)));
-      h += `<p class="efc-gh">${label}</p>` + g.map((x) => efcThumbRow(x.it, { key: 'st-' + x.it.id + '-' + x.i, data: { stash: x.i }, title: x.it.n > 1 ? 'Move to the loadout (Ctrl+click moves half)' : 'Move to the loadout' })).join('');
+      h += `<p class="efc-gh">${label}</p>` + g.map(({ it, i }) => efcThumbRow(it, {
+        key: 'st-' + it.id + '-' + i, data: { stash: i }, acts: efcHoModActs(it),
+        title: it.n > 1 ? 'Move to the loadout (Ctrl+click moves half)' : 'Move to the loadout',
+      })).join('');
     }
     $('efcHoStash').innerHTML = h || '<p class="efc-none">The stash is empty.</p>';
     const lo = st.loadout;
     $('efcHoLoad').innerHTML = efcThumbInvHtml(lo, {
+      slotActs: (slot, it) => efcHoModActs(it),
       bagActs: (i, it) => (EFC_UI_EQUIP[efcUiDef(it.id).kind] ? [['equip', 'Equip']] : []),
     });
     $('efcHoTot').innerHTML = efcUiTotHtml(lo);
   }
   const equipped = st?.loadout.slots.primary || st?.loadout.slots.sidearm;
-  efcOperatorPanel('efcOpHideout', equipped && WEAPONS[efcUiDef(equipped.id).weapon?.wkey], st?.loadout);
+  const definition = equipped && (efcCall('weaponmods:definition', equipped) || WEAPONS[efcUiDef(equipped.id).weapon?.wkey]);
+  efcOperatorPanel('efcOpHideout', definition, st?.loadout);
   efcOperatorStash();
   efcOperatorEquipment('efcOpHideoutGrids', st?.loadout);
   $('efcHoNote').textContent = EFC_HO.note;
   const first = root.querySelector('#efcHoStash .efc-it') || root.querySelector('#efcHoLoad .efc-it:not(.empty)');
   if (first) first.dataset.focus = ''; // where uiGo puts the focus on arrival (src/09e-menus.js)
   efcUiFocusBack(root, mark);
+}
+function efcHoModActs(item) {
+  return efcCall('weaponmods:slots', item)?.length ? [['bench', 'Workbench']] : [];
 }
 function efcHoMove(fn) {
   const ok = fn();
@@ -44,7 +52,9 @@ function efcHoMove(fn) {
 function efcHoClick(e) {
   const b = e.target.closest && e.target.closest('button'); if (!b || b.disabled) return;
   const ds = b.dataset;
-  if (ds.act === 'equip') {
+  if (ds.act === 'bench') {
+    efcCall('weaponmods:open', ds.stash !== undefined ? +ds.stash : ds.slot);
+  } else if (ds.act === 'equip') {
     const i = +ds.bag;
     efcHoMove(() => {
       if (efcHas('stash:equip')) return efcCall('stash:equip', i);

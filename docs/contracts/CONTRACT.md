@@ -14,13 +14,13 @@ possibly `undefined`. Register listeners at load time (top level of your file).
 ## Data shapes (plain JSON, no class instances)
 
 ```
-ItemDef   { id, name, kind: 'weapon'|'ammo'|'armor'|'pack'|'med'|'loot', w (kg), value, stack (max per stack, 1 if absent),
+ItemDef   { id, name, kind: 'weapon'|'ammo'|'armor'|'pack'|'med'|'loot'|'attachment', w (kg), value, stack (max per stack, 1 if absent),
             weapon: { wkey }            // key of the engine WEAPONS table
             ammo:   { fam }             // 'rifle'|'smg'|'sniper'|'shotgun'|'pistol'
             armor:  { tier 1..3, cut }  // cut: share of torso damage removed, 0..1
             pack:   { cap }             // kg added to the carry limit
             med:    { heal, time } }    // health restored, seconds to use
-Item      { id, n }                     // n: count. Weapons also carry { mag, res } (rounds in the magazine, reserve rounds)
+Item      { id, n }                     // n: count. Weapons also carry { mag, res } (rounds in the magazine, reserve rounds) and optionally { mods: { parts: attachment item IDs[], finish } }
 Inventory { slots: { primary: Item|null, sidearm: Item|null, armor: Item|null, pack: Item|null }, bag: Item[] }
 Grid      { cols, rows, entries: [{ item: Item, x, y, rotated: boolean }] }
 Container { id, kind: 'crate'|'locker'|'bag'|'body'|'drop', x, y, z, yaw, name, grid: Grid, rev, items: Item[] }
@@ -31,7 +31,7 @@ MapData   { inserts:  [{ x, z, yaw }],                       // one per squad, m
 Summary   { result: 'extracted'|'dead'|'mia', kills, time, extract (name or ''), items: Item[], value }
 ```
 
-World container grids are authored by the host. The flat item list is projected from entries in order. Each update advances the revision; a take must name the revision it was selected from. Wire protocol 11 requires both clients to support the grid payload.
+World container grids are authored by the host. The flat item list is projected from entries in order. Each update advances the revision; a take must name the revision it was selected from. Wire protocol 12 also requires both clients to support attachment item IDs and weapon mods.
 
 Entity fields added to engine soldiers: `e.squad` (number 0..3 for player squads, `'w'` for Wardens). Two soldiers are allies in a
 raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 or 1.
@@ -54,6 +54,9 @@ raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 
 | `inv:remove` | ITEMS | `(inv, bagIdx, n) -> Item or null` | |
 | `inv:equip` / `inv:unequip` | ITEMS | `(inv, bagIdx)` / `(inv, slot) -> boolean` | |
 | `inv:all` | ITEMS | `(inv) -> Item[]` | Everything carried, slots included (what a body holds) |
+| `weaponmods:slots` / `weaponmods:fit` | ITEMS | `(weapon) -> [{ slot, label, item, field }]` / `(weapon, partId) -> slot or null` | Item is the installed attachment or null. Field marks mounts accessible in a raid. |
+| `weaponmods:mountCarried` / `weaponmods:detachCarried` | ITEMS | `(weaponSlot, bagIndex) -> boolean` / `(weaponSlot, partSlot) -> boolean` | Validates the resulting carried kit and emits `inv:changed` on success. |
+| `weaponmods:open` | UI | `(stashIndexOrLoadoutSlot) -> boolean` | Opens the draft editor in the hideout. |
 | `inv:weapons` | ITEMS | `(inv) -> array` | The argument `makeArms()` expects, built from the primary and sidearm slots; fists/knife-only fallback handled by the engine |
 | `stash:get` | ITEMS | `() -> { items: Item[], loadout: Inventory }` | Stored as version 2 under `efc_stash_v1`; v1 saves migrate once and overflow moves to the stash |
 | `stash:grids` / `grid:loadout` | ITEMS | `() -> { stash: Grid[], loadout: object }` / `(inv) -> object or null` | Indexed layouts for the flat list API; gear determines vest/pack capacity; all stash items span as many pages as needed |

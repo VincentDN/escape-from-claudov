@@ -1788,3 +1788,4 @@ Arrange contents ⇒ =
 Hands ⇒ =
 Quick slots ⇒ =
 Vicinity ⇒ =
+Open selected weapon in workbench ⇒ =

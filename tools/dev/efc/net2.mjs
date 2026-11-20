@@ -50,7 +50,7 @@ export async function openNetPage(context, base, o, errors) {
     window.MATCH_COUNTDOWN = 0; window.EFC_TEST = true; window.NET_RELAY_URL = ''; window.EFC_NET_NAME = ${JSON.stringify(name)};`);
   await page.addInitScript(FAKEPEER);
   if (o.init) await page.addInitScript(o.init);
-  await page.goto(base + 'index.html');
+  await page.goto(base + 'index.html', { waitUntil: 'domcontentloaded', timeout: 120000 });
   await page.waitForFunction(() => typeof MATCH !== 'undefined' && MATCH.state === 'menu', null, { timeout: 300000, polling: 300 });
   await page.evaluate(() => mapEnsure(Settings.map));
   await page.evaluate(() => {

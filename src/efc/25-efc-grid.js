@@ -51,7 +51,9 @@ function efcGridMove(grid, index, x, y, rotated) {
 }
 
 function efcGridFirstFit(grid, item) {
-  const [w, h] = efcGridSize(item);
+  const size = efcGridSize(item);
+  if (!grid || !size) return null;
+  const [w, h] = size;
   for (const rotated of (w === h ? [false] : [false, true])) {
     const width = rotated ? h : w, height = rotated ? w : h;
     for (let y = 0; y <= grid.rows - height; y++) {
@@ -104,18 +106,51 @@ function efcGridSplit(grid, index, count, x, y, rotated = false) {
   return taken && efcGridPlace(taken.grid, taken.item, x, y, rotated);
 }
 
+function efcGridStoredCell(cell) {
+  if (!cell || !['pockets', 'armor', 'pack', 'stash'].includes(cell.area)) return null;
+  const { area, x, y, page = 0 } = cell;
+  if (![x, y, page].every(n => Number.isSafeInteger(n) && n >= 0) || x >= EFC_GRID_LIMIT || y >= EFC_GRID_LIMIT) return null;
+  return { area, x, y, page: area === 'stash' ? page : 0, rotated: cell.rotated === true };
+}
+
+function efcGridStoredItems(target, raw) {
+  for (const source of raw || []) {
+    const item = efcItemNorm(source);
+    if (!item) continue;
+    const cell = efcGridStoredCell(source.cell);
+    if (cell && item.n <= efcStackMax(item.id)) target.push({ ...item, cell });
+    else efcStackInto(target, item);
+  }
+}
+
+function efcGridPin(grid, item, index) {
+  const cell = item.cell;
+  const pinned = efcGridPlace(grid, item, cell.x, cell.y, cell.rotated);
+  if (pinned) pinned.entries.at(-1).index = index;
+  return pinned;
+}
+
 /* The list UI keeps bag indexes; the grid view carries those indexes through placement. */
 function efcGridLoadout(inv) {
   const grids = { pockets: efcGridContainer('pockets') };
   for (const slot of ['armor', 'pack']) {
     if (inv.slots[slot]) grids[slot] = efcGridContainer(slot, inv.slots[slot].id);
   }
-  const order = inv.bag.map((item, index) => ({ item, index }));
-  order.sort((a, b) => {
-    const [aw, ah] = efcGridSize(a.item), [bw, bh] = efcGridSize(b.item);
-    return bw * bh - aw * ah;
+  const order = inv.bag.map((item, index) => {
+    const size = efcGridSize(item);
+    return { item, index, area: size ? size[0] * size[1] : 0 };
   });
+  if (order.some(entry => !entry.area)) return null;
+  order.sort((a, b) => b.area - a.area);
+  const pinned = new Set();
   for (const { item, index } of order) {
+    const kind = item.cell?.area;
+    if (!Object.hasOwn(grids, kind)) continue;
+    const next = efcGridPin(grids[kind], item, index);
+    if (next) { grids[kind] = next; pinned.add(index); }
+  }
+  for (const { item, index } of order) {
+    if (pinned.has(index)) continue;
     let placed = false;
     for (const kind of Object.keys(grids)) {
       const grid = efcGridFirstFit(grids[kind], item);
@@ -133,22 +168,104 @@ function efcGridLoadout(inv) {
 /* Old stashes had no capacity limit. Keep all entries when building their grid. */
 function efcGridStash(items) {
   const pages = [efcGridContainer('stash')];
+  const pinned = new Set();
   for (const [index, item] of items.entries()) {
-    let grid = efcGridFirstFit(pages.at(-1), item);
-    if (!grid) {
-      pages.push(efcGridContainer('stash'));
-      grid = efcGridFirstFit(pages.at(-1), item);
+    const cell = item.cell;
+    if (cell?.area !== 'stash' || !Number.isSafeInteger(cell.page) || cell.page < 0 || cell.page >= items.length) continue;
+    while (pages.length <= cell.page) pages.push(efcGridContainer('stash'));
+    const next = efcGridPin(pages[cell.page], item, index);
+    if (next) { pages[cell.page] = next; pinned.add(index); }
+  }
+  for (const [index, item] of items.entries()) {
+    if (pinned.has(index)) continue;
+    let page = 0, grid;
+    for (; page < pages.length; page++) {
+      grid = efcGridFirstFit(pages[page], item);
+      if (grid) break;
     }
+    if (!grid) grid = efcGridFirstFit(efcGridContainer('stash'), item);
+    if (!grid) return null;
     grid.entries.at(-1).index = index;
-    pages[pages.length - 1] = grid;
+    pages[page] = grid;
   }
   return pages;
 }
+
+// Validate the existing cell occupancy first, then validate the entire resulting
+// inventory for gear removal and weight limits. Both callers publish atomically.
+function efcGridTransfer(stash, inv, source, destination) {
+  if (!efcInvOk(inv)) return null;
+  const cell = efcGridStoredCell(destination);
+  if (!cell || !['stash', 'bag', 'slot'].includes(source?.kind)) return null;
+  const { kind, key } = source;
+  const sourceList = kind === 'stash' ? stash : kind === 'bag' ? inv.bag : null;
+  const item = kind === 'slot' && EFC_SLOTS.includes(key) ? inv.slots[key] : sourceList?.[key];
+  if (!item || item.id !== source.id) return null;
+  const target = cell.area === 'stash' ? stash : inv.bag;
+  const stashGrids = stash ? efcGridStash(stash) : null, loadoutGrids = efcGridLoadout(inv);
+  const grid = cell.area === 'stash' ? stashGrids?.[cell.page] : loadoutGrids?.[cell.area];
+  if (!target || !grid || (cell.area === 'stash' && item.free)) return null;
+  const count = source.count ?? item.n;
+  if (!Number.isSafeInteger(count) || count < 1 || count > item.n) return null;
+  const skip = sourceList === target && count === item.n ? grid.entries.findIndex(entry => entry.index === key) : -1;
+  if (!efcGridFits(grid, item, cell.x, cell.y, cell.rotated, skip)) return null;
+  const next = efcClone({ stash, inv });
+  for (const [area, layout] of Object.entries(loadoutGrids || {})) {
+    for (const { index, x, y, rotated } of layout.entries) next.inv.bag[index].cell = { area, x, y, rotated, page: 0 };
+  }
+  for (const [page, layout] of (stashGrids || []).entries()) {
+    for (const { index, x, y, rotated } of layout.entries) next.stash[index].cell = { area: 'stash', page, x, y, rotated };
+  }
+  const list = kind === 'stash' ? next.stash : next.inv.bag;
+  if (kind === 'slot') next.inv.slots[key] = null;
+  else if (count === item.n) list.splice(key, 1);
+  else list[key].n -= count;
+  const listAtDestination = cell.area === 'stash' ? next.stash : next.inv.bag;
+  listAtDestination.push({ ...efcClone(item), n: count, cell });
+  if (!efcFits(efcInvWeight(next.inv), efcInvCap(next.inv))) return null;
+  const nextLoadout = efcGridLoadout(next.inv);
+  if (!nextLoadout) return null;
+  const nextGrid = cell.area === 'stash' ? efcGridStash(next.stash)?.[cell.page] : nextLoadout[cell.area];
+  if (!nextGrid?.entries.some(entry => entry.index === listAtDestination.length - 1 && entry.x === cell.x && entry.y === cell.y && entry.rotated === cell.rotated)) return null;
+  return next;
+}
+
+efcProvide('inv:place', (inv, source, cell, preview) => {
+  const next = efcGridTransfer(null, inv, source, cell);
+  if (!next) return false;
+  if (!preview) Object.assign(inv, next.inv);
+  return true;
+});
+efcProvide('inv:receiveAt', (inv, raw, cell, preview = false) => {
+  const item = efcItemNorm(raw);
+  return !!item && !!cell && cell.area !== 'stash' && !!efcReceivePlaced(inv, item, cell, preview);
+});
+
+function efcReceivePlaced(inv, item, cell, preview) {
+  const next = efcGridTransfer([item], inv, { kind: 'stash', key: 0, id: item.id }, cell);
+  if (next && !preview) Object.assign(inv, next.inv);
+  return next;
+}
+
+efcProvide('inv:sendGridItem', (inv, source, preview = false) => {
+  if (!efcInvOk(inv)) return null;
+  const next = efcClone(inv), { key, kind, id, count } = source;
+  let item;
+  if (kind === 'bag' && next.bag[key]?.id === id) item = efcInvRemove(next, key, count);
+  if (kind === 'slot' && EFC_SLOTS.includes(key) && next.slots[key]?.id === id && count == null) {
+    item = next.slots[key];
+    next.slots[key] = null;
+  }
+  if (!item || !efcFits(efcInvWeight(next), efcInvCap(next)) || !efcGridLoadout(next)) return null;
+  if (!preview) Object.assign(inv, next);
+  return item;
+});
 
 efcProvide('grid:loadout', efcGridLoadout);
 efcProvide('grid:container', efcGridContainer);
 efcProvide('grid:new', efcGridNew);
 efcProvide('grid:size', efcGridSize);
+efcProvide('grid:fits', efcGridFits);
 efcProvide('grid:place', efcGridPlace);
 efcProvide('grid:move', efcGridMove);
 efcProvide('grid:import', efcGridImport);

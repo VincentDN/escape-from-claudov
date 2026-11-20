@@ -112,30 +112,35 @@ function efcWorldHostBegin() {
   }
   efcNetToAll('w:all', { list, seed: EFC_W.seed });
 }
+function efcWorldPlacementReply(from, request, ok) {
+  if (Number.isSafeInteger(request)) efcNetTo(from, 'w:placementResult', { request, ok });
+}
+
 /* Host: take item idx (whose id must be `item`) from container id for the sender. Exactly one of two racing takers wins. */
 efcNetOnHost('w:take', (d, from) => {
   if (!d || typeof d.id !== 'string' || !Number.isInteger(d.idx) || typeof d.item !== 'string') return;
-  const c = EFC_W.map.get(d.id); if (!c || d.rev !== c.rev) return;
-  const it = c.items[d.idx]; if (!it || it.id !== d.item) return;
-  if (!efcWorldNear(c, efcWorldActor(from), efcWorldReach())) return;
-  const taken = efcCall('grid:take', c.grid, d.idx);
+  const c = EFC_W.map.get(d.id);
+  const valid = c && d.rev === c.rev && c.items[d.idx]?.id === d.item && efcWorldNear(c, efcWorldActor(from), efcWorldReach());
+  const taken = valid && efcCall('grid:take', c.grid, d.idx, d.count);
+  if (!taken) { efcWorldPlacementReply(from, d.request, false); return; }
   if (c.kind === 'drop' && !taken.grid.entries.length) efcNetToAll('w:del', { id: c.id });
   else efcWorldSendGrid(c, taken.grid);
-  efcNetTo(from, 'w:give', { item: efcClone(it), id: c.id });
+  efcNetTo(from, 'w:give', { item: taken.item, id: c.id, cell: d.cell });
+  efcWorldPlacementReply(from, d.request, true);
 });
 /* Move or split in one host transaction. A stale preview cannot overwrite a newer layout. */
 efcNetOnHost('w:place', (d, from) => {
   if (!d || typeof d.id !== 'string' || !Number.isInteger(d.idx) || typeof d.rotated !== 'boolean') return;
   const c = EFC_W.map.get(d.id);
-  if (!c || c.kind === 'drop' || d.rev !== c.rev || !efcWorldNear(c, efcWorldActor(from), efcWorldReach())) return;
-  const entry = c.grid.entries[d.idx];
-  if (!entry) return;
+  const valid = c && c.kind !== 'drop' && d.rev === c.rev && efcWorldNear(c, efcWorldActor(from), efcWorldReach()) && c.grid.entries[d.idx];
+  if (!valid) { efcWorldPlacementReply(from, d.request, false); return; }
   let grid;
   if (d.count === undefined) grid = efcCall('grid:move', c.grid, d.idx, d.x, d.y, d.rotated);
   else if (Number.isInteger(d.count) && c.grid.entries.length < EFC_W.maxItems) {
     grid = efcCall('grid:split', c.grid, d.idx, d.count, d.x, d.y, d.rotated);
   }
   if (grid) efcWorldSendGrid(c, grid);
+  efcWorldPlacementReply(from, d.request, !!grid);
 });
 /* Host: put an item into a container near the sender, otherwise into a new 'drop' at the given position (the sender's own position
    when the given one is invalid or out of reach). */
@@ -151,6 +156,15 @@ efcNetOnHost('w:put', (d, from) => {
   if (e && e.pos && (!p || !efcWorldNear(p, e, efcWorldReach()))) p = efcWorldPos(e.pos);
   if (!p) return;
   efcWorldSpawn('drop', p, [item], '');
+});
+efcNetOnHost('w:putAt', (d, from) => {
+  if (!d || !Number.isSafeInteger(d.request)) return;
+  const item = efcWorldItem(d.item), c = EFC_W.map.get(d.id), cell = d.cell;
+  const fit = item && c && cell && c.rev === d.rev && c.grid.entries.length < EFC_W.maxItems &&
+    efcWorldNear(c, efcWorldActor(from), efcWorldReach()) &&
+    efcCall('grid:place', c.grid, item, cell.x, cell.y, cell.rotated === true);
+  if (fit) efcWorldSendGrid(c, fit);
+  efcWorldPlacementReply(from, d.request, !!fit);
 });
 efcNetOnHost('w:body', (d) => {
   if (!d) return;
@@ -202,8 +216,22 @@ efcNetOnClient('w:upd', (d) => {
 });
 efcNetOnClient('w:give', (d) => {
   const it = d && efcWorldItem(d.item); if (!it) return;
-  efcEmit('loot:give', it, d.id);
+  efcEmit('loot:give', it, d.id, d.cell);
 });
+let efcWorldPlacementRequest = 0;
+const EFC_WORLD_PENDING_PLACEMENTS = new Map();
+efcNetOnClient('w:placementResult', d => {
+  const settle = EFC_WORLD_PENDING_PLACEMENTS.get(d?.request);
+  if (!settle) return;
+  EFC_WORLD_PENDING_PLACEMENTS.delete(d.request);
+  settle(d.ok === true);
+});
+function efcWorldRequestPlacement(settle) {
+  if (typeof settle !== 'function') return undefined;
+  const request = ++efcWorldPlacementRequest;
+  EFC_WORLD_PENDING_PLACEMENTS.set(request, settle);
+  return request;
+}
 /* Keeps the id counter above every known id, so a host that takes over never reuses one. */
 function efcWorldBumpNext() {
   for (const id of EFC_W.map.keys()) { const n = parseInt(id, 36); if (isFinite(n) && n >= EFC_W.next) EFC_W.next = n + 1; }
@@ -232,16 +260,25 @@ efcProvide('world:near', (p, r) => {
   }
   return best;
 });
-efcProvide('world:take', (id, idx) => {
+efcProvide('world:take', (id, idx, placement) => {
   const c = EFC_W.map.get(id), it = c && c.items[idx];
-  if (!it) return false;
-  efcNetToHost('w:take', { id, idx, item: it.id, rev: c.rev });
+  if (!it || (placement && placement.rev !== c.rev)) return false;
+  efcNetToHost('w:take', { id, idx, item: it.id, rev: c.rev, cell: placement?.cell, count: placement?.count,
+    request: efcWorldRequestPlacement(placement?.settle) });
   return true;
 });
-efcProvide('world:place', (id, idx, x, y, rotated, count, expectedRevision) => {
+efcProvide('world:putAt', (id, item, cell, rev, settle) => {
+  const c = EFC_W.map.get(id);
+  if (!c || c.rev !== rev) return false;
+  const request = efcWorldRequestPlacement(settle);
+  if (request === undefined) return false;
+  efcNetToHost('w:putAt', { request, id, item, cell, rev });
+  return true;
+});
+efcProvide('world:place', (id, idx, x, y, rotated, count, expectedRevision, settle) => {
   const c = EFC_W.map.get(id), entry = c?.grid.entries[idx];
   if (!entry || c.kind === 'drop' || (expectedRevision !== undefined && c.rev !== expectedRevision)) return false;
-  efcNetToHost('w:place', { id, idx, x, y, rotated: rotated ?? entry.rotated, count, rev: c.rev });
+  efcNetToHost('w:place', { id, idx, x, y, rotated: rotated ?? entry.rotated, count, rev: c.rev, request: efcWorldRequestPlacement(settle) });
   return true;
 });
 efcProvide('world:put', (id, item) => {
@@ -257,7 +294,7 @@ efcOn('raid:begin', () => {
   else { efcWorldClear(); efcNetToHost('w:hello', {}); } // late joiners and re-joiners get the full snapshot
 });
 // The local player's raid ending does not clear the world (the host keeps running it for the others). A left match does.
-efcOn('match:left', () => { efcWorldClear(); });
+efcOn('match:left', () => { EFC_WORLD_PENDING_PLACEMENTS.clear(); efcWorldClear(); });
 /* Host migration: a guest that becomes the host carries on with its replicated copy and re-syncs everybody. */
 efcOn('tick', () => {
   const h = efcIsHost();

@@ -29,6 +29,8 @@ function efcUirOpen(kind, cid) {
 function efcUirClose(silent) {
   const { panel, cid } = EFC_UIR;
   if (!panel) return;
+  const view = EFC_OPERATOR_VIEWS.get(panel === 'loot' ? 'efcOpLoot' : 'efcOpRaid');
+  if (view?.pick) efcOperatorDragEnd(view, false);
   EFC_UIR.panel = null; EFC_UIR.cid = null; EFC_UIR.all = null;
   efcContainerDraw(null);
   $('efcInv').classList.add('hidden'); $('efcLoot').classList.add('hidden');
@@ -173,6 +175,7 @@ function efcUirKey(e) {
   const down = e.type === 'keydown', c = e.code, stop = () => { e.preventDefault(); e.stopImmediatePropagation(); };
   if (EFC_UIR.panel) {
     const root = $(EFC_UIR.panel === 'loot' ? 'efcLoot' : 'efcInv');
+    if (efcOperatorKeyboard(e, EFC_OPERATOR_VIEWS.get(EFC_UIR.panel === 'loot' ? 'efcOpLoot' : 'efcOpRaid'))) { stop(); return; }
     if (efcOperatorNumber(e, EFC_UIR.panel)) { stop(); return; }
     if (EFC_UIR.panel === 'loot' && efcContainerKey(e)) { stop(); return; }
     if (c === 'Tab' || c === 'Escape') { stop(); if (down && !e.repeat) efcUirClose(); return; }

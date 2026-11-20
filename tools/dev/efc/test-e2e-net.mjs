@@ -75,6 +75,43 @@ const ga = await after(guest, tgt.id), ha = await after(host, tgt.id);
 ok(ga.carried > tgt.carried && ga.left === tgt.n - 1, 'the guest received the item it took', { before: tgt.carried, after: ga.carried, left: ga.left });
 ok(ha.left === tgt.n - 1, 'the host sees the container with one item less', ha.left);
 
+// The guest previews a destination, then the host grants a crate item at that exact carried cell.
+const position = await guest.evaluate(() => ({ x: PL.ent.pos.x, y: PL.ent.pos.y, z: PL.ent.pos.z }));
+const exactCrate = await host.evaluate(pos => efcCall('world:spawn', 'crate', pos, [{ id: 'loot_wrench', n: 1 }], 'Transfer fixture'), position);
+await guest.waitForFunction(id => efcCall('world:list').some(c => c.id === id), exactCrate, { polling: 100 });
+const landing = await guest.evaluate(id => {
+  const c = efcCall('world:list').find(c => c.id === id);
+  const item = c.items[0];
+  for (const [area, grid] of Object.entries(efcCall('grid:loadout', EFC.inv))) {
+    for (let y = grid.rows - 1; y >= 0; y--) for (let x = grid.cols - 1; x >= 0; x--) {
+      const cell = { area, x, y, rotated: true };
+      if (!efcCall('inv:receiveAt', EFC.inv, item, cell, true)) continue;
+      efcCall('world:take', id, 0, { rev: c.rev, cell });
+      return cell;
+    }
+  }
+  return null;
+}, exactCrate);
+ok(landing, 'the guest can request an exact landing cell for a crate item');
+if (landing) {
+  await guest.waitForFunction(cell => efcCall('grid:loadout', EFC.inv)[cell.area].entries.some(e =>
+    e.item.id === 'loot_wrench' && e.x === cell.x && e.y === cell.y && e.rotated), landing, { polling: 100 });
+  const committed = await guest.evaluate(({ id, landing }) => new Promise(resolve => {
+    const inv = EFC.inv, c = efcCall('world:list').find(c => c.id === id);
+    const key = inv.bag.findIndex(item => item.id === 'loot_wrench' && item.cell?.area === landing.area
+      && item.cell.x === landing.x && item.cell.y === landing.y);
+    const item = efcCall('inv:sendGridItem', inv, { kind: 'bag', key, id: 'loot_wrench' });
+    if (!item || !efcCall('world:putAt', id, item, { x: 3, y: 2, rotated: true }, c.rev, resolve)) resolve(false);
+  }), { id: exactCrate, landing });
+  ok(committed, 'the host accepts the guest’s exact deposit');
+  if (committed) {
+    const seesDeposit = id => efcCall('world:list').find(c => c.id === id)?.grid.entries.some(entry =>
+      entry.item.id === 'loot_wrench' && entry.x === 3 && entry.y === 2 && entry.rotated);
+    await Promise.all(both.map(page => page.waitForFunction(seesDeposit, exactCrate, { polling: 100 })));
+    ok(true, 'host and guest agree on the deposited item’s exact coordinates and rotation');
+  }
+}
+
 // the guest dies: its body, with its kit, exists on the host, and the host can loot it
 const gd = await guest.evaluate(() => { const carried = efcCall('inv:all', EFC.inv).length, p = { x: PL.ent.pos.x, z: PL.ent.pos.z }; PL.ent.protT = 0; applyDamage(PL.ent, 999, entities.find((e) => !e.isPlayer), 'M4A1', false, new V3(1, 0, 0)); return { carried, p, alive: PL.ent.alive }; });
 const LIVE = 'if (PL.ent.alive) { PL.ent.health = 100; PL.ent.protT = 1; }'; // the host must survive to loot the body

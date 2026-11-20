@@ -2592,8 +2592,8 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 #efcLootGrid button { min-width: 0; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; background: var(--panel); color: var(--paper); border: 1px solid var(--line); font-size: 12px; }
 #efcLootGrid button[data-entry] { background: var(--acc-soft); }
 #efcLootGrid button:focus-visible { z-index: 1; outline-offset: -2px; }
-#efcLootGrid .efc-placement { position: absolute; inset: 0; pointer-events: none; border: 2px solid var(--ally); }
-#efcLootGrid .efc-placement.blocked { border-color: var(--danger); }
+:is(#efcLootGrid, .efc-op-grid) .efc-placement { position: absolute; inset: 0; z-index: 1; pointer-events: none; border: 2px solid var(--ally); }
+:is(#efcLootGrid, .efc-op-grid) .efc-placement.blocked { border-color: var(--danger); }
 .efc-two .efc-it { grid-template-columns: minmax(0, 1fr) 3.2em 4.6em 5.4em; }
 .efc-bh { display: flex; align-items: baseline; gap: 18px; }
 .efc-bh h2 { margin: 0; font-family: var(--stencil); font-weight: 400; font-size: 34px; line-height: 1; }
@@ -2641,6 +2641,7 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
   text-overflow: ellipsis; padding: 2px; background: #080a08aa; }
 .efc-op-item[aria-pressed="true"], .efc-op-slot[aria-pressed="true"] { outline: 2px solid var(--acc); outline-offset: -2px; }
 .efc-op-ghost { position: fixed; z-index: 9999; pointer-events: none; opacity: .84; }
+body:has(.efc-op-ghost) .efc-prev { visibility: hidden; }
 [data-op-drop="valid"] { outline: 2px solid var(--ally); outline-offset: -2px; }
 [data-op-drop="invalid"] { outline: 2px solid var(--danger); outline-offset: -2px; }
 .efc-op-section { margin-top: 8px; }

@@ -31,7 +31,7 @@ MapData   { inserts:  [{ x, z, yaw }],                       // one per squad, m
 Summary   { result: 'extracted'|'dead'|'mia', kills, time, extract (name or ''), items: Item[], value }
 ```
 
-World container grids are authored by the host. The flat item list is projected from entries in order. Each update advances the revision; a take must name the revision it was selected from. Wire protocol 12 also requires both clients to support attachment item IDs and weapon mods.
+World container grids are authored by the host. The flat item list is projected from entries in order. Each update advances the revision, and an exact placement request names the revision it was selected from. Wire protocol 14 adds placement acknowledgments and exact destinations for cross-grid transfers. Stash and carried entries can save a local `cell` with `{ area, page, x, y, rotated }`. World items use the host grid for position.
 
 Entity fields added to engine soldiers: `e.squad` (number 0..3 for player squads, `'w'` for Wardens). Two soldiers are allies in a
 raid when their `squad` is equal. `e.team` keeps its engine meaning and stays 0 or 1.

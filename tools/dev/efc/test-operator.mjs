@@ -32,7 +32,8 @@ try {
   const ghost = page.locator('.efc-op-ghost');
   assert.equal(await ghost.getAttribute('data-efc-id'), 'med_kit');
   assert.equal(await stashTarget.getAttribute('data-op-drop'), 'valid');
-  assert.ok(Math.abs((await ghost.boundingBox()).width - sourceRect.width) < 1);
+  const columns = Number(await stashTarget.getAttribute('data-op-cols'));
+  assert.ok(Math.abs((await ghost.boundingBox()).width - targetRect.width * 2 / columns) < 1);
   await page.mouse.up();
   assert.equal(await ghost.count(), 0);
   assert.ok(await page.evaluate(() => efcCall('stash:get').loadout.bag.some(item => item.id === 'med_kit')));

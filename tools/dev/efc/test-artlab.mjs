@@ -38,6 +38,31 @@ try {
   });
   ok('#artlab boots Claudov in a live raid with no Wardens or Scavengers, no lobby, a day on the clock, the free SKS, stash choice restored');
 
+  const targetCheck = await page.evaluate(() => {
+    const captured = [], renderWorld = worldPass.render;
+    worldPass.render = function (renderer, write, read, ...args) {
+      captured.push(read.samples);
+      return renderWorld.call(this, renderer, write, read, ...args);
+    };
+    try {
+      efcArtPreset('Current game');
+      const phases = [];
+      for (const enabled of [false, true, false]) {
+        efcArtSet('dither', enabled ? 'bayer4' : 'off');
+        for (let i = 0; i < 3; i++) composer.render(0);
+        phases.push({ samples: captured.splice(0), scene: RQ.q.msaa, labOnScreen: enabled && EFC_ART.pass.renderToScreen,
+          finalOnScreen: finalPass.renderToScreen });
+      }
+      return phases;
+    } finally { worldPass.render = renderWorld; }
+  });
+  for (const [i, phase] of targetCheck.entries()) {
+    assert.ok(phase.scene > 0 && phase.samples.every(samples => samples === phase.scene), JSON.stringify(phase));
+    assert.equal(phase.labOnScreen, i === 1);
+    assert.equal(phase.finalOnScreen, i !== 1);
+  }
+  ok('every scene frame uses the MSAA buffer with the Art Lab pass both off and on');
+
   /* ---------- 2. The panel opens and closes ---------- */
   // mouse-free mode, as the bench route uses: headless Chromium grants pointer lock asynchronously, and a lock that lands late would send
   // every click to the canvas. With it, closing the panel does not ask for the lock (the real game does, to resume looking around).

@@ -46,7 +46,7 @@ L0, the art style lab (`#artlab`, `src/efc/47-efc-artlab*.js`, `docs/artlab/READ
 - **X1, inventory test failures.** Fixed on `beta` in `42541ff`. The complete UI test passed with valid mock catalogue entries.
 - **X2, anti-aliasing on alternate frames (`codex/x2-msaa-swap`).** Fixed on `beta` in `74e6eff`. The composer starts every frame
   on its MSAA target and still swaps buffers inside each frame. The Art Lab test checks both enabled and disabled passes.
-- **X3, menu button for the lab (with C10).** Add an "Art lab" entry to the main menu (UI package) that opens `#artlab`.
+- **X3, menu button for the lab.** The main-menu Art Lab entry is live on `beta` in `812ac05`. C10 typography remains open.
 
 ## C0. Finish the grid inventory (medium; first, before C1)
 
@@ -81,6 +81,10 @@ Shared container changes are revision-checked on the host. The original containe
   `docs/inventory/`.
 
 ## C1. Raid-start weapon check (medium)
+
+The beta checkpoint contains the first-person insertion action, opt-out setting, and replicated start and cancellation.
+The automated checks cover the four weapon families and a two-client cancellation on aim. Third-person moving parts and
+family contact sheets still need visual review.
 
 The owner asked for this flourish (P9 in `docs/plans/2026-11-14-polish-pass.md`); T7 produced a design,
 `docs/briefs/P9-WEAPON-CHECK.md`. Implement that design.
@@ -196,6 +200,9 @@ Use rival raiders (C6) as stand-in players to run many scripted raids and tune t
 - Raise anything that needs the owner's taste (for example how punishing death should feel) as a question instead of tuning it.
 
 ## C9. Omnimovement (very large; second, right after C1; two branches)
+
+The C9a beta checkpoint supports sprint and slide in all eight directions and a short double-tap tactical sprint.
+Dive, mantle, vault, prone orientation, and matching hit volumes and weapon poses remain open. See [movement controls](omnimovement.md).
 
 P8 in `docs/plans/2026-11-14-polish-pass.md`: movement in the manner of recent Call of Duty and Battlefield titles, built from the
 engine's own code. Nothing copied from those games.

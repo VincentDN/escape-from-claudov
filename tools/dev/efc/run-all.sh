@@ -22,6 +22,9 @@ run node tools/dev/efc/test-world.mjs
 run node tools/dev/efc/test-raid.mjs
 run node tools/dev/efc/test-warden.mjs
 run node tools/dev/efc/test-ui.mjs
+run node tools/dev/efc/test-grid-placement.mjs
+run node tools/dev/efc/test-weapon-check.mjs
+run node tools/dev/efc/test-omni-sprint.mjs
 run node tools/dev/efc/test-panel-event.mjs
 run node tools/dev/efc/test-thumbs.mjs
 run node tools/dev/efc/test-sounds.mjs
@@ -37,5 +40,6 @@ run env MAP=sable node tools/dev/efc/test-e2e.mjs
 run env MAP=claudov node tools/dev/efc/test-e2e.mjs
 run node tools/dev/efc/test-net.mjs
 run node tools/dev/efc/test-e2e-net.mjs
+run node tools/dev/efc/test-weapon-check-net.mjs
 [ $fail = 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED"
 exit $fail

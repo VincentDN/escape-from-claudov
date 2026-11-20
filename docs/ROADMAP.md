@@ -20,6 +20,7 @@ mergeable branch.
 
 | Order | Task | What | Size |
 | --- | --- | --- | --- |
+| first | L0 | Art style lab: `#artlab` loads Claudov empty with live dials (retro/PS1 dither, lens, colour), presets, A/B split, copy and paste of settings (`docs/artlab/README.md`); on `claude/l0-art-style-lab`, waiting for review | medium |
 | 0 | C0 | Finish the grid inventory: visual drag and drop between every panel, R to rotate, foley on every action | medium |
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |

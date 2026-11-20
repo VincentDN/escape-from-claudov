@@ -51,7 +51,9 @@ function efcGridMove(grid, index, x, y, rotated) {
 }
 
 function efcGridFirstFit(grid, item) {
-  const [w, h] = efcGridSize(item);
+  const size = efcGridSize(item);
+  if (!grid || !size) return null;
+  const [w, h] = size;
   for (const rotated of (w === h ? [false] : [false, true])) {
     const width = rotated ? h : w, height = rotated ? w : h;
     for (let y = 0; y <= grid.rows - height; y++) {
@@ -110,11 +112,12 @@ function efcGridLoadout(inv) {
   for (const slot of ['armor', 'pack']) {
     if (inv.slots[slot]) grids[slot] = efcGridContainer(slot, inv.slots[slot].id);
   }
-  const order = inv.bag.map((item, index) => ({ item, index }));
-  order.sort((a, b) => {
-    const [aw, ah] = efcGridSize(a.item), [bw, bh] = efcGridSize(b.item);
-    return bw * bh - aw * ah;
+  const order = inv.bag.map((item, index) => {
+    const size = efcGridSize(item);
+    return { item, index, area: size ? size[0] * size[1] : 0 };
   });
+  if (order.some(entry => !entry.area)) return null;
+  order.sort((a, b) => b.area - a.area);
   for (const { item, index } of order) {
     let placed = false;
     for (const kind of Object.keys(grids)) {

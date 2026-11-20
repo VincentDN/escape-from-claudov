@@ -45,7 +45,13 @@ try {
     const S = { items: [{ id: 'ak', n: 1, mag: 30, res: 90 }, { id: 'a545', n: 60 }, { id: 'watch', n: 2 }, { id: 'rk', n: 1 }, { id: 'band', n: 3 }], loadout: { slots: { primary: null, sidearm: { id: 'pm', n: 1, mag: 8, res: 24 }, armor: { id: 'vest', n: 1 }, pack: null }, bag: [{ id: 'cog', n: 1 }] } };
     T.S = S;
     delete EFC.services['stash:equip']; // real ITEMS service: this test drives the fake stash through inv:equip
-    efcProvide('item:def', (id) => D[id]);
+    // Give the mock items real catalogue dimensions so the grid can normalize them.
+    const geometry = { ak: 'w_ak47', pm: 'w_m9', vest: 'armor_t2', rk: 'pack_s',
+      a545: 'ammo_rifle', band: 'med_bandage', watch: 'loot_tobacco', cog: 'loot_bearing' };
+    for (const [id, key] of Object.entries(geometry)) {
+      const real = efcItemDef(key);
+      EFC_ITEMS[id] = { ...real, ...D[id], weapon: real.weapon };
+    }
     efcProvide('stash:get', () => S);
     efcProvide('stash:toLoadout', (i) => { log('stash:toLoadout', i); const it = S.items.splice(i, 1)[0]; if (!it) return false; S.loadout.bag.push(it); return true; });
     efcProvide('stash:toStash', (k) => { log('stash:toStash', k); const it = typeof k === 'string' ? S.loadout.slots[k] : S.loadout.bag[k]; if (!it) return false; if (typeof k === 'string') S.loadout.slots[k] = null; else S.loadout.bag.splice(k, 1); S.items.push(it); return true; });

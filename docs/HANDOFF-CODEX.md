@@ -255,6 +255,13 @@ while it is open (as the inventory does).
 When the player looks toward a strong light source (the sun, lamps, the extraction flares), the camera should react like a
 real lens.
 
+**Reference (owner, 20 November 2026):** [`docs/lens/reference-dirty-lens-rainbow-flare.png`](lens/reference-dirty-lens-rainbow-flare.png),
+a capture from another game used for the look only. Match two things in it: a **rainbow spectral streak** (a short, horizontal
+band split into spectrum colours, as if light passed through a prism) that appears over the scene where a strong light grazes
+the lens, and **lens dirt**: small specks and short rain-like streaks scattered over the whole frame, lit up only where
+bright light reaches them. Keep it subtler than the reference by default; strength is a setting. The art style lab (L0,
+`#artlab`) has a dirty-lens dial: start from its shader and settings rather than writing a second one.
+
 - **Lens flare**: ghosts and a halo along the line from the light through the screen centre, sized and faded by how directly
   the light is in view and whether it is blocked (occlusion test against the depth buffer or a ray).
 - **Dirty lens**: a subtle dust and smudge texture over the screen that only shows where bright light hits it. Generate the

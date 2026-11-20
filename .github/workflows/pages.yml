@@ -1,7 +1,7 @@
 name: Deploy to GitHub Pages
 on:
   push:
-    branches: [main]
+    branches: [main, beta]
   workflow_dispatch:
 permissions:
   contents: read
@@ -9,15 +9,25 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   deploy:
+    if: github.ref_name == 'main' || github.ref_name == 'beta'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: production
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: beta
+          path: staging
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -25,8 +35,32 @@ jobs:
         with:
           node-version: 22
       - run: python3 build.py
+        working-directory: production
+      - run: python3 build.py
+        working-directory: staging
+        env:
+          EFC_BETA_PAGES: '1'
+      - name: Assemble public and beta paths
+        run: mv staging/dist production/dist/beta
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: production/dist
       - id: deploy
         uses: actions/deploy-pages@v4
+      - name: Verify published production and beta builds
+        env:
+          SITE_URL: ${{ steps.deploy.outputs.page_url }}
+        run: |
+          for prefix in '' 'beta/'; do
+            expected=$(jq -r .build "production/dist/${prefix}version.json")
+            for attempt in {1..12}; do
+              actual=$(curl -fsSL --max-time 8 "${SITE_URL%/}/${prefix}version.json?build=$expected" | jq -r .build) || actual=''
+              if [[ "$actual" == "$expected" ]]; then break; fi
+              sleep 5
+            done
+            if [[ "$actual" != "$expected" ]]; then
+              echo "::error::Expected ${prefix:-production/} build $expected, got ${actual:-no response}"
+              exit 1
+            fi
+            echo "Verified ${prefix:-production/} build $actual"
+          done

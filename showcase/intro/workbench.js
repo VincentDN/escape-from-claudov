@@ -144,14 +144,14 @@ function drawLcd(time){
  g.putImageData(img,0,0);lcdTex.needsUpdate=true;
 }
 
-// FIA flag (Altis) draped over the near edge of the bench: most of it lies flat on the table
+// Polish resistance flag (white over red, the Kotwica of Polska Walcząca in black) draped over the near edge of the bench: most of it lies flat on the table
 // top under the rifle and the rest hangs down towards the operator's knees, swaying a little. The cloth is a grid
-// bent over the edge on the CPU each frame; texture: fia-flag.png (supplied by the site owner).
+// bent over the edge on the CPU each frame; texture: polish-resistance-flag.png (tools/dev/efc/brand-kotwica.mjs; emblem credit in NOTICE.md).
 const FLAG={x:[-.95,-.25],flat:.3,height:.40,bend:.012,cols:36,rows:26};
 const flagGeo=new T.PlaneGeometry(1,1,FLAG.cols,FLAG.rows);
 // flipY off turns the image 180° together with the +x mapping in drapeFlag (not a mirror image):
 // the crest ends up in view and reads the right way round from above.
-const flagTexture=new T.TextureLoader().load('./fia-flag.png');flagTexture.flipY=false;flagTexture.colorSpace=T.SRGBColorSpace;flagTexture.anisotropy=8;
+const flagTexture=new T.TextureLoader().load('./polish-resistance-flag.png');flagTexture.flipY=false;flagTexture.colorSpace=T.SRGBColorSpace;flagTexture.anisotropy=8;
 const flagMat=new T.MeshStandardMaterial({map:flagTexture,roughness:.95,side:T.DoubleSide});
 const flag=new T.Mesh(flagGeo,flagMat);flag.castShadow=flag.receiveShadow=true;flag.frustumCulled=false;scene.add(flag);
 function drapeFlag(time){

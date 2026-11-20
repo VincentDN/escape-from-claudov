@@ -1,4 +1,5 @@
-"""Draws the Escape From Claudov brand assets (logo, icons, link preview) from code. Run from the repo root: python3 tools/dev/efc/brand.py"""
+"""Draws the Escape From Claudov brand assets (logo, link preview) from code. Run from the repo root: python3 tools/dev/efc/brand.py
+The site icons are drawn by tools/dev/efc/brand-kotwica.mjs since 20 November 2026; this script no longer writes them."""
 import os
 from PIL import Image, ImageDraw, ImageFont
 BOLD = "/usr/share/fonts/opentype/inter/Inter-ExtraBold.otf"
@@ -19,12 +20,7 @@ def mark(size, pad=0.0, bg=DARK):
     cx, cy, r = a + s * 0.50, a + s * 0.50, s * 0.19
     d.polygon([(cx - r, cy - r), (cx + r * 1.5, cy), (cx - r, cy + r), (cx - r * 0.25, cy)], fill=AMBER)
     return im
-os.makedirs("assets/icon", exist_ok=True)
-logo().save("assets/logo.webp", lossless=True)
-for name, size, pad in (("favicon-64", 64, 0), ("favicon-96", 96, 0), ("apple-touch-icon", 180, 0.06), ("icon-192", 192, 0.04), ("icon-512", 512, 0.04),
-                        ("maskable-192", 192, 0.18), ("maskable-512", 512, 0.18)):
-    mark(size, pad).save(f"assets/icon/{name}.png")
-mark(64).save("assets/icon/favicon.ico", sizes=[(16, 16), (32, 32), (48, 48)])
+# (site icons: tools/dev/efc/brand-kotwica.mjs)
 bg = Image.open("assets/menu-bg.webp").convert("RGB").resize((1470, 630)).crop((135, 0, 1335, 630)).convert("RGBA")
 bg.alpha_composite(Image.new("RGBA", bg.size, (0, 0, 0, 90))); lg = logo().resize((700, 161)); bg.alpha_composite(lg, (60, 60))
 bg.convert("RGB").save("assets/apercu.jpg", quality=86)

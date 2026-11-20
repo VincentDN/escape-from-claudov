@@ -65,7 +65,9 @@ function iconSvg({ emblem, border, framed = true }) {
     '<rect x="3" y="3" width="28" height="28" fill="url(#d)" shape-rendering="crispEdges"/>' +
     `<rect x=".5" y=".5" width="28" height="28" fill="${RED}" stroke="${border}" stroke-width="1" shape-rendering="crispEdges"/>${glyph}</svg>\n`;
 }
-const SHIP = iconSvg({ emblem: DARK, border: DARK }), WHITE_PROPOSAL = iconSvg({ emblem: '#ffffff', border: '#ffffff' }), MASK = iconSvg({ emblem: DARK, border: DARK, framed: false });
+// The owner chose the white version (20 November 2026); the dark green one is kept in outbound/ for reference.
+const DARK_GREEN = iconSvg({ emblem: DARK, border: DARK }), WHITE_PROPOSAL = iconSvg({ emblem: '#ffffff', border: '#ffffff' }), MASK = iconSvg({ emblem: '#ffffff', border: '#ffffff', framed: false });
+const SHIP = WHITE_PROPOSAL;
 async function rasterise(svgText, size, file) {
   const b = await chromium.launch(), p = await b.newPage({ viewport: { width: size, height: size } });
   await p.setContent(`<html><body style="margin:0;background:transparent">${svgText.replace('<svg ', `<svg width="${size}" height="${size}" `)}</body></html>`);
@@ -82,9 +84,9 @@ const tmp = path.join(REPO, 'assets/icon/favicon-256.tmp.png');
 execFileSync('python3', ['-I', '-c', 'import sys;from PIL import Image;Image.open(sys.argv[1]).save(sys.argv[2],sizes=[(16,16),(32,32),(48,48)])',
   tmp, path.join(REPO, 'assets/icon/favicon.ico')]);
 fs.unlinkSync(tmp); console.log('wrote assets/icon/favicon.ico');
-// the owner's white proposal, not shipped
+// both versions side by side for reference (the white one ships)
 const out = path.join(REPO, 'outbound/favicon-proposal-white'); fs.mkdirSync(out, { recursive: true });
 fs.writeFileSync(path.join(out, 'favicon-white.svg'), WHITE_PROPOSAL);
-fs.writeFileSync(path.join(out, 'favicon-dark-green.svg'), SHIP);
-for (const sz of [32, 64, 256]) { await rasterise(WHITE_PROPOSAL, sz, path.join(out, `favicon-white-${sz}.png`)); await rasterise(SHIP, sz, path.join(out, `favicon-dark-green-${sz}.png`)); }
+fs.writeFileSync(path.join(out, 'favicon-dark-green.svg'), DARK_GREEN);
+for (const sz of [32, 64, 256]) { await rasterise(WHITE_PROPOSAL, sz, path.join(out, `favicon-white-${sz}.png`)); await rasterise(DARK_GREEN, sz, path.join(out, `favicon-dark-green-${sz}.png`)); }
 console.log('wrote outbound/favicon-proposal-white/');

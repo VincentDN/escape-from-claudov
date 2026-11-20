@@ -1,4 +1,4 @@
-# Third track: tasks C1 to C15
+# Third track: tasks C0 to C15
 
 Written 20 November 2026 for the agent that finished tracks T and A. Everything from `docs/HANDOFF.md` sections 1 to 4 and 7
 still applies (branching, build, tests, rules that are not negotiable, how to report), with these updates:
@@ -21,6 +21,7 @@ rates).
 
 Work in this order. Each line is one or more mergeable branches.
 
+0. **C0** finish the grid inventory: drag, rotate, foley (owner, before C1)
 1. **C1** raid-start weapon check
 2. **C9** omnimovement (moved up by the owner: right after C1)
 3. **C2** Partisan modern weapons, batch 1
@@ -36,6 +37,33 @@ Work in this order. Each line is one or more mergeable branches.
 **C10** (menu fonts) is small and touches only the menus: do it whenever a short slot is free, ideally before C9's long run.
 
 ---
+
+## C0. Finish the grid inventory (medium; first, before C1)
+
+The owner played the grid inventory (A6 to A8) and wants it finished before anything else. Three things:
+
+1. **Visual drag and drop everywhere.** The player picks an item up with the mouse and sees it follow the cursor at its real
+   grid size, drawn with its thumbnail; the cells under it light up green where it fits and red where it does not; releasing
+   places it, releasing on an invalid spot returns it. This must work between every pair of places: stash, loadout slots,
+   every container grid (vest or rig, backpack, pockets), the vicinity (open crate or body, loose items on the ground), the
+   hands panel and quick slots, and the weapon's attachment slots. Dropping outside every panel drops the item on the ground
+   in a raid. Some pointer handling exists already (`src/efc/50-efc-ui-container.js`, `src/efc/55-efc-operator.js`): read it,
+   keep what works, and make one drag system that all panels use rather than one per panel.
+2. **R rotates.** While an item is being dragged, R rotates it 90 degrees (the data already supports `rotated`: `efcGridSize`,
+   `efcGridFits` in `src/efc/25-efc-grid.js`); the ghost and the fit highlight update at once. R must not reload while the
+   inventory is open. Square items ignore it.
+3. **Foley on every action.** Opening and closing the inventory, picking an item up, putting it down, rotating it, a refused
+   drop, equipping into a slot, mounting an attachment, splitting a stack, and searching a container each play a handling
+   sound from the existing pools in `src/efc/45-efc-sounds.js` (heavier items pitched lower; a weapon picked up sounds like
+   a weapon, a bandage does not). Throttle so fast dragging never stacks sounds.
+
+- Online: the host still decides placements in shared containers; the drag shows the result only when the host confirms, and
+  a refused move snaps back with the refusal sound.
+- Keyboard operation stays possible (pick up with Enter, move with the arrow keys, R rotates, Enter places).
+- Tests: scripted drags between every pair of panels, rotation that makes a long item fit where it did not, a refused drop,
+  the ghost following the cursor, R not reloading while open, and every action firing its sound (record the calls); the
+  two-client rig for a drag into a shared crate. Screenshots of a drag in progress (green and red highlight) in
+  `docs/inventory/`.
 
 ## C1. Raid-start weapon check (medium)
 

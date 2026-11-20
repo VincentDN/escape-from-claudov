@@ -13,13 +13,14 @@ says what is done, what is assigned to whom, and what only the owner can do.
 | Handoff A1 to A9 | Performance route (`#bench`), StG 44 in raids, Scavengers, host migration, container collision, grid inventory data, grid interactions, operator inventory screen, attachments and the hideout workbench | `docs/HANDOFF-ASTRA.md` |
 | Other | Raid-only game (team deathmatch retired), Partisan opening scene and StG 44 studio in `showcase/`, ElevenLabs and CC0 handling takes, Partisan radio tracks | git log |
 
-## Open: third track, tasks C1 to C15
+## Open: third track, tasks C0 to C15
 
 Detailed in [`docs/HANDOFF-CODEX.md`](HANDOFF-CODEX.md), in this order (owner, 20 November 2026). Each task ends on its own
 mergeable branch.
 
 | Order | Task | What | Size |
 | --- | --- | --- | --- |
+| 0 | C0 | Finish the grid inventory: visual drag and drop between every panel, R to rotate, foley on every action | medium |
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
 | 3 | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3 | large |

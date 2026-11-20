@@ -5,7 +5,7 @@ Owner: Vincent De Nil. The plan, work packages and ownership rules are in [docs/
 
 **Joining now?** Read [docs/ROADMAP.md](docs/ROADMAP.md) for the status of everything, then
 [docs/HANDOFF.md](docs/HANDOFF.md) sections 1 to 4 and 7 for how to branch, build, test and report. The open tasks are in
-[docs/HANDOFF-CODEX.md](docs/HANDOFF-CODEX.md) (C1 to C9). The earlier tracks, now done, are in `docs/HANDOFF.md` (T1 to T7) and
+[docs/HANDOFF-CODEX.md](docs/HANDOFF-CODEX.md) (C0 to C15, in the order given there). The earlier tracks, now done, are in `docs/HANDOFF.md` (T1 to T7) and
 [docs/HANDOFF-ASTRA.md](docs/HANDOFF-ASTRA.md) (A1 to A9).
 
 ## Hard rules

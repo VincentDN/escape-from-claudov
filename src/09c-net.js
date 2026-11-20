@@ -907,7 +907,7 @@ function netSetGun(e, key) {
 }
 /* Arme annoncée par un participant : sa clé (modèle, accessoires, camouflage), à défaut son identifiant ; une valeur inconnue ou mal formée donne le M4A1 */
 function netWeaponDef(P) {
-  const k = typeof P.g === 'string' && /^[a-z0-9_]{2,16}(~[a-z.]{0,80}){0,2}$/.test(P.g) ? P.g : '';
+  const k = typeof P.g === 'string' && /^[a-z0-9_]{2,16}(~[a-z0-9_.]{0,80}){0,2}$/.test(P.g) ? P.g : '';
   return (k && weaponDefByKey(k)) || (hasKey(WEAPONS, P.w) && weaponDef(P.w)) || WEAPONS.m4;
 }
 /* Un joueur ou un bot distant quitte la partie ; ses éliminations restent au score de son équipe (NET.goneK), sauf keep (un bot que je reprends) */

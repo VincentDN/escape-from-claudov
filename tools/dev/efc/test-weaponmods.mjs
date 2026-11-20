@@ -12,7 +12,7 @@ try {
         const normalized = efcItemNorm({ ...item, mods: { parts: [part.id], finish: 'foret' } });
         const def = efcCall('weaponmods:definition', normalized), fp = buildGunModel(def.key), world = buildWorldGun(def.key);
         result.push([key, part.id, def.att.includes(part.part.key), fp.group.children.length > 3, world.group.children.length > 0,
-          weaponDefByKey(def.key).key === def.key]);
+          weaponDefByKey(def.key).key === def.key, netWeaponDef({ w: key, g: def.key }).key === def.key]);
       }
     }
     return result;

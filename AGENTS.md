@@ -9,6 +9,8 @@ The second track, for larger multi-file work, is [docs/HANDOFF-ASTRA.md](docs/HA
 
 ## Hard rules
 
+- **Beta first.** Start agent work on `beta` or branch from it. Push changes to `beta` for staging verification. Push or merge to `main` only with explicit owner permission.
+
 - **File ownership.** Each work package owns the files listed for it in [docs/contracts/CONTRACT.md](docs/contracts/CONTRACT.md),
   engine files included. Do not edit a file another package owns; describe the change you need in your handoff note instead.
 - **Packages talk through the core only** (`src/efc/00-efc-core.js`: events, services, network bus), never by calling each other.

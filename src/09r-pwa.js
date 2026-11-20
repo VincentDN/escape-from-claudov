@@ -107,7 +107,7 @@ function pwaInit() {
   PWA.title0 = $('poTitle').textContent; PWA.lead0 = $('poLead').textContent; // textes ordinaires de la fenêtre (déjà traduits), rétablis après un cas particulier
   // service worker : après le chargement de la page, pour ne pas ralentir le démarrage
   if ('serviceWorker' in navigator) {
-    const reg = () => { navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => { /* hors HTTPS, ou refusé : le jeu fonctionne sans */ }); };
+    const reg = () => { if (!EFC_BETA_PAGES) navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => { /* hors HTTPS, ou refusé : le jeu fonctionne sans */ }); };
     if (document.readyState === 'complete') reg(); else addEventListener('load', reg, { once: true });
   }
   $('poGo').addEventListener('click', () => pwaInstall());

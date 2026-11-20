@@ -11,10 +11,9 @@ owner says otherwise. Bigger work (section 6) is parked on purpose: do not start
 
 ## 1. Before you start
 
-- Branch from `main` (it holds everything merged so far, the same as `claude/trusting-franklin-zp9ch5`). Name your branch
+- Branch from the current `beta` for task isolation. Name your branch
   `<agent>/<task-id>-<topic>`, for example `sol/t1-english-title`. One branch per task.
-- Push your branch. Do not push to `main` or to any `claude/` branch, and do not open a pull request unless the owner asks:
-  the owner reviews and merges.
+- Push verified work to `beta` for staging. Push or merge to `main` only with explicit owner permission. Open a pull request only if the owner asks.
 - Commit style: `feat|fix|docs|chore|test(T<n>): subject`, and a body that says what you verified.
 
 ## 2. How the code is laid out

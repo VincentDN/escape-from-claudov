@@ -4,7 +4,7 @@ Written 18 November 2026, after the first handoff (`docs/HANDOFF.md`, tasks T1 t
 an agent that can take on larger, multi-file work. Read `docs/HANDOFF.md` sections 1 to 4 and 7 first: how to branch, build,
 test and report, and the rules that are not negotiable. They all apply here, with these changes:
 
-- Name branches `astra/a<n>-<topic>`, branched from the current `main`.
+- Name branches `astra/a<n>-<topic>`, branched from the current `beta`.
 - The game is now **raid only**: team deathmatch was retired (`e2eb1cc`). Tests and smoke runs use raid mode.
 - `showcase/` holds standalone pages ported from Partisan Project: the opening scene and the StG 44 workbench, with Partisan's
   weapon and attachment models (`showcase/assets/models/weapons/*.glb`). The owner authorised that port and cleared every

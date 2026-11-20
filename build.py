@@ -9,6 +9,7 @@ et leurs illustrations (dist/maps/).
 import base64,datetime,glob,hashlib,html as _html,json,os,re,shutil,subprocess,sys,tempfile
 sys.path.insert(0,"tools")
 import i18n,minif
+beta_pages = os.environ.get("EFC_BETA_PAGES") == "1"
 tags="" # three.js : dist/tex/three.<condensat>.js (socle, plus bas), servi par le site comme le reste
 # Relais des salons en ligne (serveur de jeu, voir serveur/README.md) : COD_RELAY_URL, sinon le fichier relay.url.
 # Avec un relais, tout passe par lui (netViaServer, src/09d-netrelay.js) et PeerJS n'est pas chargé : aucune connexion directe
@@ -28,6 +29,10 @@ js="\n".join(open(f,encoding="utf-8").read() for f in _files)
 js=re.sub(r"^export ","",open("api/_lib/filtre.js",encoding="utf-8").read(),flags=re.M)+"\n"+js
 def data_uri(path):
     return "data:image/"+("png" if path.endswith(".png") else "webp")+";base64,"+base64.b64encode(open(path,"rb").read()).decode("ascii")
+js = "const EFC_BETA_PAGES = " + json.dumps(beta_pages) + ";\n" + js
+if beta_pages:
+    # GitHub Pages project sites on the same account share an origin and browser storage.
+    js = re.sub(r'\b(localStorage|sessionStorage)\.(getItem|setItem|removeItem)\(', r'\1.\2("claudov-beta:" + ', js)
 # Textures photo CC0 (assets/tex/<surface>/map, normal, rough .webp, produites par tools/build_assets.py) : elles ne sont
 # plus dans la page. Chaque surface devient un petit script à côté du HTML, dist/tex/<surface>.<condensat>.js, qui appelle
 # texPack(clé, données) ; le jeu ne le charge qu'au lancement de la première carte qui s'en sert. Le condensat change
@@ -191,7 +196,12 @@ json.dump({"id":"/","name":"Escape From Claudov","short_name":"Claudov","descrip
              {"src":icons["maskable-192"],"sizes":"192x192","type":"image/png","purpose":"maskable"},{"src":icons["maskable-512"],"sizes":"512x512","type":"image/png","purpose":"maskable"}]},
     open("dist/manifest.webmanifest","w",encoding="utf-8"),ensure_ascii=False,indent=1)
 # Service worker (assets/pwa/sw.js) : à la racine de dist/ pour couvrir tout le site
-shutil.copyfile("assets/pwa/sw.js","dist/sw.js")
+if beta_pages:
+    # Avoid sharing the production service worker's origin-wide cache management.
+    if os.path.exists("dist/sw.js"):
+        os.remove("dist/sw.js")
+else:
+    shutil.copyfile("assets/pwa/sw.js", "dist/sw.js")
 shutil.copyfile("assets/icon/favicon.ico","dist/favicon.ico")  # /favicon.ico : chemin par défaut que les moteurs de recherche essaient
 html=html.replace("__ICON_FAVICON96__",icons["favicon-96"]).replace("__ICON_FAVICON__",data_uri("assets/icon/favicon-64.png")).replace("__ICON_APPLE__",icons["apple-touch-icon"])
 print("icônes :",", ".join(icons))

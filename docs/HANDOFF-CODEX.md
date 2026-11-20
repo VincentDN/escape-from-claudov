@@ -38,6 +38,19 @@ Work in this order. Each line is one or more mergeable branches.
 
 ---
 
+## Before C0: three small items found while building L0 (Claude, 20 November 2026)
+
+L0, the art style lab (`#artlab`, `src/efc/47-efc-artlab*.js`, `docs/artlab/README.md`), is merged into `beta` and live at
+`/beta/#artlab`. It owns its two files; do not restyle the game from it until the owner sends the chosen settings.
+
+- **X1, inventory test failures (fix first, as part of C0).** `node tools/dev/efc/test-ui.mjs` fails 2 checks on `beta`:
+  "efcGridSize is not a function or its return value is not iterable" in `efcGridLoadout`. They fail with or without L0.
+- **X2, anti-aliasing on alternate frames (own branch, `codex/x2-msaa-swap`).** In `src/01-core.js` only `finalPass` swaps
+  buffers, so the composer alternates between `renderTarget1` (MSAA) and `renderTarget2` (no MSAA when AO is off): measured
+  `{"rt1":4,"rt2":0,"swaps":["ShaderPass"]}` at medium quality. Likely fix: `finalPass.needsSwap = false`. Prove it with a
+  test that every frame renders into the MSAA target, and before/after stills; check the L0 lab pass still runs last.
+- **X3, menu button for the lab (with C10).** Add an "Art lab" entry to the main menu (UI package) that opens `#artlab`.
+
 ## C0. Finish the grid inventory (medium; first, before C1)
 
 The owner played the grid inventory (A6 to A8) and wants it finished before anything else. Three things:

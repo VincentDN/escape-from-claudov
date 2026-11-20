@@ -22,6 +22,7 @@ function armsW(ent) { return ent.arms.slots[ent.arms.cur]; }
 function initCtl(ent, ids, reserveMul) {
   ent.input = makeInput(); ent.arms = makeArms(ids, reserveMul);
   ent.onGround = true; ent.vy = 0; ent.eyeH = 1.62; ent.airVy = 0; ent.slideT = 0; ent.slideCd = 0; ent.slideBuf = 0; ent.slideAmt = 0; ent.sprinting = false; ent.jumpHeld = false; ent.busy = false; ent.blockSprint = false; ent.adsActive = false;
+  if (ent.isPlayer) efcOmniReset(ent);
 }
 
 /* Glissade : accroupi pendant un sprint. L'élan de la course est conservé (un peu accéléré) puis retombe ; on glisse en ligne
@@ -45,7 +46,7 @@ const SWITCH = { dur: 0.44, swap: 0.24 };
 /* Déplacement : renvoie la vitesse verticale d'atterrissage (0 si pas d'atterrissage) */
 function ctlMove(ent, dt) {
   const I = ent.input, A = ent.arms, d = armsW(ent).def;
-  let sprint = I.sprint && I.mz > 0.3 && !I.ads && !ent.blockSprint && A.boltT <= 0 && (!ent.busy || ent.sprintBusyOk);
+  let sprint = I.sprint && efcOmniSprintDirection(ent, I) && !I.ads && !ent.blockSprint && A.boltT <= 0 && (!ent.busy || ent.sprintBusyOk);
   // glissade : démarrage, puis la course n'est plus « un sprint » (on peut tirer et viser)
   ent.slideCd = Math.max(0, (ent.slideCd || 0) - dt);
   let slid = false, sliding = (ent.slideT || 0) > 0;
@@ -69,7 +70,8 @@ function ctlMove(ent, dt) {
   ent.adsActive = I.ads && !sprint && !A.reload && !ent.busy && !A.knife && A.switching <= 0 && (A.boltT <= 0.2 || !!d.bolt || !!d.pump);
   A.adsW = damp(A.adsW, ent.adsActive ? 1 : 0, (1 / Math.max(0.05, d.adsTime)) * 2.2, dt);
   let spd = MOVE_SPEED * (A.knife ? KNIFE_MOVE : d.move);
-  if (sprint) spd *= SPRINT_MUL; else if (A.adsW > 0.5) spd *= d.scope ? 0.4 : 0.58;
+  const tactical = efcOmniTacticalSprint(ent, sprint, dt);
+  if (sprint) spd *= SPRINT_MUL * tactical; else if (A.adsW > 0.5) spd *= d.scope ? 0.4 : 0.58;
   if (ent.crouch) spd *= 0.6;
   const fx = -Math.sin(ent.yaw), fz = -Math.cos(ent.yaw), rx = Math.cos(ent.yaw), rz = -Math.sin(ent.yaw);
   let wx = fx * I.mz + rx * I.mx, wz = fz * I.mz + rz * I.mx; const wl = hyp(wx, wz);

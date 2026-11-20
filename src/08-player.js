@@ -325,7 +325,7 @@ function updatePlayer(dt, now) {
   const fw = lockMove ? 0 : padClamp((TOUCH.on ? TOUCH.mz : (KEYS.KeyW || KEYS.ArrowUp ? 1 : 0) - (KEYS.KeyS || KEYS.ArrowDown ? 1 : 0)) + PAD.mz);
   const st = lockMove ? 0 : padClamp((TOUCH.on ? TOUCH.mx : (KEYS.KeyD || KEYS.ArrowRight ? 1 : 0) - (KEYS.KeyA || KEYS.ArrowLeft ? 1 : 0)) + PAD.mx);
   const run = (TOUCH.on ? TOUCH.sprint : !!KEYS.ShiftLeft) || PAD.sprint;
-  if (run && fw > 0 && PL.crouchToggle) PL.crouchToggle = false;
+  if (run && efcOmniSprintDirection(e, { mx: st, mz: fw }) && PL.crouchToggle) PL.crouchToggle = false;
   if (KEYS.Space && e.crouch && PL.onGround) PL.crouchToggle = false;
   // tirer pendant une course l'interrompt, quelle que soit l'entrée (le contrôleur ne tire pas en sprint, ctlWeapon) : tant que la
   // gâchette est tenue, et pour un coup demandé en courant tant qu'il n'est pas parti (runShot : la sortie de course dure un instant,

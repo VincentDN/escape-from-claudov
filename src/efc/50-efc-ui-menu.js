@@ -173,6 +173,7 @@ efcOn('ui:init', () => {
   EFC_UI.raidL = lmMount($('scr-raid'), { pages: EFC_RAID_PAGES, home: 'raid', col: $('efcRaidList'), stage: $('efcRaidStage'), panel: $('efcRaidPanel'),
     preview: $('efcRaidPrev'), preview2: $('efcRaidPrev2'), title: $('scr-raid').querySelector('h2'), sub: $('efcRaidSub'), screen: 'raid' });
   $('efcRaidGo').addEventListener('click', () => efcUiRaidLaunch());
+  $('efcArtLabBtn').addEventListener('click', () => { location.hash = 'artlab'; });
   $('efcCrSrc').addEventListener('click', () => window.open(EFC_UI_SRC, '_blank', 'noopener'));
   $('efcMmStash').textContent = efcUiStashLine();
 });

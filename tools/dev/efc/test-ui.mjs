@@ -21,7 +21,7 @@ try {
     const btn = (t) => [...document.querySelectorAll('#scr-main button')].find((b) => b.querySelector('b') ? b.querySelector('b').firstChild.textContent.trim() === t : b.textContent.trim() === t);
     return {
       screen: UI.screen, lang: LANG,
-      shown: ['Raid', 'Squad raid', 'Hideout', 'Settings', 'Credits'].map((t) => [t, vis(btn(t))]),
+      shown: ['Raid', 'Squad raid', 'Hideout', 'Settings', 'Credits', 'Art Lab'].map((t) => [t, vis(btn(t))]),
       hidden: [['play', $('mmPlay').closest('button')], ['classes', document.querySelector('#scr-main [data-go=classes]')], ['skins', document.querySelector('#scr-main [data-go=skins]')],
         ['news', document.querySelector('#scr-main [data-go=news]')], ['account', $('acctChip')], ['friends', $('friendsBtn')], ['community', $('commBtn')], ['ranking', $('rankBtn')],
         ['legal', document.querySelector('#scr-main [data-go=legal]')], ['pwa', $('pwaCard')], ['deck', $('deckCard')], ['whatsnew', $('whatsnew')], ['eco', $('ecoAsk')], ['install', $('pwaOffer')]].map(([k, e]) => [k, vis(e)]),

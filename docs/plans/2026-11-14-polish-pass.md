@@ -80,6 +80,15 @@ the Warden count within the map's number for the whole raid.
 **Proof**: I cannot hear. I can check that every event has a sample, levels, clipping and timing against the animation. An
 audition page (`dev/sounds.html`: every event, old and new, with play buttons) lets the owner judge by ear.
 
+### Follow-up. Recorded handling foley
+
+- Audit the live handling bank and mark which cues use recordings, generated audio or synthesis. Prioritize the cues still
+  using synthesis or repeated generic clips.
+- Audition existing owner-cleared takes and licensed recorded sound libraries. Build several clean variants for each common
+  handling cue, with coverage for reloads, magazine movement, action sounds, draw, holster and inspect.
+- Match the sound transients to the in-game animations, level-match old and new clips for an A/B review, and verify that each
+  selected recording plays in a raid. Record the source and redistribution terms for every new clip.
+
 ## P2b. Warden pace and posture (owner, 14 November)
 
 Owner's report: Wardens move weirdly fast; they should move slower, and much slower when idle, in a relaxed low-ready pose.

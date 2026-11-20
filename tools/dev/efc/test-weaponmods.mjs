@@ -59,6 +59,11 @@ try {
   });
   assert.deepEqual(raid, [['red', 'stg40'], 40, true, true, ['holo', 'stg40'], true]);
   if (process.env.EFC_RAID_SHOT) await page.screenshot({ path: process.env.EFC_RAID_SHOT, timeout: 120000 });
+  await page.evaluate(() => { GPUX.halt = true; efcUirOpen('inv'); });
+  await page.locator('#efcInv [data-op-detach="optic"]').click();
+  assert.deepEqual(await page.evaluate(() => [
+    curW().def.att, EFC.inv.bag.some(it => it.id === 'part_holo'), efcCall('ui:busy'),
+  ]), [['stg40'], true, true]);
   assert.deepEqual(errors, []);
   console.log('Weapon mods passed supported model builds, ownership, storage, world payload, raid stats and field swaps');
 } finally {

@@ -80,6 +80,7 @@ async function measure({ page, canvas }) {
     const opportunities = metrics.opportunities.filter(time => time >= start).length;
     return {
       buffer: [element.width, element.height], frames: frames.length, opportunities,
+      antialias: element.getContext('webgl2').getContextAttributes().antialias,
       medianMs: value(.5), p95Ms: value(.95),
     };
   });
@@ -103,6 +104,8 @@ try {
   console.log('Current Claudov', current);
   assert.deepEqual(reference.buffer, [960, 540]);
   assert.deepEqual(current.buffer, reference.buffer);
+  assert.equal(reference.antialias, true, 'The reference scene uses WebGL antialiasing');
+  assert.equal(current.antialias, reference.antialias, 'Use the same edge antialiasing as Partisan');
   assert.equal(current.readbacks, 0, 'The opening scene should have exclusive use of the GPU');
   assert.ok(current.frames > 2 && reference.frames > 2, 'Both canvases must animate');
   assert.ok(current.frames >= current.opportunities - 1, 'Draw on every available animation frame');

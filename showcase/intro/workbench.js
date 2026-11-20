@@ -178,7 +178,7 @@ function drapeFlag(time){
 drapeFlag(0);
 
 // ---------- Operator, leaning over the bench ----------
-const op=buildOperator({...DEFAULT_OPERATOR,headgear:'none',gloves:'none',pack:'none'});
+const op=buildOperator({...DEFAULT_OPERATOR,headgear:'none',gloves:'none',pack:'none',armband:'none',patch:'pl'});// Polish theme: white and red armband, no star
 op.root.traverse(m=>{if(m.isMesh)m.castShadow=m.receiveShadow=true;});scene.add(op.root);
 const LEAN={hips:.1,spine:.16,chest:.18,neck:.08,head:.42};
 function pose(time){

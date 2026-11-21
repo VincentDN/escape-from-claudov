@@ -31,10 +31,14 @@ jobs:
           export EFC_TEST_URL=http://127.0.0.1:8231/
           python3 -m http.server 8231 --bind 127.0.0.1 --directory dist >"$RUNNER_TEMP/efc-checks/server.log" 2>&1 &
           trap 'kill "$!"' EXIT
+          failed=0
           for check_pass in 1 2; do
             export EFC_TEST_LOG_DIR="$RUNNER_TEMP/efc-checks/pass-$check_pass"
-            bash tools/dev/efc/run-all.sh | tee "$RUNNER_TEMP/efc-checks/pass-$check_pass.log"
+            if ! bash tools/dev/efc/run-all.sh | tee "$RUNNER_TEMP/efc-checks/pass-$check_pass.log"; then
+              failed=1
+            fi
           done
+          exit "$failed"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

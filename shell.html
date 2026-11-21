@@ -2539,8 +2539,11 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 #scr-deploy.raid #cpDeploy { display: none; }
 #efcDepKit { display: none; }
 #scr-deploy.raid #efcDepKit { display: block; flex: 1 1 auto; min-height: 0; overflow-y: auto; max-width: 760px; }
-.efc-ho { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; flex: 1 1 auto; min-height: 0; max-width: 1280px; width: 100%; }
-.efc-ho .efc-col { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+#scr-hideout { --px: clamp(12px, 1.8vw, 36px); --py: clamp(12px, 2.4vh, 28px); }
+.efc-ho { flex: 1 1 0; }
+.efc-ho .efc-col { display: flex; flex-direction: column; }
+#efcOpStash { flex: 0 1 auto; min-height: 0; overflow: auto; }
+#efcHoStash, #efcHoLoad { min-height: 76px; }
 .efc-list { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; min-height: 0; flex: 1 1 auto; }
 .efc-gh { margin: 12px 0 4px; font-size: var(--fs-xs); font-weight: 700; color: var(--mute); letter-spacing: var(--track-w); text-transform: uppercase; }
 .efc-gh:first-child { margin-top: 0; }
@@ -2613,8 +2616,9 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 .efc-stats .st b { font-family: var(--hud); font-size: 28px; }
 .efc-sum .efc-list { max-height: 34vh; }
 /* Shared operator inventory, in the Hideout and during raids. */
-.efc-ho.efc-op-layout, .efc-op-layout {
-  display: grid; grid-template-columns: minmax(0,1fr) minmax(180px,.82fr) minmax(0,1fr); gap: 16px; min-height: 0;
+.efc-op-layout {
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(180px,.82fr) minmax(0,1fr);
+  gap: clamp(8px, 1.2vw, 24px); width: 100%; min-width: 0; min-height: 0; margin-inline: auto;
 }
 .efc-op-layout > .efc-col { min-width: 0; min-height: 0; overflow: auto; }
 .efc-op-layout .efc-it.efc-thr.noslot {
@@ -2625,7 +2629,7 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 }
 .efc-op-layout .efc-it .efc-th { width: 100%; max-height: 46px; }
 .efc-op-model { display: flex; flex-direction: column; align-items: stretch; min-height: 0; padding: 12px; gap: 8px; }
-.efc-op-model canvas { display: block; width: 100%; height: min(45vh, 430px); object-fit: contain; background: #171a14; cursor: grab; touch-action: none; }
+.efc-op-model canvas { display: block; width: 100%; min-height: 0; flex: 1 1 0; object-fit: contain; background: #171a14; cursor: grab; touch-action: none; }
 .efc-op-model canvas:active { cursor: grabbing; }
 .efc-op-hands { min-height: 1.5em; margin: 0; color: var(--paper); }
 .efc-op-grid { display: grid; position: relative; max-width: 100%; aspect-ratio: var(--cols) / var(--rows);
@@ -2645,7 +2649,7 @@ body:has(.efc-op-ghost) .efc-prev { visibility: hidden; }
 [data-op-drop="valid"] { outline: 2px solid var(--ally); outline-offset: -2px; }
 [data-op-drop="invalid"] { outline: 2px solid var(--danger); outline-offset: -2px; }
 .efc-op-section { margin-top: 8px; }
-#efcOpStash .efc-op-grid { max-width: 235px; }
+#efcOpStash .efc-op-grid { max-width: clamp(235px, 32vh, 350px); margin-inline: auto; }
 #efcOpLootGrid .efc-op-grid { max-width: 330px; }
 .efc-col:has(#efcLootArrange:not([hidden])) #efcOpLootGrid { display: none; }
 .efc-op-section .lbl { display: flex; justify-content: space-between; gap: 6px; }
@@ -2657,7 +2661,7 @@ body:has(.efc-op-ghost) .efc-prev { visibility: hidden; }
 .efc-op-slot b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .efc-op-slot .efc-th.slot { width: 100%; height: 28px; }
 .efc-op-bottom { flex: 0 0 auto; display: grid; grid-template-columns: minmax(110px,.25fr) minmax(0,1fr); gap: 12px;
-  width: 100%; max-width: 1280px; padding: 8px 12px; background: var(--panel); border: 1px solid var(--line); }
+  width: 100%; padding: 8px 12px; background: var(--panel); border: 1px solid var(--line); }
 .efc-op-bottom .lbl { margin: 0 0 4px; }
 .efc-op-quick { display: grid; grid-template-columns: repeat(9,minmax(0,1fr)); gap: 4px; }
 .efc-op-quick button { min-width: 0; display: grid; grid-template-columns: auto minmax(0,1fr); gap: 4px; align-items: center;
@@ -2669,11 +2673,14 @@ body:has(.efc-op-ghost) .efc-prev { visibility: hidden; }
 .efc-op-attachments li { display: flex; gap: 6px; margin: 0 0 4px; }
 .efc-op-attachments .efc-op-slot { display: flex; justify-content: space-between; align-items: center; flex: 1 1 auto; min-height: 30px; }
 .efc-op-grids { max-height: 48vh; overflow: auto; flex-shrink: 0; }
-.efc-box.efc-op-box { width: min(94vw,1280px); height: min(88vh,780px); }
-.efc-op-box .efc-op-layout { flex: 1 1 auto; }
+.efc-box.efc-op-box { width: 100%; height: 100%; max-height: none; padding: clamp(12px, 1.8vw, 36px); }
+.efc-op-box .efc-op-layout { flex: 1 1 0; }
 .efc-op-vicinity { margin: 0; padding-left: 1.25rem; }
-@media (max-width:760px) { .efc-ho.efc-op-layout, .efc-op-layout { grid-template-columns: minmax(0,1fr); overflow: auto; } }
-@media (max-width: 760px) { .efc-ho, .efc-box.efc-two { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .efc-op-layout { grid-template-columns: minmax(0,1fr); grid-auto-rows: max-content; overflow: auto; }
+  .efc-op-model canvas { flex: none; height: min(42vh, 320px); }
+  .efc-box.efc-two { grid-template-columns: 1fr; }
+}
 </style>
 <!--SOCLE_UI-->
 </head>

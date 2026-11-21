@@ -143,8 +143,10 @@ layout, not the look: no art, icons, fonts or text from DayZ, Tarkov or any othe
 
 ## A9. Attachments and weapon modding through the workbench (large; after A2 and A8)
 
-`showcase/workbench/` already has Partisan's StG 44 workbench: attachment models, mount and fit rules, finishes, sliders and
-studio lighting, as a standalone viewer. Turn it into the game's gunsmith.
+Use [Partisan's main workbench](https://github.com/VincentDN/partisan-project/tree/main/workbench) as the source for the modding
+system and weapon and attachment assets. Its catalogue, mounting points, compatibility and clearance rules, rail adjustments
+and finishes govern the Claudov workbench. Bring Riposte's base weapons into the same catalogue with model and mount mappings
+for compatible parts. The StG 44 studio supplies only the lighting, background, floor and canted weapon view.
 
 - **Attachments as items**: every attachment model in `showcase/assets/models/weapons/` (optics, muzzles and suppressors, grips,
   lights, lasers, magazines, bipods, rails) becomes an item with size, weight, value, a thumbnail and stat effects (recoil,
@@ -152,12 +154,12 @@ studio lighting, as a standalone viewer. Turn it into the game's gunsmith.
   carry some.
 - **Weapons carry their parts**: a weapon item stores its attachments and finish; the first-person and world models show them;
   stats change with them; a looted weapon keeps what was on it, so stripping a dead Warden's rifle is worth it.
-- **The workbench**: from the hideout, open a weapon from the stash on the bench (the showcase's lighting and studio set-up, run
-  with the game's renderer or as the showcase page talking to the game through a small message bridge, whichever is cleaner).
-  Mount only parts the player owns in the stash; mount and fit rules from the showcase decide what fits where; removed parts go
-  back to the stash. Save, and the modded weapon is what the player takes into the next raid.
+- **The workbench**: from the hideout, open a stash weapon in the StG 44 studio. Use Partisan's modding system to decide what
+  fits where, including rail requirements and 10 mm position adjustments where supported. Mount only parts the player owns
+  in the stash. Removed parts return to the stash. Saving carries the build into the next raid.
 - **In the field**: attach and detach small parts from the A8 screen by dragging onto the weapon's slots, without the bench.
-- Start with the StG 44 from A2 and the AK-family rifles the showcase covers, then extend the mount rules to the other weapons.
+- Start with the StG 44 from A2, the Partisan AK-family rifles and a Riposte base weapon. Extend the shared catalogue and
+  compatibility rules to the rest of the roster in C2 and C3.
 - Tests: logic tests for fit rules and stat changes, a raid where a looted optic is mounted at the bench and the stats and model
   change, the two-client rig showing the mounted parts on the remote copy, and screenshots of the bench and of a modded rifle in
   first person.

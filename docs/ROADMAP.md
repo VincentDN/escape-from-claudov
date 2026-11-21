@@ -1,7 +1,6 @@
 # Escape From Claudov: roadmap
 
-Single status page for the whole project. Updated 20 November 2026, with the owner's decisions of that day. Detail lives in the files linked from each line; this page
-says what is done, what is assigned to whom, and what only the owner can do.
+Single status page for the whole project. Updated 21 November 2026. The linked handoffs record what is done, what is assigned, and what needs the owner.
 
 ## Done and merged on `main`
 
@@ -24,12 +23,12 @@ mergeable branch.
 | 0 | C0 | Finish the grid inventory: visual drag and drop between every panel, R to rotate, foley on every action | medium |
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
-| 3 | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3 | large |
+| 3 | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3. Integrate Partisan’s modding system and assets with Riposte’s base weapons in the same workbench. Use the StG 44 bench only for lighting, background, floor and canted weapon view. | large |
 | 4 | C15 | Minimal HUD: no ammo counter; hold R to pull the magazine and see the rounds | medium |
 | 5 | C11 | `M` opens a full-screen map with extracts and points of interest; green smoke flares over open extracts | medium |
 | 6 | C12 | Dirty lens, lens flare and bloom when looking at light sources | medium |
 | 7 | C13 | Real weapon foley for every action, with ElevenLabs alternatives and variants (plan use approved) | medium to large |
-| 8 | C3 | Remaining modern weapons (MK14, SPEAR) and every remaining attachment | large |
+| 8 | C3 | Remaining modern weapons (MK14, SPEAR) and every remaining attachment through the same Partisan modding system | large |
 | 9 | C4 | Marksman, Breacher and Heavy enemy types | medium to large |
 | 10 | C5 | AI behaviour upgrade for every hostile | large |
 | 11 | C6 | Rival raider squads | large |

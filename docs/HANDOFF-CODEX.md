@@ -104,6 +104,11 @@ Follow `docs/weapon-port.md` (the StG 44 pilot) for each of these Partisan rifle
 Models are in the Partisan Project repository (`assets/models/weapons/`); the owner cleared all of them for this repository.
 Copy only what you use into `showcase/assets/models/weapons/` or a game asset folder, and list each in `NOTICE.md`.
 
+Carry forward the [A9 workbench specification](HANDOFF-ASTRA.md#a9-attachments-and-weapon-modding-through-the-workbench-large-after-a2-and-a8).
+Use Partisan's modding system and assets for the combined Partisan and Riposte roster. Use the StG 44 bench only for its
+lighting, background, floor and canted view. Verify that both a Partisan weapon and a Riposte base weapon support selecting,
+mounting and saving compatible parts through the same workbench.
+
 For each weapon:
 
 - Offline model preparation (decimate, strip spare parts, keep the attachment mount points that A9 uses), within the triangle
@@ -112,8 +117,8 @@ For each weapon:
   short table in `docs/weapons.md` so the roster stays coherent.
 - First-person grips and aligned sights, world model, reload choreography, sounds, thumbnail with calibre, item, loot tables
   and which hostiles carry it.
-- Attachments: it must accept the A9 parts that physically fit (rails, muzzles, optics, grips, magazines such as the AK drum and
-  G3 drum), with the mount rules from the showcase workbench.
+- Attachments: it must accept the A9 parts that fit (rails, muzzles, optics, grips, magazines such as the AK drum and
+  G3 drum), using Partisan's mount and compatibility rules.
 - Tests: one `test-<weapon>.mjs` per weapon (or one shared parametrised test): builds in both views, fires, reloads, aims,
   time to kill at 25 m, mounts at least one attachment; thumbnails and end-to-end raid tests pass.
 

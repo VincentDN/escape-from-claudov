@@ -32,6 +32,7 @@ run node tools/dev/efc/test-warden.mjs
 run node tools/dev/efc/test-ui.mjs
 run node tools/dev/efc/test-inventory-layout.mjs
 run node tools/dev/efc/test-grid-placement.mjs
+run node tools/dev/efc/test-inventory-keys.mjs
 run node tools/dev/efc/test-weapon-check.mjs
 run node tools/dev/efc/test-omni-sprint.mjs
 run node tools/dev/efc/test-panel-event.mjs

@@ -113,10 +113,11 @@ before starting).
 | K3 | Run the CI suite on pull requests to `beta` too | XS | none | done |
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
 | K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |
+| K9 | `test-sks.mjs` "stepped TTK: the SKS is the longest" fails on some runs | S | K5 | open |
 | K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
 | K6 | Find why the online lean takes 0.33 s | S | K1 | open (passes in GitHub Actions on 25 November; fails only in the slower sandbox) |
 | K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | done (A3 Scavengers take 2 of the 7 hostile slots by design; test updated) |
-| C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | open |
+| C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | done |
 | C0-2 | Test: drags between every raid panel pair | S | C0-1 | open |
 | C0-3 | Foley: unmount sound and one shared throttle | S | C0-2 | open |
 | C0-4 | Close C0 in the roadmap | XS | C0-3 | open |
@@ -220,6 +221,18 @@ value column below 300 px row width. Until the owner chooses, do not start this 
 - **Edit:** `shell.html` (CSS only), `tools/dev/efc/test-thumbs.mjs` (only for option (a), and only the "one line" part).
 - **Verify:** `node tools/dev/efc/test-thumbs.mjs` passes; `node tools/dev/efc/test-inventory-layout.mjs` (HTTP) passes; a
   screenshot of the hideout at 1280 by 720 committed to `docs/inventory/hideout-list-1280.png`.
+
+### K9. Make the SKS stepped time-to-kill check deterministic (S)
+
+Seen in the local full run on 25 November: `FAIL stepped TTK: the SKS is the longest of all rifles`, with a different starting
+aim (`aim0`) than the passing runs, and the L96 at 2.53 s (2 hits in 3 shots) beating the SKS. The other runs that day passed.
+The stepped duel depends on where the target stands and on hit spread, so the ordering is not guaranteed.
+
+- **Read:** `tools/dev/efc/test-sks.mjs` (the "stepped TTK" block), `grep -n "Math.random" src/06-weapons.js src/08-player.js` for spread.
+- **Steps:** find what sets `aim0` and the spread per shot. Make the duel use a fixed target position and a seeded random
+  source for the test only (for example replace `Math.random` inside the evaluate with a seeded generator, then restore it).
+  Do not change game code and do not widen the threshold.
+- **Verify:** run `node tools/dev/efc/test-sks.mjs` five times; all pass.
 
 ### K5. Fix the weapon count in `test-sks.mjs` (XS)
 

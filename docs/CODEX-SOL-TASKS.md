@@ -121,7 +121,7 @@ before starting).
 | C0-2 | Test: drags between every raid panel pair | S | C0-1 | open |
 | C0-3 | Foley: unmount sound and one shared throttle | S | C0-2 | open |
 | C0-4 | Close C0 in the roadmap | XS | C0-3 | open |
-| C1-1 | Test: every gameplay input cancels the weapon check | S | K1 | open |
+| C1-1 | Test: every gameplay input cancels the weapon check | S | K1 | done |
 | C1-2 | Contact sheets of the weapon check per family | S | C1-1 | open |
 | C10-1 | Self-hosted open-licence font files | S | K1 | open |
 | C10-2 | Swap the stencil face for the new font | S | C10-1 | open |

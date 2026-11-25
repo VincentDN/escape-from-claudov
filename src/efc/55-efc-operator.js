@@ -477,7 +477,7 @@ function efcOperatorDragEnd(view, commit) {
       if (item) { efcCall('world:put', null, item); efcUirChanged(); placed = true; }
     }
     if (placed !== 'pending') {
-      const action = { slot: 'equip', hands: 'equip', attachment: 'mount' }[pick.target?.dataset.opTarget] || 'place';
+      const action = { slot: 'equip', hands: 'equip', attachment: 'mount' }[pick.target?.dataset.opTarget] || (pick.source.kind === 'attachment' ? 'unmount' : 'place');
       efcEmit('ui:inventory-gesture', placed ? (pick.count ? 'split' : action) : 'refuse', pick.source.item);
     }
   }
@@ -543,7 +543,11 @@ function efcOperatorInteractions(view) {
     }
     if (event.target.closest('[data-op-bench]')) { efcCall('weaponmods:open', 'primary'); return; }
     const detach = event.target.closest('[data-op-detach]');
-    if (detach) { efcCall('weaponmods:detachCarried', 'primary', detach.dataset.opDetach); return; }
+    if (detach) {
+      const part = view.inv?.slots.primary && efcCall('weaponmods:slots', view.inv.slots.primary)?.find(p => p.slot === detach.dataset.opDetach)?.item;
+      if (efcCall('weaponmods:detachCarried', 'primary', detach.dataset.opDetach) === true && part) efcEmit('ui:inventory-gesture', 'unmount', part);
+      return;
+    }
     const button = item(event), dest = target(event), pick = view.selected;
     if (event.detail && view.ignoreClick) return;
     if (view.hideout && event.ctrlKey && button) {

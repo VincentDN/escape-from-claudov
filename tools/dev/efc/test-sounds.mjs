@@ -141,18 +141,27 @@ const bootAudio = () => (async () => {
     const b = efcSndInvSnap(inv); inv.bag[0].n = 1; const med = efcSndInvDiff(b, efcSndInvSnap(inv));
     const c = efcSndInvSnap(inv); inv.slots.primary = null; const drop = efcSndInvDiff(c, efcSndInvSnap(inv));
     const d = efcSndInvSnap(inv); inv.bag.push({ id: 'w_m4', n: 1 }); inv.slots.primary = { id: 'w_ak47', n: 1 }; inv.slots.primary = null; const un = efcSndInvDiff(c, efcSndInvSnap(inv));
-    efcEmit('ui:panel', true, 'loot', 'x'); const search = EFC_SND.log.filter(l => l.kind === 'inv_search').length;
-    efcEmit('ui:panel', true, 'inv');
-    efcEmit('ui:panel', false, 'inv');
+    const gap = () => { EFC_SND.invLast = -1; }; // the shared inventory gap (see the gesture loop below)
+    gap(); efcEmit('ui:panel', true, 'loot', 'x'); const search = EFC_SND.log.filter(l => l.kind === 'inv_search').length;
+    gap(); efcEmit('ui:panel', true, 'inv');
+    gap(); efcEmit('ui:panel', false, 'inv');
     const item = { id: 'w_ak47', n: 1 };
-    for (const gesture of ['pick', 'place', 'rotate', 'refuse', 'split', 'equip', 'mount']) efcEmit('ui:inventory-gesture', gesture, item);
+    // AU.ctx.currentTime does not move inside one evaluate: clear the shared gap so each cue is heard on its own
+    for (const gesture of ['pick', 'place', 'rotate', 'refuse', 'split', 'equip', 'mount', 'unmount']) { EFC_SND.invLast = -1; EFC_SND.last = {}; efcEmit('ui:inventory-gesture', gesture, item); }
     const gestures = [...new Set(EFC_SND.log.map(l => l.kind))];
+    // a fast drag in one instant: pick, rotate and place give one cue; a refusal right after is still heard
+    EFC_SND.log = []; EFC_SND.invLast = -1; EFC_SND.last = {};
+    for (const gesture of ['pick', 'rotate', 'place']) efcEmit('ui:inventory-gesture', gesture, item);
+    const burst = new Set(EFC_SND.log.map(l => l.kind)).size;
+    efcEmit('ui:inventory-gesture', 'refuse', item);
+    const refused = EFC_SND.log.some(l => l.kind === 'inv_refuse');
     EFC_SND.on = false; const off = efcHandlingPlay('magin', 0, null, null); EFC_SND.on = true;
     EFC_SND.log = null;
-    return { take, eq, med, drop, un, search, gestures, off, d: !!d };
+    return { take, eq, med, drop, un, search, gestures, burst, refused, off, d: !!d };
   });
   ok(I.take > 0 && I.search > 0 && ['inv_open', 'inv_close', 'pickup', 'inv_drop', 'inv_rotate', 'inv_refuse', 'inv_split',
-    'inv_equip', 'inv_mount'].every(kind => I.gestures.includes(kind)), 'inventory actions play handling cues ' + JSON.stringify(I));
+    'inv_equip', 'inv_mount', 'inv_unmount'].every(kind => I.gestures.includes(kind)), 'inventory actions play handling cues ' + JSON.stringify(I));
+  ok(I.burst === 1 && I.refused, 'a fast drag plays one cue, a refusal is always heard ' + JSON.stringify({ burst: I.burst, refused: I.refused }));
   ok(I.eq === 'inv_equip' && I.med === 'inv_med' && I.drop === 'inv_drop' && I.un === 'inv_unequip', 'inventory diffs ' + JSON.stringify(I));
   ok(I.off === false, 'sounds off: the engine plays');
   // audition page (dist/index.html#sounds): every button plays without an error

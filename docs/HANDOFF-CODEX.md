@@ -48,6 +48,10 @@ L0, the art style lab (`#artlab`, `src/efc/47-efc-artlab*.js`, `docs/artlab/READ
   on its MSAA target and still swaps buffers inside each frame. The Art Lab test checks both enabled and disabled passes.
 - **X3, menu button for the lab.** The main-menu Art Lab entry is live on `beta` in `812ac05`. C10 typography remains open.
 
+**Step-by-step cards (25 November 2026).** [`CODEX-SOL-TASKS.md`](CODEX-SOL-TASKS.md) splits the open work below into small
+cards with exact files, steps, checks and acceptance, written for less experienced agents. Start there. The audit behind it
+found `beta` not green (six failing checks, cards K1 to K7) and fixed X1 and X2 confirmed by their tests.
+
 ## C0. Finish the grid inventory (medium; first, before C1)
 
 The owner played the grid inventory (A6 to A8) and wants it finished before anything else. Three things:

@@ -112,7 +112,7 @@ before starting).
 | K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | open |
 | K3 | Run the CI suite on pull requests to `beta` too | XS | none | done |
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | open |
-| K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | open |
+| K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
 | K6 | Find why the online lean takes 0.33 s | S | K1 | open |
 | K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | open |
 | C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | open |

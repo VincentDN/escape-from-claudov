@@ -18,12 +18,12 @@ try {
     // sights: the front post (sight material) and the rear notch tops on info.sightY
     const M = gunMaterials(); let post = null;
     fp.group.traverse((o) => { if (o.isMesh && o.material === M.sight) post = new THREE.Box3().setFromObject(o); });
-    return { n: Object.keys(WEAPONS).length, d: { auto: d.auto, mag: d.mag, tube: d.tube, fam: d.fam, slots: d.slots, sound: d.sound }, ak: WEAPONS.ak47.dmg[0] - d.dmg[0],
+    return { n: Object.keys(WEAPONS).filter((k) => !EFC_PARTISAN_WEAPON_MODELS.has(k)).length, partisan: EFC_PARTISAN_WEAPON_MODELS.size, d: { auto: d.auto, mag: d.mag, tube: d.tube, fam: d.fam, slots: d.slots, sound: d.sound }, ak: WEAPONS.ak47.dmg[0] - d.dmg[0],
       fpMesh, wMesh, fam: gunFam('sks'), tubeFed: fp.tubeFed, gripR: fp.gripR.toArray(), gripL: fp.gripL.toArray(), grips: !!(fp.gripDef && fp.trigDef),
       postTop: post ? post.max.y : null, sightY: fp.sightY, postX: post ? (post.max.x + post.min.x) / 2 : null, arms: A.slots[0].def.id + ' ' + A.slots[0].mag + '/' + A.slots[0].reserve,
       inBots: BOT_WEAPONS.includes('sks'), item: efcCall('item:def', 'w_sks') };
   });
-  check('nineteen engine weapons', r.n === 19, r.n);
+  check('twenty engine weapons and 14 Partisan', r.n === 20 && r.partisan === 14, { n: r.n, partisan: r.partisan });
   check('SKS: semi-automatic, 10 rounds, tube reload, rifle family, no attachments, AK shot profile', !r.d.auto && r.d.mag === 10 && r.d.tube && r.d.fam === 'rifle' && r.d.slots.length === 0 && r.d.sound === 'ak', r.d);
   check('damage a little under the AK', r.ak > 0 && r.ak <= 8, r.ak);
   check('first-person model builds', r.fpMesh > 30 && r.fam === 'rifle' && r.tubeFed && r.grips, { mesh: r.fpMesh, fam: r.fam });

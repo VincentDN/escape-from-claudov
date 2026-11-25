@@ -109,7 +109,7 @@ before starting).
 | Card | What | Size | Needs | Status |
 | --- | --- | --- | --- | --- |
 | K1 | Translate the "Art Lab" button so `check_i18n.py` passes | XS | none | done |
-| K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | open |
+| K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | done (full run pending; see PR #15) |
 | K3 | Run the CI suite on pull requests to `beta` too | XS | none | done |
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
 | K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |

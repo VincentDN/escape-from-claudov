@@ -13,6 +13,14 @@ run() {
   if "$@" > "$log" 2>&1; then tail -1 "$log"; else tail -5 "$log"; echo "FAILED: $*"; fail=1; fi
 }
 run python3 build.py
+# Some tests need the game over HTTP (the workbench iframe, the #bench route). CI sets EFC_TEST_URL; locally, serve dist/ here.
+if [ -z "${EFC_TEST_URL:-}" ]; then
+  python3 -m http.server 8231 --bind 127.0.0.1 --directory dist > /dev/null 2>&1 &
+  efc_server_pid=$!
+  trap 'kill "$efc_server_pid" 2>/dev/null' EXIT
+  export EFC_TEST_URL=http://127.0.0.1:8231/
+  sleep 1
+fi
 run python3 tools/dev/check_decl.py
 run python3 tools/dev/check_i18n.py
 run node tools/dev/efc/smoke.mjs
@@ -37,6 +45,15 @@ run node tools/dev/efc/test-lean.mjs
 run node tools/dev/efc/test-music.mjs
 run node tools/dev/efc/test-map.mjs
 run node tools/dev/efc/test-spawns.mjs
+run node tools/dev/efc/test-operator.mjs
+run node tools/dev/efc/test-weaponmods.mjs
+run node tools/dev/efc/test-partisan-rifles.mjs
+run node tools/dev/efc/test-stg44.mjs
+run node tools/dev/efc/test-scavengers.mjs
+run node tools/dev/efc/test-migration.mjs
+run node tools/dev/efc/test-container-collision.mjs
+run node tools/dev/efc/test-iron-sight-kick.mjs
+run node tools/dev/efc/test-bench-route.mjs
 run env MAP=sable node tools/dev/efc/test-e2e.mjs
 run env MAP=claudov node tools/dev/efc/test-e2e.mjs
 run node tools/dev/efc/test-net.mjs

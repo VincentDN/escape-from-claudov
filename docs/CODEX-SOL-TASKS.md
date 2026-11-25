@@ -139,7 +139,7 @@ before starting).
 | C15-1 to C15-4 | Minimal HUD and hold-R magazine check | M total | C2-8 | open |
 | C11-1 to C11-3 | Full-screen map and extraction flares | M total | C15-4 | open |
 | C12 | Dirty lens | M | C11-3 | blocked (reference image missing, see findings) |
-| C13 | Weapon foley | M | C12 | blocked (needs the owner's ElevenLabs budget) |
+| C13 | Weapon foley | M | C12 | open (ElevenLabs budget approved by the owner, 25 November 2026) |
 | C3, C4 to C8, C14 | Later tracks, outlined in section 6 | L | earlier cards | open |
 
 ---
@@ -529,8 +529,12 @@ Sol agent starts it. A planning agent writes the split into this file first.
   keyboard; (3) flare columns per open extract.
 - **C12 Dirty lens:** blocked until the owner adds the reference image (see findings). The lab shader to start from is
   `src/efc/47-efc-artlab-fx.js` (lens dirt at line 83).
-- **C13 Weapon foley:** blocked until the owner sets an ElevenLabs credit budget. The shot list (events times weapons times
-  four takes) can be written first from `docs/audio-events.md`.
+- **C13 Weapon foley:** the owner approved the ElevenLabs budget on 25 November 2026. Split into cards first: (1) the shot list
+  (events times weapon families times four takes) from `docs/audio-events.md` and `docs/handling-foley.md`, with the expected
+  number of generations; (2) generation through the ElevenLabs connector, logging credits used per batch in the commit body;
+  (3) editing and levelling with `tools/sfx/` and `tools/build_sfx.py`; (4) mapping in `src/efc/45-efc-sounds.js` and the
+  `#sounds` audition page; (5) `test-sounds.mjs` coverage. Generation needs the ElevenLabs connector: an agent without it
+  stops after card (1) and hands the shot list to the owner.
 - **C3** (MK14, SPEAR, remaining attachments): the rifles are already in `EFC_PARTISAN_PROFILES`; reuse cards C2-2 to C2-8.
   The GP-25 launcher needs its own card on the engine grenade code.
 - **C4 to C8** (enemies, AI, rival raiders, optimisation, balance): large; plan them after C3.

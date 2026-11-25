@@ -114,8 +114,8 @@ before starting).
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
 | K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |
 | K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
-| K6 | Find why the online lean takes 0.33 s | S | K1 | open |
-| K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | open |
+| K6 | Find why the online lean takes 0.33 s | S | K1 | open (passes in GitHub Actions on 25 November; fails only in the slower sandbox) |
+| K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | done (A3 Scavengers take 2 of the 7 hostile slots by design; test updated) |
 | C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | open |
 | C0-2 | Test: drags between every raid panel pair | S | C0-1 | open |
 | C0-3 | Foley: unmount sound and one shared throttle | S | C0-2 | open |

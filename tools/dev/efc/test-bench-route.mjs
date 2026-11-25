@@ -17,9 +17,10 @@ try {
   await page.waitForFunction(() => typeof EFC_BENCH_CAPTURE !== 'undefined' && EFC_BENCH_CAPTURE.start !== null && PFR.n >= 2, null, { timeout: 180000 });
   const points = await page.evaluate(() => ({
     start: efcBenchmarkPoint(0), end: efcBenchmarkPoint(1),
-    wardens: EFC_BENCH_CAPTURE.wardens.length, map: MAPL.id,
+    wardens: EFC_BENCH_CAPTURE.wardens.length, scavengers: entities.filter(e => e.alive && e.squad === 's').length, map: MAPL.id,
   }));
-  assert.deepEqual(points, { start: [-51, 26], end: [69, 41], wardens: 7, map: 'claudov' });
+  // Claudov's hostile budget is efcWardenNumber = 7; since A3 two of those slots are Scavengers, so the route alerts 5 Wardens
+  assert.deepEqual(points, { start: [-51, 26], end: [69, 41], wardens: 5, scavengers: 2, map: 'claudov' });
   await page.evaluate(() => { EFC_BENCH_CAPTURE.start = performance.now() - 90001; });
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download JSON report' }).click({ timeout: 90000 });

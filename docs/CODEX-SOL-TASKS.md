@@ -1,0 +1,537 @@
+# Task cards for Codex Sol
+
+Written 25 November 2026 (Claude) after an audit of `beta` at `d02c3fb`. This file turns the open part of
+[`HANDOFF-CODEX.md`](HANDOFF-CODEX.md) into small task cards that a less experienced agent can finish one at a time.
+`HANDOFF-CODEX.md` stays the specification (the *what* and *why*); this file is the *how*. Where the two disagree, the
+specification wins and you stop and report.
+
+## 1. How to work a card
+
+1. Take the **first card in section 4 whose status is `open` and whose "Needs" cards are all `done`**. Do one card per branch.
+2. Branch from the current `beta`: `git fetch origin beta && git checkout -B codex/<card-id>-<topic> origin/beta`
+   (for example `codex/c0-1-r-no-reload`). Card ids are lower case in branch names.
+3. Read only the files the card lists under **Read**. The engine files (`src/*.js`, French) have very long lines: use
+   `grep -n` and `sed -n 'A,Bp' file | cut -c1-400`, never `cat` a whole engine file.
+4. Edit only the files under **Edit**. If you need to change another file, stop and say so in your report. If
+   `docs/contracts/CONTRACT.md` gives a listed file to another package, that is also a stop: report it, do not edit.
+5. Do the **Steps** in order. Do not add features the card does not ask for.
+6. Run every command under **Verify**. All must pass. Then run the base checks (section 2).
+7. Commit with `feat|fix|docs|test|chore(<CARD-ID>): subject` and a body that lists the commands you ran and their last line.
+8. Set the card's status in this file to `done` and, if the card says so, update its line in [`ROADMAP.md`](ROADMAP.md) in the
+   same branch. Push the branch. Do not open a pull request unless the owner asks.
+
+**Stop rule.** Stop, push what you have and write the question in the commit body when: a step does not match the code you
+find (a function is missing or named differently), a test fails for a reason the card does not describe, the work grows past
+about twice the card's size, or a choice is marked **owner**. Never guess at a design choice. Never disable, skip or loosen an
+existing test to get green.
+
+**Report.** In the last commit body: what changed, the commands and results, what the tests cannot prove (feel, sound
+quality, real GPU frame rates), and any question.
+
+## 2. Base checks (before every commit)
+
+```bash
+python3 build.py                      # last lines: "style des textes : rien à signaler" and the asset list
+python3 tools/dev/check_decl.py       # prints nothing and exits 0
+python3 tools/dev/check_i18n.py       # must end with "0 erreur(s)"
+node tools/dev/efc/smoke.mjs          # "smoke ok"
+```
+
+Needs Python 3, Node 22 and Playwright with Chromium. If `require('playwright')` fails, set `NODE_PATH` to the global
+`node_modules` (for example `export NODE_PATH=/opt/node22/lib/node_modules`). Rendering is software only in sandboxes: tests
+step the game without drawing (`simRun` in `tools/dev/efc/harness.mjs`). Give any screenshot a two-minute timeout.
+
+Rules that are easy to break (all from `AGENTS.md` and `HANDOFF.md`):
+
+- Every new top-level name starts with `efc` or `EFC`; never declare a function twice (`check_decl.py`).
+- New code is English and goes in `src/efc/NN-efc-<topic>.js`. Do not translate the engine.
+- Every new English text in `shell.html` needs a line `Your text ⇒ =` in `i18n/en.txt`.
+- Packages talk through `src/efc/00-efc-core.js` (`efcOn`, `efcEmit`, `efcProvide`, `efcCall`) only.
+- Host decides loot, containers, extraction and bots. Never add client-only loot.
+- No asset of unclear origin. Fonts, sounds, textures need a source page with a licence, recorded in the matching credits file
+  and `NOTICE.md`. Never take files from search-engine results or other games.
+
+## 3. Verified state on 25 November 2026
+
+What the audit checked by running it, not by reading the docs.
+
+**Already done (do not redo):**
+
+| Item | Proof |
+| --- | --- |
+| X1, inventory UI test failures | Fixed in `42541ff`. `test-ui.mjs` result: see the test table below. |
+| X2, anti-aliasing only every other frame | Fixed in `74e6eff`: `composer.render` in `src/01-core.js` (line 1196) resets `readBuffer` to the MSAA target at the start of every frame. `test-artlab.mjs` checks every frame. |
+| X3, Art Lab menu button | Done in `812ac05`, but it left one missing translation (card K1). |
+| C0, most of it | Exact-cell drag with ghost and green/red cells (`src/efc/55-efc-operator.js`), R rotates, Ctrl-drag splits, drop outside sends to ground, keyboard placement, host revision checks, two-client test. Open: cards C0-1 to C0-3. |
+| C1, most of it | Four-family check, cancel on aim, ammo preserved, remote start and cancel (`src/efc/10-efc-weapon-check.js`). Open: cards C1-1, C1-2. |
+| C9a, first part | Eight-direction sprint and slide, tactical sprint (`src/efc/44-efc-omni.js`). Open: dive, mantle, vault, prone, hit volumes, C9b. |
+| C2/C3/C14 models | All 14 Partisan rifle configurations are already in raids with placeholder stats (`src/efc/18-efc-partisan-rifles.js`, `EFC_PARTISAN_PROFILES`). Open: real stats, per-weapon tests, the Partisan modding rules. |
+
+**Test results on `beta` `d02c3fb`** (full `run-all.sh` plus the tests it does not run):
+
+Run in a cloud sandbox with software rendering. "file" means the default `file://` page; "HTTP" means `dist/` served
+over HTTP with `EFC_TEST_URL` set, as CI does.
+
+| Test | Result | Notes |
+| --- | --- | --- |
+| `build.py`, `check_decl.py`, both `smoke.mjs` runs | pass | |
+| `check_i18n.py` | **fail** | `'Art Lab'` has no English line (card K1) |
+| `test-items`, `test-world`, `test-raid`, `test-warden`, `test-ui` | pass | X1 is fixed: `test-ui ok` |
+| `test-grid-placement`, `test-weapon-check`, `test-omni-sprint`, `test-panel-event` | pass | |
+| `test-sounds` (65 checks), `test-artlab`, `test-warden-pace`, `test-music`, `test-map`, `test-spawns` | pass | X2 is fixed: `test-artlab` passes |
+| `test-e2e` (Sable and Claudov), `test-net`, `test-e2e-net`, `test-weapon-check-net` | pass | |
+| `test-inventory-layout`, `test-bench` | fail (file), **pass (HTTP)** | both need HTTP; `run-all.sh` does not serve it (card K2) |
+| `test-thumbs` | **fail** (6 checks, file and HTTP) | stale after the grid inventory and Partisan parts (card K4) |
+| `test-sks` | **fail** (1 check) | expects 19 weapons, there are 34 (card K5) |
+| `test-lean` | **fail** (1 check, file and HTTP) | host sees the guest's lean after 0.33 s, limit 0.3 s (card K6) |
+| `test-operator`, `test-weaponmods`, `test-partisan-rifles`, `test-stg44`, `test-scavengers`, `test-migration`, `test-container-collision`, `test-iron-sight-kick` | pass (HTTP) | not in `run-all.sh` (card K2) |
+| `test-bench-route` | **fail** (HTTP) | expects 7 Wardens on the bench route, finds 5 (card K7) |
+| `test-menu-render` | not runnable here | loads the live Partisan site; needs internet. Keep it out of `run-all.sh` |
+
+**Problems found:**
+
+1. The coordinator's brief still listed X1 and X2 as open; both were fixed on 20 November (`42541ff`, `74e6eff`) and their
+   tests pass. Nothing to do for them.
+2. `beta` is not green: six checks fail in `run-all.sh` (table above). Cards K1, K2, K4 to K7 make it green before feature work.
+3. `.github/workflows/checks.yml` runs only on pull requests to `main`, so none of these failures showed up in CI (card K3).
+4. Ten test files are not in `run-all.sh` at all (card K2).
+5. C12 points to `docs/lens/reference-dirty-lens-rainbow-flare.png`, but commit `2cdbe1c` only changed the handoff text: the
+   image was never committed. **Owner:** add the image, or C12 works from the text description only.
+6. `docs/HANDOFF-CODEX.md` C2 asks for `docs/weapons.md`; it does not exist yet (card C2-2).
+7. The contact sheets the specs ask for (`docs/weapon-check/`, `docs/omnimovement/`, `docs/hud/`, `docs/map/`, `docs/fonts/`)
+   do not exist yet; only `docs/inventory/` has screenshots.
+
+## 4. Cards in order
+
+Status values: `open`, `done`, `blocked (reason)`. Sizes: XS (under an hour), S (a few hours), M (a day), L (split further
+before starting).
+
+| Card | What | Size | Needs | Status |
+| --- | --- | --- | --- | --- |
+| K1 | Translate the "Art Lab" button so `check_i18n.py` passes | XS | none | open |
+| K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | open |
+| K3 | Run the CI suite on pull requests to `beta` too | XS | none | open |
+| K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | open |
+| K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | open |
+| K6 | Find why the online lean takes 0.33 s | S | K1 | open |
+| K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | open |
+| C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | open |
+| C0-2 | Test: drags between every raid panel pair | S | C0-1 | open |
+| C0-3 | Foley: unmount sound and one shared throttle | S | C0-2 | open |
+| C0-4 | Close C0 in the roadmap | XS | C0-3 | open |
+| C1-1 | Test: every gameplay input cancels the weapon check | S | K1 | open |
+| C1-2 | Contact sheets of the weapon check per family | S | C1-1 | open |
+| C10-1 | Self-hosted open-licence font files | S | K1 | open |
+| C10-2 | Swap the stencil face for the new font | S | C10-1 | open |
+| C10-3 | Font screenshots and overflow check | S | C10-2 | open |
+| C9-1 | Movement state machine skeleton and transition table | S | C1-2 | open |
+| C9-2 | Dive | M | C9-1 | open |
+| C9-3 | Mantle and vault | M | C9-1 | open |
+| C9-4 | Prone: enter, crawl, get up | M | C9-1 | open |
+| C9-5 | Prone: free turn, roll to back and sides | M | C9-4 | open |
+| C9-6 | Hit volumes follow the stance | M | C9-4 | open |
+| C9-7 | Replicate stances online | S | C9-6 | open |
+| C9-8 | C9b: the weapon follows the body | L | C9-7 | open |
+| C2-1 | Port Partisan's rail and compatibility rules | M | K2 | open |
+| C2-2 | Roster stats table and niche stats for batch 1 | S | K2 | open |
+| C2-3 | One parametrised weapon test | S | C2-2 | open |
+| C2-4 to C2-8 | One card per weapon: AK-15K, AK-74M Zenitco, RPK, M16, G3 | S each | C2-3 | open |
+| C15-1 to C15-4 | Minimal HUD and hold-R magazine check | M total | C2-8 | open |
+| C11-1 to C11-3 | Full-screen map and extraction flares | M total | C15-4 | open |
+| C12 | Dirty lens | M | C11-3 | blocked (reference image missing, see findings) |
+| C13 | Weapon foley | M | C12 | blocked (needs the owner's ElevenLabs budget) |
+| C3, C4 to C8, C14 | Later tracks, outlined in section 6 | L | earlier cards | open |
+
+---
+
+## 5. Cards
+
+### K1. Translate the "Art Lab" button (XS)
+
+`check_i18n.py` fails on `beta`: `erreur : sans traduction anglaise : 'Art Lab'  (shell.html)`. X3 added the button
+(`shell.html` line 2742, `id="efcArtLabBtn"`) without its line in `i18n/en.txt`.
+
+- **Read:** `i18n/en.txt` (lines 30 to 40 show the format), `HANDOFF.md` section 2 (the `i18n` row).
+- **Edit:** `i18n/en.txt`.
+- **Steps:**
+  1. Add one line `Art Lab ⇒ =` next to the other menu entries (for example after `Notifications ⇒ =`). The arrow is the
+     character `⇒` (U+21D2), with one space on each side, then `=`. Copy it from an existing line rather than typing it.
+- **Verify:** `python3 tools/dev/check_i18n.py` ends with `0 erreur(s)`; then the base checks.
+- **Acceptance:** zero i18n errors; no other file changed.
+- **Pitfall:** do not translate the text into French or change the button. `=` means "English stays as written".
+
+### K2. Serve HTTP in `run-all.sh` and add the tests it skips (S)
+
+Locally `run-all.sh` loads the game from `file://`, so `test-bench.mjs` (which refuses to run without `EFC_TEST_URL`) and
+`test-inventory-layout.mjs` (the workbench uses an `iframe` only over HTTP, `src/efc/50-efc-ui-workbench.js` line 138) fail,
+while CI serves HTTP and they pass. Ten tests are not in the runner at all.
+
+- **Read:** `tools/dev/efc/run-all.sh`, `.github/workflows/checks.yml` (the "Run the full suite twice" step), the test table in section 3.
+- **Edit:** `tools/dev/efc/run-all.sh`.
+- **Steps:**
+  1. After the `build.py` line, if `EFC_TEST_URL` is empty, start `python3 -m http.server 8231 --bind 127.0.0.1 --directory dist`
+     in the background, `export EFC_TEST_URL=http://127.0.0.1:8231/`, and add `trap 'kill $server_pid' EXIT`. If it is already
+     set (CI), start nothing.
+  2. Add these lines before `run env MAP=sable node tools/dev/efc/test-e2e.mjs`: `test-operator.mjs`, `test-weaponmods.mjs`,
+     `test-partisan-rifles.mjs`, `test-stg44.mjs`, `test-scavengers.mjs`, `test-migration.mjs`, `test-container-collision.mjs`,
+     `test-iron-sight-kick.mjs`, and `test-bench-route.mjs` once K7 is done. Do **not** add `test-menu-render.mjs` (needs the internet).
+- **Verify:** `bash tools/dev/efc/run-all.sh` (about 40 minutes) ends with `ALL CHECKS PASSED`.
+- **Acceptance:** the full run passes locally with no environment variables set.
+- **Pitfall:** port 8231 may be busy if a previous run crashed: `pkill -f "http.server 8231"` first.
+
+### K4. Bring `test-thumbs.mjs` up to date with the grid inventory (S)
+
+Six checks fail. They were written on 14 November for the old row lists. Since A8, A9 and C0 the hideout and loot panels are
+grids and Partisan attachment parts became items. Failures, from the log:
+
+- `4 to 85 % opaque pixels`: parts `part_p35123218a` and `part_pca7a0599d` cover only 2 % of their thumbnail (very thin parts).
+- `props are 50 to 300 triangles`: 36 Partisan parts have 304 to 4,974 triangles (real models, not procedural props).
+- `every hideout row has a thumbnail`, `row boxes 128x48 ...`, `item rows keep name ... on one line`, `loot panel rows have
+  thumbnails`: the counts and sizes are for rows that the grid inventory replaced (42 images for 21 rows, boxes now 53 by 46).
+
+- **Read:** `tools/dev/efc/test-thumbs.mjs` (all), `src/efc/52-efc-thumbs.js`, `src/efc/52-efc-thumb-props.js` (header
+  comment), `src/efc/55-efc-operator.js` lines 105 to 121 (grid item markup).
+- **Edit:** `tools/dev/efc/test-thumbs.mjs`; `src/efc/52-efc-thumbs.js` only for step 2.
+- **Steps:**
+  1. Triangle check: keep 50 to 300 for procedural props; for items whose id starts with `part_p` (Partisan parts) check
+     at most 5,000 triangles instead. **Owner** may set another part budget; say which number you used.
+  2. Opacity check: for the two thin parts, frame the part tighter in the thumbnail (the camera fit in `52-efc-thumbs.js`) until
+     cover is at least 4 %. If you cannot without clipping, keep 4 % for everything else and list those two ids as known
+     exceptions in the test with a comment.
+  3. Hideout and loot checks: rewrite them for the grid. Every `.efc-op-item` button in `#scr-hideout` and `#efcLoot` has
+     exactly one thumbnail image; every thumbnail fits inside its button; the item name `<span>` is not clipped
+     (`scrollWidth <= clientWidth + 1`) or the button has an `aria-label` with the full name. Keep the preview-on-hover checks.
+- **Verify:** `node tools/dev/efc/test-thumbs.mjs` ends with no failed checks; `test-ui.mjs`, `test-operator.mjs` pass.
+- **Acceptance:** no check removed without a replacement that tests the same promise on the new layout.
+
+### K5. Fix the weapon count in `test-sks.mjs` (XS)
+
+`check('nineteen engine weapons', r.n === 19, r.n)` (line 26) counts every key of `WEAPONS`, which is 34 now: 20 engine
+weapons (the build prints "20 armes") plus the 14 Partisan profiles.
+
+- **Edit:** `tools/dev/efc/test-sks.mjs`.
+- **Steps:** in the `ev(...)` block return `n: Object.keys(WEAPONS).filter(k => !EFC_PARTISAN_WEAPON_MODELS.has(k)).length` and
+  `partisan: EFC_PARTISAN_WEAPON_MODELS.size`; change the check to `'twenty engine weapons and 14 Partisan'`, `r.n === 20 && r.partisan === 14`.
+- **Verify:** `node tools/dev/efc/test-sks.mjs` ends without `FAILED`.
+- **Pitfall:** do not change the other SKS checks; they pass.
+
+### K6. Find why the online lean takes 0.33 s (S)
+
+`test-lean.mjs` check (7) fails the same way on every run: the host's copy of a leaning guest matches after 0.33 s of game time;
+the limit is 0.3 s. The test steps in 2-tick slices (0.067 s), so the lean now needs one slice more than before. This is either a
+regression (something slowed the lean or its replication) or a test that was on the edge.
+
+- **Read:** `tools/dev/efc/test-lean.mjs` lines 206 to 236, `src/efc/42-efc-lean.js`, `grep -n "leanX" src/09c-net.js`.
+- **Edit:** nothing until step 2 says which file.
+- **Steps:**
+  1. Find the first bad commit: `git bisect start origin/beta 26e0295`, then at each step
+     `python3 build.py >/dev/null && node tools/dev/efc/test-lean.mjs; git bisect good|bad` (good when it ends `0 FAILED`).
+     If `26e0295` already fails, try `03ea09b`. Record the result, then `git bisect reset`.
+  2. If one commit changed the lean speed (`42-efc-lean.js`), the send rate or interpolation of remote players (`09c-net.js`),
+     fix that commit's side effect in the same file, and only that.
+  3. If no commit is to blame (it never passed reliably), **stop** and report the numbers; the owner decides whether 0.33 s is
+     acceptable. Do not raise the limit yourself.
+- **Verify:** `node tools/dev/efc/test-lean.mjs` twice, `node tools/dev/efc/test-net.mjs`.
+- **Acceptance:** check (7) passes twice, or a report with the bisect result.
+
+### K7. Find why the bench route has 5 Wardens, not 7 (S)
+
+`test-bench-route.mjs` (HTTP only) expects the A1 benchmark route on Claudov to have 7 Wardens; it now has 5
+(`EFC_BENCH_CAPTURE.wardens.length`). The route is used to compare GPU numbers over time, so its load must stay fixed.
+
+- **Read:** `src/efc/48-efc-bench-route.js`, `tools/dev/efc/test-bench-route.mjs`, `efcWardenNumber` in `src/efc/00-efc-core.js` line 98.
+- **Steps:**
+  1. Serve `dist/` over HTTP (`python3 -m http.server 8231 --bind 127.0.0.1 --directory dist &`), `export EFC_TEST_URL=http://127.0.0.1:8231/`.
+  2. Bisect as in K6 between `origin/beta` and `ca8efcc` (A9) with `node tools/dev/efc/test-bench-route.mjs`.
+  3. If the route spawns its Wardens through the normal raid budget and a later change (Scavengers, spawn rules) took two of
+     them, make the route set its own fixed count in `48-efc-bench-route.js` so it no longer depends on the raid budget.
+- **Verify:** `node tools/dev/efc/test-bench-route.mjs` passes; `test-spawns.mjs`, `test-scavengers.mjs` pass.
+- **Acceptance:** 7 Wardens on the route, raid spawns unchanged.
+
+### K3. Run the CI suite on pull requests to `beta` (XS)
+
+`.github/workflows/checks.yml` only triggers on pull requests to `main`, but all work now lands on `beta` first.
+
+- **Read:** `.github/workflows/checks.yml` (first 6 lines).
+- **Edit:** `.github/workflows/checks.yml`.
+- **Steps:** change `branches: [main]` under `pull_request:` to `branches: [main, beta]`. Change nothing else.
+- **Verify:** `python3 -c "import yaml,sys;yaml.safe_load(open('.github/workflows/checks.yml'))"` exits 0 (install `pyyaml`
+  if missing, or skip this line and say so).
+- **Acceptance:** one-line diff.
+
+### C0-1. Test: R does not reload while a raid panel is open (XS)
+
+The behaviour already exists: with a panel open, `efcUirKey` in `src/efc/50-efc-ui-raid.js` (lines 173 to 198) swallows
+every key except movement, so the engine's `startReload()` (`src/08-player.js` line 56) never sees R. There is no test.
+
+- **Read:** `src/efc/50-efc-ui-raid.js` lines 172 to 200, `tools/dev/efc/test-ui.mjs` lines 100 to 170 (how a raid panel is
+  opened with mock services), `tools/dev/efc/harness.mjs` (`openGame`, `startSolo`, `simRun`).
+- **Edit:** new file `tools/dev/efc/test-inventory-keys.mjs`; `tools/dev/efc/run-all.sh` (one line after `test-grid-placement.mjs`).
+- **Steps:**
+  1. Start a solo raid: `openGame({ settings: { map: 'claudov' } })`, then `startSolo(page)`, then `simRun(page, 2)`.
+  2. Give the player a primary weapon with a part-empty magazine: in `page.evaluate`, set `curW().mag = 5` and record
+     `curW().reserve`.
+  3. Open the inventory with `efcUirOpen('inv')`. Assert `efcCall('ui:busy') === true`.
+  4. `page.keyboard.press('KeyR')`, then `simRun(page, 3)`. Assert `PL.reload` is falsy and `curW().mag === 5` and the reserve
+     did not change.
+  5. Close the panel with `efcUirClose()`, press R, `simRun(page, 4)`. Assert the magazine is now larger than 5 (the reload
+     happened), which proves the test can see a reload at all.
+  6. Assert the page logged no errors (`assert.deepEqual(errors, [])`) and print one line `inventory keys ok`.
+- **Verify:** `node tools/dev/efc/test-inventory-keys.mjs` passes; base checks.
+- **Acceptance:** the test fails if you temporarily delete the final `e.stopImmediatePropagation(); return;` line in
+  `efcUirKey` (try it, then restore the line, and say so in the report).
+- **Pitfall:** the engine ignores keys when the pointer is not locked (`pointerActive()`); the harness sets
+  `LOCK.fallback = true` in `startSolo`. If step 5 does not reload, check `pointerActive()` first, do not change the game.
+
+### C0-2. Test: drags between every raid panel pair (S)
+
+`test-grid-placement.mjs` and `test-operator.mjs` cover the hideout. The raid panels have no scripted drag test.
+
+- **Read:** `src/efc/55-efc-operator.js` lines 218 to 290 (`efcOperatorGetSource`, `efcOperatorCanMove`, `efcOperatorMove`)
+  and 351 to 485 (`efcOperatorExact`, drag move and end), `shell.html` lines 3050 to 3070 (panel ids),
+  `tools/dev/efc/test-grid-placement.mjs` (the pointer pattern to copy), `tools/dev/efc/test-ui.mjs` lines 100 to 120 (mock
+  container services).
+- **Edit:** new file `tools/dev/efc/test-inventory-drag.mjs`; `tools/dev/efc/run-all.sh` (one line).
+- **Targets in the DOM** (use these selectors): equipment slots `[data-op-target="slot"][data-op-key="primary|sidearm|armor|pack"]`;
+  carried grids `.efc-op-grid[data-op-area="pockets|rig|pack"]`; open container grid `#efcOpLootGrid .efc-op-grid`; quick slots
+  `[data-op-target="quick"][data-op-key="0"]`; attachment slots `[data-op-target="attachment"][data-op-key="optic"]`; ground
+  rows `[data-op-source="ground"]`. Items are `[data-op-source][data-efc-id="<item id>"]`.
+- **Steps:** write one helper `drag(fromLocator, toLocator, cell = null)` that does `mouse.move` to the source centre,
+  `mouse.down`, `mouse.move` in 5 steps to the target (or to cell `x, y` of a grid with the formula from
+  `test-grid-placement.mjs`), checks the ghost `.efc-op-ghost` exists and its centre is within 40 px of the pointer, then
+  `mouse.up`. Use real game services (no mocks) in a solo raid on Claudov, and put a crate next to the player through the
+  host world (`efcCall('world:list')` shows what exists; pick the nearest container and teleport the player to it). Cover:
+  1. pockets to pack grid (exact cell; check `efcCall('grid:loadout', EFC.inv)` shows it at that cell);
+  2. pack grid to primary slot with a weapon (slot filled);
+  3. open crate grid to pockets, and pockets to crate (item moved, crate `rev` increased);
+  4. a long item onto a cell where it does not fit: `data-op-drop="invalid"` while hovering, press R, `valid`, release, placed rotated;
+  5. a refused drop (onto an occupied cell): item back at its origin;
+  6. bag item to quick slot 0 (quick list holds it);
+  7. a red dot from pockets onto the optic attachment slot (mounted: `efcCall('weaponmods:slots', EFC.inv.slots.primary)`);
+  8. pockets item released outside every `.efc-box`: a new ground container near the player holds it.
+- **Verify:** the new test passes twice in a row; base checks; `test-ui.mjs` still passes.
+- **Acceptance:** eight named checks print `ok`; no page errors.
+- **Pitfall:** grids re-render after every change, so locate elements again after each drag, never reuse an old element
+  handle. Wait for `world:changed` to land with `simRun(page, 0.5)` after container moves (the host applies them on its tick).
+
+### C0-3. Foley: unmount sound and one shared throttle (S)
+
+Spec C0 item 3. Today `efcInvSound` (`src/efc/45-efc-sounds.js` line 100) throttles each sound key separately (50 ms), so a
+fast drag can stack a pick, a rotate and a place in the same instant. Detaching an attachment by drag emits `place`, not an
+unmount cue.
+
+- **Read:** `src/efc/45-efc-sounds.js` lines 36 to 60 and 95 to 160; `src/efc/55-efc-operator.js` lines 371 to 375
+  (attachment branch of `efcOperatorExact`) and 465 to 485 (`efcOperatorDragEnd`); `tools/dev/efc/test-sounds.mjs` lines 130 to 160.
+- **Edit:** `src/efc/45-efc-sounds.js`, `src/efc/55-efc-operator.js`, `tools/dev/efc/test-sounds.mjs`.
+- **Steps:**
+  1. In `EFC_HANDLING` add `inv_unmount: [['hf_click', 0, 0.55, 0.98], ['hf_slide', 0.04, 0.4, 0.95]],` after `inv_mount`.
+  2. In the `ui:inventory-gesture` handler add `unmount: 'inv_unmount'` to the map.
+  3. In `efcOperatorDragEnd`, when `pick.source.kind === 'attachment'` and the drop succeeded, emit `'unmount'` instead of
+     `'place'`. Also emit `'unmount'` from the Detach button handler (`data-op-detach` in `efcOperatorInteractions`) when
+     `weaponmods:detachCarried` returns true.
+  4. Add a shared gap: in `EFC_SND` add `invLast: -1`; in `efcInvSound`, return false if `t - EFC_SND.invLast < 0.07`, except
+     when `key === 'inv_refuse'` (a refusal must always be heard); set `EFC_SND.invLast = t` when a sound plays.
+- **Verify:** extend `test-sounds.mjs` so it (a) emits `unmount` and finds `inv_unmount` in `EFC_SND.log`, and (b) emits
+  `pick`, `rotate`, `place` in one synchronous loop and finds exactly one of them in the log, then `refuse` and finds it.
+  Run `node tools/dev/efc/test-sounds.mjs`, `node tools/dev/efc/test-inventory-drag.mjs`, base checks.
+- **Acceptance:** both new checks pass; existing sound checks still pass.
+- **Pitfall:** `AU.ctx.currentTime` does not advance inside one `page.evaluate`, which is what makes check (b) work. Do not
+  use `performance.now()`.
+
+### C0-4. Close C0 in the roadmap (XS)
+
+- **Edit:** `docs/ROADMAP.md`, `docs/HANDOFF-CODEX.md`.
+- **Steps:** set the C0 row in `ROADMAP.md` to `done` with the merge commits; in `HANDOFF-CODEX.md` add one line under the C0
+  heading: "Done on `beta` (cards C0-1 to C0-3 in `CODEX-SOL-TASKS.md`)". Commit a fresh screenshot of a raid drag with a red
+  and a green highlight to `docs/inventory/raid-drag.png` (capture it in `test-inventory-drag.mjs` when `EFC_GRID_SHOTS` is set).
+- **Acceptance:** docs say C0 is done; screenshot committed.
+
+### C1-1. Test: every gameplay input cancels the weapon check (S)
+
+The brief (`docs/briefs/P9-WEAPON-CHECK.md`, Acceptance) asks for separate scenarios for move, aim, fire, sprint and switch,
+each handled in the same frame. `test-weapon-check.mjs` only tests aim.
+
+- **Read:** `src/efc/10-efc-weapon-check.js` (all, 82 lines), `tools/dev/efc/test-weapon-check.mjs`, `docs/briefs/P9-WEAPON-CHECK.md`.
+- **Edit:** `tools/dev/efc/test-weapon-check.mjs` only.
+- **Steps:** after the existing loop, for each of these inputs start a fresh check exactly as the test does
+  (`efcWeaponCheckPending = true; efcWeaponCheckTick({}, false)`, run 20 `updateViewmodel` steps) and then cancel with:
+  `{ fire: true }`, `{ sprint: true }`, `{ jump: true }`, `{ crouch: true }`, `PL.reload = true`, `PL.switching = 0.2`, and a
+  move of 2 m (`PL.ent.pos.x += 2`). For each assert in the same tick: `VM.action === null`, `PL.ent.efcWeaponCheck === null`,
+  the magazine and reserve unchanged, the magazine and bolt back at home (`returnToReady()`). Reset the changed state after each.
+- **Verify:** `node tools/dev/efc/test-weapon-check.mjs`; `node tools/dev/efc/test-weapon-check-net.mjs`; base checks.
+- **Acceptance:** seven new scenarios pass. If one does not cancel, **stop**: that is a bug report, not a test to loosen.
+- **Pitfall:** `PL.reload = true` without a real reload leaves the player stuck; set it back to `false` before the next case.
+
+### C1-2. Contact sheets of the weapon check per family (S)
+
+- **Read:** `tools/dev/efc/artlab-contact-sheet.mjs` (the pattern for a contact sheet), `src/efc/10-efc-weapon-check.js`
+  (`EFC_WEAPON_CHECK_TIMELINES`), `src/06b-soldier.js` (grep `efcWeaponCheckPose` for the third-person pose).
+- **Edit:** new `tools/dev/efc/weapon-check-sheet.mjs`; new images in `docs/weapon-check/`.
+- **Steps:** for `ak47` (mag), `l96` (bolt), `sks`, `rem870` (pump): render first person at 0 %, 35 %, 60 % and 100 % of the
+  check; render a third-person soldier (a remote entity with `efcWeaponCheckRemote(entity, { on: true, kind })`) at the same
+  times. Tile them into one PNG per family, 4 columns by 2 rows, labelled, `docs/weapon-check/<family>.png`.
+- **Verify:** the script exits 0 and writes four PNGs; open each with an image viewer and confirm the weapon is visible in every
+  tile. State in the report that hand contact quality needs the owner's eye.
+- **Acceptance:** four PNGs committed, each under 600 KB (use 960 by 540 tiles at most).
+
+### C10-1. Self-hosted open-licence font files (S)
+
+Spec C10. **Owner choice:** the family. Default if the owner has not answered: **Inter** (SIL Open Font License 1.1), weights
+400, 600 and 700; keep Barlow Condensed for HUD numbers.
+
+- **Read:** `shell.html` lines 50 to 66; `build.py` lines 275 to 290 (the Content Security Policy); `NOTICE.md`.
+- **Edit:** new `assets/fonts/` (font files plus `OFL.txt`), `NOTICE.md`, `build.py` (only if the build must copy or inline the files).
+- **Steps:**
+  1. Download Inter from its official release page on GitHub (`rsms/inter`, a tagged release zip), not from a font mirror.
+     Take the `woff2` files for 400, 600, 700 and the licence text. Do the same for Barlow Condensed 400 to 700 from the
+     `google/fonts` GitHub repository (`ofl/barlowcondensed`). If the sandbox cannot download, **stop** and ask the owner to
+     place the files in `assets/fonts/`.
+  2. Record each family in `NOTICE.md`: name, version, source URL, licence (SIL OFL 1.1).
+  3. Find how `build.py` ships other assets (grep `assets/` in `build.py`) and make sure `assets/fonts/` reaches `dist/`.
+- **Verify:** `python3 build.py` then `ls dist/assets/fonts` (or wherever the build puts assets) shows the files.
+- **Acceptance:** files and licence committed, total under 400 KB.
+
+### C10-2. Swap the stencil face for the new font (S)
+
+- **Read:** `shell.html` lines 50 to 120 and every `var(--stencil)` (31 uses: `grep -n "var(--stencil)" shell.html`);
+  `grep -rn "stencil" src/efc/` ; `build.py` lines 280 to 284.
+- **Edit:** `shell.html`, `build.py`, any `src/efc/*.js` that names the variable.
+- **Steps:**
+  1. Delete the three Google Fonts lines (`shell.html` 51 to 53). Add `@font-face` rules for each file from C10-1, with
+     relative URLs (`assets/fonts/...`) and `font-display: swap`.
+  2. Rename `--stencil` to `--display` and set it to `"Inter", system-ui, "Segoe UI", sans-serif`. Replace every
+     `var(--stencil)` with `var(--display)`. Stencil headings were weight 400; set them to 700 where they are titles (`.title`,
+     `.shead h2`, `.mbtn b`, `.deploy`) and 600 elsewhere.
+  3. In `build.py` change the CSP: remove `https://fonts.googleapis.com` from `style-src` and set `font-src 'self'`.
+- **Verify:** `grep -c "stencil\|Saira\|googleapis\|gstatic" shell.html build.py` prints 0 for each; base checks;
+  `node tools/dev/efc/test-ui.mjs`; `node tools/dev/efc/test-bench.mjs`.
+- **Acceptance:** no third-party requests (run the smoke test with the browser's network log: no request leaves the origin).
+- **Pitfall:** Inter is wider than Saira Stencil. Do not shrink sizes here; C10-3 handles overflow.
+
+### C10-3. Font screenshots and overflow check (S)
+
+- **Edit:** new `tools/dev/efc/test-fonts.mjs`, `docs/fonts/*.png`, `tools/dev/efc/run-all.sh`, `shell.html` (sizes only).
+- **Steps:** at 1280 by 720 and 1920 by 1080, open each screen (main menu, hideout, operator inventory, lobby, settings, summary,
+  credits, raid HUD) and for every element with `font-family` containing Inter assert `scrollWidth <= clientWidth + 1` (no
+  overflow). Fix overflow with `letter-spacing`, `font-size: clamp(...)` or `white-space` only. Save screenshots of the main
+  menu, hideout and HUD in `docs/fonts/`.
+- **Verify:** the new test passes; `test-ui.mjs`, `test-inventory-layout.mjs` pass.
+- **Acceptance:** zero overflow at both sizes; three screenshots committed; ROADMAP C10 row set to done.
+
+### C9-1. Movement state machine skeleton and transition table (S)
+
+C9 is very large. Build it in small steps on one long-lived branch `codex/c9-omni`, one card per commit, each passing.
+
+- **Read:** `src/efc/44-efc-omni.js` (30 lines), `src/07c-controller.js` lines 20 to 140 (`slideT`, `crouch`, `onGround`),
+  `src/08-player.js` lines 300 to 360, `docs/omnimovement.md`, `tools/dev/efc/test-omni-sprint.mjs`.
+- **Edit:** `src/efc/44-efc-omni.js`, `docs/omnimovement.md`, new `tools/dev/efc/test-omni-states.mjs`.
+- **Steps:**
+  1. Add `efcOmniState(entity)` that returns one of `stand`, `crouch`, `sprint`, `tactical`, `slide`, `air`, from the existing
+     fields (`onGround`, `crouch`, `slideT`, `sprinting`, `efcTactical`). No new behaviour.
+  2. Extend the table in `docs/omnimovement.md` with the planned rows for `dive`, `mantle`, `vault`, `prone`, `supine`,
+     `side` and mark each `planned`. **Owner:** the keys. Default proposal: dive = Crouch while sprinting and airborne, or
+     Crouch double-tap while sprinting; prone = hold Crouch 0.4 s; roll to back = prone + Lean key held; mantle and vault =
+     Jump facing waist-high geometry. Write the proposal as a question in the commit body.
+  3. The test drives the existing transitions with `simRun` and asserts `efcOmniState` at each step.
+- **Acceptance:** the test passes; nothing in gameplay changed (`test-omni-sprint.mjs`, `test-warden.mjs` pass).
+
+### C9-2 to C9-8. Remaining omnimovement (M each, L for C9-8)
+
+Use the same card shape. For each: read `44-efc-omni.js` and `07c-controller.js`, put new rules in `44-efc-omni.js` (or a new
+`44a-efc-omni-prone.js` if the file passes 300 lines), call them from the controller with the smallest possible hook, gate
+everything on `entity.isPlayer && efcRaidMode()`, and add a test that drives the transition in all eight directions.
+
+- **C9-2 Dive:** forward impulse plus short airborne arc, lands into prone (after C9-4) or crouch (before it). Test: distance
+  covered, lands without clipping, cooldown.
+- **C9-3 Mantle and vault:** a forward ray at knee and waist height finds a ledge 0.5 to 1.2 m high; mantle onto it, vault
+  over if the far side is free within 1 m. Test on a box placed in the test (do not edit the map). Collision: never end inside geometry.
+- **C9-4 Prone:** eye height about 0.35 m, crawl speed about 0.9 m/s, collision capsule lowered, get up blocked under low ceilings.
+- **C9-5 Prone turning:** turn 360 degrees with the camera while the body follows with a limit; roll to back and sides.
+- **C9-6 Hit volumes:** `entEye`, chest and head helpers in `src/06b-soldier.js` (lines 520 to 560) use `crouchAmt` only;
+  add the prone and supine shapes. Test with `rayEntities` from fixed angles. Wardens' hit tests must hit a prone player.
+- **C9-7 Online:** add the stance to the player snapshot in `src/09c-net.js` (grep `crouchAmt` at lines 873 and 1084) and check
+  the two-client rig (`net2.mjs`) shows the same stance.
+- **C9-8 (C9b):** weapon held across the chest on the back, rolled on a side, aim limits, third person matches. Split into cards
+  before starting: write the split in this file and get it reviewed.
+
+### C2-1. Port Partisan's rail and compatibility rules (M)
+
+The owner wants Partisan's modding rules to govern the Claudov workbench (`HANDOFF-ASTRA.md` A9, updated in `d02c3fb`). The
+pure rule modules in Partisan need no three.js or DOM, so they can be ported as data and functions.
+
+- **Read:** in the Partisan Project repository: `workbench/rails.js` (84 lines), `workbench/universal.js` (79),
+  `workbench/stats.js` (116), and their unit tests in `tests/rails.test.mjs` and `tests/workbench.test.mjs`. In Claudov: `src/efc/19-efc-weaponmods.js`
+  (`EFC_MOD_PARTS`, fit rules), `src/efc/18a-efc-partisan-parts.js`, `tools/dev/efc/test-weaponmods.mjs`.
+- **Edit:** new `src/efc/19a-efc-partisan-rules.js`, new `tools/dev/efc/test-partisan-rules.mjs`, `NOTICE.md` (one line: code
+  ported from Partisan Project, same owner), `run-all.sh`.
+- **Steps:**
+  1. Copy the logic of `rails.js` (`span`, `clash`, `clashing`, `candidates`, `resolve`, `fits`) into the new file as global
+     functions named `efcRail<Name>` and the constant `EFC_RAIL_GAP`. Remove `import`/`export`. Keep the comments.
+  2. Port `RULES` and `blockedBy` from `stats.js` as `EFC_PARTISAN_RULES` and `efcPartisanBlockedBy`.
+  3. Port the matching unit tests from Partisan's `tests/rails.test.mjs` and `tests/workbench.test.mjs` into the new test, run inside the game page with
+     `openGame({ noMap: true })`.
+  4. Do **not** wire it into the workbench yet. That is a follow-up card; write its plan in your commit body (which calls in
+     `19-efc-weaponmods.js` would use the new rules).
+- **Verify:** new test passes; `test-weaponmods.mjs` still passes; base checks.
+- **Pitfall:** Partisan uses +X as the muzzle axis; Claudov models use −Z (see `docs/weapon-port.md`). The rail functions work
+  on one axis in metres, so they do not care, but say so in a comment.
+
+### C2-2. Roster stats table and niche stats for batch 1 (S)
+
+`EFC_PARTISAN_PROFILES` in `src/efc/18-efc-partisan-rifles.js` (lines 2 to 17) gives every Partisan rifle the stats of an
+engine template scaled by one `impact` number. The spec wants each weapon to have a niche.
+
+- **Read:** `src/efc/18-efc-partisan-rifles.js`, `src/06-weapons.js` (grep `ak47:`, `m4:`, `scarh:`, `svd:` for the template
+  stats and their field names), `src/efc/20-efc-items.js` lines 45 to 70 (how weapons become items and values).
+- **Edit:** new `docs/weapons.md`; `src/efc/18-efc-partisan-rifles.js`.
+- **Steps:**
+  1. Write `docs/weapons.md`: one table of every raid weapon (engine and Partisan) with calibre, magazine, fire rate, damage,
+     recoil, weight, value and a one-line role. Use only the values the code has now.
+  2. For AK-15K, AK-74M Zenitco, RPK, M16 and G3 propose changed values so each has a role no other weapon fills (for example
+     RPK: heavy, 45-round magazine, slow to aim, low recoil when crouched). Add a "Proposed" column. **Owner:** final numbers.
+  3. Change the profile tuple only for values already in it (magazine, fire rate, impact). Add a `recoil` or `ads` multiplier
+     only if the engine weapon definition already has that field; do not invent new engine fields.
+- **Verify:** `node tools/dev/efc/test-partisan-rifles.mjs`, `node tools/dev/efc/test-items.mjs`, base checks.
+- **Acceptance:** table committed; changed values match the table.
+
+### C2-3. One parametrised weapon test (S)
+
+- **Edit:** new `tools/dev/efc/test-weapon.mjs`.
+- **Steps:** with `WEAPON=<id>` (default `ak15k`): build the first-person and world models (`buildGunModel`, `buildWorldGun` as
+  in `test-partisan-rifles.mjs`), equip it in a solo raid, fire a burst (magazine decreases), reload (magazine full, reserve
+  lower), aim (ADS reached within the weapon's aim time), measure time to kill a standing Warden at 25 m with perfect aim
+  (record it), mount one compatible part through `weaponmods` and assert the stats changed.
+- **Verify:** `WEAPON=ak15k node tools/dev/efc/test-weapon.mjs` passes, and for `ak47` too.
+- **Acceptance:** prints one JSON line with the measured numbers; add those numbers to `docs/weapons.md`.
+
+### C2-4 to C2-8. One card per weapon (S each)
+
+For each of `ak15k`, `ak74m`, `rpk`, `m16`, `g3`: run `test-weapon.mjs` with it; take one first-person screenshot aimed down
+sights and one at hip into `docs/weapons/<id>-ads.png` and `-hip.png`; check that the sight line is centred (the front and rear
+sight or optic sit on the screen centre within 4 px) and fix `info.mount` / `adsZ` in `efcPartisanBuild` for that weapon only if
+not; confirm the thumbnail exists (`test-thumbs.mjs`); confirm it appears in a loot table and which hostiles carry it
+(`src/efc/24-efc-loot-tables.js`). Update `docs/weapons.md`. Set the ROADMAP C2 row to done after the fifth.
+
+---
+
+## 6. Later tracks (split into cards before starting)
+
+Each item below must be split into cards of the shape above (XS to M, exact files, steps, verify, acceptance) before a Codex
+Sol agent starts it. A planning agent writes the split into this file first.
+
+- **C15 Minimal HUD** (after C2): HUD markup is `shell.html` around line 3021 (`.ammo`, `#wname`), styles around 1446.
+  Suggested cards: (1) a setting `efcHudMinimal` and hide `.ammo` and `#wname` in raids; (2) hold-R detection in
+  `src/08-player.js` line 56 with a 0.3 s threshold, tap keeps `startReload()`; (3) the check pose, reusing the inspect action
+  in `src/06d-reload.js`, with rough count text; (4) remote replication through the `weaponCheck`-style net event and
+  `docs/hud.md`. **Owner:** rough or exact count as default.
+- **C11 Map and flares** (after C15): reuse `drawTacMap` (`src/08b-killstreaks.js` line 406) and `drawMinimap`
+  (`src/09-game.js` line 248). Cards: (1) `M` opens a full-screen canvas map with player and extracts; (2) zoom, pan, legend,
+  keyboard; (3) flare columns per open extract.
+- **C12 Dirty lens:** blocked until the owner adds the reference image (see findings). The lab shader to start from is
+  `src/efc/47-efc-artlab-fx.js` (lens dirt at line 83).
+- **C13 Weapon foley:** blocked until the owner sets an ElevenLabs credit budget. The shot list (events times weapons times
+  four takes) can be written first from `docs/audio-events.md`.
+- **C3** (MK14, SPEAR, remaining attachments): the rifles are already in `EFC_PARTISAN_PROFILES`; reuse cards C2-2 to C2-8.
+  The GP-25 launcher needs its own card on the engine grenade code.
+- **C4 to C8** (enemies, AI, rival raiders, optimisation, balance): large; plan them after C3.
+- **C14** (PPSh-41, Bren, Chauchat): already in `EFC_PARTISAN_PROFILES`; reuse the C2 cards once the bipod exists (after C9-4).

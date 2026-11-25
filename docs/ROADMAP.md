@@ -14,13 +14,14 @@ Single status page for the whole project. Updated 21 November 2026. The linked h
 
 ## Open: third track, tasks C0 to C15
 
-Detailed in [`docs/HANDOFF-CODEX.md`](HANDOFF-CODEX.md), in this order (owner, 20 November 2026). Each task ends on its own
+Detailed in [`docs/HANDOFF-CODEX.md`](HANDOFF-CODEX.md), in this order (owner, 20 November 2026); split into step-by-step cards in [`docs/CODEX-SOL-TASKS.md`](CODEX-SOL-TASKS.md) (25 November 2026). Each task ends on its own
 mergeable branch.
 
 | Order | Task | What | Size |
 | --- | --- | --- | --- |
 | done | L0 | Art style lab: `#artlab` loads Claudov empty with live dials (retro/PS1 dither, lens, colour), presets, A/B split, copy and paste of settings (`docs/artlab/README.md`); done, merged into `beta` and live at `/beta/#artlab`; waiting for the owner's chosen settings | medium |
-| 0 | C0 | Finish the grid inventory: visual drag and drop between every panel, R to rotate, foley on every action | medium |
+| first | K1 to K7 | Make `beta` green: i18n line, stale thumbnail and SKS tests, online lean timing, bench route Warden count, HTTP in `run-all.sh`, CI on `beta` | small |
+| 0 | C0 | Finish the grid inventory: mostly done; open are a raid drag test, an R-key test and two foley fixes (cards C0-1 to C0-4) | small |
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
 | 3 | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3. Integrate Partisan’s modding system and assets with Riposte’s base weapons in the same workbench. Use the StG 44 bench only for lighting, background, floor and canted weapon view. | large |

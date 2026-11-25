@@ -108,7 +108,7 @@ before starting).
 
 | Card | What | Size | Needs | Status |
 | --- | --- | --- | --- | --- |
-| K1 | Translate the "Art Lab" button so `check_i18n.py` passes | XS | none | open |
+| K1 | Translate the "Art Lab" button so `check_i18n.py` passes | XS | none | done |
 | K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | open |
 | K3 | Run the CI suite on pull requests to `beta` too | XS | none | open |
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | open |

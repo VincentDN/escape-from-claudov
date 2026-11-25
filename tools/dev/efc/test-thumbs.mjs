@@ -61,13 +61,18 @@ try {
     return out;
   }, VARS);
   const bad = (f) => pics.filter(f).map((p) => p.id + '|' + p.v);
+  // Thin Partisan parts (folded bipod, sling strap) cannot reach 4 % of a 440 x 168 frame without clipping: at least 1.5 % for them.
+  const THIN = new Set(['part_p35123218a', 'part_pca7a0599d']);
+  const coverOk = (p) => p.cover <= 0.85 && p.cover >= (THIN.has(p.id) ? 0.015 : 0.04);
   check(bad((p) => !p.url).length === 0, 'every item has a picture in every size', bad((p) => !p.url));
   check(bad((p) => { const s = SIZE[p.v][p.kind === 'weapon' ? 'weapon' : 'other']; return p.url && (p.w !== s[0] || p.h !== s[1]); }).length === 0, 'picture sizes (row 256x96 / 128x128, slot 440x168, preview 840x320)');
-  check(bad((p) => !(p.cover >= 0.04 && p.cover <= 0.85)).length === 0, '4 to 85 % opaque pixels', pics.filter((p) => !(p.cover >= 0.04 && p.cover <= 0.85)).map((p) => [p.id, p.v, +p.cover.toFixed(3)]));
+  check(bad((p) => !coverOk(p)).length === 0, '4 to 85 % opaque pixels (1.5 % for the two thin parts)', pics.filter((p) => !coverOk(p)).map((p) => [p.id, p.v, +p.cover.toFixed(3)]));
   check(bad((p) => p.sd < 6).length === 0, 'no picture is one flat colour', pics.filter((p) => p.sd < 6).map((p) => [p.id, p.v, p.sd]));
   check(bad((p) => p.kind === 'weapon' && !(p.bw > p.bh)).length === 0, 'guns are wider than tall', pics.filter((p) => p.kind === 'weapon' && !(p.bw > p.bh)).map((p) => [p.id, p.v, p.bw, p.bh]));
   check(bad((p) => p.edge).length === 0, 'nothing touches the picture edge (not clipped)', bad((p) => p.edge));
-  check(bad((p) => p.tri !== null && !(p.tri >= 50 && p.tri <= 300)).length === 0, 'props are 50 to 300 triangles', pics.filter((p) => p.tri !== null && !(p.tri >= 50 && p.tri <= 300)).map((p) => [p.id, p.tri]));
+  // procedural props stay 50 to 300 triangles; imported Partisan parts (part_p…) are real models, at most 5,000
+  const triOk = (p) => p.tri === null || (p.id.startsWith('part_p') ? p.tri <= 5000 : p.tri >= 50 && p.tri <= 300);
+  check(bad((p) => !triOk(p)).length === 0, 'props are 50 to 300 triangles, Partisan parts at most 5,000', pics.filter((p) => !triOk(p)).map((p) => [p.id, p.tri]));
   check(bad((p) => p.mean < 45).length === 0, 'no picture too dark (mean luminance of the object >= 45)', pics.filter((p) => p.mean < 45).map((p) => [p.id, p.v, p.mean]));
   const gunMean = pics.filter((p) => p.kind === 'weapon' && p.v === 'row').map((p) => p.mean);
   check(Math.min(...gunMean) >= 70, 'guns lit bright (darkest gun mean luminance >= 70)', Math.min(...gunMean));
@@ -101,15 +106,18 @@ try {
     for (const id of ['w_m82', 'armor_t3', 'pack_l', 'loot_sextant', 'loot_gauge', 'loot_keys', 'loot_chrono']) if (efcCall('item:def', id)) st.items.push(efcItemNorm({ id, n: 1 }));
     uiGo('hideout');
     const box = (sel) => { const e = document.querySelector('#scr-hideout ' + sel); if (!e) return null; const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
-    const imgs = [...document.querySelectorAll('#scr-hideout .efc-th img')], rows = [...document.querySelectorAll('#scr-hideout .efc-it')];
+    const rows = [...document.querySelectorAll('#scr-hideout .efc-it')], cells = [...document.querySelectorAll('#scr-hideout .efc-op-item')];
+    // since A8 the lists sit under the operator grids: count the pictures inside list rows and inside grid items separately
+    const imgs = rows.flatMap((r) => [...r.querySelectorAll('.efc-th img')]), cellImgs = cells.map((c) => c.querySelectorAll('.efc-th img').length);
     const fit = rows.every((r) => { const t = r.querySelector('.efc-th'); if (!t) return false; const a = r.getBoundingClientRect(), b = t.getBoundingClientRect(); return b.top >= a.top && b.bottom <= a.bottom + 0.5; });
     const line = rows.filter((r) => r.classList.contains('noslot')).every((r) => { const a = r.querySelector('.nm').getBoundingClientRect(), b = r.querySelector('.w').getBoundingClientRect(); return Math.abs((a.top + a.bottom) / 2 - (b.top + b.bottom) / 2) < 4; });
-    const named = rows.filter((r) => !r.classList.contains('empty')).every((r) => { const n = r.querySelector('.nm'); return n.scrollWidth <= n.clientWidth + 1 || n.clientWidth > 120; });
-    return { imgs: imgs.length, rows: rows.length, fit, line, named, gun: box('#efcHoStash .efc-th.gun'), sq: box('#efcHoStash .efc-th.sq'), slot: box('#efcHoLoad .efc-th.slot'),
+    const clipped = rows.filter((r) => !r.classList.contains('empty')).map((r) => r.querySelector('.nm')).filter((n) => !(n.scrollWidth <= n.clientWidth + 1 || n.clientWidth > 120)).map((n) => [n.textContent, n.clientWidth]), named = clipped.length === 0;
+    return { imgs: imgs.length, rows: rows.length, cells: cells.length, cellsOk: cellImgs.every((n) => n === 1), fit, line, named, clipped, gun: box('#efcHoStash .efc-th.gun'), sq: box('#efcHoStash .efc-th.sq'), slot: box('#efcHoLoad .efc-th.slot'),
       pend: imgs.filter((i) => i.dataset.pend !== undefined).length };
   });
-  check(ho.imgs > 0 && ho.imgs === ho.rows, 'every hideout row has a thumbnail', ho);
-  check(String(ho.gun) === '128,48' && String(ho.sq) === '64,64' && String(ho.slot) === '220,84', 'row boxes 128x48 (weapons), 64x64 (items), slots 220x84', ho);
+  check(ho.imgs > 0 && ho.imgs === ho.rows && ho.cells > 0 && ho.cellsOk, 'every hideout row and grid item has one thumbnail', ho);
+  // the A8 operator layout (shell.html .efc-op-layout .efc-it) gives list thumbnails a 53 px column (72 px for slots), at most 46 px tall
+  check(String(ho.gun) === '53,46' && String(ho.sq) === '53,46' && String(ho.slot) === '72,46', 'row boxes 53x46 (weapons and items), slots 72x46', ho);
   check(ho.fit, 'every thumbnail fits inside its row (row height raised)');
   check(ho.line && ho.named, 'item rows keep name, weight and value on one line, names readable', ho);
   check(ho.pend === 0, 'pictures already rendered show at once');
@@ -134,7 +142,7 @@ try {
     EFC.inv = efcClone(efcStash().loadout);
     uiGo('main'); efcUirOpen('loot', 9001);
     const rows = [...document.querySelectorAll('#efcLoot .efc-it')];
-    return { rows: rows.length, imgs: document.querySelectorAll('#efcLoot .efc-th img').length };
+    return { rows: rows.length, imgs: rows.filter((r) => r.querySelectorAll('.efc-th img').length === 1).length };
   });
   check(lo.rows > 0 && lo.rows === lo.imgs, 'loot panel rows have thumbnails', lo);
   await page.locator('#efcLootList .efc-it[data-efc-id="w_ak47"]').focus();

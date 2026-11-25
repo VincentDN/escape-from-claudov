@@ -111,7 +111,8 @@ before starting).
 | K1 | Translate the "Art Lab" button so `check_i18n.py` passes | XS | none | done |
 | K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | open |
 | K3 | Run the CI suite on pull requests to `beta` too | XS | none | done |
-| K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | open |
+| K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
+| K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |
 | K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
 | K6 | Find why the online lean takes 0.33 s | S | K1 | open |
 | K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | open |
@@ -203,6 +204,22 @@ grids and Partisan attachment parts became items. Failures, from the log:
      (`scrollWidth <= clientWidth + 1`) or the button has an `aria-label` with the full name. Keep the preview-on-hover checks.
 - **Verify:** `node tools/dev/efc/test-thumbs.mjs` ends with no failed checks; `test-ui.mjs`, `test-operator.mjs` pass.
 - **Acceptance:** no check removed without a replacement that tests the same promise on the new layout.
+
+### K8. Stash list names are 24 px wide at 1280 by 720 (S)
+
+Found while doing K4. Under the stash grid, the hideout list (`#efcHoStash`) gives each row 252 px at 1280 by 720. The A8 layout
+(`shell.html` around line 2624: `.efc-op-layout .efc-it.efc-thr.noslot`, columns `53px minmax(0,1fr) 2.1em 3.3em 3.6em`) leaves the
+name 24 px, so "AK-47 (30 + 60)" is cut to two letters. The count column (`.n`) takes 34 px even when it is empty.
+`test-thumbs.mjs` keeps failing "item rows keep name, weight and value on one line, names readable" until this is fixed.
+
+**Owner:** the P3b rule says name, weight and value stay on one line; at this width that leaves no room for the name. Choose one:
+(a) in the operator layout, put weight and value on a second line under the name (the "one line" part of the check then applies
+only outside `.efc-op-layout`), or (b) keep one line, let the count, weight and value columns size to content (`auto`) and hide the
+value column below 300 px row width. Until the owner chooses, do not start this card.
+
+- **Edit:** `shell.html` (CSS only), `tools/dev/efc/test-thumbs.mjs` (only for option (a), and only the "one line" part).
+- **Verify:** `node tools/dev/efc/test-thumbs.mjs` passes; `node tools/dev/efc/test-inventory-layout.mjs` (HTTP) passes; a
+  screenshot of the hideout at 1280 by 720 committed to `docs/inventory/hideout-list-1280.png`.
 
 ### K5. Fix the weapon count in `test-sks.mjs` (XS)
 

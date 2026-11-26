@@ -113,7 +113,7 @@ before starting).
 | K3 | Run the CI suite on pull requests to `beta` too | XS | none | done |
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
 | K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |
-| K9 | `test-sks.mjs` "stepped TTK: the SKS is the longest" fails on some runs | S | K5 | open |
+| K9 | `test-sks.mjs` "stepped TTK: the SKS is the longest" fails on some runs | S | K5 | open (one attempt logged in the card) |
 | K10 | Raid panels cover the whole screen, so "drop outside the panel" never reaches the ground | S | C0-2 | done (a "Drop here" zone under the operator; owner may still pick another option) |
 | K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
 | K6 | Find why the online lean takes 0.33 s | S | K1 | open (passes in GitHub Actions on 25 November; fails only in the slower sandbox) |
@@ -234,6 +234,12 @@ The stepped duel depends on where the target stands and on hit spread, so the or
   source for the test only (for example replace `Math.random` inside the evaluate with a seeded generator, then restore it).
   Do not change game code and do not widen the threshold.
 - **Verify:** run `node tools/dev/efc/test-sks.mjs` five times; all pass.
+- **Tried on 26 November (did not fix it):** seeding `Math.random` before `startSolo` makes the 25 m line the same on every
+  run (`aim0` stayed `[0.382,-0.014,-0.924]`), and reseeding it per weapon inside the duel evaluate; still 4 of 5 runs failed.
+  The spread is not the only source: the L96 sometimes needs a second hit (1.267 s or 2.533 s) and the SKS sometimes kills in
+  3 hits (0.867 s), so where the bullets land also depends on something time-based (look for `performance.now`, sway or the
+  target's pose clock). Note the margin: with one L96 hit the L96 is 1.267 s against the SKS's 1.3 s, a near tie. If no
+  deterministic fix is found, ask the owner whether the check should compare against the semi-automatic rifles only.
 
 ### K10. Make "drop outside the panel" reachable in a raid (S)
 

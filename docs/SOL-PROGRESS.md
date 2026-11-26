@@ -6,14 +6,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 ## Current card
 
 - **Card:** C10-3, font screenshots and overflow check.
-- **Branch:** `codex/c10-3-font-overflow` (stacked on C10-2 while its final checks run).
+- **Branch:** `codex/c10-3-font-overflow` (includes the completed C10-2 prerequisite).
 - **Started:** 2026-11-26 13:42 CET, Codex Sol cloud session.
-- **Steps done:** Added the Inter overflow check to run-all and visually reviewed three 1280×720 reference PNGs. The seven non-lobby screens passed at 1280×720 and 1920×1080 with no sizing changes.
-- **Next step:** Fetch the C10-2 browser-test adapter fix, then run test-fonts.mjs through the lobby and complete both required UI regressions.
+- **Steps done:** All 16 page-wide Inter checks passed, including the actual local lobby and the raid HUD warning timer. Refreshed and visually reviewed the main menu, hideout and raid HUD PNGs. No sizing changes were needed.
+- **Next step:** Finish the inventory layout regression, then mark C10-3 and ROADMAP C10 done.
 - **How to verify:** Run `node tools/dev/efc/test-fonts.mjs`, `node tools/dev/efc/test-ui.mjs` and `node tools/dev/efc/test-inventory-layout.mjs` against the built HTTP site. Set `FONT_SCREENSHOTS=docs/fonts` to refresh the reference PNGs.
-- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-fonts.mjs` — 14 checks passed before the lobby failed with Host: timed out waiting for the lobby to open.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-fonts.mjs` — font overflow checks passed. `node tools/dev/efc/test-ui.mjs` — test-ui ok.
 - **Questions for the owner:**
-- **Watch out for:** The local production PeerJS script currently replaces the browser test rig's fake transport. C10-2 is updating only the test rig's route handling.
+- **Watch out for:** The raid HUD check temporarily shows the existing combat-zone warning and restores it before taking the screenshot.
 
 ## Next open cards, in order
 

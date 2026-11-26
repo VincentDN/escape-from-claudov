@@ -17,32 +17,49 @@ const screen = async (page, name, root, shot) => {
     await page.setViewportSize(size);
     await page.locator(root).waitFor({ state: 'visible', timeout: 45_000 });
     const results = await page.evaluate(async (root) => {
-      await document.fonts.ready;
       const target = document.querySelector(root);
-      await Promise.allSettled(target.getAnimations({ subtree: true }).filter(animation =>
-        Number.isFinite(animation.effect?.getComputedTiming().endTime)).map(animation => animation.finished));
-      const candidates = [target, ...target.querySelectorAll('*')].filter((element) =>
-        element instanceof HTMLElement && element.checkVisibility({ visibilityProperty: true }) &&
-        getComputedStyle(element).fontFamily.split(',').some((name) => name.trim().replace(/^["']|["']$/g, '') === 'Inter'));
-      return {
-        total: candidates.length,
-        fonts: [...document.fonts].filter((face) => face.family === 'Inter' && face.status === 'loaded').map((face) => face.weight),
-        overflow: candidates.filter((element) => element.scrollWidth > element.clientWidth + 1).map((element) => ({
-          selector: element.id ? '#' + element.id : element.tagName.toLowerCase() + (element.classList.length ? '.' + [...element.classList].join('.') : ''),
-          sample: element.textContent.trim().replace(/\s+/g, ' ').slice(0, 65),
-          client: element.clientWidth,
-          scroll: element.scrollWidth,
-        })),
-      };
+      const settle = (element) => Promise.allSettled(element.getAnimations({ subtree: true }).filter(
+        (animation) => Number.isFinite(animation.effect?.getComputedTiming().endTime)
+      ).map((animation) => animation.finished));
+      // Present the real HUD warning in its shown state so the Inter timer is exercised.
+      const warning = target.querySelector('#ringOut:not(.show)');
+      warning?.classList.add('show');
+      try {
+        await settle(target);
+        await document.fonts.ready;
+        const candidates = [...document.querySelectorAll('*')].filter((element) =>
+          element instanceof HTMLElement && element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) &&
+          getComputedStyle(element).fontFamily.split(',').some((name) => name.trim().replace(/^["']|["']$/g, '') === 'Inter'));
+        return {
+          total: candidates.length,
+          inScreen: candidates.filter((element) => target.contains(element)).length,
+          fonts: [...document.fonts].filter((face) => face.family === 'Inter' && face.status === 'loaded').map((face) => face.weight),
+          overflow: candidates.filter((element) => element.scrollWidth > element.clientWidth + 1).map((element) => ({
+            selector: element.id ? '#' + element.id : element.tagName.toLowerCase() + (element.classList.length ? '.' + [...element.classList].join('.') : ''),
+            sample: element.textContent.trim().replace(/\s+/g, ' ').slice(0, 65),
+            client: element.clientWidth,
+            scroll: element.scrollWidth,
+          })),
+        };
+      } finally {
+        if (warning) {
+          warning.classList.remove('show');
+          await settle(warning);
+        }
+      }
     }, root);
     const label = `${name} at ${size.width}×${size.height}`;
-    if (!results.fonts.length || !results.total || results.overflow.length) {
+    if (!results.fonts.length || !results.inScreen || results.overflow.length) {
       console.error('FAIL', label, JSON.stringify(results));
       failed++;
     } else {
-      console.log('PASS', label, `(${results.total} Inter elements)`);
+      console.log('PASS', label, `(${results.total} Inter elements, ${results.inScreen} in screen)`);
     }
     if (shot && screenshots && size.width === sizes[0].width) {
+      if (shot === 'hideout') {
+        await page.mouse.move(2, 2);
+        await page.locator('#scr-hideout [data-back]').evaluate((button) => button.focus({ preventScroll: true }));
+      }
       await mkdir(screenshots, { recursive: true });
       await page.screenshot({ path: join(screenshots, shot + '.png'), timeout: 120_000 });
     }

@@ -186,7 +186,7 @@ before starting).
 | C0-4 | Close C0 in the roadmap | XS | C0-3 | done |
 | C1-1 | Test: every gameplay input cancels the weapon check | S | K1 | done |
 | C1-2 | Contact sheets of the weapon check per family | S | C1-1 | open |
-| C10-1 | Self-hosted open-licence font files | S | K1 | open |
+| C10-1 | Self-hosted open-licence font files | S | K1 | done |
 | C10-2 | Swap the stencil face for the new font | S | C10-1 | open |
 | C10-3 | Font screenshots and overflow check | S | C10-2 | open |
 | C9-1 | Movement state machine skeleton and transition table | S | C1-2 | open |

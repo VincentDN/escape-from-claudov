@@ -5,15 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C10-1, self-hosted open-licence font files.
-- **Branch:** `codex/c10-1-self-hosted-fonts`
-- **Started:** 2026-11-26 13:20 CET, Codex Sol cloud session.
-- **Steps done:** Vendored and licensed both families. The build copies all seven fonts and both licenses to dist/assets/fonts.
-- **Next step:** Close C10-1 and continue to C10-2.
-- **How to verify:** Build, confirm the fonts are shipped in `dist/`, and check that the committed assets total under 400 KB.
-- **Checks so far:** Build: asset list printed, exit 0. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. diff -qr assets/fonts dist/assets/fonts: no output, exit 0.
-- **Questions for the owner:** Inter approved.
-- **Watch out for:** Barlow Condensed is specified for HUD numbers. Use upstream fonts and licence texts.
+- **Card:** none in progress. Take the next eligible card in section 4.
+- **Branch:**
+- **Started:** (date, time, session)
+- **Steps done:**
+- **Next step:**
+- **Checks so far:** (command and its last line)
+- **Questions for the owner:**
+- **Watch out for:**
 
 ## Next open cards, in order
 
@@ -30,4 +29,5 @@ Blocked on the owner: K8 (stash names, one line or two), C12 (reference image mi
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-26 Codex Sol: C10-1 done. Seven Inter and Barlow Condensed font files and both licenses ship in dist/assets/fonts (321057 bytes).
 - 2026-11-26 Claude: K1 to K5, K7, K10, C0-1 to C0-4, C1-1 done and merged into `beta` (PR #15, `a9d990f`), live at /beta.

@@ -12,11 +12,11 @@ Quickly release and press Sprint again while moving to start a tactical sprint. 
 | Sprint or tactical sprint | Start slide with enough momentum | Slide |
 | Slide | Slide ends on the ground | Crouch |
 | Slide | Jump | Airborne with slide momentum |
-| Sprint or tactical sprint | Binding pending | Dive (planned) |
-| Grounded approach to an obstacle | Binding pending | Mantle (planned) |
-| Grounded approach to an obstacle | Binding pending | Vault (planned) |
-| Stand or crouch | Binding pending | Prone (planned) |
-| Prone | Binding pending | Supine (planned) |
-| Prone | Binding pending | Side (planned) |
+| Sprint or tactical sprint | Press Crouch | Dive (planned) |
+| Grounded approach to an obstacle | Press Jump facing waist-high geometry with a reachable top | Mantle (planned) |
+| Grounded approach to an obstacle | Press Jump facing waist-high geometry with a clear far side | Vault (planned) |
+| Stand or crouch | Hold Crouch for 0.4 seconds | Prone (planned) |
+| Prone | Turn the view until the look angle calls for rolling onto the back | Supine (planned) |
+| Prone | Press the corresponding Lean key | Side (planned) |
 
-The owner will choose the inputs for the planned transitions. This table records the intended states for future movement, weapon poses, and hit volumes.
+Crouch while sprinting currently starts a slide. C9-2 must account for that overlap when it adds the planned dive input. Supine weapon pose and aiming are part of C9-8.

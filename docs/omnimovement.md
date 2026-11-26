@@ -12,5 +12,11 @@ Quickly release and press Sprint again while moving to start a tactical sprint. 
 | Sprint or tactical sprint | Start slide with enough momentum | Slide |
 | Slide | Slide ends on the ground | Crouch |
 | Slide | Jump | Airborne with slide momentum |
+| Sprint or tactical sprint | Binding pending | Dive (planned) |
+| Grounded approach to an obstacle | Binding pending | Mantle (planned) |
+| Grounded approach to an obstacle | Binding pending | Vault (planned) |
+| Stand or crouch | Binding pending | Prone (planned) |
+| Prone | Binding pending | Supine (planned) |
+| Prone | Binding pending | Side (planned) |
 
-Dive, mantle, vault, prone orientation, and the matching weapon poses and hit volumes are still open.
+The owner will choose the inputs for the planned transitions. This table records the intended states for future movement, weapon poses, and hit volumes.

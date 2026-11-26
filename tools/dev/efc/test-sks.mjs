@@ -72,47 +72,53 @@ try {
   // stepped measurement: the player re-aimed at the chest of a frozen Warden 25 m away every step, firing as fast as the weapon allows
   const meas = await ev((keys) => {
     const P = PL.ent, tgt = entities.find((e) => !e.isPlayer && e.alive && !e.off && !e.efcElite) || entities.find((e) => !e.isPlayer && e.alive && !e.off);
-    // a clear, level 25 m line from the player or a Warden's spot (chest and knee height, same ground height at both ends)
-    let base = null, dir = null, tried = 0;
-    for (const e of [P, ...entities.filter((x) => !x.isPlayer)]) {
-      for (let a = 0; a < 32 && !dir; a++) {
-        const b = e.pos, dx = Math.sin((a * Math.PI) / 16), dz = Math.cos((a * Math.PI) / 16); tried++;
-        if (rayWorld(b.x, b.y + 1.62, b.z, dx, 0, dz, 26, 1) || rayWorld(b.x, b.y + 1.3, b.z, dx, 0, dz, 26, 1) || rayWorld(b.x, b.y + 0.6, b.z, dx, 0, dz, 26, 1)) continue;
-        const g = rayWorld(b.x + dx * 25, b.y + 1, b.z + dz * 25, 0, -1, 0, 3);
-        if (g && Math.abs(g.t - 1) < 0.3) { base = b.clone(); dir = [dx, dz]; }
-      }
-      if (dir) break;
+    // A fixed, level line on Claudov, independent of where the raid spawned the player and Wardens.
+    const base = new V3(-57.5, 0, -76.5), heading = 7 * Math.PI / 8;
+    const dx = Math.sin(heading), dz = Math.cos(heading);
+    const tp = base.clone().add(new V3(dx * 25, 0, dz * 25));
+    const blocked = [1.62, 1.3, 0.6].some((h) => rayWorld(base.x, base.y + h, base.z, dx, 0, dz, 26, 1));
+    const ground = rayWorld(tp.x, tp.y + 1, tp.z, 0, -1, 0, 3);
+    if (!tgt || blocked || !ground || Math.abs(ground.t - 1) >= 0.3) {
+      return { err: 'no clear line', tgt: !!tgt, blocked, ground: ground?.t };
     }
-    if (!dir || !tgt) return { err: 'no clear line', tgt: !!tgt, tried };
-    const tp = base.clone(); tp.x += dir[0] * 25; tp.z += dir[1] * 25;
-    const out = {}, offWas = new Map();
+    const out = {}, offWas = new Map(), random = Math.random;
     for (const e of entities) if (!e.isPlayer && e !== tgt) { offWas.set(e, e.off); e.off = true; }
-    for (const k of keys) {
-      P.arms = makeArms([k]); P.arms.fireCd = 0; tgt.alive = true; tgt.health = 100; tgt.pos.copy(tp); tgt.vel && tgt.vel.set(0, 0, 0);
-      if (tgt.efcArmor !== undefined) tgt.efcArmor = null;
-      let t = 0, shots = 0, hits = 0, last = 100, first = -1;
-      while (tgt.alive && tgt.health > 0 && t < 10) {
-        P.pos.copy(base); P.vel.set(0, 0, 0); P.health = 100; tgt.pos.copy(tp); tgt.vel && tgt.vel.set(0, 0, 0);
-        poseSoldier(tgt, 0); // Move joint-based hitboxes with the teleported target before firing.
-        hitSpheres(tgt);
-        const aim = HS[1].c;
-        const ex = aim.x - base.x, ez = aim.z - base.z, ey = aim.y - (base.y + PL.eyeH);
-        PL.yaw = Math.atan2(-ex, -ez); PL.pitch = Math.atan2(ey, Math.hypot(ex, ez));
-        camera.position.set(base.x, base.y + PL.eyeH, base.z); camera.rotation.set(PL.pitch, PL.yaw, 0, 'YXZ'); camera.updateMatrixWorld();
-        if (!out.aim0) { const f = camFwd(new V3()); out.aim0 = { f: f.toArray().map((x) => +x.toFixed(3)), want: new V3(ex, ey, ez).normalize().toArray().map((x) => +x.toFixed(3)) }; }
-        PL.adsWant = true; PL.queued = PL.held = P.arms.adsW > 0.9; const s0 = P.arms.shots;
-        matchTick(1 / 30, false); t += 1 / 30;
-        if (P.arms.shots > s0) { shots++; if (first < 0) first = t; }
-        if (tgt.health < last) { hits++; last = tgt.health; }
-        if (P.arms.slots[0].mag === 0 && !P.arms.reload) ctlStartReload(P);
+    try {
+      for (const k of keys) {
+        // Each rifle starts its own reproducible spread sequence.
+        let seed = 1;
+        Math.random = () => {
+          seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+          return seed / 0x100000000;
+        };
+        P.arms = makeArms([k]); P.arms.fireCd = 0; tgt.alive = true; tgt.health = 100; tgt.pos.copy(tp); tgt.vel && tgt.vel.set(0, 0, 0);
+        if (tgt.efcArmor !== undefined) tgt.efcArmor = null;
+        let t = 0, shots = 0, hits = 0, last = 100, first = -1;
+        while (tgt.alive && tgt.health > 0 && t < 10) {
+          P.pos.copy(base); P.vel.set(0, 0, 0); P.health = 100; tgt.pos.copy(tp); tgt.vel && tgt.vel.set(0, 0, 0);
+          poseSoldier(tgt, 0); // Move joint-based hitboxes with the teleported target before firing.
+          hitSpheres(tgt);
+          const aim = HS[1].c;
+          const ex = aim.x - base.x, ez = aim.z - base.z, ey = aim.y - (base.y + PL.eyeH);
+          PL.yaw = Math.atan2(-ex, -ez); PL.pitch = Math.atan2(ey, Math.hypot(ex, ez));
+          camera.position.set(base.x, base.y + PL.eyeH, base.z); camera.rotation.set(PL.pitch, PL.yaw, 0, 'YXZ'); camera.updateMatrixWorld();
+          if (!out.aim0) { const f = camFwd(new V3()); out.aim0 = { f: f.toArray().map((x) => +x.toFixed(3)), want: new V3(ex, ey, ez).normalize().toArray().map((x) => +x.toFixed(3)) }; }
+          PL.adsWant = true; PL.queued = PL.held = P.arms.adsW > 0.9; const s0 = P.arms.shots;
+          matchTick(1 / 30, false); t += 1 / 30;
+          if (P.arms.shots > s0) { shots++; if (first < 0) first = t; }
+          if (tgt.health < last) { hits++; last = tgt.health; }
+          if (P.arms.slots[0].mag === 0 && !P.arms.reload) ctlStartReload(P);
+        }
+        out[k] = { ttk: first < 0 || tgt.alive ? null : +(t - first).toFixed(3), shots, hits, dead: !tgt.alive || tgt.health <= 0 };
+        if (!hits) { const f = camFwd(new V3()), o = camera.position.clone(), w = rayWorld(o.x, o.y, o.z, f.x, f.y, f.z, 300, 1), re = rayEntities(o, f, 300, P);
+          out[k].diag = { f: f.toArray().map((x) => +x.toFixed(3)), want: [tp.x - o.x, tp.y + 1.25 - o.y, tp.z - o.z].map((x) => +(x / 25).toFixed(3)), wt: w ? +w.t.toFixed(2) : null, ent: re ? (re.e === tgt ? 'target' : 'other') : null, rt: re ? +(+re.t).toFixed(2) : null, off: tgt.off, eyeH: PL.eyeH, tgy: +(tgt.pos.y - base.y).toFixed(2) }; }
+        if (!shots) out[k].why = { adsW: +P.arms.adsW.toFixed(2), alive: P.alive, state: MATCH.state, busy: P.busy, mag: P.arms.slots[0].mag, raid: efcCall('raid:state').state, sprint: P.sprinting, cd: P.arms.fireCd, sw: P.arms.switching };
       }
-      out[k] = { ttk: first < 0 || tgt.alive ? null : +(t - first).toFixed(3), shots, hits, dead: !tgt.alive || tgt.health <= 0 };
-      if (!hits) { const f = camFwd(new V3()), o = camera.position.clone(), w = rayWorld(o.x, o.y, o.z, f.x, f.y, f.z, 300, 1), re = rayEntities(o, f, 300, P);
-        out[k].diag = { f: f.toArray().map((x) => +x.toFixed(3)), want: [tp.x - o.x, tp.y + 1.25 - o.y, tp.z - o.z].map((x) => +(x / 25).toFixed(3)), wt: w ? +w.t.toFixed(2) : null, ent: re ? (re.e === tgt ? 'target' : 'other') : null, rt: re ? +(+re.t).toFixed(2) : null, off: tgt.off, eyeH: PL.eyeH, tgy: +(tgt.pos.y - base.y).toFixed(2) }; }
-      if (!shots) out[k].why = { adsW: +P.arms.adsW.toFixed(2), alive: P.alive, state: MATCH.state, busy: P.busy, mag: P.arms.slots[0].mag, raid: efcCall('raid:state').state, sprint: P.sprinting, cd: P.arms.fireCd, sw: P.arms.switching };
+    } finally {
+      Math.random = random;
+      PL.adsWant = false; PL.queued = PL.held = false;
+      for (const [e, o] of offWas) e.off = o;
     }
-    PL.adsWant = false; PL.queued = PL.held = false;
-    for (const [e, o] of offWas) e.off = o;
     return out;
   }, Object.keys(ttk));
   console.log('\nTime to kill at 25 m, still target, 100 health, torso, no armour');

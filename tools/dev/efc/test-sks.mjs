@@ -83,7 +83,9 @@ try {
     }
     const out = {}, offWas = new Map(), random = Math.random;
     for (const e of entities) if (!e.isPlayer && e !== tgt) { offWas.set(e, e.off); e.off = true; }
+    const targetArms = tgt.arms, targetFireCd = targetArms.fireCd;
     try {
+      targetArms.fireCd = Infinity;
       for (const k of keys) {
         // Each rifle starts its own reproducible spread sequence.
         let seed = 1;
@@ -96,7 +98,9 @@ try {
         let t = 0, shots = 0, hits = 0, last = 100, first = -1;
         while (tgt.alive && tgt.health > 0 && t < 10) {
           P.pos.copy(base); P.vel.set(0, 0, 0); P.health = 100; tgt.pos.copy(tp); tgt.vel && tgt.vel.set(0, 0, 0);
-          poseSoldier(tgt, 0); // Move joint-based hitboxes with the teleported target before firing.
+          // Use the same standing, front-facing pose before each shot.
+          tgt.yaw = heading; tgt.pitch = 0; tgt.crouch = false; tgt.recoil = 0;
+          poseSoldier(tgt, 0);
           hitSpheres(tgt);
           const aim = HS[1].c;
           const ex = aim.x - base.x, ez = aim.z - base.z, ey = aim.y - (base.y + PL.eyeH);
@@ -116,6 +120,7 @@ try {
       }
     } finally {
       Math.random = random;
+      targetArms.fireCd = targetFireCd;
       PL.adsWant = false; PL.queued = PL.held = false;
       for (const [e, o] of offWas) e.off = o;
     }

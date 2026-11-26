@@ -46,7 +46,10 @@ const SWITCH = { dur: 0.44, swap: 0.24 };
 /* Déplacement : renvoie la vitesse verticale d'atterrissage (0 si pas d'atterrissage) */
 function ctlMove(ent, dt) {
   const I = ent.input, A = ent.arms, d = armsW(ent).def;
+  const traversal = efcOmniTraversalStep(ent, dt);
+  if (traversal) return traversal;
   let sprint = I.sprint && efcOmniSprintDirection(ent, I) && !I.ads && !ent.blockSprint && A.boltT <= 0 && (!ent.busy || ent.sprintBusyOk);
+  const diving = efcOmniDive(ent, sprint, dt);
   // glissade : démarrage, puis la course n'est plus « un sprint » (on peut tirer et viser)
   ent.slideCd = Math.max(0, (ent.slideCd || 0) - dt);
   let slid = false, sliding = (ent.slideT || 0) > 0;
@@ -62,8 +65,8 @@ function ctlMove(ent, dt) {
       sliding = slid = true; ent.slideBuf = 0;
     }
   }
-  if (sliding) sprint = false;
-  if (sliding) ent.crouch = true;
+  if (sliding || diving) sprint = false;
+  if (sliding || diving) ent.crouch = true;
   else if (I.crouch && !sprint) ent.crouch = true;
   else if (ent.crouch && ceilingAbove(ent.pos.x, ent.pos.z, ent.pos.y + 1.0, 0.3) > ent.pos.y + 1.8) ent.crouch = false;
   ent.crouchAmt = damp(ent.crouchAmt, ent.crouch ? 1 : 0, 10, dt);
@@ -92,7 +95,7 @@ function ctlMove(ent, dt) {
     ent.vel.x = ent.slideDx * slideV; ent.vel.z = ent.slideDz * slideV;
     ent.slideT -= dt;
     if (ent.slideT <= 0) { ent.slideT = 0; ent.slideCd = SLIDE.cd; }
-  } else { ent.vel.x = damp(ent.vel.x, wx * spd, acc, dt); ent.vel.z = damp(ent.vel.z, wz * spd, acc, dt); }
+  } else if (!diving) { ent.vel.x = damp(ent.vel.x, wx * spd, acc, dt); ent.vel.z = damp(ent.vel.z, wz * spd, acc, dt); }
   let jumped = false;
   if (I.jump && ent.onGround && !ent.jumpHeld) { // on saute même en lançant une grenade ou en changeant d'arme
     if (sliding) { ent.slideT = 0; ent.slideCd = SLIDE.cd; ent.crouch = false; sliding = false; ent.vy = 6.3; ent.onGround = false; jumped = true; } // saut de glissade : l'élan est gardé
@@ -133,6 +136,7 @@ function ctlMove(ent, dt) {
   else if (ent.onGround && ent.vy <= 0 && ent.pos.y - g < STEP + 0.05) { ent.pos.y = g; ent.vy = 0; }
   else ent.onGround = false;
   ent.airVy = ent.vy;
+  if (diving && ent.onGround) efcOmniDiveLand(ent);
   if (sliding && !ent.onGround) { ent.slideT = 0; ent.slideCd = SLIDE.cd; sliding = false; } // plus de sol : fin de la glissade
   ent.slideAmt = damp(ent.slideAmt || 0, sliding ? 1 : 0, sliding ? 12 : 7, dt);
   ent.eyeH = damp(ent.eyeH, sliding ? 0.85 : ent.crouch ? 1.1 : 1.62, sliding ? 22 : 12, dt);

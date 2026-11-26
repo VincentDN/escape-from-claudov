@@ -15,7 +15,8 @@ What remains under its own terms:
      the owner for this public repository. The other Partisan sounds (`f_casing_wood`, `assets/sfx/ballistics/`) are Freesound CC0,
      authors and source pages in `assets/sfx/credits.json`.
 2. **Textures, skies and HDRI** (`assets/tex/`, `assets/sky/`, `assets/vendor/hdri/`): Poly Haven and ambientCG, CC0 (`assets/tex/credits.json`).
-3. **Libraries**: three.js r147 (MIT, notice at the top of `assets/vendor/three-r147.js`); PeerJS (MIT), loaded from jsDelivr for online lobbies.
+3. **Libraries**: three.js r147 (MIT, notice at the top of `assets/vendor/three-r147.js`); PeerJS 1.5.5 (MIT), from
+   https://registry.npmjs.org/peerjs/-/peerjs-1.5.5.tgz for online lobbies. Its distribution and license are in `assets/vendor/`.
 4. **Soldier animations**: none are shipped. The game runs on the engine's procedural poses. To add baked clips, bake them from your own
    Mixamo account with `tools/dev/anim/cuire.mjs`; Mixamo's terms allow use in a game, not redistribution of the clips on their own.
 5. **Music and harbour layer** (`assets/music/`, P5): every file is CC0 1.0 from OpenGameArt, each page fetched and its licence read
@@ -37,6 +38,14 @@ What remains under its own terms:
    (placed on a red tile, and on a white and red flag) made by `tools/dev/efc/brand-kotwica.mjs`, and are shared under the same
    CC BY-SA 4.0 licence. In Poland the sign is protected by the Act of 10 June 2014 on the protection of the Sign of Fighting Poland:
    use it respectfully.
+
+
+7. **UI fonts** (`assets/fonts/`), both under the **SIL Open Font License 1.1**. Each family includes its upstream `OFL.txt`.
+   - Inter 4.1, weights 400, 600 and 700, from https://github.com/rsms/inter/releases/tag/v4.1.
+     The web fonts are subset to Latin and extended Latin, common punctuation, currency, arrows and symbols.
+   - Barlow Condensed 1.408, weights 400, 500, 600 and 700, from
+     https://github.com/google/fonts/tree/6ebe737e44fd64ee736bbc6feed6136a6dbfd222/ofl/barlowcondensed.
+     The upstream TrueType files were compressed to WOFF2 with their full character coverage.
 
 The raid StG 44 model is a reduced derivative of the Partisan Project Neuro-Bash showcase asset, cleared by Vincent De Nil for this repository. See `showcase/asset-credits.json` and `docs/weapon-port.md`.
 

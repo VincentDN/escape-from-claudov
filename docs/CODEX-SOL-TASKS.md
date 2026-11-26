@@ -175,23 +175,23 @@ before starting).
 | K3 | Run the CI suite on pull requests to `beta` too | XS | none | done |
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
 | K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |
-| K9 | `test-sks.mjs` "stepped TTK: the SKS is the longest" fails on some runs | S | K5 | open (one attempt logged in the card) |
+| K9 | `test-sks.mjs` "stepped TTK: the SKS is the longest" fails on some runs | S | K5 | done |
 | K10 | Raid panels cover the whole screen, so "drop outside the panel" never reaches the ground | S | C0-2 | done (a "Drop here" zone under the operator; owner may still pick another option) |
 | K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
-| K6 | Find why the online lean takes 0.33 s | S | K1 | open (passes in GitHub Actions on 25 November; fails only in the slower sandbox) |
+| K6 | Find why the online lean takes 0.33 s | S | K1 | done |
 | K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | done (A3 Scavengers take 2 of the 7 hostile slots by design; test updated) |
 | C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | done |
 | C0-2 | Test: drags between every raid panel pair | S | C0-1 | done (8 checks, after K10) |
 | C0-3 | Foley: unmount sound and one shared throttle | S | C0-2 | done |
 | C0-4 | Close C0 in the roadmap | XS | C0-3 | done |
 | C1-1 | Test: every gameplay input cancels the weapon check | S | K1 | done |
-| C1-2 | Contact sheets of the weapon check per family | S | C1-1 | open |
-| C10-1 | Self-hosted open-licence font files | S | K1 | open |
-| C10-2 | Swap the stencil face for the new font | S | C10-1 | open |
-| C10-3 | Font screenshots and overflow check | S | C10-2 | open |
-| C9-1 | Movement state machine skeleton and transition table | S | C1-2 | open |
-| C9-2 | Dive | M | C9-1 | open |
-| C9-3 | Mantle and vault | M | C9-1 | open |
+| C1-2 | Contact sheets of the weapon check per family | S | C1-1 | done |
+| C10-1 | Self-hosted open-licence font files | S | K1 | done |
+| C10-2 | Swap the stencil face for the new font | S | C10-1 | done |
+| C10-3 | Font screenshots and overflow check | S | C10-2 | done |
+| C9-1 | Movement state machine skeleton and transition table | S | C1-2 | done |
+| C9-2 | Dive | M | C9-1 | done |
+| C9-3 | Mantle and vault | M | C9-1 | done |
 | C9-4 | Prone: enter, crawl, get up | M | C9-1 | open |
 | C9-5 | Prone: free turn, roll to back and sides | M | C9-4 | open |
 | C9-6 | Hit volumes follow the stance | M | C9-4 | open |

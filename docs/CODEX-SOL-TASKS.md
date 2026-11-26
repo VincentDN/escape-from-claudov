@@ -188,7 +188,7 @@ before starting).
 | C1-2 | Contact sheets of the weapon check per family | S | C1-1 | open |
 | C10-1 | Self-hosted open-licence font files | S | K1 | done |
 | C10-2 | Swap the stencil face for the new font | S | C10-1 | done |
-| C10-3 | Font screenshots and overflow check | S | C10-2 | open |
+| C10-3 | Font screenshots and overflow check | S | C10-2 | done |
 | C9-1 | Movement state machine skeleton and transition table | S | C1-2 | open |
 | C9-2 | Dive | M | C9-1 | open |
 | C9-3 | Mantle and vault | M | C9-1 | open |

@@ -178,7 +178,7 @@ before starting).
 | K9 | `test-sks.mjs` "stepped TTK: the SKS is the longest" fails on some runs | S | K5 | open (one attempt logged in the card) |
 | K10 | Raid panels cover the whole screen, so "drop outside the panel" never reaches the ground | S | C0-2 | done (a "Drop here" zone under the operator; owner may still pick another option) |
 | K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
-| K6 | Find why the online lean takes 0.33 s | S | K1 | open (passes in GitHub Actions on 25 November; fails only in the slower sandbox) |
+| K6 | Find why the online lean takes 0.33 s | S | K1 | done |
 | K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | done (A3 Scavengers take 2 of the 7 hostile slots by design; test updated) |
 | C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | done |
 | C0-2 | Test: drags between every raid panel pair | S | C0-1 | done (8 checks, after K10) |

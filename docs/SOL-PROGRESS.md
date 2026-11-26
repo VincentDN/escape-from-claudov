@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next eligible card in section 4.
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:**
-- **Checks so far:** (command and its last line)
+- **Card:** C9-2, airborne dive.
+- **Branch:** `codex/c9-omni`
+- **Started:** 2026-11-26, Codex Sol cloud session.
+- **Steps done:** Sprint + Crouch triggers a dive in the air and keeps Slide on the ground. Dive preserves the heading, uses the existing collision solver, lands crouched, and has a 0.65 s cooldown.
+- **Next step:** Run movement and Warden regressions, then close the card.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-omni-dive.mjs` — Dive passed in eight directions, stops at a wall, lands crouched, respects cooldown and preserves grounded Slide.
 - **Questions for the owner:**
-- **Watch out for:**
+- **Watch out for:** C9-4 will integrate landing into Prone. The focused test uses a runtime floor and wall inside the map bounds.
 
 ## Next open cards, in order
 

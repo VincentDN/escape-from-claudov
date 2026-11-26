@@ -8,10 +8,10 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C10-1, self-hosted open-licence font files.
 - **Branch:** `codex/c10-1-self-hosted-fonts`
 - **Started:** 2026-11-26 13:20 CET, Codex Sol cloud session.
-- **Steps done:** Downloaded official Inter 4.1 and Barlow Condensed 1.408. Packaged seven weights and both licenses (321057 bytes).
-- **Next step:** Record upstream sources, versions, licenses and font processing in NOTICE.md.
+- **Steps done:** Vendored seven font weights and both licenses, and recorded family versions, upstream sources and processing in NOTICE.md.
+- **Next step:** Copy assets/fonts to dist/assets/fonts during the build and compare the output with its source.
 - **How to verify:** Build, confirm the fonts are shipped in `dist/`, and check that the committed assets total under 400 KB.
-- **Checks so far:** Build: asset list printed, exit 0. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. Font metadata verified weights 400/600/700 and 400/500/600/700.
+- **Checks so far:** Build: asset list printed, exit 0. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok.
 - **Questions for the owner:** Inter approved.
 - **Watch out for:** Barlow Condensed is specified for HUD numbers. Use upstream fonts and licence texts.
 

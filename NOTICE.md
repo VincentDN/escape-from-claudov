@@ -38,6 +38,14 @@ What remains under its own terms:
    CC BY-SA 4.0 licence. In Poland the sign is protected by the Act of 10 June 2014 on the protection of the Sign of Fighting Poland:
    use it respectfully.
 
+
+7. **UI fonts** (`assets/fonts/`), both under the **SIL Open Font License 1.1**. Each family includes its upstream `OFL.txt`.
+   - Inter 4.1, weights 400, 600 and 700, from https://github.com/rsms/inter/releases/tag/v4.1.
+     The web fonts are subset to Latin and extended Latin, common punctuation, currency, arrows and symbols.
+   - Barlow Condensed 1.408, weights 400, 500, 600 and 700, from
+     https://github.com/google/fonts/tree/6ebe737e44fd64ee736bbc6feed6136a6dbfd222/ofl/barlowcondensed.
+     The upstream TrueType files were compressed to WOFF2 with their full character coverage.
+
 The raid StG 44 model is a reduced derivative of the Partisan Project Neuro-Bash showcase asset, cleared by Vincent De Nil for this repository. See `showcase/asset-credits.json` and `docs/weapon-port.md`.
 
 **Q2 raid rifle geometry** (`assets/raid-models/partisan.json`): from Partisan Project. Geometry is baked, reoriented and quantized for Claudov. Third-party assets retain their original terms. Source files and recorded credits are listed below.

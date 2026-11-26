@@ -205,7 +205,12 @@ before starting).
 | C16-6 | Radio processing and packaging | S | C16-5 | open |
 | C16-7 | Voice playback in the game | S | C16-6, C16-2 | open |
 | C16-8 | Online barks and closing test | S | C16-7, C16-3 | open |
-| C2-1 | Port Partisan's rail and compatibility rules | M | C16-8 | open |
+| C16-9 | Downed state for players in raids | M | C16-8, C9-4 | open (owner: defaults in the card) |
+| C16-10 | Teammate revive online | S | C16-9 | open |
+| C16-11 | Execution: walk up, taunt, draw pistol, last line, finishing shot | M | C16-9 | open |
+| C16-12 | The downed player's view of it | S | C16-11 | open |
+| C16-13 | Execution online and closing test | S | C16-11, C16-10 | open |
+| C2-1 | Port Partisan's rail and compatibility rules | M | C16-13 | open |
 | C2-2 | Roster stats table and niche stats for batch 1 | S | C2-1 | open |
 | C2-3 | One parametrised weapon test | S | C2-2 | open |
 | C2-4 to C2-8 | One card per weapon: AK-15K, AK-74M Zenitco, RPK, M16, G3 | S each | C2-3 | open |
@@ -732,7 +737,35 @@ Spec: `HANDOFF-CODEX.md` C16. New file `src/efc/45b-efc-barks.js` holds the logi
   not.
 - **C16-8. Online and closing (S).** Host decides barks; replicate the `bark` event to guests through the net bus; guests show
   the caption and play the line. Test with `net2.mjs`: the guest receives the same bark kind and line. Close C16 in
-  `ROADMAP.md`.
+  `ROADMAP.md` once C16-13 is done too.
+
+**Execution of a downed player (C16-9 to C16-13).** Owner's request: a hostile walks up to a downed player, taunts ("Got you,
+you bastard."), draws a pistol, says a last line ("You had a good run, meatbag.") and fires the finishing shot. Telegraphed
+like every action: from the first line to the shot at least 4 s, which is the teammates' window. Add the kinds
+`execute_taunt` and `execute_final` to `EFC_BARKS` (captions: the owner's two lines plus three variants each in the same
+tone; the voice is the invented language) and their lines to the C16-4 script.
+
+- **C16-9. Downed state (M).** Needs C9-4 (prone pose). New `src/efc/23a-efc-downed.js`, raid mode only, host decides. Damage
+  that would kill a human player sets `efcDowned = { since, by }` instead, health stays at 1; headshots still kill at once
+  (one-shot rule). Downed: prone pose, crawl at a fifth of walk speed, no firing, no inventory; bleed out after
+  `EFC.cfg.downedBleed` (30 s) through the normal death path (`efcEmit('died', …)` in `src/09-game.js` line 131). Further
+  damage while downed kills. **Owner** defaults to confirm: 30 s bleed-out, no shooting while downed, solo players go down too.
+  Test `test-downed.mjs`: lethal body shot downs, headshot kills, bleed-out kills at 30 s, no shots fire while downed.
+- **C16-10. Revive (S).** A squadmate within 1.5 m holds the interact key 5 s to revive (back to 25 health); moving or
+  taking damage cancels. Host decides; replicated. Test with `net2.mjs`: the guest revives the host's downed player.
+- **C16-11. Execution (M).** When a human is downed and a hostile sees them with no other human within 15 m of the downed one,
+  the nearest such hostile becomes the executioner (one at a time per downed player; Wardens and Scavengers, later specials
+  too). It: barks `execute_taunt` and walks (not runs) to 2 m; stops, switches to a pistol (`WEAPONS.m9` and
+  `setSoldierGun`, as Scavengers do in `src/efc/43-efc-scavengers.js` line 19); barks `execute_final`; waits 1.5 s; fires one
+  shot that kills (through the normal damage path, so a dead downed player counts as killed by that hostile). It gives up and
+  goes back to fighting when it takes damage, when another human comes within 15 m, or when the player is revived. Test in
+  `test-downed.mjs`: barks in order, at least 4 s from the first bark to the shot, the shot kills, each abort condition
+  works.
+- **C16-12. The downed player's view (S).** While downed: the camera low, a slow heartbeat and a darkened edge (no flashing;
+  reduced motion keeps it static), the bleed-out time as a thin bar, and the executioner's captions shown large so the player
+  reads them. One screenshot to `docs/barks/execution.png`.
+- **C16-13. Online and closing (S).** Host runs the sequence; guests see the walk, the draw and the captions and hear the lines;
+  a guest can interrupt it by shooting the executioner or reviving. `net2.mjs` test for both. Close C16 in `ROADMAP.md`.
 
 ### C3. Remaining modern weapons and parts (after C13)
 

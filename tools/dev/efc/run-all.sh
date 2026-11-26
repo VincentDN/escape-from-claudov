@@ -30,6 +30,7 @@ run node tools/dev/efc/test-world.mjs
 run node tools/dev/efc/test-raid.mjs
 run node tools/dev/efc/test-warden.mjs
 run node tools/dev/efc/test-ui.mjs
+run node tools/dev/efc/test-fonts.mjs
 run node tools/dev/efc/test-inventory-layout.mjs
 run node tools/dev/efc/test-grid-placement.mjs
 run node tools/dev/efc/test-inventory-keys.mjs

@@ -19,8 +19,8 @@ if not relay and os.path.exists("relay.url"):
     relay=next((l.strip() for l in open("relay.url",encoding="utf-8") if l.strip() and not l.lstrip().startswith("#")),"")
 if relay and not re.fullmatch(r"wss?://[^\s\"<>]+",relay):
     raise SystemExit("adresse du relais invalide (attendu : wss://... ) : "+relay)
-if not relay: # PeerJS : connexions WebRTC entre joueurs (voir src/09c-net.js) ; empreinte vérifiée (SRI) : jsDelivr ne peut pas en changer le code
-    tags+='\n<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js" integrity="sha384-x0YgkOr/3UOZP2CRDxGW9e0Q+2Qjyr3uJrm4xU32Y7ZCNAo7Cc7bjhrZMi/dwczu" crossorigin="anonymous"></script>'
+if not relay: # PeerJS local : connexions WebRTC entre joueurs (voir src/09c-net.js), empreinte contrôlée par SRI
+    tags+='\n<script src="assets/vendor/peerjs-1.5.5.min.js" integrity="sha384-x0YgkOr/3UOZP2CRDxGW9e0Q+2Qjyr3uJrm4xU32Y7ZCNAo7Cc7bjhrZMi/dwczu" crossorigin="anonymous"></script>'
 # Escape From Claudov: the game code in src/efc/*.js is joined after the engine, just before src/99-start.js (which starts the game)
 _eng=sorted(glob.glob("src/*.js")); _efc=sorted(glob.glob("src/efc/*.js"))
 _files=[f for f in _eng if not f.endswith("99-start.js")]+_efc+[f for f in _eng if f.endswith("99-start.js")]
@@ -277,15 +277,19 @@ if len(inline)<2: raise SystemExit("CSP : scripts en ligne attendus (code du jeu
 sha=" ".join("'sha256-"+base64.b64encode(hashlib.sha256(x.encode("utf-8")).digest()).decode("ascii")+"'" for x in inline)
 if relay:
     host=re.match(r"wss?://([^/]+)",relay).group(1); net="https://"+host+" wss://"+host
-    peer=""
-else: net="https://*.peerjs.com wss://*.peerjs.com stun: turn:"; peer=" https://cdn.jsdelivr.net/npm/peerjs@1.5.5/"
-csp=("default-src 'self'; script-src 'self' "+sha+peer+"; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-     "font-src https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' "+net+"; "
+else: net="https://*.peerjs.com wss://*.peerjs.com stun: turn:"
+csp=("default-src 'self'; script-src 'self' "+sha+"; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; "
+     "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' "+net+"; "
      "manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'")
 if html.count('<meta charset="utf-8">')!=1: raise SystemExit("shell.html : <meta charset=\"utf-8\"> attendu une fois")
 html=html.replace('<meta charset="utf-8">','<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="'+csp+'">')
 print("CSP :",len(inline),"scripts en ligne,",("relais "+host) if relay else "PeerJS")
 os.makedirs("dist", exist_ok=True)
+shutil.copytree("assets/fonts", "dist/assets/fonts", dirs_exist_ok=True)
+if not relay:
+    os.makedirs("dist/assets/vendor", exist_ok=True)
+    for name in ("peerjs-1.5.5.min.js", "peerjs-1.5.5.LICENSE"):
+        shutil.copyfile("assets/vendor/" + name, "dist/assets/vendor/" + name)
 open("dist/index.html","w",encoding="utf-8").write(html)
 with open("dist/version.json","w",encoding="utf-8") as f: f.write(json.dumps({"build":build_id,"version":log[0]["version"]})+"\n")
 # The Partisan opening scene and StG 44 viewer load as standalone modules on demand.

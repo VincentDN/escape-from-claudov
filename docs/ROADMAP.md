@@ -41,7 +41,7 @@ mergeable branch.
 | 12 | C7 | Optimisation, part 1 (what can be measured without a GPU) | medium |
 | 13 | C8 | Raid balance from scripted raids | medium |
 | 14 | C14 | Second World War weapons: PPSh-41, Bren, Chauchat (in, but after the modern ones) | large |
-| any | C10 | Clean, modern menu fonts instead of the stencil face | small |
+| done | C10 | Clean, modern menu fonts instead of the stencil face | small |
 
 ## Waiting on the owner
 

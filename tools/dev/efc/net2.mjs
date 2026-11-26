@@ -1,6 +1,6 @@
 // Two-client network rig: the built game (dist/) served over local HTTP, a host page and a guest page in one browser context, talking
-// through tools/dev/efc/fakepeer.js (a BroadcastChannel stand-in for PeerJS, injected before the game's scripts; the real PeerJS CDN
-// script and every other outside request are blocked). The helpers drive the functions the menus call: netHost, netJoinLobby, netLaunch,
+// through tools/dev/efc/fakepeer.js (a BroadcastChannel stand-in for PeerJS, injected before the game's scripts; the production PeerJS
+// bundle and every outside request are blocked). The helpers drive the functions the menus call: netHost, netJoinLobby, netLaunch,
 // the loading phase (menuLaunch) and menuDeploy. Game logic is stepped with matchTick; rendering is halted (GPUX.halt).
 //   import { openPair, createLobby, joinLobby, launch, waitInMatch, stepBoth } from './net2.mjs'
 //   const rig = await openPair({ map: 'simoun' });            // rig.host, rig.guest: Playwright pages at the main menu, map built
@@ -45,7 +45,11 @@ export async function openNetPage(context, base, o, errors) {
   page.efcName = name;
   page.on('pageerror', (e) => errors.push(`[${name} pageerror] ` + e.message + '\n' + (e.stack || '').split('\n').slice(0, 4).join('\n')));
   page.on('console', (m) => { if (m.type() === 'error' && !/ERR_FAILED|ERR_INTERNET|net::|Failed to load resource/.test(m.text())) errors.push(`[${name} console] ` + m.text()); });
-  await page.route('**/*', (r) => (r.request().url().startsWith(base) ? r.continue() : r.abort()));
+  const peerBundle = new URL('assets/vendor/peerjs-1.5.5.min.js', base).href;
+  await page.route('**/*', (route) => {
+    const url = route.request().url();
+    return url.startsWith(base) && url !== peerBundle ? route.continue() : route.abort();
+  });
   await page.addInitScript(`try{if(!localStorage.getItem('dc_settings'))localStorage.setItem('dc_settings', ${JSON.stringify(JSON.stringify(settings))})}catch(e){};
     window.MATCH_COUNTDOWN = 0; window.EFC_TEST = true; window.NET_RELAY_URL = ''; window.EFC_NET_NAME = ${JSON.stringify(name)};`);
   await page.addInitScript(FAKEPEER);

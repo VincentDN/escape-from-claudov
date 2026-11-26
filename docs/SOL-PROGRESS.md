@@ -8,9 +8,9 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C10-2, use the self-hosted Inter and Barlow Condensed fonts.
 - **Branch:** `codex/c10-2-inter-menu` (stacked on C10-1).
 - **Started:** 2026-11-26, Codex Sol cloud session.
-- **Steps done:** Switched menu screens to Inter and HUD font files to local URLs. Vendored matching PeerJS 1.5.5 with its MIT license. Default menu startup loads all seven fonts and PeerJS locally and makes zero off-origin HTTP requests.
-- **Next step:** Run test-ui, test-bench and test-net on the vendored build, then close C10-2.
-- **Checks so far:** build.py: liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. Browser audit: Off-origin HTTP requests: [].
+- **Steps done:** Switched fonts to local assets, vendored PeerJS with the original SRI, and updated the isolated network rig to keep using its local deterministic transport. Default startup made zero off-origin HTTP requests.
+- **Next step:** Close C10-2 and continue C10-3.
+- **Checks so far:** Build: asset list printed. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. test-ui.mjs: test-ui ok. test-bench.mjs: persistent scene, menu shots, pointer input, seven-tap developer door, solo cheats, soundtrack and legacy redirect passed. test-net.mjs: all passed. Browser audit: Off-origin HTTP requests: [].
 - **Questions for the owner:**
 - **Watch out for:** C10-3 covers overflow and screenshots.
 

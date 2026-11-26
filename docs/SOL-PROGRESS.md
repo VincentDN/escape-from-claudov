@@ -5,14 +5,15 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C10-2, use the self-hosted Inter and Barlow Condensed fonts.
-- **Branch:** `codex/c10-2-inter-menu` (stacked on C10-1).
-- **Started:** 2026-11-26, Codex Sol cloud session.
-- **Steps done:** Switched menu screens to Inter and HUD font files to local URLs. Vendored matching PeerJS 1.5.5 with its MIT license. Default menu startup loads all seven fonts and PeerJS locally and makes zero off-origin HTTP requests.
-- **Next step:** Run test-ui, test-bench and test-net on the vendored build, then close C10-2.
-- **Checks so far:** build.py: liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. Browser audit: Off-origin HTTP requests: [].
+- **Card:** C10-3, font screenshots and overflow check.
+- **Branch:** `codex/c10-3-font-overflow` (stacked on C10-2 while its final checks run).
+- **Started:** 2026-11-26 13:42 CET, Codex Sol cloud session.
+- **Steps done:** Added the Inter overflow check to run-all and visually reviewed three 1280×720 reference PNGs. The seven non-lobby screens passed at 1280×720 and 1920×1080 with no sizing changes.
+- **Next step:** Fetch the C10-2 browser-test adapter fix, then run test-fonts.mjs through the lobby and complete both required UI regressions.
+- **How to verify:** Run `node tools/dev/efc/test-fonts.mjs`, `node tools/dev/efc/test-ui.mjs` and `node tools/dev/efc/test-inventory-layout.mjs` against the built HTTP site. Set `FONT_SCREENSHOTS=docs/fonts` to refresh the reference PNGs.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-fonts.mjs` — 14 checks passed before the lobby failed with Host: timed out waiting for the lobby to open.
 - **Questions for the owner:**
-- **Watch out for:** C10-3 covers overflow and screenshots.
+- **Watch out for:** The local production PeerJS script currently replaces the browser test rig's fake transport. C10-2 is updating only the test rig's route handling.
 
 ## Next open cards, in order
 

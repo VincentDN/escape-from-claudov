@@ -286,6 +286,7 @@ if html.count('<meta charset="utf-8">')!=1: raise SystemExit("shell.html : <meta
 html=html.replace('<meta charset="utf-8">','<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="'+csp+'">')
 print("CSP :",len(inline),"scripts en ligne,",("relais "+host) if relay else "PeerJS")
 os.makedirs("dist", exist_ok=True)
+shutil.copytree("assets/fonts", "dist/assets/fonts", dirs_exist_ok=True)
 open("dist/index.html","w",encoding="utf-8").write(html)
 with open("dist/version.json","w",encoding="utf-8") as f: f.write(json.dumps({"build":build_id,"version":log[0]["version"]})+"\n")
 # The Partisan opening scene and StG 44 viewer load as standalone modules on demand.

@@ -279,8 +279,8 @@ if relay:
     host=re.match(r"wss?://([^/]+)",relay).group(1); net="https://"+host+" wss://"+host
     peer=""
 else: net="https://*.peerjs.com wss://*.peerjs.com stun: turn:"; peer=" https://cdn.jsdelivr.net/npm/peerjs@1.5.5/"
-csp=("default-src 'self'; script-src 'self' "+sha+peer+"; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-     "font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' "+net+"; "
+csp=("default-src 'self'; script-src 'self' "+sha+peer+"; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; "
+     "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' "+net+"; "
      "manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'")
 if html.count('<meta charset="utf-8">')!=1: raise SystemExit("shell.html : <meta charset=\"utf-8\"> attendu une fois")
 html=html.replace('<meta charset="utf-8">','<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="'+csp+'">')

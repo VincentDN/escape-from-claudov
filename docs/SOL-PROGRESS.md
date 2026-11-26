@@ -8,9 +8,9 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C10-2, use the self-hosted Inter and Barlow Condensed fonts.
 - **Branch:** `codex/c10-2-inter-menu` (stacked on C10-1).
 - **Started:** 2026-11-26, Codex Sol cloud session.
-- **Steps done:** Wired Inter through --display, with weight 700 on the named titles and 600 elsewhere.
-- **Next step:** Restrict fonts to same-origin in the CSP and run the required UI and bench checks.
-- **Checks so far:** build.py: liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. No stencil or Saira references in the edited UI.
+- **Steps done:** Restricted fonts to the same origin in the CSP and removed Google Fonts from the style allowlist.
+- **Next step:** Run test-ui, test-bench and a browser request audit.
+- **Checks so far:** build.py: liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. No stencil, Saira, googleapis or gstatic references in shell.html or build.py.
 - **Questions for the owner:**
 - **Watch out for:** C10-3 covers overflow and screenshots.
 

@@ -8,10 +8,10 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C10-2, use the self-hosted Inter and Barlow Condensed fonts.
 - **Branch:** `codex/c10-2-inter-menu` (stacked on C10-1).
 - **Started:** 2026-11-26, Codex Sol cloud session.
-- **Steps done:** Inter and Barlow Condensed are wired. The browser loaded all seven font faces from this origin with HTTP 200. The default build still requests PeerJS 1.5.5 from jsDelivr at startup.
-- **Next step:** Resolve the same-origin acceptance scope before marking C10-2 done or taking C10-3.
-- **Checks so far:** build.py: liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. test-ui.mjs: test-ui ok. test-bench.mjs: persistent scene, menu shots, pointer input, seven-tap developer door, solo cheats, soundtrack and legacy redirect passed. Browser audit: 7 local fonts loaded; 1 off-origin request to jsDelivr.
-- **Questions for the owner:** Is C10-2 same-origin acceptance limited to fonts, or should PeerJS also be vendored for the default build?
+- **Steps done:** Switched menu screens to Inter and HUD font files to local URLs. Vendored matching PeerJS 1.5.5 with its MIT license. Default menu startup loads all seven fonts and PeerJS locally and makes zero off-origin HTTP requests.
+- **Next step:** Run test-ui, test-bench and test-net on the vendored build, then close C10-2.
+- **Checks so far:** build.py: liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. Browser audit: Off-origin HTTP requests: [].
+- **Questions for the owner:**
 - **Watch out for:** C10-3 covers overflow and screenshots.
 
 ## Next open cards, in order

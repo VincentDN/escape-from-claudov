@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C10-2, use the self-hosted Inter and Barlow Condensed fonts.
-- **Branch:** `codex/c10-2-inter-menu` (stacked on C10-1).
-- **Started:** 2026-11-26, Codex Sol cloud session.
-- **Steps done:** Switched fonts to local assets, vendored PeerJS with the original SRI, and updated the isolated network rig to keep using its local deterministic transport. Default startup made zero off-origin HTTP requests.
-- **Next step:** Close C10-2 and continue C10-3.
-- **Checks so far:** Build: asset list printed. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok. test-ui.mjs: test-ui ok. test-bench.mjs: persistent scene, menu shots, pointer input, seven-tap developer door, solo cheats, soundtrack and legacy redirect passed. test-net.mjs: all passed. Browser audit: Off-origin HTTP requests: [].
+- **Card:** none in progress. Take the next eligible card in section 4.
+- **Branch:**
+- **Started:** (date, time, session)
+- **Steps done:**
+- **Next step:**
+- **Checks so far:** (command and its last line)
 - **Questions for the owner:**
-- **Watch out for:** C10-3 covers overflow and screenshots.
+- **Watch out for:**
 
 ## Next open cards, in order
 
@@ -29,5 +29,6 @@ Blocked on the owner: K8 (stash names, one line or two), C12 (reference image mi
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-26 Codex Sol: C10-2 done. Inter and Barlow Condensed load locally. Vendored PeerJS 1.5.5 with matching SRI and MIT license. Default startup audit: zero off-origin requests; UI, bench and network checks passed.
 - 2026-11-26 Codex Sol: C10-1 done. Seven Inter and Barlow Condensed font files and both licenses ship in dist/assets/fonts (321057 bytes).
 - 2026-11-26 Claude: K1 to K5, K7, K10, C0-1 to C0-4, C1-1 done and merged into `beta` (PR #15, `a9d990f`), live at /beta.

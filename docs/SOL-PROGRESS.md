@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C9-2, airborne dive.
-- **Branch:** `codex/c9-omni`
-- **Started:** 2026-11-26, Codex Sol cloud session.
-- **Steps done:** Sprint + Crouch triggers a dive in the air and keeps Slide on the ground. Dive preserves the heading, uses the existing collision solver, lands crouched, and has a 0.65 s cooldown.
-- **Next step:** Run movement and Warden regressions, then close the card.
-- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-omni-dive.mjs` — Dive passed in eight directions, stops at a wall, lands crouched, respects cooldown and preserves grounded Slide.
+- **Card:** none in progress. Take the next eligible card in section 4.
+- **Branch:**
+- **Started:** (date, time, session)
+- **Steps done:**
+- **Next step:**
+- **Checks so far:** (command and its last line)
 - **Questions for the owner:**
-- **Watch out for:** C9-4 will integrate landing into Prone. The focused test uses a runtime floor and wall inside the map bounds.
+- **Watch out for:**
 
 ## Next open cards, in order
 
@@ -28,6 +28,7 @@ Blocked on the owner: K8 (stash names, one line or two), C12 (reference image mi
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-26 Codex Sol: C9-2 done. Sprint + Crouch dives in the air and slides on the ground. The eight-direction dive, collision, cooldown and movement/Warden regressions passed.
 - 2026-11-26 Codex Sol: C9-1 done. simRun drove all six existing movement states. Sprint and Warden regressions passed. Owner chose grounded Slide and airborne Dive for Sprint + Crouch.
 - 2026-11-26 Codex Sol: C1-2 done. Generated four labelled first- and third-person contact sheets and confirmed the weapon is visible in all 32 tiles. Hand contact quality needs the owner's eye.
 - 2026-11-26 Claude: K1 to K5, K7, K10, C0-1 to C0-4, C1-1 done and merged into `beta` (PR #15, `a9d990f`), live at /beta.

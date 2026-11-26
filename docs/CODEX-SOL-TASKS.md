@@ -190,7 +190,7 @@ before starting).
 | C10-2 | Swap the stencil face for the new font | S | C10-1 | open |
 | C10-3 | Font screenshots and overflow check | S | C10-2 | open |
 | C9-1 | Movement state machine skeleton and transition table | S | C1-2 | done |
-| C9-2 | Dive | M | C9-1 | open |
+| C9-2 | Dive | M | C9-1 | done |
 | C9-3 | Mantle and vault | M | C9-1 | open |
 | C9-4 | Prone: enter, crawl, get up | M | C9-1 | open |
 | C9-5 | Prone: free turn, roll to back and sides | M | C9-4 | open |

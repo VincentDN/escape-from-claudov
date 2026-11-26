@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next eligible card in section 4.
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:**
-- **Checks so far:** (command and its last line)
+- **Card:** C10-2, use the self-hosted Inter and Barlow Condensed fonts.
+- **Branch:** `codex/c10-2-inter-menu` (stacked on C10-1).
+- **Started:** 2026-11-26, Codex Sol cloud session.
+- **Steps done:** Replaced Google font links with seven local @font-face rules and allowed same-origin font loading.
+- **Next step:** Rename the display token and apply the new weights.
+- **Checks so far:** build.py: liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. check_decl.py: no output, exit 0. check_i18n.py: 0 erreur(s). smoke.mjs: smoke ok.
 - **Questions for the owner:**
-- **Watch out for:**
+- **Watch out for:** C10-3 covers overflow and screenshots.
 
 ## Next open cards, in order
 

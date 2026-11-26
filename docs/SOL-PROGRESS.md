@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C9-3, mantle and vault.
-- **Branch:** `codex/c9-omni`
-- **Started:** 2026-11-26 18:06 CET, Codex Sol cloud session.
-- **Steps done:** Added a raid-player Jump transition onto reachable 0.5–1.2 m ledges or over them when a supported far-side landing is clear within 1 m. Checked path and landing clearance in all eight headings and preserved ordinary jump and the existing movement timers.
-- **Next step:** Close C9-3, then continue C9-4.
-- **Checks so far:** `build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `check_decl.py` — no output, exit 0. `check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `smoke.mjs` — smoke ok. `test-omni-traversal.mjs` — Mantle and vault passed in all eight headings, with blocked and ordinary jump fallbacks. `test-omni-dive.mjs` — Dive passed in eight directions, stops at a wall, lands crouched, respects cooldown and preserves grounded Slide. `test-omni-states.mjs` — Movement states passed: stand → crouch → sprint → tactical → slide → air → stand. `test-omni-sprint.mjs` — Sprint and slide passed in eight directions, tactical sprint expires, Warden movement preserved. `test-warden.mjs` — test-warden: all passed.
+- **Card:** none in progress. Take the next eligible card in section 4.
+- **Branch:**
+- **Started:** (date, time, session)
+- **Steps done:**
+- **Next step:**
+- **Checks so far:** (command and its last line)
 - **Questions for the owner:**
-- **Watch out for:** Traversal holds the standing collision volume. The dedicated test places test-only collision boxes on a temporary elevated slab and removes them when done.
+- **Watch out for:**
 
 ## Next open cards, in order
 
@@ -28,6 +28,7 @@ Blocked on the owner: K8 (stash names, one line or two), C12 (reference image mi
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-26 Codex Sol: C9-3 done. Mantle and vault passed in all eight headings with blocked landing and ordinary jump fallbacks. Dive, movement, and Warden regressions passed.
 - 2026-11-26 Codex Sol: C9-2 done. Sprint + Crouch dives in the air and slides on the ground. The eight-direction dive, collision, cooldown and movement/Warden regressions passed.
 - 2026-11-26 Codex Sol: C9-1 done. simRun drove all six existing movement states. Sprint and Warden regressions passed. Owner chose grounded Slide and airborne Dive for Sprint + Crouch.
 - 2026-11-26 Codex Sol: C1-2 done. Generated four labelled first- and third-person contact sheets and confirmed the weapon is visible in all 32 tiles. Hand contact quality needs the owner's eye.

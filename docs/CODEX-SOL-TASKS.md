@@ -108,18 +108,21 @@ before starting).
 
 | Card | What | Size | Needs | Status |
 | --- | --- | --- | --- | --- |
-| K1 | Translate the "Art Lab" button so `check_i18n.py` passes | XS | none | open |
-| K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | open |
-| K3 | Run the CI suite on pull requests to `beta` too | XS | none | open |
-| K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | open |
-| K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | open |
-| K6 | Find why the online lean takes 0.33 s | S | K1 | open |
-| K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | open |
-| C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | open |
-| C0-2 | Test: drags between every raid panel pair | S | C0-1 | open |
-| C0-3 | Foley: unmount sound and one shared throttle | S | C0-2 | open |
-| C0-4 | Close C0 in the roadmap | XS | C0-3 | open |
-| C1-1 | Test: every gameplay input cancels the weapon check | S | K1 | open |
+| K1 | Translate the "Art Lab" button so `check_i18n.py` passes | XS | none | done |
+| K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | done (full run pending; see PR #15) |
+| K3 | Run the CI suite on pull requests to `beta` too | XS | none | done |
+| K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
+| K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |
+| K9 | `test-sks.mjs` "stepped TTK: the SKS is the longest" fails on some runs | S | K5 | open (one attempt logged in the card) |
+| K10 | Raid panels cover the whole screen, so "drop outside the panel" never reaches the ground | S | C0-2 | done (a "Drop here" zone under the operator; owner may still pick another option) |
+| K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
+| K6 | Find why the online lean takes 0.33 s | S | K1 | open (passes in GitHub Actions on 25 November; fails only in the slower sandbox) |
+| K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | done (A3 Scavengers take 2 of the 7 hostile slots by design; test updated) |
+| C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | done |
+| C0-2 | Test: drags between every raid panel pair | S | C0-1 | done (8 checks, after K10) |
+| C0-3 | Foley: unmount sound and one shared throttle | S | C0-2 | done |
+| C0-4 | Close C0 in the roadmap | XS | C0-3 | done |
+| C1-1 | Test: every gameplay input cancels the weapon check | S | K1 | done |
 | C1-2 | Contact sheets of the weapon check per family | S | C1-1 | open |
 | C10-1 | Self-hosted open-licence font files | S | K1 | open |
 | C10-2 | Swap the stencil face for the new font | S | C10-1 | open |
@@ -203,6 +206,54 @@ grids and Partisan attachment parts became items. Failures, from the log:
      (`scrollWidth <= clientWidth + 1`) or the button has an `aria-label` with the full name. Keep the preview-on-hover checks.
 - **Verify:** `node tools/dev/efc/test-thumbs.mjs` ends with no failed checks; `test-ui.mjs`, `test-operator.mjs` pass.
 - **Acceptance:** no check removed without a replacement that tests the same promise on the new layout.
+
+### K8. Stash list names are 24 px wide at 1280 by 720 (S)
+
+Found while doing K4. Under the stash grid, the hideout list (`#efcHoStash`) gives each row 252 px at 1280 by 720. The A8 layout
+(`shell.html` around line 2624: `.efc-op-layout .efc-it.efc-thr.noslot`, columns `53px minmax(0,1fr) 2.1em 3.3em 3.6em`) leaves the
+name 24 px, so "AK-47 (30 + 60)" is cut to two letters. The count column (`.n`) takes 34 px even when it is empty.
+`test-thumbs.mjs` keeps failing "item rows keep name, weight and value on one line, names readable" until this is fixed.
+
+**Owner:** the P3b rule says name, weight and value stay on one line; at this width that leaves no room for the name. Choose one:
+(a) in the operator layout, put weight and value on a second line under the name (the "one line" part of the check then applies
+only outside `.efc-op-layout`), or (b) keep one line, let the count, weight and value columns size to content (`auto`) and hide the
+value column below 300 px row width. Until the owner chooses, do not start this card.
+
+- **Edit:** `shell.html` (CSS only), `tools/dev/efc/test-thumbs.mjs` (only for option (a), and only the "one line" part).
+- **Verify:** `node tools/dev/efc/test-thumbs.mjs` passes; `node tools/dev/efc/test-inventory-layout.mjs` (HTTP) passes; a
+  screenshot of the hideout at 1280 by 720 committed to `docs/inventory/hideout-list-1280.png`.
+
+### K9. Make the SKS stepped time-to-kill check deterministic (S)
+
+Seen in the local full run on 25 November: `FAIL stepped TTK: the SKS is the longest of all rifles`, with a different starting
+aim (`aim0`) than the passing runs, and the L96 at 2.53 s (2 hits in 3 shots) beating the SKS. The other runs that day passed.
+The stepped duel depends on where the target stands and on hit spread, so the ordering is not guaranteed.
+
+- **Read:** `tools/dev/efc/test-sks.mjs` (the "stepped TTK" block), `grep -n "Math.random" src/06-weapons.js src/08-player.js` for spread.
+- **Steps:** find what sets `aim0` and the spread per shot. Make the duel use a fixed target position and a seeded random
+  source for the test only (for example replace `Math.random` inside the evaluate with a seeded generator, then restore it).
+  Do not change game code and do not widen the threshold.
+- **Verify:** run `node tools/dev/efc/test-sks.mjs` five times; all pass.
+- **Tried on 26 November (did not fix it):** seeding `Math.random` before `startSolo` makes the 25 m line the same on every
+  run (`aim0` stayed `[0.382,-0.014,-0.924]`), and reseeding it per weapon inside the duel evaluate; still 4 of 5 runs failed.
+  The spread is not the only source: the L96 sometimes needs a second hit (1.267 s or 2.533 s) and the SKS sometimes kills in
+  3 hits (0.867 s), so where the bullets land also depends on something time-based (look for `performance.now`, sway or the
+  target's pose clock). Note the margin: with one L96 hit the L96 is 1.267 s against the SKS's 1.3 s, a near tie. If no
+  deterministic fix is found, ask the owner whether the check should compare against the semi-automatic rifles only.
+
+### K10. Make "drop outside the panel" reachable in a raid (S)
+
+Found by C0-2 (check 8 of `test-inventory-drag.mjs`). `efcOperatorDragEnd` drops an item on the ground when it is released
+with no target and `pick.outside` is true, which means the pointer is not inside `.efc-box`. But `.efc-box.efc-op-box` is
+`width: 100%; height: 100%` (`shell.html` line 2676), so in the raid and loot panels no point on the screen is outside the box
+and the drop never happens. The test checks the overlay's corners and edge midpoints at 1366 by 900; all are inside the box.
+
+- **Owner decision first:** where the player drops to the ground: (a) a margin around the panel box, (b) a visible
+  "Drop to ground" zone in the panel (for example under the operator figure), or (c) releasing over the operator figure column.
+- **Read:** `src/efc/55-efc-operator.js` lines 407 to 415 (`pick.outside`) and 466 to 485 (drag end); `shell.html` lines 2586 and 2676.
+- **Steps (for b):** add one element with `data-op-target="ground"` to the raid and loot layouts; in `efcOperatorDragMove`
+  treat it as `pick.outside = true` with a valid highlight; leave the hideout unchanged. Update check 8 to release over it.
+- **Verify:** `node tools/dev/efc/test-inventory-drag.mjs` prints eight `ok` lines; base checks.
 
 ### K5. Fix the weapon count in `test-sks.mjs` (XS)
 

@@ -7,7 +7,7 @@
 const EFC_SND = {
   on: true, // false: the engine's previous sounds (the audition page compares both)
   log: null, // array: every played layer is recorded { kind, id, t } (tests)
-  prevInv: null, busy: false, panelEv: false, last: {},
+  prevInv: null, busy: false, panelEv: false, last: {}, invLast: -1, // invLast: when the last inventory cue played (shared gap)
 };
 
 /* Weapon mass (kg, roughly the real weapon unloaded) by engine weapon id; bots only give their family */
@@ -49,6 +49,7 @@ const EFC_HANDLING = {
   inv_refuse: [['hf_click', 0, 0.50, 0.78]],
   inv_split: [['hf_handle', 0, 0.55, 1.1], ['hf_click', 0.04, 0.32, 1.1]],
   inv_mount: [['hf_slide', 0, 0.45, 1.03], ['hf_click', 0.045, 0.7, 1.04]],
+  inv_unmount: [['hf_click', 0, 0.55, 0.98], ['hf_slide', 0.04, 0.4, 0.95]],
   inv_search: [['hf_handle', 0, 0.5, 0.9], ['hf_ratchet', 0.08, 0.35, 1]],
   inv_med: [['hf_handle', 0, 0.6, 1.1], ['hf_handle', 0.22, 0.45, 0.95]],
 };
@@ -100,14 +101,17 @@ function efcHandlingPlay(kind, delay, pos, fam) {
 function efcInvSound(key, rate = 1) {
   if (!EFC_SND.on || typeof AU === 'undefined' || !AU.ready || !efcHandlingReady(key)) return false;
   const t = AU.ctx.currentTime;
-  if (t - (EFC_SND.last[key] || -1) < 0.05) return false; EFC_SND.last[key] = t; // 'take all' and quick clicks
+  if (t - (EFC_SND.last[key] || -1) < 0.05) return false; // 'take all' and quick clicks
+  // one gap shared by every inventory cue, so a fast drag never stacks pick, rotate and place; a refusal is always heard
+  if (key !== 'inv_refuse' && t - EFC_SND.invLast < 0.07) return false;
+  EFC_SND.last[key] = t; EFC_SND.invLast = t;
   efcHandlingLayers(key, auOut(null, 0.02, 1), t, { rate });
   return true;
 }
 efcOn('ui:inventory-gesture', (kind, item) => {
   const def = item && efcCall('item:def', item.id);
   const key = { pick: def?.kind === 'weapon' ? 'pickup' : 'inv_take', place: 'inv_drop', rotate: 'inv_rotate',
-    refuse: 'inv_refuse', split: 'inv_split', equip: 'inv_equip', mount: 'inv_mount' }[kind];
+    refuse: 'inv_refuse', split: 'inv_split', equip: 'inv_equip', mount: 'inv_mount', unmount: 'inv_unmount' }[kind];
   if (key) efcInvSound(key, efcSndWeightRate(def ? def.w * (item.n || 1) : 1));
 });
 

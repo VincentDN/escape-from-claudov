@@ -1141,6 +1141,7 @@ Niveau supérieur ⇒ Level up
 Notifications : {0} non lue ⇒ Notifications: {0} unread
 Notifications : {0} non lues ⇒ Notifications: {0} unread
 Notifications ⇒ =
+Art Lab ⇒ =
 à l'instant ⇒ just now
 il y a {0} min ⇒ {0} min ago
 il y a {0} h ⇒ {0} h ago

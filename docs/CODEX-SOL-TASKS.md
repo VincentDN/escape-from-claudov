@@ -205,7 +205,13 @@ before starting).
 | C11-1 to C11-3 | Full-screen map and extraction flares | M total | C15-4 | open |
 | C12 | Dirty lens | M | C11-3 | blocked (reference image missing, see findings) |
 | C13 | Weapon foley | M | C12 | open (ElevenLabs budget approved by the owner, 25 November 2026) |
-| C3, C4 to C8, C14 | Later tracks, outlined in section 6 | L | earlier cards | open |
+| C3-1 to C3-7 | Remaining modern weapons and parts (section 7) | M total each | C13 | open |
+| C4-1 to C4-8 | Marksman, Breacher, Heavy (section 7) | S to M | C3-7 | open |
+| C5-1 to C5-8 | AI behaviour upgrade (section 7) | S to M | C4-8 | open |
+| C6-1 to C6-6 | Rival raider squads (section 7) | S to M | C5-8 | open |
+| C7-1 to C7-7 | Optimisation, part 1 (section 7) | XS to M | C6-6 | open |
+| C8-1 to C8-6 | Raid balance (section 7) | XS to M | C7-7 | open |
+| C14-1 to C14-5 | Second World War weapons (section 7) | S to M | C8-6, C9-4 | open |
 
 ---
 
@@ -648,7 +654,165 @@ Sol agent starts it. A planning agent writes the split into this file first.
   (3) editing and levelling with `tools/sfx/` and `tools/build_sfx.py`; (4) mapping in `src/efc/45-efc-sounds.js` and the
   `#sounds` audition page; (5) `test-sounds.mjs` coverage. Generation needs the ElevenLabs connector: an agent without it
   stops after card (1) and hands the shot list to the owner.
-- **C3** (MK14, SPEAR, remaining attachments): the rifles are already in `EFC_PARTISAN_PROFILES`; reuse cards C2-2 to C2-8.
-  The GP-25 launcher needs its own card on the engine grenade code.
-- **C4 to C8** (enemies, AI, rival raiders, optimisation, balance): large; plan them after C3.
-- **C14** (PPSh-41, Bren, Chauchat): already in `EFC_PARTISAN_PROFILES`; reuse the C2 cards once the bipod exists (after C9-4).
+- **C3, C4 to C8 and C14** are split into cards in section 7.
+
+## 7. Later tracks as cards (planned 26 November 2026)
+
+Specs: `HANDOFF-CODEX.md` C3 to C8 and C14. Every card below follows sections 0 and 1: one branch per card, push after each
+step, `docs/SOL-PROGRESS.md` updated. **Before editing any engine file (`src/0*.js`) or another package's file, check
+`docs/contracts/CONTRACT.md`; if the file is owned elsewhere, stop and report the change you need.** Gate every behaviour
+change behind `efcRaidMode()` so other engine modes stay as they are. Browser tests here take 5 to 15 minutes each: run the
+card's own test, not the whole suite.
+
+Facts found while planning (so you do not have to look again):
+
+- All 14 Partisan rifles, including MK14, SPEAR, PPSh-41, Bren and Chauchat, are already in raids with placeholder numbers:
+  `EFC_PARTISAN_PROFILES` in `src/efc/18-efc-partisan-rifles.js` (lines 2 to 17: id, model, engine template, magazine, rpm,
+  impact).
+- The 41 Partisan parts are data in `assets/raid-models/partisan-parts.json`, made by `tools/dev/efc/prepare-partisan-raid.mjs`
+  and loaded by `src/efc/18a-efc-partisan-parts.js` (slots, effects at lines 26 to 37). The GP-25 (`pee7ec90cb`, slot foregrip)
+  and the bipod (`p35123218a`) exist as parts but have no behaviour beyond the `ads` and `bipod` effect flags.
+- Loot tables: `src/efc/24-efc-loot-tables.js` (`EFC_LOOT`, entries `[weight, id, min, max]`; `P:common`, `P:all` roll parts).
+- Bot budget: `efcWardenNumber` (`src/efc/00-efc-core.js` line 98); Scavengers take their slots in `efcWardenAssign`
+  (`src/efc/40-efc-wardens.js` lines 35 to 59) through `scav:count`, `scav:assign`, `scav:spawn`, `scav:spawned`
+  (`src/efc/43-efc-scavengers.js`, hooks in `src/07-bots.js` line 111 and `src/09c-net.js` line 747). Copy this pattern.
+- Engine AI: `src/07-bots.js` (grenades: `spawnNade` line 434, `botThrowNade` line 514), `src/07b-tactics.js` (`findCover` 42,
+  `flankPoint` 79, `decideTactic` 146, `updateBot` 205, `suppressAlongRay` 564). Elite post: Warehouse A
+  (`src/efc/60-efc-claudov-plan.js` line 134; mezzanine 139; crane platform 94).
+- Online tests: `tools/dev/efc/net2.mjs` (two-client rig), `test-net.mjs`, `test-e2e-net.mjs`.
+
+### C3. Remaining modern weapons and parts (after C13)
+
+- **C3-1. Parts gap list (XS, docs only).** Read `assets/raid-models/partisan-parts.json` (ids, slots, names) and the Partisan
+  repository's weapon assets (`vincentdn/partisan-project`, `assets/models/weapons/` and `assets/register.json`). Write
+  `docs/weapon-parts.md`: one table of parts in the game, one of parts in Partisan but not here (expected: ZF4 scope, AK side
+  rail, iron sight set, G3 drum; confirm each). Acceptance: both tables, with the Partisan file path for each missing part.
+- **C3-2. MK14 and SPEAR numbers (S).** Needs C2-2 and C2-3. Add their rows to the roster table in `docs/weapons.md` with the
+  niche reasoning, change only their entries in `EFC_PARTISAN_PROFILES` (and their stats where C2-2 put them), add both to the
+  C2-3 parametrised test. Verify: that test, `test-partisan-rifles.mjs`, `test-thumbs.mjs`.
+- **C3-3. Import missing parts, batch of up to three per card (M).** For each part from C3-1: extend
+  `tools/dev/efc/prepare-partisan-raid.mjs` to include it, regenerate `partisan-parts.json`, check its triangle count against the
+  existing parts (the K4 rule in `test-thumbs.mjs`: at most 5,000 for `part_p…`), and set its `models` list to the rifles it
+  physically fits. Verify: `test-weaponmods.mjs`, `test-thumbs.mjs`, the workbench mounts it on one rifle (screenshot).
+- **C3-4. Parts in loot by quality (S).** Split the part pool into common, uncommon and rare in `24-efc-loot-tables.js`
+  (for example `P:common`, `P:uncommon`, `P:rare`; scopes, suppressors, drums rare), use them in `crate` and `weapons`. Add a
+  seeded check to `test-items.mjs` or a new `test-loot-parts.mjs`: over 2,000 seeded rolls each tier appears and rare is under
+  5 %. **Owner:** the exact rare list if unsure.
+- **C3-5. GP-25 fires (M).** With the GP-25 mounted, a key (propose `B`; check `src/08a-binds.js` for a free one) launches a
+  grenade along the aim with `spawnNade(owner, p, v, fuse, 'frag')` and an impact fuse (a new flag on the nade, handled in the
+  nade update in `src/07-bots.js` near line 545: explode on first contact). One round loaded, reload from a new item
+  `ammo_vog` (`src/efc/20-efc-items.js`). Offline only in this card. Test: `test-gp25.mjs` mounts it, fires, the nade explodes
+  on contact within 2 s, the round is spent, reload needs `ammo_vog`.
+- **C3-6. GP-25 online and loot (S).** The host spawns the grenade (host authority); guests see it through the existing nade
+  replication (find it with `grep -n "nade" src/09c-net.js`). `ammo_vog` goes in the `weapons` table (rare). Test: extend
+  `test-gp25.mjs` with `net2.mjs`: the guest's launch explodes on both clients.
+- **C3-7. Fit audit (S).** One test, `test-part-fit.mjs`: for every part and every rifle, `efcCall('weaponmods:fit', …)` agrees
+  with the part's `models` list; print a matrix to `docs/weapon-parts.md`. Close C3 in `ROADMAP.md`.
+
+### C4. Marksman, Breacher, Heavy (after C3)
+
+- **C4-1. Special budget (S).** New `src/efc/43a-efc-specials.js`, copying the Scavenger hooks: `special:count`(budget, map) →
+  `{ marksman, breacher, heavy }`, taken out of the Warden number (Claudov: one each when the budget allows; other maps at most
+  one special); `special:assign`, `special:spawn`, `special:spawned`. In `efcWardenAssign` take the special slots after the
+  Scavenger slots (one-line change; check ownership first). Squad values `m`, `b`, `h`. Test `test-specials.mjs` part 1: 20 raid
+  starts per map, counts within budget, total bots unchanged.
+- **C4-2. Looks and loadouts (S).** Per type: weapon (Marksman: `svd` or the Partisan `mk14`; Breacher: `rem870`; Heavy: `rpk`,
+  Bren comes in C14), `skin` through `soldierLook` (find the skin list with `grep -n "skin" src/06ga-tenues.js | head`),
+  armour (`dmgMul`, like Scavengers' 0.45, but Heavy around 1.6 health equivalent), name pools in English. Contact sheet of
+  the three at `docs/enemies/looks.png` (`tests/e2e/contact-sheet` pattern or `test-thumbs` capture). **Owner:** looks sign-off.
+- **C4-3. Loot per type (S).** `EFC_LOOT.marksman`, `.breacher`, `.heavy` (Heavy drops the best: armour t3 chance, rare parts);
+  bodies use them through `world:body`. Seeded test as in C3-4.
+- **C4-4. Marksman perches and relocation (M).** A list of 4 to 6 perches on Claudov (crane platform, Warehouse A mezzanine,
+  container stacks; positions from `60-efc-claudov-plan.js`, checked walkable with `navNode`) in the specials file. The
+  Marksman holds a perch, fires, and after its second shot moves to another perch out of the target's sight. Test: scripted
+  scenario, after two shots its perch index changes and the new perch has no line of sight to the shooter's last target.
+- **C4-5. Marksman glint (S).** While it aims at a player in daylight, a small additive sprite at its scope is visible to that
+  player only (client-side visual, no gameplay effect). Test: flag set while aiming at the player, off otherwise; one
+  screenshot. Respect the Art Lab lens settings if they affect sprites.
+- **C4-6. Breacher (M).** Guards one building interior (Warehouse A or B box from the plan file). Pushes when it hears
+  footsteps inside its building (use the engine's hearing input: `grep -n "hear\|bruit\|step" src/07-bots.js | head`), not for
+  gunfire outside. Throws `flash` with `botThrowNade` before entering the player's room. Test: footsteps inside → push within
+  3 s; gunfire outside → stays; a flash is thrown before it crosses the doorway.
+- **C4-7. Heavy (M).** Slow (speed multiplier), armoured, posted on the elite loot in Warehouse A; on contact it fires bursts at
+  the player's last cover point with `suppressAlongRay` for 3 to 5 s. Test: player behind cover → the Heavy keeps firing at the
+  cover point (shots counted, no line of sight needed).
+- **C4-8. Close C4 (S).** `docs/enemies.md` (rules, counts, loot), the 20-start count test across all maps passes, all P1
+  tests still pass (one-shot rule, insertion grace, spawn distances: `test-warden.mjs`, `test-raid.mjs`, `test-spawns.mjs`).
+
+### C5. AI behaviour upgrade (after C4)
+
+Every card: behind `efcRaidMode()`, numbers before and after in `docs/ai.md`, P1 tests still pass.
+
+- **C5-1. Scenario harness and baseline (M).** `tools/dev/efc/test-ai-scenarios.mjs` with a small scenario API (place player
+  and bots, freeze or script the player, run N seconds with `simRun`, return metrics). Baseline table in `docs/ai.md`: time to
+  kill the player and bot survival per enemy type at two difficulties, 10 seeded runs each.
+- **C5-2. Suppress and flank pair (M).** When two bots of one post engage, one takes `tactic = 'flank'` (`flankPoint`) and the
+  other suppresses (`suppressAlongRay`) until the flanker arrives. Scenario: two Wardens vs a player in cover: one flanks,
+  one suppresses, in 8 of 10 runs.
+- **C5-3. Cover discipline (M).** Reload and heal only in cover (`findCover`); leave cover only when a teammate is covering.
+  Scenario: a bot with an empty magazine moves to cover before reloading in 9 of 10 runs.
+- **C5-4. Grenade flush (S).** A player who stays in one cover for over 8 s gets a frag (`botThrowNade`), never when a teammate
+  is within 6 m of the landing point. Scenario for both rules.
+- **C5-5. Investigation (M).** On a shot heard or a container or body that changed (`world:changed`), go there with caution,
+  search (`botSearchStart`), give up after 30 s. Scenario: a shot fired out of sight → a bot reaches within 5 m of its origin.
+- **C5-6. Retreat and call for help (S).** Outnumbered or under 35 % health → fall back to the post and alert the post
+  (`efcWardenAlert`). Scenario.
+- **C5-7. Loot awareness (S).** On the next patrol pass, a bot that passes an opened container or a missing body near its post
+  switches to investigation. Scenario.
+- **C5-8. After table (S).** Re-run the C5-1 baseline; write the after columns and what changed; P1 tests pass. Close C5.
+
+### C6. Rival raider squads (after C5)
+
+- **C6-1. Slots and setting (M).** New `src/efc/43b-efc-rivals.js`. Setting `efcRivals` 0 to 2 (default 1 on Claudov,
+  0 elsewhere) next to the other raid settings; rivals take bot slots like specials (out of the Warden number; **owner** if
+  that should be on top instead). Squad values `r1`, `r2`, hostile to everyone. They insert at a free insert after the humans
+  (`raid:inserts`). Test: counts and insert positions over 20 starts.
+- **C6-2. Route plan (M).** Per squad: a route of 3 to 5 loot points (containers from `world:list`) ending at an open extract;
+  re-plan when threatened or when bags are full. Pure data function first, tested without rendering.
+- **C6-3. Looting (M).** Rivals take items through the host world (`world:take` with the rival as actor) into a bot inventory
+  (`inv:new`); visible kit updates when they pick up armour or a better weapon. Test: container contents drop, rival inventory
+  grows.
+- **C6-4. Extract and death (S).** On reaching an open extract before the timer they vanish (as players do); on death the body
+  holds everything carried (`world:body`). Test both.
+- **C6-5. Bot-only raids (M).** `test-rivals.mjs`: 10 seeded bot-only raids (minutes: 60 setting, fast stepping): rivals extract
+  in at least half, none stuck for over 20 s (position sampling), Warden numbers unchanged.
+- **C6-6. Online (S).** Host simulates rivals; `net2.mjs` shows them on both clients with matching kit. Close C6.
+
+### C7. Optimisation, part 1 (after C6)
+
+- **C7-1. Baseline (S).** With the A1 route (`#bench`, `src/efc/48-efc-bench-route.js`): draw calls, triangles,
+  `renderer.info.memory`, and host tick CPU time with all bots awake. Table in `docs/perf.md` ("before", this sandbox; note it
+  is software rendering).
+- **C7-2. Far bots sleep (M).** Hostiles farther than a set distance from every human update at a lower rate and skip
+  pathfinding; wake on noise, damage or proximity. Test: a sleeping bot wakes within 0.5 s of a shot heard; tick time drops.
+- **C7-3. Static merge (M).** Merge static map geometry per material per chunk where the kit does not already
+  (`src/efc/60-efc-claudov-kit.js`, `30-efc-worldmesh.js`). Draw calls before and after; screenshots before and after must look
+  the same.
+- **C7-4. Level of detail (M).** Containers, props and bodies get a low level beyond a distance, behind the quality setting.
+- **C7-5. Closed panels cost nothing (S).** Thumbnails and the operator view do no rendering while their panel is closed
+  (count renders with a spy). Test.
+- **C7-6. Memory soak (S).** 20-minute bot-only raid (stepped): JS heap, geometries and textures flat within 5 %.
+- **C7-7. Report (XS).** "After" columns in `docs/perf.md` and the list of what still needs the owner's GPU numbers.
+
+### C8. Raid balance (after C7)
+
+- **C8-1. Balance runner (M).** `tools/dev/efc/balance.mjs`: N seeded raids with rival squads standing in for players; prints
+  median raid length, survival rate, value extracted per raid. Runs in the background; writes a JSON summary.
+- **C8-2. Baseline (XS).** `docs/balance.md` with the targets (median 8 to 15 min, survival 30 to 50 %, a full kit replaced in
+  about three successful raids) and the current numbers.
+- **C8-3 to C8-6. One knob group per card (S each):** (3) Warden lethality and reaction, (4) loot weights and item values,
+  (5) raid length and extract opening times, (6) starter kit. Data only (`EFC.cfg`, loot tables). Each card: before and after
+  numbers in `docs/balance.md`. Anything that is taste (how punishing death feels) is an **owner** question, not a tweak.
+
+### C14. Second World War weapons (after C8 and C9-4)
+
+- **C14-1. Roster rows (S).** PPSh-41, Bren, Chauchat (and the plain StG 44 if it differs from `stg44classic`) in
+  `docs/weapons.md` with the reasoning: period pieces, rare, priced to match. Update their `EFC_PARTISAN_PROFILES` entries.
+- **C14-2. Where they are found (S).** A `collector` loot table for an armoury cage and a collector's locker (new container
+  placements on Claudov, host-rolled) and the Heavy's Bren (C4-7). Seeded loot test.
+- **C14-3. Light machine gun handling (S).** Bren and Chauchat: heavy, slow to aim (data in their weapon entries). Add them to
+  the C2-3 parametrised test.
+- **C14-4. Bipod (M).** Needs C9-4 (prone). With the bipod part (`p35123218a`) or a built-in bipod, the gun deploys on a ledge
+  in front of the player or when prone: recoil much lower, turn limited. Test: deployed on a ledge and prone, recoil below a
+  threshold; not deployed in the open.
+- **C14-5. Close C14 (XS).** Thumbnails, roadmap, `docs/weapons.md` complete.

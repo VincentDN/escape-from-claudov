@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next open card (below).
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:**
-- **Checks so far:** (command and its last line)
+- **Card:** K6, investigate online lean replication timing.
+- **Branch:** `codex/k6-online-lean`
+- **Started:** 2026-11-26 13:05 CET, Codex Sol cloud session.
+- **Steps done:** Tested the proposed bad endpoint, beta at `066ba94`. Check (7) passed at 0.27 s, with guest lean 0.350 m and host copy 0.344 m. The diff since `26e0295` leaves lean easing, send rate, and interpolation untouched.
+- **Next step:** Finish the second full lean test and the network suite. Bisect only after finding a reproducible bad endpoint.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-lean.mjs` — all passed (86s).
 - **Questions for the owner:**
-- **Watch out for:**
+- **Watch out for:** Use Node 22, system Chromium, and the loopback HTTP setup. Keep the 0.3 s acceptance limit.
 
 ## Next open cards, in order
 

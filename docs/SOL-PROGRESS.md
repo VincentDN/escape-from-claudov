@@ -21,7 +21,7 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 3. C1-2, weapon-check contact sheets per family.
 4. C10-1 to C10-3, open-licence menu font, swap, screenshots.
 5. C9-1 to C9-8, omnimovement.
-6. C16-1 to C16-8, enemy combat barks (captions and radio voice; telegraphing is a core rule).
+6. C16-1 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
 7. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
 8. Then C15, C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).
 

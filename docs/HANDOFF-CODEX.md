@@ -261,6 +261,18 @@ on-screen caption and a voice line.
 - **Tests:** a scenario per bark kind proving the lead time; the caption appears and the line plays; the cooldown holds; the
   guest sees and hears the same bark.
 
+**Execution of a downed player (owner, 26 November 2026).** When a player goes down, a hostile walks up to finish them,
+taunting on the way ("Got you, you bastard."), stops, draws a pistol, says a last line ("You had a good run, meatbag.") and
+fires the finishing shot. It is telegraphed like every other action: the two lines and the draw give the downed player's
+teammates a clear window to save them, and the executioner gives up if shot at or outnumbered.
+
+- The game has no downed state yet (a player dies at once). This sub-track adds one in raids: lethal damage downs a human
+  player instead of killing (headshots still kill at once, keeping the one-shot rule), they crawl slowly without a weapon and
+  bleed out after a set time; online, a teammate can revive them. **Owner** questions with proposed defaults: bleed-out 30 s;
+  revive by holding the interact key for 5 s; a downed player cannot shoot; solo players go down too (the execution still
+  comes).
+- Voice lines are in the invented bark language; the English lines above are the captions.
+
 ## C10. Clean, modern menu fonts (small)
 
 The owner wants the stencil look gone. The menus use **Saira Stencil One** through the CSS variable `--stencil` (about 25 uses

@@ -8,11 +8,12 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** K9, make the SKS stepped time-to-kill check deterministic.
 - **Branch:** `codex/k9-sks-stepped-ttk`
 - **Started:** 2026-11-26 12:31 CET, Codex Sol cloud session.
-- **Steps done:** Baseline passed (SKS 1.300 s, L96 0.000 s). Replaced spawn-dependent lane selection with a fixed, checked 25 m lane and seeded random draws per rifle. The fixed lane and seed still varied across three runs (one failure). Traces showed target yaw changing between shots. Holding its pose and preventing it from firing still failed (L96 2.533 s, SKS 1.733 s). A test-only stepped performance clock passed once (L96 1.267 s, SKS 1.733 s).
-- **Next step:** Repeat the stepped-clock experiment. If the duel stabilizes, run the full SKS test five times. Otherwise record the owner question in K9.
-- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node --check tools/dev/efc/test-sks.mjs` and `git diff --check` — no output, exit 0. `node tools/dev/efc/test-sks.mjs` — 1 FAILED.
-- **Questions for the owner:**
-- **Watch out for:** Serve `dist/` over loopback HTTP with `EFC_TEST_URL=http://127.0.0.1:8231/`. The cloud setup draft documents the browser path for system Chromium.
+- **Steps done:** Baseline passed (L96 0.000 s, SKS 1.300 s). A fixed 25 m lane and seeded draws still varied across three runs (one failure). Holding the Warden's pose and preventing it from firing still failed (L96 2.533 s, SKS 1.733 s). A stepped browser clock then passed once (L96 1.267 s, SKS 1.733 s) and failed once (L96 2.533 s, SKS 1.300 s). Restored the test to its beta version.
+- **Next step:** Await the owner decision below. If the owner retains the all-rifles comparison, continue investigating what changes the shot outcome after fixing the lane, RNG, target posture, and performance clock.
+- **How to verify:** Build and serve `dist/` over loopback HTTP using the cloud startup instructions. Run `node tools/dev/efc/test-sks.mjs`; compare the stepped L96 and SKS result lines. K9 requires five full passes after a fix.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. Original `node tools/dev/efc/test-sks.mjs` — sks ok. Final stepped-clock probe — 1 FAILED. `git diff --exit-code origin/beta -- tools/dev/efc/test-sks.mjs` — no output, exit 0.
+- **Questions for the owner:** Should stepped TTK compare the SKS only against the semi-automatic rifles, as K9 suggests, or should the all-rifles comparison remain?
+- **Watch out for:** The trace showed the Warden's yaw changing even with its position pinned. With fixed `aim0` to three decimals, shot and hit counts can still differ. The browser clock probe never changed the game's source or the original assertion. The cloud setup uses Node 22 and system Chromium via `PLAYWRIGHT_BROWSERS_PATH`; set `EFC_TEST_URL=http://127.0.0.1:8231/`.
 
 ## Next open cards, in order
 

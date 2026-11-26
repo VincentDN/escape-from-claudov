@@ -46,6 +46,8 @@ const SWITCH = { dur: 0.44, swap: 0.24 };
 /* Déplacement : renvoie la vitesse verticale d'atterrissage (0 si pas d'atterrissage) */
 function ctlMove(ent, dt) {
   const I = ent.input, A = ent.arms, d = armsW(ent).def;
+  const traversal = efcOmniTraversalStep(ent, dt);
+  if (traversal) return traversal;
   let sprint = I.sprint && efcOmniSprintDirection(ent, I) && !I.ads && !ent.blockSprint && A.boltT <= 0 && (!ent.busy || ent.sprintBusyOk);
   const diving = efcOmniDive(ent, sprint, dt);
   // glissade : démarrage, puis la course n'est plus « un sprint » (on peut tirer et viser)

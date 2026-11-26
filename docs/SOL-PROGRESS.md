@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next open card (below).
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:**
-- **Checks so far:** (command and its last line)
+- **Card:** C9-1, movement state classifier and transition table.
+- **Branch:** `codex/c9-omni` (stacked on completed C1-2).
+- **Started:** 2026-11-26 13:36 CET, Codex Sol parallel session.
+- **Steps done:** 1. Added a read-only classifier for the six current movement states.
+- **Next step:** 2. Document the planned transitions and record the owner's binding decision.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — exit 0, no output. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. Inline Node assertion — six states classified.
 - **Questions for the owner:**
-- **Watch out for:**
+- **Watch out for:** Use the isolated checkout and local HTTP port 8239 for Playwright checks.
 
 ## Next open cards, in order
 

@@ -1,6 +1,13 @@
 /* C9a player movement rules. Wardens retain their existing movement set. */
 const EFC_TACTICAL_SPRINT = { tapWindow: 0.28, duration: 0.82, cooldown: 1.55, multiplier: 1.17 };
 
+function efcOmniState(entity) {
+  if (!entity.onGround) return 'air';
+  if (entity.slideT > 0) return 'slide';
+  if (entity.sprinting) return entity.efcTactical > 0 ? 'tactical' : 'sprint';
+  return entity.crouch ? 'crouch' : 'stand';
+}
+
 function efcOmniSprintDirection(entity, input) {
   return entity.isPlayer && efcRaidMode() ? hyp(input.mx, input.mz) > 0.3 : input.mz > 0.3;
 }

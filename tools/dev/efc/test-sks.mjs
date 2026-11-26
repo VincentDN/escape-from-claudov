@@ -99,7 +99,9 @@ try {
         while (tgt.alive && tgt.health > 0 && t < 10) {
           P.pos.copy(base); P.vel.set(0, 0, 0); P.health = 100; tgt.pos.copy(tp); tgt.vel && tgt.vel.set(0, 0, 0);
           // Use the same standing, front-facing pose before each shot.
-          tgt.yaw = heading; tgt.pitch = 0; tgt.crouch = false; tgt.recoil = 0;
+          tgt.yaw = heading; tgt.pitch = 0; tgt.recoil = 0;
+          tgt.crouch = tgt.wantCrouch = tgt.input.crouch = false;
+          tgt.crouchAmt = tgt.slideAmt = tgt.vy = 0;
           poseSoldier(tgt, 0);
           hitSpheres(tgt);
           const aim = HS[1].c;

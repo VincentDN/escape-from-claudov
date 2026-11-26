@@ -114,13 +114,14 @@ before starting).
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
 | K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |
 | K9 | `test-sks.mjs` "stepped TTK: the SKS is the longest" fails on some runs | S | K5 | open |
+| K10 | Raid panels cover the whole screen, so "drop outside the panel" never reaches the ground | S | C0-2 | blocked (owner: where the drop zone goes) |
 | K5 | Fix the weapon count in `test-sks.mjs` | XS | K1 | done |
 | K6 | Find why the online lean takes 0.33 s | S | K1 | open (passes in GitHub Actions on 25 November; fails only in the slower sandbox) |
 | K7 | Find why the bench route has 5 Wardens, not 7 | S | K1 | done (A3 Scavengers take 2 of the 7 hostile slots by design; test updated) |
 | C0-1 | Test: R does not reload while a raid panel is open | XS | K1 | done |
-| C0-2 | Test: drags between every raid panel pair | S | C0-1 | open |
+| C0-2 | Test: drags between every raid panel pair | S | C0-1 | done (7 of 8 checks; the eighth is a real bug, K10) |
 | C0-3 | Foley: unmount sound and one shared throttle | S | C0-2 | done |
-| C0-4 | Close C0 in the roadmap | XS | C0-3 | open |
+| C0-4 | Close C0 in the roadmap | XS | C0-3 | done (C0 closed except K10) |
 | C1-1 | Test: every gameplay input cancels the weapon check | S | K1 | done |
 | C1-2 | Contact sheets of the weapon check per family | S | C1-1 | open |
 | C10-1 | Self-hosted open-licence font files | S | K1 | open |
@@ -233,6 +234,20 @@ The stepped duel depends on where the target stands and on hit spread, so the or
   source for the test only (for example replace `Math.random` inside the evaluate with a seeded generator, then restore it).
   Do not change game code and do not widen the threshold.
 - **Verify:** run `node tools/dev/efc/test-sks.mjs` five times; all pass.
+
+### K10. Make "drop outside the panel" reachable in a raid (S)
+
+Found by C0-2 (check 8 of `test-inventory-drag.mjs`). `efcOperatorDragEnd` drops an item on the ground when it is released
+with no target and `pick.outside` is true, which means the pointer is not inside `.efc-box`. But `.efc-box.efc-op-box` is
+`width: 100%; height: 100%` (`shell.html` line 2676), so in the raid and loot panels no point on the screen is outside the box
+and the drop never happens. The test checks the overlay's corners and edge midpoints at 1366 by 900; all are inside the box.
+
+- **Owner decision first:** where the player drops to the ground: (a) a margin around the panel box, (b) a visible
+  "Drop to ground" zone in the panel (for example under the operator figure), or (c) releasing over the operator figure column.
+- **Read:** `src/efc/55-efc-operator.js` lines 407 to 415 (`pick.outside`) and 466 to 485 (drag end); `shell.html` lines 2586 and 2676.
+- **Steps (for b):** add one element with `data-op-target="ground"` to the raid and loot layouts; in `efcOperatorDragMove`
+  treat it as `pick.outside = true` with a valid highlight; leave the hideout unchanged. Update check 8 to release over it.
+- **Verify:** `node tools/dev/efc/test-inventory-drag.mjs` prints eight `ok` lines; base checks.
 
 ### K5. Fix the weapon count in `test-sks.mjs` (XS)
 

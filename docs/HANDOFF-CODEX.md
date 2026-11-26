@@ -54,6 +54,8 @@ found `beta` not green (six failing checks, cards K1 to K7) and fixed X1 and X2 
 
 ## C0. Finish the grid inventory (medium; first, before C1)
 
+Done on `beta` (cards C0-1 to C0-3 in `CODEX-SOL-TASKS.md`), except card K10: the raid panel box fills the screen, so a drop outside it never reaches the ground.
+
 The owner played the grid inventory (A6 to A8) and wants it finished before anything else. Three things:
 
 The shared drag interaction now previews exact cells in the stash, carried grids, and open world containers. Positions in

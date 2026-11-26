@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { openGame, startSolo, simRun } from './harness.mjs';
 
 const { browser, page, errors } = await openGame({ settings: { map: 'claudov', mode: 'raid', minutes: 60 }, w: 1366, h: 900 });
+page.setDefaultTimeout(90000); // CI renders slowly; Playwright waits for elements to be stable before scrolling them in
 // full health, and the player pinned next to the crate (the loot panel closes beyond reach, and a raid can push the player)
 const KEEP = 'PL.ent.health = 100; if (window.efcTestPin) PL.ent.pos.copy(window.efcTestPin);';
 const passed = [];

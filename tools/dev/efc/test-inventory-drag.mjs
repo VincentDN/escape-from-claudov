@@ -3,12 +3,15 @@
 import assert from 'node:assert/strict';
 import { openGame, startSolo, simRun } from './harness.mjs';
 
-const { browser, page, errors } = await openGame({ settings: { map: 'claudov', mode: 'raid' }, w: 1366, h: 900 });
-const KEEP = 'PL.ent.health = 100;';
+const { browser, page, errors } = await openGame({ settings: { map: 'claudov', mode: 'raid', minutes: 60 }, w: 1366, h: 900 });
+// full health, and the player pinned next to the crate (the loot panel closes beyond reach, and a raid can push the player)
+const KEEP = 'PL.ent.health = 100; if (window.efcTestPin) PL.ent.pos.copy(window.efcTestPin);';
 const passed = [];
 const ok = (name) => { passed.push(name); console.log('ok   ' + name); };
 const grid = (area) => page.locator(`#efcLoot .efc-op-grid[data-op-area="${area}"]`);
 const item = (scope, id) => page.locator(`${scope} [data-op-source][data-efc-id="${id}"]`).first();
+// an item in the carried grids only (the crate's random contents can hold the same item ids)
+const carried = (id) => item('#efcLoot #efcOpLootEquipment .efc-op-grid', id);
 // scrolls every scroll box around an element by the least amount that brings rows top..bottom (page pixels, from rect) on
 // screen, as a player does with the wheel; the carried grids and slots share one 48vh scroll box
 async function reveal(locator, rows = (r) => r) {
@@ -27,7 +30,7 @@ async function cellPoint(gridLocator, x, y) {
   await reveal(gridLocator, `(r, g) => ({ top: r.top + ${y} * r.height / +g.dataset.opRows, bottom: r.top + ${y + 1} * r.height / +g.dataset.opRows })`);
   let box = null;
   for (let i = 0; i < 10 && !box; i++) box = (await gridLocator.boundingBox()) || (await page.waitForTimeout(100), null); // the grid may be re-rendering
-  assert.ok(box, 'the target grid is on screen ' + await page.evaluate(() => JSON.stringify({ panel: EFC_UIR.panel, grids: [...document.querySelectorAll('#efcLoot .efc-op-grid')].map(g => [g.dataset.opArea, g.getBoundingClientRect().height]) })));
+  assert.ok(box, 'the target grid is on screen ' + await page.evaluate(() => JSON.stringify({ panel: EFC_UIR.panel, alive: PL.ent.alive, health: PL.ent.health, state: MATCH.state, on: EFC_UIR.on, cid: EFC_UIR.cid, cont: !!efcUirCont(), dist: efcUirCont() && efcUirDist(efcUirCont()), grids: [...document.querySelectorAll('#efcLoot .efc-op-grid')].map(g => [g.dataset.opArea, g.getBoundingClientRect().height]) })));
   const cols = +(await gridLocator.getAttribute('data-op-cols')), rows = +(await gridLocator.getAttribute('data-op-rows'));
   return [box.x + box.width * (x + 0.5) / cols, box.y + box.height * (y + 0.5) / rows];
 }
@@ -69,6 +72,8 @@ try {
     list.sort((a, b) => Math.hypot(a.x - p.x, a.z - p.z) - Math.hypot(b.x - p.x, b.z - p.z));
     const c = list[0];
     PL.ent.pos.set(c.x + 0.8, c.y, c.z);
+    window.efcTestPin = PL.ent.pos.clone();
+    setInterval(() => { PL.ent.health = 100; PL.ent.pos.copy(window.efcTestPin); }, 20); // the live game loop also runs between steps
     // a known kit: large pack, the raid sidearm kept (the primary slot empty for check 7), a bandage, a rifle and a red dot in the bag; a known item in the crate
     const inv = efcCall('inv:new');
     inv.slots.primary = EFC.inv.slots.primary; inv.slots.sidearm = EFC.inv.slots.sidearm;
@@ -128,40 +133,35 @@ try {
 
   // 5. a refused drop onto the rifle: the red dot stays where it was
   const dotBefore = (await entries('pockets')).concat(await entries('armor')).find(e => e.id === 'part_red');
-  await drag(item('#efcLoot .efc-op-grid', 'part_red'), () => cellPoint(pack, fit.x, fit.y));
+  await drag(carried('part_red'), () => cellPoint(pack, fit.x, fit.y));
   const dotAfter = (await entries('pockets')).concat(await entries('armor')).find(e => e.id === 'part_red');
   assert.deepEqual(dotAfter, dotBefore, 'refused drop returns the item');
   ok('refused drop returns the item to its origin');
 
   // 6. bag item to quick slot 0
-  await drag(item('#efcLoot .efc-op-grid', 'med_bandage'), () => centreOnScreen(page.locator('#efcLoot [data-op-target="quick"][data-op-key="0"]')));
+  await drag(carried('med_bandage'), () => centreOnScreen(page.locator('#efcLoot [data-op-target="quick"][data-op-key="0"]')));
   assert.equal(await page.evaluate(() => efcOperatorQuickList()[0]?.id), 'med_bandage');
   ok('bag item to quick slot');
 
   // 7. rifle to the primary slot, then the red dot onto its optic slot
-  await drag(item('#efcLoot .efc-op-grid', 'w_ak47'), () => centreOnScreen(page.locator('#efcLoot [data-op-target="slot"][data-op-key="primary"]')));
+  await drag(carried('w_ak47'), () => centreOnScreen(page.locator('#efcLoot [data-op-target="slot"][data-op-key="primary"]')));
   assert.equal(await page.evaluate(() => EFC.inv.slots.primary?.id), 'w_ak47');
   const optic = page.locator('#efcLoot [data-op-target="attachment"][data-op-key="optic"]');
-  await drag(item('#efcLoot .efc-op-grid', 'part_red'), () => centreOnScreen(optic));
+  await drag(carried('part_red'), () => centreOnScreen(optic));
   const mounted = await page.evaluate(() => efcCall('weaponmods:slots', EFC.inv.slots.primary).find(p => p.slot === 'optic')?.item?.id);
   assert.equal(mounted, 'part_red');
   ok('rifle to the primary slot, red dot onto its optic');
 
-  // 8. released outside every panel: the host puts it into a container within reach (here the open crate), otherwise a new drop
-  const anyBagItem = page.locator(['pockets', 'armor', 'pack'].map(a => `#efcLoot .efc-op-grid[data-op-area="${a}"] [data-op-source]`).join(', ')).first();
-  const droppedId = await anyBagItem.getAttribute('data-efc-id');
-  const inWorld = (id) => page.evaluate((id) => (efcCall('world:list') || []).reduce((n, c) => n + c.items.filter(i => i.id === id).length, 0), id);
-  const worldBefore = await inWorld(droppedId);
-  // a point outside the panel box: the overlay's edges, where the box leaves a margin
-  const outside = await page.evaluate(() => {
-    const pts = [[1, 1], [innerWidth - 2, 1], [1, innerHeight - 2], [innerWidth - 2, innerHeight - 2], [innerWidth / 2, 1], [innerWidth / 2, innerHeight - 2]];
-    return pts.find(([x, y]) => !document.elementFromPoint(x, y)?.closest('.efc-box')) || null;
-  });
-  assert.ok(outside, 'the screen has a point outside the panel box');
-  await drag(anyBagItem, outside);
+  // 8. released on the "Drop here" zone under the operator (K10): the host puts it into a container within reach (here the open
+  // crate), otherwise into a new drop at the player's feet
+  const droppedId = 'med_bandage', bagCount = () => page.evaluate(() => efcCall('grid:loadout', EFC.inv) && EFC.inv.bag.filter(i => i.id === 'med_bandage').reduce((k, i) => k + (i.n || 1), 0));
+  const inWorld = (id) => page.evaluate((id) => (efcCall('world:list') || []).reduce((n, c) => n + c.items.filter(i => i.id === id).reduce((k, i) => k + (i.n || 1), 0), 0), id); // counts units, as a drop may join a stack
+  const worldBefore = await inWorld(droppedId), bagBefore = await bagCount();
+  const zone = page.locator('#efcLoot [data-op-target="ground"]');
+  await drag(carried(droppedId), () => centreOnScreen(zone), async () => assert.equal(await zone.getAttribute('data-op-drop'), 'valid', 'the ground zone lights green'));
   await simRun(page, 0.5, KEEP);
-  assert.ok(await inWorld(droppedId) > worldBefore, 'the dropped item is in the world ' + droppedId);
-  ok('released outside every panel: dropped into the world');
+  assert.ok(await inWorld(droppedId) > worldBefore, 'the dropped item is in the world ' + JSON.stringify({ worldBefore, world: await inWorld(droppedId), bagBefore, bag: await bagCount() }));
+  ok('released on the ground zone: dropped into the world');
 
   assert.deepEqual(errors, []);
   console.log(`inventory drag ok (${passed.length} checks)`);

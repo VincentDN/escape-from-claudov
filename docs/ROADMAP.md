@@ -21,7 +21,7 @@ mergeable branch.
 | --- | --- | --- | --- |
 | done | L0 | Art style lab: `#artlab` loads Claudov empty with live dials (retro/PS1 dither, lens, colour), presets, A/B split, copy and paste of settings (`docs/artlab/README.md`); done, merged into `beta` and live at `/beta/#artlab`; waiting for the owner's chosen settings | medium |
 | first | K1 to K7 | Make `beta` green: i18n line, stale thumbnail and SKS tests, online lean timing, bench route Warden count, HTTP in `run-all.sh`, CI on `beta` | small |
-| done | C0 | Finish the grid inventory: raid drag test (`test-inventory-drag.mjs`), R-key test (`test-inventory-keys.mjs`), unmount cue and one shared sound gap (cards C0-1 to C0-4, PR #15 on `beta`); one bug left, K10: dropping outside the raid panel cannot reach the ground | small |
+| done | C0 | Finish the grid inventory: raid drag test (`test-inventory-drag.mjs`), R-key test (`test-inventory-keys.mjs`), unmount cue and one shared sound gap (cards C0-1 to C0-4, PR #15 on `beta`); K10 added a "Drop here to leave it on the ground" zone under the operator, since the raid panel fills the screen | small |
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
 | 3 | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3. Integrate Partisan’s modding system and assets with Riposte’s base weapons in the same workbench. Use the StG 44 bench only for lighting, background, floor and canted weapon view. | large |

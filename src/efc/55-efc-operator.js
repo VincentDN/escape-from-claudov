@@ -5,7 +5,8 @@ function efcOperatorPanel(id, weapon, inv) {
   let view = EFC_OPERATOR_VIEWS.get(id);
   if (!view) {
     const model = $(id), hideout = id === 'efcOpHideout', root = model.closest(hideout ? '#scr-hideout' : '.efc-ov');
-    model.innerHTML = '<p class="lbl">Operator</p><canvas width="300" height="400" tabindex="0" data-key="operator" aria-label="Rotate the operator with the arrow keys or by dragging"></canvas>';
+    model.innerHTML = '<p class="lbl">Operator</p><canvas width="300" height="400" tabindex="0" data-key="operator" aria-label="Rotate the operator with the arrow keys or by dragging"></canvas>'
+      + (hideout ? '' : '<div class="efc-op-ground" data-op-target="ground">Drop here to leave it on the ground</div>');
     const canvas = model.querySelector('canvas');
     view = { id, root, hideout, canvas, hands: root.querySelector('.efc-op-hands'), angle: 0.55, drag: null, frame: 0, drawn: '' };
     efcOperatorInteractions(view);
@@ -409,7 +410,7 @@ function efcOperatorDragMove(view, pick, x, y, grid = null) {
   const under = grid || document.elementFromPoint(x, y);
   const hit = under?.closest('[data-op-target]');
   const target = hit && view.root.contains(hit) ? hit : null;
-  pick.outside = !grid && !under?.closest('.efc-box');
+  pick.outside = !grid && (!under?.closest('.efc-box') || target?.dataset.opTarget === 'ground');
   const data = target?.dataset;
   let cell = null;
   let width = pick.rotated === pick.initialRotation ? pick.w : pick.h;
@@ -445,7 +446,8 @@ function efcOperatorDragMove(view, pick, x, y, grid = null) {
       return;
     }
   }
-  target.dataset.opDrop = efcOperatorCanMove(view, pick.source, target) ? 'valid' : 'invalid';
+  const ground = target.dataset.opTarget === 'ground' && ['bag', 'slot'].includes(pick.source.kind);
+  target.dataset.opDrop = ground || efcOperatorCanMove(view, pick.source, target) ? 'valid' : 'invalid';
 }
 
 function efcOperatorRotate(event, view) {
@@ -472,7 +474,7 @@ function efcOperatorDragEnd(view, commit) {
   if (commit && pick.button.isConnected) {
     const source = efcOperatorGetSource(view, pick.button);
     let placed = source && (efcOperatorExact(view, pick, false) ?? (!pick.count && efcOperatorMove(view, source, pick.target)));
-    if (!pick.target && pick.outside && !view.hideout && source && ['bag', 'slot'].includes(source.kind)) {
+    if ((!pick.target || pick.target.dataset.opTarget === 'ground') && pick.outside && !view.hideout && source && ['bag', 'slot'].includes(source.kind)) {
       const item = efcCall('inv:sendGridItem', EFC.inv, { kind: source.kind, key: source.key, id: source.item.id, count: pick.count });
       if (item) { efcCall('world:put', null, item); efcUirChanged(); placed = true; }
     }

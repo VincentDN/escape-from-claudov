@@ -197,8 +197,16 @@ before starting).
 | C9-6 | Hit volumes follow the stance | M | C9-4 | open |
 | C9-7 | Replicate stances online | S | C9-6 | open |
 | C9-8 | C9b: the weapon follows the body | L | C9-7 | open |
-| C2-1 | Port Partisan's rail and compatibility rules | M | K2 | open |
-| C2-2 | Roster stats table and niche stats for batch 1 | S | K2 | open |
+| C16-1 | Bark events, catalogue and rules (no sound, no UI) | S | C9-8 | open |
+| C16-2 | Captions over the hostile and in a feed | S | C16-1 | open |
+| C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | open |
+| C16-4 | Invented language and the voice script | S | C16-1 | open |
+| C16-5 | Record the lines with ElevenLabs | M | C16-4 | open (needs the ElevenLabs connector) |
+| C16-6 | Radio processing and packaging | S | C16-5 | open |
+| C16-7 | Voice playback in the game | S | C16-6, C16-2 | open |
+| C16-8 | Online barks and closing test | S | C16-7, C16-3 | open |
+| C2-1 | Port Partisan's rail and compatibility rules | M | C16-8 | open |
+| C2-2 | Roster stats table and niche stats for batch 1 | S | C2-1 | open |
 | C2-3 | One parametrised weapon test | S | C2-2 | open |
 | C2-4 to C2-8 | One card per weapon: AK-15K, AK-74M Zenitco, RPK, M16, G3 | S each | C2-3 | open |
 | C15-1 to C15-4 | Minimal HUD and hold-R magazine check | M total | C2-8 | open |
@@ -662,7 +670,8 @@ Specs: `HANDOFF-CODEX.md` C3 to C8 and C14. Every card below follows sections 0 
 step, `docs/SOL-PROGRESS.md` updated. **Before editing any engine file (`src/0*.js`) or another package's file, check
 `docs/contracts/CONTRACT.md`; if the file is owned elsewhere, stop and report the change you need.** Gate every behaviour
 change behind `efcRaidMode()` so other engine modes stay as they are. Browser tests here take 5 to 15 minutes each: run the
-card's own test, not the whole suite.
+card's own test, not the whole suite. **Telegraphing rule (owner): every new enemy or AI action in C3 to C8 and C14 calls
+`efcBark` (C16) before it acts, adds its kind and captions to `EFC_BARKS`, and its scenario test checks the 0.6 s lead.**
 
 Facts found while planning (so you do not have to look again):
 
@@ -680,6 +689,50 @@ Facts found while planning (so you do not have to look again):
   `flankPoint` 79, `decideTactic` 146, `updateBot` 205, `suppressAlongRay` 564). Elite post: Warehouse A
   (`src/efc/60-efc-claudov-plan.js` line 134; mezzanine 139; crane platform 94).
 - Online tests: `tools/dev/efc/net2.mjs` (two-client rig), `test-net.mjs`, `test-e2e-net.mjs`.
+
+### C16. Enemy combat barks (after C9; telegraphing is a core rule)
+
+Spec: `HANDOFF-CODEX.md` C16. New file `src/efc/45b-efc-barks.js` holds the logic; captions go in a new
+`src/efc/50-efc-ui-barks.js`; check `docs/contracts/CONTRACT.md` before touching `07*.js`.
+
+- **C16-1. Bark events, catalogue and rules (S).** A data catalogue `EFC_BARKS`: kind → `{ lead, cooldown, priority, range,
+  captions: [English lines] }` for at least `spot`, `lost`, `flank_left`, `flank_right`, `frag`, `flash`, `smoke`, `suppress`,
+  `reload`, `move_up`, `fall_back`, `help`, `man_down`, `search`, `all_clear`. A host function `efcBark(bot, kind, data)` that
+  applies the per-bot cooldown (default 4 s), per-kind cooldown, range (default 45 m from any human) and priority (a grenade
+  warning is never dropped), then emits `efcEmit('bark', { id, kind, line, voice, pos, at })`. Voice group from the bot
+  (`w` Wardens, `s` Scavengers, later specials). Test `test-barks.mjs` part 1 (logic, no rendering): cooldowns, range,
+  priority, deterministic line choice with a seeded rng.
+- **C16-2. Captions (S).** On `bark`: a short caption anchored over the speaker's head when on screen (project with the camera),
+  otherwise a line in a small caption feed with a direction arrow; 2.5 s each, at most three visible, oldest out first. A
+  setting `efcBarkCaptions` (on by default) in the raid settings; reduced motion means no slide or fade. English lines need
+  their `⇒ =` entries in `i18n/en.txt` if they are in `shell.html`. Test: a bark shows a caption; off-screen shows the arrow;
+  setting off hides both; one screenshot to `docs/barks/captions.png`.
+- **C16-3. Hook into the existing AI with lead time (M).** Call `efcBark` from raid-mode hooks, each **before** the action by
+  the kind's `lead` (at least 0.6 s): `spot` from `efcWardenAlert` (`src/efc/40-efc-wardens.js` line 220); `flank_*` where
+  `decideTactic` sets `tactic = 'flank'` (`src/07b-tactics.js` line 198: delay the path start by the lead); `frag`, `flash`,
+  `smoke` in `botThrowNade` (`src/07-bots.js` line 514: bark, then throw after the lead); `reload`; `suppress` near
+  `suppressAlongRay`; `man_down` on a teammate's death; `search` from `botSearchStart`. Scavengers use their own voice group.
+  Test part 2: per kind, the bark time precedes the action time by at least 0.6 s in a scripted scenario.
+- **C16-4. Invented language and script (S, docs).** `docs/barks.md`: the language rules (a small syllable set, stress,
+  two or three recurring "words" per meaning so players learn them, e.g. one word always means grenade); 4 to 6 variants per
+  kind per voice group; three voice groups (Wardens, Scavengers, specials); file naming `bark_<group>_<kind>_<n>`; total
+  generations expected. Must be our own invented syllables, not copied from any game. **Owner:** approve the sound of a
+  sample sheet (five lines) before C16-5 spends credits.
+- **C16-5. Record with ElevenLabs (M).** Through the ElevenLabs connector: pick voices with `creative_list_voices` (one per
+  group, say which), generate each line of the script (one take each, `generations_count` 1), download, keep the raw takes in
+  `assets-incoming/barks/` (not committed). Log credits per batch in the commit body and in `docs/barks.md`. An agent without
+  the connector stops here and hands the script to the owner.
+- **C16-6. Radio processing and packaging (S).** Offline chain with the existing audio tools (`tools/build_sfx.py`,
+  `tools/sfx/`): trim, level, band-pass about 300 Hz to 3.4 kHz, light saturation, a squelch click at start and end; package
+  into the game's sfx format; add each file to `assets/sfx/credits.json` as our own ElevenLabs generation (keep the file's
+  existing entries intact). Test: `build.py` lists them; sizes within the sfx budget.
+- **C16-7. Playback (S).** On `bark`: play a random variant for the group and kind, positional (`src/05-audio.js` panner
+  pattern, line 112) within range, one line per bot at a time, grenade warnings never ducked. Add the lines to the `#sounds`
+  audition page. Test in `test-sounds.mjs`: a bark plays its sample; a second bark from the same bot inside the cooldown does
+  not.
+- **C16-8. Online and closing (S).** Host decides barks; replicate the `bark` event to guests through the net bus; guests show
+  the caption and play the line. Test with `net2.mjs`: the guest receives the same bark kind and line. Close C16 in
+  `ROADMAP.md`.
 
 ### C3. Remaining modern weapons and parts (after C13)
 
@@ -722,18 +775,18 @@ Facts found while planning (so you do not have to look again):
   the three at `docs/enemies/looks.png` (`tests/e2e/contact-sheet` pattern or `test-thumbs` capture). **Owner:** looks sign-off.
 - **C4-3. Loot per type (S).** `EFC_LOOT.marksman`, `.breacher`, `.heavy` (Heavy drops the best: armour t3 chance, rare parts);
   bodies use them through `world:body`. Seeded test as in C3-4.
-- **C4-4. Marksman perches and relocation (M).** A list of 4 to 6 perches on Claudov (crane platform, Warehouse A mezzanine,
+- **C4-4. Marksman perches and relocation (M).** Barks: `relocate` before moving, `spot` with a long lead. A list of 4 to 6 perches on Claudov (crane platform, Warehouse A mezzanine,
   container stacks; positions from `60-efc-claudov-plan.js`, checked walkable with `navNode`) in the specials file. The
   Marksman holds a perch, fires, and after its second shot moves to another perch out of the target's sight. Test: scripted
   scenario, after two shots its perch index changes and the new perch has no line of sight to the shooter's last target.
 - **C4-5. Marksman glint (S).** While it aims at a player in daylight, a small additive sprite at its scope is visible to that
   player only (client-side visual, no gameplay effect). Test: flag set while aiming at the player, off otherwise; one
   screenshot. Respect the Art Lab lens settings if they affect sprites.
-- **C4-6. Breacher (M).** Guards one building interior (Warehouse A or B box from the plan file). Pushes when it hears
+- **C4-6. Breacher (M).** Barks: `breach` and `flash` before entering. Guards one building interior (Warehouse A or B box from the plan file). Pushes when it hears
   footsteps inside its building (use the engine's hearing input: `grep -n "hear\|bruit\|step" src/07-bots.js | head`), not for
   gunfire outside. Throws `flash` with `botThrowNade` before entering the player's room. Test: footsteps inside → push within
   3 s; gunfire outside → stays; a flash is thrown before it crosses the doorway.
-- **C4-7. Heavy (M).** Slow (speed multiplier), armoured, posted on the elite loot in Warehouse A; on contact it fires bursts at
+- **C4-7. Heavy (M).** Barks: `suppress` before the burst. Slow (speed multiplier), armoured, posted on the elite loot in Warehouse A; on contact it fires bursts at
   the player's last cover point with `suppressAlongRay` for 3 to 5 s. Test: player behind cover → the Heavy keeps firing at the
   cover point (shots counted, no line of sight needed).
 - **C4-8. Close C4 (S).** `docs/enemies.md` (rules, counts, loot), the 20-start count test across all maps passes, all P1
@@ -746,16 +799,16 @@ Every card: behind `efcRaidMode()`, numbers before and after in `docs/ai.md`, P1
 - **C5-1. Scenario harness and baseline (M).** `tools/dev/efc/test-ai-scenarios.mjs` with a small scenario API (place player
   and bots, freeze or script the player, run N seconds with `simRun`, return metrics). Baseline table in `docs/ai.md`: time to
   kill the player and bot survival per enemy type at two difficulties, 10 seeded runs each.
-- **C5-2. Suppress and flank pair (M).** When two bots of one post engage, one takes `tactic = 'flank'` (`flankPoint`) and the
+- **C5-2. Suppress and flank pair (M).** Barks: one says `suppress`, the other `flank_*`, both before acting. When two bots of one post engage, one takes `tactic = 'flank'` (`flankPoint`) and the
   other suppresses (`suppressAlongRay`) until the flanker arrives. Scenario: two Wardens vs a player in cover: one flanks,
   one suppresses, in 8 of 10 runs.
 - **C5-3. Cover discipline (M).** Reload and heal only in cover (`findCover`); leave cover only when a teammate is covering.
   Scenario: a bot with an empty magazine moves to cover before reloading in 9 of 10 runs.
-- **C5-4. Grenade flush (S).** A player who stays in one cover for over 8 s gets a frag (`botThrowNade`), never when a teammate
+- **C5-4. Grenade flush (S).** Bark `frag` first (never dropped). A player who stays in one cover for over 8 s gets a frag (`botThrowNade`), never when a teammate
   is within 6 m of the landing point. Scenario for both rules.
 - **C5-5. Investigation (M).** On a shot heard or a container or body that changed (`world:changed`), go there with caution,
   search (`botSearchStart`), give up after 30 s. Scenario: a shot fired out of sight → a bot reaches within 5 m of its origin.
-- **C5-6. Retreat and call for help (S).** Outnumbered or under 35 % health → fall back to the post and alert the post
+- **C5-6. Retreat and call for help (S).** Barks `fall_back`, `help`. Outnumbered or under 35 % health → fall back to the post and alert the post
   (`efcWardenAlert`). Scenario.
 - **C5-7. Loot awareness (S).** On the next patrol pass, a bot that passes an opened container or a missing body near its post
   switches to investigation. Scenario.
@@ -767,7 +820,7 @@ Every card: behind `efcRaidMode()`, numbers before and after in `docs/ai.md`, P1
   0 elsewhere) next to the other raid settings; rivals take bot slots like specials (out of the Warden number; **owner** if
   that should be on top instead). Squad values `r1`, `r2`, hostile to everyone. They insert at a free insert after the humans
   (`raid:inserts`). Test: counts and insert positions over 20 starts.
-- **C6-2. Route plan (M).** Per squad: a route of 3 to 5 loot points (containers from `world:list`) ending at an open extract;
+- **C6-2. Route plan (M).** Rivals get their own voice group and barks (`loot`, `extract`, `contact`). Per squad: a route of 3 to 5 loot points (containers from `world:list`) ending at an open extract;
   re-plan when threatened or when bags are full. Pure data function first, tested without rendering.
 - **C6-3. Looting (M).** Rivals take items through the host world (`world:take` with the rival as actor) into a bot inventory
   (`inv:new`); visible kit updates when they pick up armour or a better weapon. Test: container contents drop, rival inventory

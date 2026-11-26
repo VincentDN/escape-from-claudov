@@ -12,7 +12,11 @@ Single status page for the whole project. Updated 21 November 2026. The linked h
 | Handoff A1 to A9 | Performance route (`#bench`), StG 44 in raids, Scavengers, host migration, container collision, grid inventory data, grid interactions, operator inventory screen, attachments and the hideout workbench | `docs/HANDOFF-ASTRA.md` |
 | Other | Raid-only game (team deathmatch retired), Partisan opening scene and StG 44 studio in `showcase/`, ElevenLabs and CC0 handling takes, Partisan radio tracks | git log |
 
-## Open: third track, tasks C0 to C15
+## Open: third track, tasks C0 to C16
+
+**Design rule (owner, 26 November 2026): telegraphing.** Hostiles announce what they are about to do (spotting, flanking,
+grenades, suppressing, falling back and more) with a caption and a radio voice line, early enough for the player to react.
+Every enemy and AI feature from C16 on emits its bark.
 
 Detailed in [`docs/HANDOFF-CODEX.md`](HANDOFF-CODEX.md), in this order (owner, 20 November 2026); split into step-by-step cards in [`docs/CODEX-SOL-TASKS.md`](CODEX-SOL-TASKS.md) (25 November 2026). Agents on a five-hour token window work by its section 0 and keep [`docs/SOL-PROGRESS.md`](SOL-PROGRESS.md) up to date after every step. Each task ends on its own
 mergeable branch.
@@ -24,6 +28,7 @@ mergeable branch.
 | done | C0 | Finish the grid inventory: raid drag test (`test-inventory-drag.mjs`), R-key test (`test-inventory-keys.mjs`), unmount cue and one shared sound gap (cards C0-1 to C0-4, PR #15 on `beta`); K10 added a "Drop here to leave it on the ground" zone under the operator, since the raid panel fills the screen | small |
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
+| 2b | C16 | Enemy combat barks: every hostile action announced before it happens, with an on-screen caption and an ElevenLabs radio voice in an invented gibberish language (owner, 26 November) | medium to large |
 | 3 | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3. Integrate Partisan’s modding system and assets with Riposte’s base weapons in the same workbench. Use the StG 44 bench only for lighting, background, floor and canted weapon view. | large |
 | 4 | C15 | Minimal HUD: no ammo counter; hold R to pull the magazine and see the rounds | medium |
 | 5 | C11 | `M` opens a full-screen map with extracts and points of interest; green smoke flares over open extracts | medium |

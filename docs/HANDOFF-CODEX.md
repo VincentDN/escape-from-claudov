@@ -24,6 +24,7 @@ Work in this order. Each line is one or more mergeable branches.
 0. **C0** finish the grid inventory: drag, rotate, foley (owner, before C1)
 1. **C1** raid-start weapon check
 2. **C9** omnimovement (moved up by the owner: right after C1)
+2b. **C16** enemy combat barks: captions and radio voice telegraphing every hostile action (owner, 26 November 2026: right after C9)
 3. **C2** Partisan modern weapons, batch 1
 4. **C15** minimal HUD and the magazine check
 5. **C11** full-screen map and extraction flares
@@ -237,6 +238,28 @@ derived; find it before you start):
 
 Tests: a state-machine test of every transition in every direction, collision checks per stance, the two-client rig showing the
 same stance remotely, and contact sheets of every stance in first and third person in `docs/omnimovement/`.
+
+## C16. Enemy combat barks (medium to large; right after C9)
+
+Owner, 26 November 2026: **telegraphing is a core rule of the game.** Hostiles tell the player what they are about to do, so
+fights are readable and fair. Every hostile action that matters to the player is announced before it happens, with an
+on-screen caption and a voice line.
+
+- **What they announce** (at least): spotting the player, losing them, flanking (with a side), throwing a grenade (frag, flash,
+  smoke), suppressing, reloading, moving up or falling back, calling for help, man down, searching or investigating, all clear;
+  later tracks add their own (Marksman relocating, Breacher breaching, Heavy suppressing, rivals looting or extracting).
+- **Lead time:** the bark comes at least 0.6 s before the action it announces (grenade, flank move, push), so the player can
+  react. A test proves it for each action.
+- **Captions:** a short English line anchored over the speaking hostile when on screen, and in a caption feed with a direction
+  marker when off screen. Readable, throttled, can be turned off in the settings, honours reduced motion.
+- **Voice:** a made-up gibberish language (the owner calls it "simlish"; ours must be our own invented syllables, not the
+  language of any existing game), with consistent rules so lines sound like one language. Recorded with ElevenLabs voices
+  (budget approved by the owner as part of the ElevenLabs plan use), then processed as a field radio: band-pass, light
+  distortion, squelch clicks. Separate voices for Wardens, Scavengers and later each enemy type.
+- **Rules:** host decides barks (host authority), replicated to guests; per-bot and per-kind cooldowns so it never becomes
+  noise; only within hearing range; one voice per bot at a time; ducking under gunfire is fine but never drop a grenade warning.
+- **Tests:** a scenario per bark kind proving the lead time; the caption appears and the line plays; the cooldown holds; the
+  guest sees and hears the same bark.
 
 ## C10. Clean, modern menu fonts (small)
 

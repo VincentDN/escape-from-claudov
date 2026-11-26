@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next open card (below).
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:**
-- **Checks so far:** (command and its last line)
+- **Card:** K9, make the SKS stepped time-to-kill check deterministic.
+- **Branch:** `codex/k9-sks-stepped-ttk`
+- **Started:** 2026-11-26 12:31 CET, Codex Sol cloud session.
+- **Steps done:** Baseline passed. The duel picks the first clear line from live entity positions, and `aim0` reports the camera direction to the target chest sphere. The baseline recorded SKS 1.300 s and L96 0.000 s.
+- **Next step:** Pin the 25 m duel fixture and seed the browser RNG within the duel, then run the full SKS test five times.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-sks.mjs` — sks ok.
 - **Questions for the owner:**
-- **Watch out for:**
+- **Watch out for:** Serve `dist/` over loopback HTTP with `EFC_TEST_URL=http://127.0.0.1:8231/`. The cloud setup draft documents the browser path for system Chromium.
 
 ## Next open cards, in order
 

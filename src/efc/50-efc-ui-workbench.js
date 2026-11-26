@@ -82,7 +82,7 @@ function efcBenchDialog() {
 .efc-bench[open] { display:grid;grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,1.2vw,24px); }
 .efc-bench::backdrop { background:rgba(5,7,5,.88); }
 .efc-bench header { display:flex;align-items:center;justify-content:space-between;gap:12px; }
-.efc-bench h2 { margin:0;font-family:var(--stencil);font-size:clamp(24px,2.3vw,44px);font-weight:400; }
+.efc-bench h2 { margin:0;font-family:var(--display);font-size:clamp(24px,2.3vw,44px);font-weight:600; }
 .efc-bench-content { display:grid;grid-template-columns:minmax(0,1fr) clamp(230px,28vw,480px);gap:clamp(10px,1.2vw,24px);min-height:0; }
 .efc-bench-stage { position:relative;min-width:0;min-height:0;background:#171915; }
 .efc-bench-stage :is(iframe,img) { position:absolute;inset:0;display:block;width:100%;height:100%;border:0; }

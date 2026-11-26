@@ -84,6 +84,7 @@ try {
     const out = {}, offWas = new Map(), random = Math.random;
     for (const e of entities) if (!e.isPlayer && e !== tgt) { offWas.set(e, e.off); e.off = true; }
     const targetArms = tgt.arms, targetFireCd = targetArms.fireCd;
+    const targetModel = tgt.model;
     try {
       targetArms.fireCd = Infinity;
       for (const k of keys) {
@@ -102,6 +103,11 @@ try {
           tgt.yaw = heading; tgt.pitch = 0; tgt.recoil = 0;
           tgt.crouch = tgt.wantCrouch = tgt.input.crouch = false;
           tgt.crouchAmt = tgt.slideAmt = tgt.vy = 0;
+          // Remove animation state carried over from the Warden's live raid.
+          targetModel.phase = targetModel.hipYaw = 0;
+          targetModel.aimW = targetModel.aimWV = 0;
+          targetModel.stepSh = targetModel.stepDip = 0;
+          targetModel.lastYaw = heading;
           poseSoldier(tgt, 0);
           hitSpheres(tgt);
           const aim = HS[1].c;

@@ -5,8 +5,70 @@ Written 25 November 2026 (Claude) after an audit of `beta` at `d02c3fb`. This fi
 `HANDOFF-CODEX.md` stays the specification (the *what* and *why*); this file is the *how*. Where the two disagree, the
 specification wins and you stop and report.
 
+## 0. Working inside a five-hour token window (read first)
+
+Codex Sol sessions run on a capped plan: the window can run out in the middle of a card, and a cloud container is thrown away
+when the session ends. Anything not pushed is lost. Work so that a fresh session can pick up at the exact step where the last
+one stopped.
+
+**The checkpoint file.** [`docs/SOL-PROGRESS.md`](SOL-PROGRESS.md) is the single source of where work stands. It holds the
+current card, its branch, the last step done, the next step, test results so far and open questions. Read it before anything
+else. Update it and push after every step (see the loop below).
+
+**The loop, for every step of a card:**
+
+1. Do one step of the card (one item of its **Steps** list, or one failing check).
+2. Run the fastest check that proves it (base checks, or the one test the step touches; not the whole suite).
+3. Update `docs/SOL-PROGRESS.md`: step done, next step, the last line of each check you ran.
+4. Commit (`wip(<CARD-ID>): step N, <what>` is fine for an unfinished card) and `git push -u origin <branch>`.
+
+Never hold more than about 20 minutes of work uncommitted. Push even when a test still fails; say so in the progress file.
+
+**Budget rules.**
+
+- Start of a session: note the time. A window is five hours; plan for four.
+- Before a step that takes long (a browser test is 5 to 15 minutes here, the full `run-all.sh` over an hour), check the time
+  left. With under 45 minutes left, do not start it: write the progress file and push instead.
+- At about 80 % of the window (four hours in, or when the tool says usage is high): finish the current step, push, write the
+  handoff block in the progress file (**Next step**, **How to verify**, **Watch out for**), push again, and stop.
+- Run long tests in the background with output to a file under `/tmp`, and copy their result lines into the progress file
+  as soon as they finish: logs in `/tmp` die with the container.
+- Do not run the whole suite to check a one-file change. Run the test for that file; leave the full suite to CI
+  (`checks.yml` runs it on pull requests to `beta`, when the owner opens or merges one).
+
+**Spending fewer tokens.**
+
+- Read only what the card lists. Use `grep -n`, `sed -n 'A,Bp' file | cut -c1-300` and `git diff --stat`; never print a whole
+  engine file, a whole log or a whole test output. Filter logs: `grep -E "^ok|FAIL|Error|passed" log | head`.
+- Do not re-read a file you just edited. Do not re-run a check that passed if nothing changed since.
+- Prefer one contact sheet to many screenshots. Look at a screenshot only when the card asks for a visual check.
+- Keep replies and commit bodies short: what changed, commands run, last line of each.
+
+**Resuming in a new session.**
+
+1. `git fetch origin && git checkout <branch from SOL-PROGRESS.md>` (or `-B <branch> origin/<branch>`).
+2. Read `docs/SOL-PROGRESS.md`, then only the card it names.
+3. Re-run the last check listed there to confirm the state, then continue with **Next step**.
+4. If the progress file and the branch disagree, trust the branch (`git log --oneline -5`) and fix the progress file first.
+
+**Finishing a card.** Set its status in section 4 to `done`, clear the card block in `SOL-PROGRESS.md` (keep the one-line entry
+in its log), commit, push. The owner merges branches into `beta`; do not merge or open a pull request unless asked.
+
+**Known traps (cost hours before):**
+
+- Browser tests take minutes each in a sandbox. Raid tests that run longer than the default raid time need `minutes: 60` in
+  the `openGame` settings, or the raid ends and the panels close.
+- The live game loop keeps running between `simRun` calls. To keep the player alive and in place, pin them with a
+  `setInterval` in the page, not only in the `simRun` callback.
+- The raid inventory's carried grids and slots share one scroll box (`max-height: 48vh`): scroll the target in before
+  measuring it, or after the drag has started.
+- Crates have random contents: find items by their grid (`#efcOpLootEquipment`) rather than by id alone.
+- Playwright locators default to a 30 s wait; CI is slower than a local run. Use `page.setDefaultTimeout(90000)` in long tests.
+- Known flaky checks (do not "fix" them by loosening): `test-lean` (K6), `test-sks` stepped TTK (K9).
+
 ## 1. How to work a card
 
+0. Read section 0 and [`SOL-PROGRESS.md`](SOL-PROGRESS.md). If a card is in progress there, resume it.
 1. Take the **first card in section 4 whose status is `open` and whose "Needs" cards are all `done`**. Do one card per branch.
 2. Branch from the current `beta`: `git fetch origin beta && git checkout -B codex/<card-id>-<topic> origin/beta`
    (for example `codex/c0-1-r-no-reload`). Card ids are lower case in branch names.
@@ -109,7 +171,7 @@ before starting).
 | Card | What | Size | Needs | Status |
 | --- | --- | --- | --- | --- |
 | K1 | Translate the "Art Lab" button so `check_i18n.py` passes | XS | none | done |
-| K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | done (full run pending; see PR #15) |
+| K2 | Serve HTTP in `run-all.sh` and add the tests it skips | S | K1, K4 to K7 | done |
 | K3 | Run the CI suite on pull requests to `beta` too | XS | none | done |
 | K4 | Bring `test-thumbs.mjs` up to date with the grid inventory | S | K1 | done (5 of 6 checks; the sixth is a real bug, K8) |
 | K8 | Stash list names are 24 px wide at 1280 by 720 | S | K4 | blocked (owner: one line or two) |

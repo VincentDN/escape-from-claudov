@@ -14,13 +14,13 @@ Single status page for the whole project. Updated 21 November 2026. The linked h
 
 ## Open: third track, tasks C0 to C15
 
-Detailed in [`docs/HANDOFF-CODEX.md`](HANDOFF-CODEX.md), in this order (owner, 20 November 2026); split into step-by-step cards in [`docs/CODEX-SOL-TASKS.md`](CODEX-SOL-TASKS.md) (25 November 2026). Each task ends on its own
+Detailed in [`docs/HANDOFF-CODEX.md`](HANDOFF-CODEX.md), in this order (owner, 20 November 2026); split into step-by-step cards in [`docs/CODEX-SOL-TASKS.md`](CODEX-SOL-TASKS.md) (25 November 2026). Agents on a five-hour token window work by its section 0 and keep [`docs/SOL-PROGRESS.md`](SOL-PROGRESS.md) up to date after every step. Each task ends on its own
 mergeable branch.
 
 | Order | Task | What | Size |
 | --- | --- | --- | --- |
 | done | L0 | Art style lab: `#artlab` loads Claudov empty with live dials (retro/PS1 dither, lens, colour), presets, A/B split, copy and paste of settings (`docs/artlab/README.md`); done, merged into `beta` and live at `/beta/#artlab`; waiting for the owner's chosen settings | medium |
-| first | K1 to K7 | Make `beta` green: i18n line, stale thumbnail and SKS tests, online lean timing, bench route Warden count, HTTP in `run-all.sh`, CI on `beta` | small |
+| first | K1 to K10 | Make `beta` green: K1 to K5, K7 and K10 done (26 November); open are K6 (flaky online lean timing), K9 (flaky SKS time-to-kill order) and K8 (stash names, waits on the owner) | small |
 | done | C0 | Finish the grid inventory: raid drag test (`test-inventory-drag.mjs`), R-key test (`test-inventory-keys.mjs`), unmount cue and one shared sound gap (cards C0-1 to C0-4, PR #15 on `beta`); K10 added a "Drop here to leave it on the ground" zone under the operator, since the raid panel fills the screen | small |
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |

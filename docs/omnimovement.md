@@ -12,5 +12,11 @@ Quickly release and press Sprint again while moving to start a tactical sprint. 
 | Sprint or tactical sprint | Start slide with enough momentum | Slide |
 | Slide | Slide ends on the ground | Crouch |
 | Slide | Jump | Airborne with slide momentum |
+| Airborne while sprinting or tactical sprinting | Press Crouch | Dive (planned) |
+| Grounded approach to an obstacle | Press Jump facing waist-high geometry with a reachable top | Mantle (planned) |
+| Grounded approach to an obstacle | Press Jump facing waist-high geometry with a clear far side | Vault (planned) |
+| Stand or crouch | Hold Crouch for 0.4 seconds | Prone (planned) |
+| Prone | Turn the view until the look angle calls for rolling onto the back | Supine (planned) |
+| Prone | Press the corresponding Lean key | Side (planned) |
 
-Dive, mantle, vault, prone orientation, and the matching weapon poses and hit volumes are still open.
+The owner chose to keep Crouch during a grounded sprint as Slide and use Crouch during an airborne sprint for Dive in C9-2. Supine weapon pose and aiming are part of C9-8.

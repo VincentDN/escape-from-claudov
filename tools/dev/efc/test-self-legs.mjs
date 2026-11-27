@@ -8,6 +8,23 @@ try {
   const result = await page.evaluate(() => {
     const model = PL.ent.model, mesh = efcSelfLegsMesh;
     const original = model.lod.lo.geometry;
+    const vertices = Array.from({ length: 24 }, (_, i) =>
+      mesh.geometry.index.getX(Math.floor(i * mesh.geometry.index.count / 24)));
+    const worldVertex = (skin, index) => {
+      const rest = new V3().fromBufferAttribute(skin.geometry.attributes.position, index);
+      return skin.boneTransform(index, rest).applyMatrix4(skin.matrixWorld);
+    };
+    const samplePose = () => {
+      scene.updateMatrixWorld(true);
+      return vertices.map((index) => worldVertex(mesh, index));
+    };
+    const standing = samplePose();
+    PL.crouchToggle = true;
+    for (let i = 0; i < 24; i++) matchTick(1 / 60, true);
+    const crouched = samplePose();
+    const maxPoseChange = Math.max(...standing.map((vertex, i) => vertex.distanceTo(crouched[i])));
+    const maxPoseError = Math.max(...crouched.map((vertex, i) => vertex.distanceTo(worldVertex(model.lod.lo, vertices[i]))));
+    const bodyHidden = !model.root.visible;
     const playing = mesh.visible;
     VM.root.visible = false;
     efcSelfLegsTick(PL.ent);
@@ -25,6 +42,7 @@ try {
       castsShadow: mesh.castShadow,
       playing, outsideFirstPerson, backInFirstPerson,
       dead: mesh.visible,
+      maxPoseChange, maxPoseError, bodyHidden,
     };
   });
   assert.ok(result.triangles > 0 && result.triangles < result.originalTriangles);
@@ -36,8 +54,11 @@ try {
   assert.equal(result.outsideFirstPerson, false);
   assert.equal(result.backInFirstPerson, true);
   assert.equal(result.dead, false);
+  assert.equal(result.bodyHidden, true);
+  assert.ok(result.maxPoseChange > 0.05, 'legs follow crouching');
+  assert.ok(result.maxPoseError < 0.00001, 'legs match the hidden soldier in world space');
   assert.deepEqual(errors, []);
-  console.log('first-person legs share the soldier skeleton and hide outside the live first-person view');
+  console.log('first-person legs follow the hidden soldier pose and hide outside the live first-person view');
 } finally {
   await browser.close();
 }

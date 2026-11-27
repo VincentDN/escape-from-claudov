@@ -157,7 +157,7 @@ whichever of C16-8 or C16-13 lands first. C9's files (`44*-efc-omni*.js`) belong
 
 | Card | What | Size | Needs | Status |
 | --- | --- | --- | --- | --- |
-| C17-1 | Legs mesh: a visible lower body from the player's own soldier | M | C15-4 | open |
+| C17-1 | Legs mesh: a visible lower body from the player's own soldier | M | C15-4 | done |
 | C17-2 | Place the body under the camera so feet show when looking down | S | C17-1 | open |
 | C17-3 | Legs follow every stance (stand, crouch, sprint, slide, mantle, vault, prone, supine, side) | M | C17-2 | open |
 | C17-4 | Shadows, setting, budget and closing sheet | S | C17-3 | open |

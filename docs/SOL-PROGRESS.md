@@ -5,13 +5,13 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C17-1, first-person lower-body mesh
-- **Branch:** `codex/c17-1-self-legs`
-- **Started:** 2026-11-27 23:27 UTC
-- **Steps done:** 1. Bound lower-body triangles to the soldier skeleton. 2. Gated visibility on the living first-person raid player and the raid lifecycle.
-- **Next step:** 3. Verify deformed vertices follow the hidden body and check a straight-down view.
+- **Card:** none in progress. Take the next eligible card in the active track.
+- **Branch:**
+- **Started:** (date, time, session)
+- **Steps done:**
+- **Next step:** C17-2, tune the first-person legs relative to the camera. The baseline down-facing view clips the mesh.
 - **How to verify:** `node tools/dev/efc/test-self-legs.mjs` and the base checks.
-- **Checks so far:** `first-person legs share the soldier skeleton and hide outside the live first-person view`, `smoke ok`, build asset list and translation check with `0 erreur(s)`. Declaration check exited 0.
+- **Checks so far:** `first-person legs follow the hidden soldier pose and hide outside the live first-person view`, `smoke ok`, build asset list and translation check with `0 erreur(s)`. Declaration check exited 0.
 - **Questions for the owner:** C16-5 requires approval of the five-line bark sample sheet before generation.
 - **Watch out for:** C18 follows the per-card dependencies and owner defaults in section 5 of the new plan. C16-5 also requires the ElevenLabs connector.
 
@@ -27,6 +27,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-28 Codex Sol: C17-1 done. The same skin and skeleton drive the lower-body mesh. World-space vertices match the hidden body through crouch. Visibility lifecycle and base checks passed. Visual framing continues in C17-2.
 - 2026-11-28 Codex Sol: C15-4 done. Both clients see the magazine detach, return and cancel. Documented the raid HUD and captured rifle, pistol and pump shotgun checks. Build, declaration, translation, smoke, local and two-client checks passed.
 - 2026-11-27 Codex Sol: C15-3 done. Hold Reload to show and keep the magazine in view and release to put it back. Rough is the owner-selected default, and exact numbers are selectable. Browser pose/readout, insertion check and all base checks passed.
 - 2026-11-27 Codex Sol: C15-2 done. Tap Reload to reload, hold for 0.30 s to enter the local check. Focused tests ended with `magazine key tap, hold, cancellation, and rebinding ok` and `inventory keys ok`. Build, declaration, translation and smoke checks passed.

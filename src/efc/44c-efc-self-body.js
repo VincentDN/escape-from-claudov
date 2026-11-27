@@ -4,7 +4,8 @@ const EFC_SELF_LEG_BONES = new Set([
   SB.THL, SB.KNL, SB.SHL, SB.FTL, SB.TOL, SB.SHHL,
   SB.THR, SB.KNR, SB.SHR, SB.FTR, SB.TOR, SB.SHHR,
 ]);
-const EFC_SELF_LEGS = { back: 0.14, crouchedBack: 0.10, downBack: 0.08, maxDown: Math.PI / 3 };
+const EFC_SELF_LEGS = { back: 0.14, crouchedBack: 0.10, downBack: 0.08, maxDown: Math.PI / 3, minCameraDistance: 0.25 };
+const EFC_SELF_LEGS_PELVIS = new V3();
 let efcSelfLegsMesh = null;
 
 function efcSelfLegsBuild(model, skin) {
@@ -54,7 +55,8 @@ function efcSelfLegsTick(e) {
   const back = lerp(EFC_SELF_LEGS.back, EFC_SELF_LEGS.crouchedBack, e.crouchAmt || 0) + EFC_SELF_LEGS.downBack * down;
   const bodyYaw = e.efcProneTurn?.bodyYaw ?? e.yaw;
   mesh.position.set(Math.sin(bodyYaw) * back, 0, Math.cos(bodyYaw) * back);
-  mesh.visible = true;
+  const pelvis = e.model.P.pelvis.getWorldPosition(EFC_SELF_LEGS_PELVIS).add(mesh.position);
+  mesh.visible = camera.position.distanceToSquared(pelvis) >= EFC_SELF_LEGS.minCameraDistance ** 2;
 }
 
 efcOn('died', (victim) => { if (victim === PL.ent) efcSelfLegsHide(); });

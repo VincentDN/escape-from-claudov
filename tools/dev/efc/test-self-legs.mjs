@@ -42,6 +42,14 @@ try {
     efcSelfLegsTick(PL.ent);
     const proneOffsetError = mesh.position.distanceTo(new V3(0.18, 0, 0));
     PL.ent.efcProneTurn = null;
+    efcSelfLegsTick(PL.ent);
+    const eye = camera.position.clone();
+    camera.position.copy(model.P.pelvis.getWorldPosition(new V3())).add(mesh.position);
+    efcSelfLegsTick(PL.ent);
+    const insideBody = mesh.visible;
+    camera.position.copy(eye);
+    efcSelfLegsTick(PL.ent);
+    const outsideBody = mesh.visible;
     VM.root.visible = false;
     efcSelfLegsTick(PL.ent);
     const outsideFirstPerson = mesh.visible;
@@ -58,7 +66,7 @@ try {
       castsShadow: mesh.castShadow,
       playing, outsideFirstPerson, backInFirstPerson,
       dead: mesh.visible,
-      maxPoseChange, maxPoseError, bodyHidden, offsets, freeLookOffsetError, proneOffsetError,
+      maxPoseChange, maxPoseError, bodyHidden, offsets, freeLookOffsetError, proneOffsetError, insideBody, outsideBody,
     };
   });
   assert.ok(result.triangles > 0 && result.triangles < result.originalTriangles);
@@ -76,8 +84,10 @@ try {
   assert.deepEqual(result.offsets.map((value) => +value.toFixed(3)), [0.14, 0.22, 0.10, 0.18]);
   assert.equal(result.freeLookOffsetError, 0);
   assert.ok(result.proneOffsetError < 0.00001);
+  assert.equal(result.insideBody, false);
+  assert.equal(result.outsideBody, true);
   assert.deepEqual(errors, []);
-  console.log('first-person legs follow the hidden soldier pose and hide outside the live first-person view');
+  console.log('first-person legs follow the soldier, retain body yaw, and hide on camera overlap or death');
 } finally {
   await browser.close();
 }

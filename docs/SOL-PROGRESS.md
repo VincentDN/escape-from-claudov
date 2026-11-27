@@ -8,12 +8,12 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C17-2, first-person legs framing
 - **Branch:** `codex/c17-2-legs-framing`
 - **Started:** 2026-11-27 23:36 UTC
-- **Steps done:** 1. Added standing, crouched and downward-look offsets. 2. Anchored them to body yaw during free-look and prone turning.
-- **Next step:** 3. Hide the legs when the camera is too close to the pelvis and capture the pitch contact sheet.
+- **Steps done:** 1. Added standing, crouched and downward-look offsets. 2. Anchored them to body yaw. 3. Added the camera proximity guard and captured the eight-angle contact sheet.
+- **Next step:** Resolve the standing −60° visual target, then recapture `docs/omnimovement/legs-pitch.png` and verify the card.
 - **How to verify:** `node tools/dev/efc/test-self-legs.mjs` and the base checks.
-- **Checks so far:** `first-person legs follow the hidden soldier pose and hide outside the live first-person view`, `smoke ok`, build asset list and translation check with `0 erreur(s)`. Declaration check exited 0.
-- **Questions for the owner:** C16-5 requires approval of the five-line bark sample sheet before generation.
-- **Watch out for:** C18 follows the per-card dependencies and owner defaults in section 5 of the new plan. C16-5 also requires the ElevenLabs connector.
+- **Checks so far:** `first-person legs follow the soldier, retain body yaw, and hide on camera overlap or death`, `smoke ok`, and `eight standing and crouched pitch screenshots captured`. Build, declarations and translations passed. Visual acceptance is still open.
+- **Questions for the owner:** Should C17-2 use forward compensation at steep pitch to show the boots at −60°, or retain the backward offset and show the boots at steeper angles?
+- **Watch out for:** At the default FOV, the planned 0.22 m backward shift put the standing boots below the frame at −60°. A diagnostic 0.18 m forward shift brought both boot bones into frame and showed clipped waist geometry. Keep C17-2 on its feature branch until visual acceptance passes.
 
 ## Next open cards, in order
 

@@ -41,6 +41,11 @@ function curW() { return armsW(PL.ent); }
 function onKey(e, down) {
   if (efcFreeLookKey(e, down)) return;
   if (efcMedKey(e, down)) return;
+  if (!down && efcRaidMode() && keyCanon(e.code) === 'KeyR') {
+    KEYS.KeyR = false;
+    efcRaidMagCheckRelease();
+    return;
+  }
   if (CHAT.open) return; // saisie d'un message : les touches ne commandent plus le soldat
   if (down && (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyF') && (MATCH.state === 'killcam' || (MATCH.state === 'playing' && !PL.ent.alive))) { e.preventDefault(); kcSkip(); return; }
   if (MATCH.state !== 'playing' && MATCH.state !== 'paused') return;
@@ -55,7 +60,10 @@ function onKey(e, down) {
   if (PILOT.d) return; // drone en vol : les touches ne servent qu'à le piloter (KEYS, lu par fpvPlayer)
   if (MECHA_P.me) { if (c === 'KeyE') mechaUse(); return; } // à bord du mecha : les touches le pilotent (mechaPilot), E fait descendre
   if (adsToggleMode() && ADS_UNAIM.has(c)) PL.adsWant = false; // visée en bascule : recharger, changer d'arme, courir la rangent
-  if (c === 'KeyR') startReload();
+  if (c === 'KeyR') {
+    if (!efcRaidMode()) startReload();
+    else if (!e.repeat) efcRaidMagCheckPress();
+  }
   else if (c === 'Digit1') switchWeapon(0);
   else if (c === 'Digit2') switchWeapon(1);
   else if (c === 'KeyQ' && e.getModifierState && !e.getModifierState('Control')) quickSwap();
@@ -345,6 +353,7 @@ function updatePlayer(dt, now) {
   I.mz = fw; I.mx = st; I.sprint = run && !lockMove && !(canShoot && (PL.held || PL.runShot)); I.crouch = PL.crouchToggle || !!KEYS.ControlLeft; I.jump = !!KEYS.Space && !lockMove;
   I.ads = PL.adsWant && !hold && !healing; I.fire = (PL.held || PL.runShot) && !hold; I.firePressed = PL.queued && !hold;
   efcWeaponCheckTick(I, hold);
+  efcRaidMagCheckTick(I, hold);
   if (hold) PL.queued = false; // un tir demandé pendant le décompte ne part pas au départ (une gâchette tenue, si)
   e.busy = busy(); e.blockSprint = !!PL.nadeState || healing; e.sprintBusyOk = KS_PHONE.has(KS.mode);
   e.yaw = PL.yaw; e.pitch = PL.pitch;

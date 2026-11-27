@@ -201,8 +201,8 @@ before starting).
 | C16-2 | Captions over the hostile and in a feed | S | C16-1 | done |
 | C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | done |
 | C15-1 | Minimal raid HUD option | S | C1-2 | done |
-| C15-2 | Separate tap reload from hold magazine check | S | C15-1 | open |
-| C15-3 | Magazine check pose and ammo readout | M | C15-2 | open (owner: default count style) |
+| C15-2 | Separate tap reload from hold magazine check | S | C15-1 | done |
+| C15-3 | Magazine check pose and ammo readout | M | C15-2 | open |
 | C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | open |
 | C16-4 | Invented language and the voice script | S | C16-1 | open |
 | C16-5 | Record the lines with ElevenLabs | M | C16-4 | open (needs the ElevenLabs connector) |
@@ -702,12 +702,11 @@ Sol agent starts it. A planning agent writes the split into this file first.
 
 ### C15-3. Magazine check pose and ammo readout (M)
 
-- **Owner:** Choose rough or exact as the default for the count style. The handoff proposes rough with an exact option.
+- **Owner decision (27 November 2026):** default to rough counts, with exact counts selectable.
 - **Read:** `src/efc/10-efc-weapon-check.js`, `src/efc/10-efc-raid-magcheck.js`, `src/06d-reload.js` (existing handling
   choreography), `src/09e-menus.js` (Interface options), `shell.html` (HUD), and `i18n/en.txt`.
 - **Edit:** `src/efc/10-efc-raid-magcheck.js`, `src/efc/10-efc-weapon-check.js`, `src/06d-reload.js`, `src/09e-menus.js`,
-  `shell.html`, `i18n/en.txt`, and `tools/dev/efc/test-magcheck.mjs`. Coordinate the engine choreography and UI hooks with
-  their package owners before editing.
+  `shell.html`, `i18n/en.txt`, and `tools/dev/efc/test-magcheck.mjs`. Keep the choreography in the existing viewmodel hook and the setting and markup in the UI.
 - **Steps:** Reuse the C1 and reload poses to open, hold and return the weapon. Handle detachable, fixed, tube and drum
   magazines. Add the selectable count style and show a small readout while the check is held. Account for the chamber
   separately where modeled. Test the output and the pose through cancellation and release.

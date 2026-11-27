@@ -9,16 +9,17 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Branch:**
 - **Started:** (date, time, session)
 - **Steps done:**
-- **Next step:**
+- **Next step:** Split C15 Minimal HUD and hold-R magazine check into cards using section 6, then take C15-1.
 - **Checks so far:** (command and its last line)
 - **Questions for the owner:**
 - **Watch out for:**
 
 ## Next open cards, in order
 
-1. C16-4 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
-2. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
-3. Then C15, C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).
+1. C15-1 to C15-4, Minimal HUD and hold-R magazine check (split in section 6 first).
+2. C16-4 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
+3. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
+4. Then C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).
 
 Blocked on the owner: K8 (stash names, one line or two), C12 (reference image missing). Owner may still change K10's drop zone.
 C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the owner's eye.

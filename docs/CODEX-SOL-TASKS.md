@@ -200,6 +200,7 @@ before starting).
 | C16-1 | Bark events, catalogue and rules (no sound, no UI) | S | C9-8 | done |
 | C16-2 | Captions over the hostile and in a feed | S | C16-1 | done |
 | C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | done |
+| C15-1 to C15-4 | Minimal HUD and hold-R magazine check (split in section 6 first) | M total | C1-2 | open |
 | C16-4 | Invented language and the voice script | S | C16-1 | open |
 | C16-5 | Record the lines with ElevenLabs | M | C16-4 | open (needs the ElevenLabs connector) |
 | C16-6 | Radio processing and packaging | S | C16-5 | open |
@@ -214,7 +215,6 @@ before starting).
 | C2-2 | Roster stats table and niche stats for batch 1 | S | C2-1 | open |
 | C2-3 | One parametrised weapon test | S | C2-2 | open |
 | C2-4 to C2-8 | One card per weapon: AK-15K, AK-74M Zenitco, RPK, M16, G3 | S each | C2-3 | open |
-| C15-1 to C15-4 | Minimal HUD and hold-R magazine check | M total | C2-8 | open |
 | C11-1 to C11-3 | Full-screen map and extraction flares | M total | C15-4 | open |
 | C12 | Dirty lens | M | C11-3 | blocked (reference image missing, see findings) |
 | C13 | Weapon foley | M | C12 | open (ElevenLabs budget approved by the owner, 25 November 2026) |
@@ -671,7 +671,7 @@ not; confirm the thumbnail exists (`test-thumbs.mjs`); confirm it appears in a l
 Each item below must be split into cards of the shape above (XS to M, exact files, steps, verify, acceptance) before a Codex
 Sol agent starts it. A planning agent writes the split into this file first.
 
-- **C15 Minimal HUD** (after C2): HUD markup is `shell.html` around line 3021 (`.ammo`, `#wname`), styles around 1446.
+- **C15 Minimal HUD** (next open priority, builds on C1's weapon check): HUD markup is `shell.html` around line 3021 (`.ammo`, `#wname`), styles around 1446.
   Suggested cards: (1) a setting `efcHudMinimal` and hide `.ammo` and `#wname` in raids; (2) hold-R detection in
   `src/08-player.js` line 56 with a 0.3 s threshold, tap keeps `startReload()`; (3) the check pose, reusing the inspect action
   in `src/06d-reload.js`, with rough count text; (4) remote replication through the `weaponCheck`-style net event and

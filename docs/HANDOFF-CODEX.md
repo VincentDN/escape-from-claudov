@@ -24,9 +24,9 @@ Work in this order. Each line is one or more mergeable branches.
 0. **C0** finish the grid inventory: drag, rotate, foley (owner, before C1)
 1. **C1** raid-start weapon check
 2. **C9** omnimovement (moved up by the owner: right after C1)
-2b. **C16** enemy combat barks: captions and radio voice telegraphing every hostile action (owner, 26 November 2026: right after C9)
-3. **C2** Partisan modern weapons, batch 1
-4. **C15** minimal HUD and the magazine check
+3. **C15** minimal HUD and the magazine check (next open priority, owner, 27 November 2026)
+4. **C16** enemy combat barks: captions and radio voice telegraphing every hostile action
+4b. **C2** Partisan modern weapons, batch 1
 5. **C11** full-screen map and extraction flares
 6. **C12** dirty lens and light effects
 7. **C13** real weapon foley for every action
@@ -370,7 +370,7 @@ it differs from the raid version.
 - Bren and Chauchat are light machine guns: heavy, slow to aim, with a bipod that deploys on a ledge or prone (prone exists
   after C9).
 
-## C15. Minimal HUD and the magazine check (medium; right after C2)
+## C15. Minimal HUD and the magazine check (medium; next open priority)
 
 The owner wants a minimal HUD: **the ammunition count is no longer shown on screen.** To know how many rounds are left, the
 player **holds R**: the character pulls the magazine out and looks at it, and the round count appears while it is held.

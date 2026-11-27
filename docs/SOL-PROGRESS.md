@@ -5,14 +5,15 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next eligible card in section 4.
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:**
-- **Checks so far:** (command and its last line)
-- **Questions for the owner:**
-- **Watch out for:**
+- **Card:** C9-8, weapon poses and aim limits for low stances.
+- **Branch:** `codex/c9-omni`
+- **Started:** 2026-11-27 08:15 CET, Codex Sol cloud session.
+- **Steps done:** Wrote the proposed six-step split in CODEX-SOL-TASKS.md. Prerequisite C9-7 passed and is pushed at `6ce12d7`.
+- **Next step:** Get the split reviewed, then start C9-8a with the existing equipped viewmodel.
+- **How to verify:** Each proposed step includes its own verification. C9-8f closes with local and two-client weapon pose review.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok.
+- **Questions for the owner:** Approve the six-step split? Beyond the weapon aim bounds, keep camera free-look and block firing, or clamp the camera while aiming?
+- **Watch out for:** The pose work uses C9-5 camera/body separation and the C9-7 replicated stance.
 
 ## Next open cards, in order
 

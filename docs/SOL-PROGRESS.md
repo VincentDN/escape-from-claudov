@@ -8,9 +8,9 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C9-8, weapon poses, aim limits and Alt free-look.
 - **Branch:** `codex/c9-omni`
 - **Started:** 2026-11-27, Codex Sol cloud session.
-- **Steps done:** C9-8a–c implemented the first-person prone, supine and both side holds. Smooth entry/return and the hand contact bounds passed.
-- **Next step:** Finish integration checks for C9-8d (aim limits and hold-Alt free-look), then integrate C9-8e and review C9-8f.
-- **Checks so far:** `test-omni-prone-view.mjs` — First-person prone, supine and both side holds passed with bounded hand error and smooth return. `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `smoke.mjs` — smoke ok.
+- **Steps done:** C9-8a–c added the first-person holds and smooth transitions. C9-8d added hold-Alt free-look and bounded the low-stance weapon aim while keeping the camera free. The release frame restores shot alignment.
+- **Next step:** Integrate C9-8e third-person poses and the C9-8f first-person framing correction, then run the final combined checks.
+- **Checks so far:** `test-omni-prone-view.mjs` — First-person prone, supine and both side holds passed with bounded hand error and smooth return. `test-omni-free-look.mjs` — omni free-look and aim limits ok. `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `smoke.mjs` — smoke ok.
 - **Questions for the owner:**
 - **Watch out for:** Re-run the pose tests with the Alt, aim limit and third-person integrations present.
 

@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C9-4, enter, crawl and rise from prone.
-- **Branch:** `codex/c9-omni`, based on C9-3's closing checkpoint.
-- **Started:** 2026-11-27 07:58 CET, Codex Sol cloud session resumed.
-- **Steps done:** Added 0.4 s Crouch hold, all-direction crawl, lowered collision height and eye height, headroom checks for Jump and Crouch tap, and Dive-to-Prone. Prone Jump takes priority over traversal.
-- **Next step:** Finish the combined Dive, Traversal, Sprint, movement state and Warden regressions, then close C9-4.
-- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-omni-prone.mjs` — Prone holds, crawls in all eight directions, respects headroom, and follows Dive.
+- **Card:** none in progress. Take the next eligible card in section 4.
+- **Branch:**
+- **Started:** (date, time, session)
+- **Steps done:**
+- **Next step:**
+- **Checks so far:** (command and its last line)
 - **Questions for the owner:**
-- **Watch out for:** An entry or Dive Crouch release must keep Prone. A blocked rise needs a new press after clearance returns.
+- **Watch out for:**
 
 ## Next open cards, in order
 
@@ -28,6 +28,7 @@ Blocked on the owner: K8 (stash names, one line or two), C12 (reference image mi
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-27 Codex Sol: C9-4 done. Hold Crouch to go prone and crawl. Jump or tap Crouch to rise with headroom. Dive lands prone. Movement and Warden regressions passed.
 - 2026-11-26 Codex Sol: C9-3 done. Mantle and vault passed in all eight headings with blocked landing and ordinary jump fallbacks. Dive, movement, and Warden regressions passed.
 - 2026-11-26 Codex Sol: C9-2 done. Sprint + Crouch dives in the air and slides on the ground. The eight-direction dive, collision, cooldown and movement/Warden regressions passed.
 - 2026-11-26 Codex Sol: C9-1 done. simRun drove all six existing movement states. Sprint and Warden regressions passed. Owner chose grounded Slide and airborne Dive for Sprint + Crouch.

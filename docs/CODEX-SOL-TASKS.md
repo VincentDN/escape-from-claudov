@@ -192,7 +192,7 @@ before starting).
 | C9-1 | Movement state machine skeleton and transition table | S | C1-2 | done |
 | C9-2 | Dive | M | C9-1 | done |
 | C9-3 | Mantle and vault | M | C9-1 | done |
-| C9-4 | Prone: enter, crawl, get up | M | C9-1 | open |
+| C9-4 | Prone: enter, crawl, get up | M | C9-1 | done |
 | C9-5 | Prone: free turn, roll to back and sides | M | C9-4 | open |
 | C9-6 | Hit volumes follow the stance | M | C9-4 | open |
 | C9-7 | Replicate stances online | S | C9-6 | open |

@@ -285,6 +285,7 @@ const OPT_TABS = [
     ['check', 'padVib', _t('Vibrations de la manette')],
     ['head', _t('Interface')],
     ['check', 'efcWeaponCheck', 'Raid-start weapon check'],
+    ['check', 'efcBarkCaptions', 'Enemy bark captions', efcBarkCaptionUpdate],
     ['select', 'lang', _t('Langue'), [['auto', _t('Automatique')], ['en', 'English'], ['fr', 'Français']], langApply, 'menu'],
     ['check', 'allyMarks', _t('Marqueurs d\u0027alliés (au-dessus de leur tête)')],
     ['check', 'nadeArc', _t('Trajectoire des grenades (en tenant une grenade)')],

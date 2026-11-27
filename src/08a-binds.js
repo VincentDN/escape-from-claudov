@@ -18,6 +18,7 @@ const BIND_DEFS = [
   ['reload', 'KeyR', _t('Recharger')], ['w1', 'Digit1', _t('Arme principale')], ['w2', 'Digit2', _t('Arme secondaire')], ['swap', 'KeyQ', _t('Changer d\u0027arme'), 'KeyZ'],
   ['knife', 'KeyF', _t('Couteau (maintenir pour le garder en main)')], ['nade', 'KeyG', _t('Grenade (maintenir pour la garder en main)')], ['use', 'KeyE', _t('Ramasser l\u0027arme au sol'), 'KeyV'], ['inspect', 'KeyI', _t('Inspecter l\u0027arme')],
   ['leanL', 'LeanL', _t('Se pencher à gauche'), 'KeyQ'], ['leanR', 'LeanR', _t('Se pencher à droite'), 'KeyE'],
+  ['heal', 'KeyH', _t('Se soigner en raid (maintenir)')],
   ['ks1', 'Digit4', _t('Première série')], ['ks2', 'Digit5', _t('Deuxième série')], ['ks3', 'Digit6', _t('Troisième série')], ['board', 'Tab', _t('Tableau des scores')],
 ];
 const BIND_RESERVED = new Set(['Escape', 'KeyP', 'KeyT', 'Enter', 'NumpadEnter', 'MetaLeft', 'MetaRight', 'ContextMenu', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);

@@ -25,6 +25,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-27 Codex Sol: Raid healing follow-up done. Hold H to use a carried medical item with a first-person bandage wrap. Build, declaration and translation checks passed. Browser checks ended with `bandage hold, animation, cancellation, consumption and rebinding ok`, `items ok` and `smoke ok`.
 - 2026-11-27 Codex Sol: Alt free-look follow-up done. Firing, reloads and grenade throws work while detached and use weapon aim. Focused and smoke tests passed.
 - 2026-11-27 Codex Sol: C16-3 done. Scheduled raid AI cues ahead of actions, including automatic reloads and Scavenger cues. All 15 lead-time scenarios and Warden/Scavenger regressions passed.
 - 2026-11-27 Codex Sol: C16-2 done. Added projected bark captions, an off-screen arrow feed, and a settings toggle. Verified ordering, 2.5 s expiry, reduced motion and the reference screenshot.

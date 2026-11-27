@@ -502,6 +502,7 @@ Pavé tactile détecté. Tir automatique et double clic pour viser (Options, Jeu
 Souris détectée. Le clic gauche tire de nouveau (Options, Jeu) ⇒ Mouse detected. Left click fires again (Options, Game)
 Viser, clic gauche pour tirer, clic droit pour épauler ⇒ Aim, left click to fire, right click to aim down sights
 Recharger ⇒ Reload
+Se soigner en raid (maintenir) ⇒ Heal in raid (hold)
 Changer d'arme ⇒ Switch weapon
 Grenade (maintenir pour la garder en main) ⇒ Grenade (hold to keep it in hand)
 Couteau (maintenir pour le garder en main) ⇒ Knife (hold to keep it in hand)

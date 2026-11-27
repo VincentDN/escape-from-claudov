@@ -40,6 +40,7 @@ function curW() { return armsW(PL.ent); }
 /* ---------- Entrées ---------- */
 function onKey(e, down) {
   if (efcFreeLookKey(e, down)) return;
+  if (efcMedKey(e, down)) return;
   if (CHAT.open) return; // saisie d'un message : les touches ne commandent plus le soldat
   if (down && (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyF') && (MATCH.state === 'killcam' || (MATCH.state === 'playing' && !PL.ent.alive))) { e.preventDefault(); kcSkip(); return; }
   if (MATCH.state !== 'playing' && MATCH.state !== 'paused') return;
@@ -102,7 +103,7 @@ addEventListener('wheel', (e) => {
   if (KS.map.open || trackpadOn()) return; // au pavé tactile, le défilement à deux doigts ne change pas d'arme
   quickSwap();
 }, { passive: true });
-addEventListener('blur', () => { for (const k in KEYS) KEYS[k] = false; PL.held = false; TPAD.down = false; PL.adsWant = false; PL.knifeBtn = null; });
+addEventListener('blur', () => { for (const k in KEYS) KEYS[k] = false; PL.held = false; TPAD.down = false; PL.adsWant = false; PL.knifeBtn = null; efcMedCancelHold(); });
 
 /* ---------- Actions ---------- */
 function busy() { return PL.switching > 0 || PL.knifeT > 0 || PL.nadeState || !PL.ent.alive || !!KS.mode || !!PILOT.d || !!MECHA_P.me; }
@@ -327,6 +328,7 @@ function updatePlayer(dt, now) {
   // aérienne immobilise le joueur (drone, tablette qu'on sort ou range : on continue d'avancer), et le décompte du départ
   // (09y-decompte.js : on regarde autour de soi, on recharge, on change d'arme, mais ni pas, ni saut, ni visée, ni tir)
   const hold = playHold(), I = e.input, lockMove = KS.map.open || hold;
+  const healing = efcMedHolding();
   // au doigt : joystick analogique et sprint à fond vers l'avant (09q-tactile.js) ; Maj sert alors à retenir son souffle (bouton)
   const fw = lockMove ? 0 : padClamp((TOUCH.on ? TOUCH.mz : (KEYS.KeyW || KEYS.ArrowUp ? 1 : 0) - (KEYS.KeyS || KEYS.ArrowDown ? 1 : 0)) + PAD.mz);
   const st = lockMove ? 0 : padClamp((TOUCH.on ? TOUCH.mx : (KEYS.KeyD || KEYS.ArrowRight ? 1 : 0) - (KEYS.KeyA || KEYS.ArrowLeft ? 1 : 0)) + PAD.mx);
@@ -341,10 +343,10 @@ function updatePlayer(dt, now) {
   if (PL.queued && (PL.sprinting || e.arms.sprintW > 0.3)) PL.runShot = true;
   if (!canShoot) PL.runShot = false;
   I.mz = fw; I.mx = st; I.sprint = run && !lockMove && !(canShoot && (PL.held || PL.runShot)); I.crouch = PL.crouchToggle || !!KEYS.ControlLeft; I.jump = !!KEYS.Space && !lockMove;
-  I.ads = PL.adsWant && !hold; I.fire = (PL.held || PL.runShot) && !hold; I.firePressed = PL.queued && !hold;
+  I.ads = PL.adsWant && !hold && !healing; I.fire = (PL.held || PL.runShot) && !hold; I.firePressed = PL.queued && !hold;
   efcWeaponCheckTick(I, hold);
   if (hold) PL.queued = false; // un tir demandé pendant le décompte ne part pas au départ (une gâchette tenue, si)
-  e.busy = busy(); e.blockSprint = !!PL.nadeState; e.sprintBusyOk = KS_PHONE.has(KS.mode);
+  e.busy = busy(); e.blockSprint = !!PL.nadeState || healing; e.sprintBusyOk = KS_PHONE.has(KS.mode);
   e.yaw = PL.yaw; e.pitch = PL.pitch;
   const mv = ctlMove(e, dt);
   if (voidCheck(e) || ringCheck(e, dt)) return; // tombé dans le vide (îles flottantes), ou resté trop longtemps hors de la zone ronde
@@ -460,7 +462,7 @@ function updatePlayer(dt, now) {
     PL.wall = h ? clamp((0.9 - h.t) / 0.45, 0, 1) : 0;
   }
   wall = PL.wall || 0;
-  laserUpdate(!!d.laser && e.alive && !PL.sprinting && VM.ads < 0.35 && !PL.nadeState && PL.knifeT <= 0 && VM.lower < 0.3, dt);
+  laserUpdate(!!d.laser && e.alive && !PL.sprinting && VM.ads < 0.35 && !PL.nadeState && !healing && PL.knifeT <= 0 && VM.lower < 0.3, dt);
   updateViewmodel(dt, { ads, sprint: PL.sprinting, speed: hs, grounded: PL.onGround, crouch: e.crouch, empty: curW().mag === 0, lat, fwd, fire: PL.held, wall, slide: e.slideAmt });
   // corps invisible du joueur : ne sert qu'à projeter son ombre
   const sm = e.model;
@@ -473,6 +475,7 @@ function updatePlayer(dt, now) {
   if (KNIFE_DEBUG) KNIFE_DEBUG(rigS, dt); // banc de réglage du couteau (?couteau=1)
   if (NADE_DEBUG) NADE_DEBUG(rigS, dt); // banc de réglage des grenades (?grenade=1)
   updateRigs(dt, rigS);
+  efcBandageUpdate();
 }
 /* Poussière soulevée derrière les pieds pendant la glissade */
 function slideDust(e, dt) { // e : le joueur ou un bot

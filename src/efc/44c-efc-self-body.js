@@ -37,3 +37,19 @@ function efcSelfLegsBuild(model, skin) {
   efcSelfLegsMesh = mesh;
   return mesh;
 }
+
+function efcSelfLegsHide() {
+  if (efcSelfLegsMesh) efcSelfLegsMesh.visible = false;
+}
+
+function efcSelfLegsTick(e) {
+  if (!e.isPlayer || !e.alive || e.out || !efcRaidLive() || KC.active || !VM.root.visible) {
+    efcSelfLegsHide();
+    return;
+  }
+  efcSelfLegsBuild(e.model, e.model.lod.skin).visible = true;
+}
+
+efcOn('died', (victim) => { if (victim === PL.ent) efcSelfLegsHide(); });
+efcOn('raid:over', efcSelfLegsHide);
+efcOn('match:left', efcSelfLegsHide);

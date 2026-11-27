@@ -478,7 +478,7 @@ function updatePlayer(dt, now) {
   if (sm) {
     if (sm.gunKey !== d.key) setSoldierGun(sm, d.key);
     e.recoil = 0; poseSoldier(e, dt); layoutSoldier(sm, true);
-    if (efcRaidMode()) efcSelfLegsBuild(sm, sm.lod.skin);
+    efcSelfLegsTick(e);
     sm.root.visible = false; // l'ombre du corps invisible créait une silhouette noire parasite devant le joueur
   }
   const rigS = { knifeT: PL.knifeT, knifeNew: PL.knifeNew, nadeState: PL.nadeState, nadeT: PL.nadeT, cookT: PL.cookT, knifeHold: PL.knifeHold, sprint: VM.sprint, speed: hs };

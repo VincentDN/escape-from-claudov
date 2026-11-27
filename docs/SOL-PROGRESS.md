@@ -8,10 +8,10 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C17-1, first-person lower-body mesh
 - **Branch:** `codex/c17-1-self-legs`
 - **Started:** 2026-11-27 23:27 UTC
-- **Steps done:** 1. Filtered lower-body triangles and bound the mesh to the existing soldier skeleton.
-- **Next step:** 2. Gate legs visibility on the living first-person raid player.
+- **Steps done:** 1. Bound lower-body triangles to the soldier skeleton. 2. Gated visibility on the living first-person raid player and the raid lifecycle.
+- **Next step:** 3. Verify deformed vertices follow the hidden body and check a straight-down view.
 - **How to verify:** `node tools/dev/efc/test-self-legs.mjs` and the base checks.
-- **Checks so far:** `first-person legs mesh filters triangles and shares the soldier skeleton`, `smoke ok`, build asset list and translation check with `0 erreur(s)`. Declaration check exited 0.
+- **Checks so far:** `first-person legs share the soldier skeleton and hide outside the live first-person view`, `smoke ok`, build asset list and translation check with `0 erreur(s)`. Declaration check exited 0.
 - **Questions for the owner:** C16-5 requires approval of the five-line bark sample sheet before generation.
 - **Watch out for:** C18 follows the per-card dependencies and owner defaults in section 5 of the new plan. C16-5 also requires the ElevenLabs connector.
 

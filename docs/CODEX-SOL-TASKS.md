@@ -200,7 +200,7 @@ before starting).
 | C16-1 | Bark events, catalogue and rules (no sound, no UI) | S | C9-8 | done |
 | C16-2 | Captions over the hostile and in a feed | S | C16-1 | done |
 | C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | done |
-| C16-4 | Invented language and the voice script | S | C16-1 | open |
+| C16-4 | Invented language and the voice script | S | C16-1 | done |
 | C16-5 | Record the lines with ElevenLabs | M | C16-4 | open (needs the ElevenLabs connector) |
 | C16-6 | Radio processing and packaging | S | C16-5 | open |
 | C16-7 | Voice playback in the game | S | C16-6, C16-2 | open |

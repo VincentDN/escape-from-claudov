@@ -9,14 +9,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Branch:**
 - **Started:** (date, time, session)
 - **Steps done:**
-- **Next step:**
+- **Next step:** Review the five sample lines in barks.md before C16-5 records the pack.
 - **Checks so far:** (command and its last line)
-- **Questions for the owner:**
+- **Questions for the owner:** Approve the five-line sample sheet before recording?
 - **Watch out for:**
 
 ## Next open cards, in order
 
-1. C16-4 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
+1. C16-5 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
 2. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
 3. Then C15, C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).
 
@@ -25,6 +25,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-27 Codex Sol: C16-4 done. Documented 180 distinct recordings across the 15 cues and three groups, with five sample lines ready for review.
 - 2026-11-27 Codex Sol: C16-3 done. Scheduled raid AI cues ahead of actions, including automatic reloads and Scavenger cues. All 15 lead-time scenarios and Warden/Scavenger regressions passed.
 - 2026-11-27 Codex Sol: C16-2 done. Added projected bark captions, an off-screen arrow feed, and a settings toggle. Verified ordering, 2.5 s expiry, reduced motion and the reference screenshot.
 - 2026-11-27 Codex Sol: C16-1 done. Added the host bark catalogue, hearing range, priorities and cooldowns. Five logic tests and all base checks passed.

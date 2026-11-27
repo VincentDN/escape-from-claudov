@@ -35,14 +35,12 @@ try {
     const rounds = shotCount();
     const consumed = key('keydown', 'AltLeft', 'Alt') === false;
     mouse(250, 80);
-    PL.queued = PL.held = true;
     tick(8);
     const detached = {
       consumed,
       active: EFC_FREE_LOOK.active,
       viewMoved: camera.quaternion.angleTo(view) > 0.1,
       aimFixed: PL.yaw === yaw && PL.pitch === pitch && weaponHeading().angleTo(heading) < 0.001,
-      noShot: shotCount() === rounds,
     };
 
     key('keydown', 'AltRight', 'Alt');
@@ -86,6 +84,61 @@ try {
     tick();
     const blurred = !EFC_FREE_LOOK.active && EFC_FREE_LOOK.yaw === 0;
 
+    const shotsAtEntry = shotCount();
+    key('keydown', 'AltLeft', 'Alt');
+    mouse(280, -60);
+    tick();
+    const aimDirection = efcActionForward(new V3());
+    const viewDirection = camera.getWorldDirection(new V3());
+    const originalSpread = coneDir;
+    let shotAxis = null;
+    try {
+      coneDir = (axis, ...args) => {
+        shotAxis = axis.clone();
+        return originalSpread(axis, ...args);
+      };
+      PL.noFireT = 0;
+      window.dispatchEvent(new MouseEvent('mousedown', { button: 0, bubbles: true }));
+      tick();
+      window.dispatchEvent(new MouseEvent('mouseup', { button: 0, bubbles: true }));
+    } finally {
+      coneDir = originalSpread;
+    }
+    const firedWhileDetached = EFC_FREE_LOOK.active && shotCount() > shotsAtEntry &&
+      !!shotAxis && shotAxis.angleTo(aimDirection) < 0.001 && shotAxis.angleTo(viewDirection) > 0.1;
+
+    const missingRound = armsW(entity).mag;
+    key('keydown', 'KeyR', 'r');
+    key('keyup', 'KeyR', 'r');
+    const reloadStarted = !!entity.arms.reload;
+    tick(180);
+    const reloadedWhileDetached = reloadStarted && EFC_FREE_LOOK.active && armsW(entity).mag > missingRound;
+
+    const originalSpawn = spawnNade;
+    let thrown = false;
+    try {
+      spawnNade = (owner, origin, velocity, ...args) => {
+        if (owner === entity) {
+          const forward = new V3(-Math.sin(PL.yaw), 0, -Math.cos(PL.yaw));
+          const heading = velocity.clone().setY(0).normalize();
+          thrown = EFC_FREE_LOOK.active && heading.angleTo(forward) < 0.001;
+        }
+        return originalSpawn(owner, origin, velocity, ...args);
+      };
+      PL.nades = 1;
+      PL.nadeType = 'frag';
+      key('keydown', 'KeyG', 'g');
+      tick(3);
+      key('keyup', 'KeyG', 'g');
+      tick(36);
+    } finally {
+      spawnNade = originalSpawn;
+    }
+    const threwWhileDetached = thrown && PL.nades === 0 && EFC_FREE_LOOK.active;
+    key('keyup', 'AltLeft', 'Alt');
+    tick(4);
+    const roundsAfterActions = shotCount();
+
     key('keydown', 'KeyC', 'c');
     tick(15);
     key('keyup', 'KeyC', 'c');
@@ -97,12 +150,12 @@ try {
     PL.pitch = 1.1;
     PL.held = PL.queued = true;
     tick(5);
-    const pitchBlocked = efcOmniAimBlocked(entity, PL.yaw, PL.pitch) && shotCount() === rounds &&
+    const pitchBlocked = efcOmniAimBlocked(entity, PL.yaw, PL.pitch) && shotCount() === roundsAfterActions &&
       Math.abs(camera.rotation.x - PL.pitch) < 0.02;
     PL.pitch = 0;
     PL.held = PL.queued = true;
     tick(5);
-    const fireRestored = shotCount() > rounds;
+    const fireRestored = shotCount() > roundsAfterActions;
 
     // Switch using the keyboard while detached, then check that a scope still
     // zooms normally after Alt release.
@@ -127,7 +180,7 @@ try {
     key('keyup', 'AltLeft', 'Alt');
     tick(20);
     const scopeViewRestored = detachedFov > zoomedFov + 5 && Math.abs(camera.fov - zoomedFov) < 0.1;
-    return { ...detached, otherAltHeld, recentered, releaseAim, normalAim, blurred, prone, yawLimit, pitchBlocked, fireRestored, switchedDuringLook, scopeViewRestored };
+    return { ...detached, otherAltHeld, recentered, releaseAim, normalAim, blurred, firedWhileDetached, reloadedWhileDetached, threwWhileDetached, prone, yawLimit, pitchBlocked, fireRestored, switchedDuringLook, scopeViewRestored };
   });
   for (const [check, passed] of Object.entries(result)) assert.equal(passed, true, check);
   assert.deepEqual(errors, []);

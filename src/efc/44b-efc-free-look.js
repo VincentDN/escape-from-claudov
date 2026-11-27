@@ -1,5 +1,5 @@
 /* Hold Alt to turn the first-person camera independently of the weapon and movement heading. */
-const EFC_FREE_LOOK = { active: false, yaw: 0, pitch: 0, yawLimit: 110 * Math.PI / 180, pitchLimit: 65 * Math.PI / 180 };
+const EFC_FREE_LOOK = { active: false, yaw: 0, pitch: 0, appliedYaw: 0, appliedPitch: 0, yawLimit: 110 * Math.PI / 180, pitchLimit: 65 * Math.PI / 180 };
 const efcFreeLookRelative = new THREE.Quaternion(), efcWeaponViewEuler = new THREE.Euler();
 const EFC_OMNI_AIM_YAW = Math.PI / 3, EFC_OMNI_AIM_PITCH = Math.PI / 4;
 
@@ -33,12 +33,13 @@ function efcFreeLookKey(event, down) {
 
 function efcFreeLookHeld() {
   return (KEYS.AltLeft || KEYS.AltRight) && pointerActive() && !CHAT.open && !KS.map.open &&
-    !PILOT.d && !MECHA_P.me && !PL.nadeState && !playHold() && !efcCall('ui:busy');
+    !PILOT.d && !MECHA_P.me  && !playHold() && !efcCall('ui:busy');
 }
 
 function efcFreeLookReset() {
   EFC_FREE_LOOK.active = false;
   EFC_FREE_LOOK.yaw = EFC_FREE_LOOK.pitch = 0;
+  EFC_FREE_LOOK.appliedYaw = EFC_FREE_LOOK.appliedPitch = 0;
   vmCamera.rotation.x = vmCamera.rotation.y = 0;
 }
 
@@ -46,9 +47,10 @@ function efcFreeLookTick(yaw, pitch) {
   const look = EFC_FREE_LOOK;
   // The weapon controller can fire before applyCamera runs on this tick.
   // Remove the prior frame's visual offset before it reads the camera.
-  if (look.yaw || look.pitch) {
-    camera.rotation.x -= look.pitch;
-    camera.rotation.y -= look.yaw;
+  if (look.appliedYaw || look.appliedPitch) {
+    camera.rotation.x -= look.appliedPitch;
+    camera.rotation.y -= look.appliedYaw;
+    look.appliedYaw = look.appliedPitch = 0;
   }
   if (!efcFreeLookHeld()) {
     efcFreeLookReset();
@@ -58,7 +60,6 @@ function efcFreeLookTick(yaw, pitch) {
   look.yaw = clamp(look.yaw + yaw, -look.yawLimit, look.yawLimit);
   look.pitch = clamp(look.pitch + pitch, -look.pitchLimit, look.pitchLimit);
   look.pitch = clamp(PL.pitch + look.pitch, -1.5, 1.5) - PL.pitch;
-  PL.queued = PL.held = PL.runShot = false;
   return true;
 }
 
@@ -73,8 +74,19 @@ function efcFreeLookCamera(entity) {
   efcWeaponViewEuler.x += pitch;
   efcWeaponViewEuler.y += yaw;
   efcFreeLookRelative.setFromEuler(efcWeaponViewEuler).invert();
-  camera.rotation.x += look.pitch;
-  camera.rotation.y += look.yaw;
+  camera.rotation.x += look.appliedPitch = look.pitch;
+  camera.rotation.y += look.appliedYaw = look.yaw;
   efcFreeLookRelative.multiply(camera.quaternion);
   vmCamera.quaternion.multiply(efcFreeLookRelative);
+}
+
+
+// Input handlers can act between ticks, when the rendered camera still has its look offset.
+function efcActionForward(out) {
+  const { appliedYaw, appliedPitch } = EFC_FREE_LOOK;
+  if (!appliedYaw && !appliedPitch) return camFwd(out);
+  efcWeaponViewEuler.copy(camera.rotation);
+  efcWeaponViewEuler.x -= appliedPitch;
+  efcWeaponViewEuler.y -= appliedYaw;
+  return out.set(0, 0, -1).applyEuler(efcWeaponViewEuler);
 }

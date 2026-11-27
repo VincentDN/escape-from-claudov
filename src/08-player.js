@@ -90,7 +90,6 @@ addEventListener('mousedown', (e) => {
   if (TOUCH.on && performance.now() - TOUCH.lastT < 800) return;
   if (e.button === 0 && (MATCH.state === 'killcam' || (MATCH.state === 'playing' && !PL.ent.alive && pointerActive()))) { kcSkip(); return; }
   if (MATCH.state !== 'playing' || !pointerActive() || CHAT.open) return;
-  if (e.button === 0 && efcFreeLookHeld()) return;
   if (performance.now() < PL.noFireT) return; // second clic d'un double clic sur Déployer ou Reprendre : pas un tir
   if (KS.map.open) { if (e.button === 0) ksConfirm(); else if (e.button === 2) ksCancel(); return; }
   if (e.button === 0) { if (trackpadOn()) trackpadClick(e); else { PL.held = true; PL.queued = true; } } // pavé tactile : tir automatique, double clic pour viser (09qe-pavetactile.js)
@@ -126,7 +125,7 @@ function knife() {
 }
 /* Cible d'une fente de couteau : un ennemi proche devant soi */
 function knifePick() {
-  const f = camFwd(new V3());
+  const f = efcActionForward(new V3());
   let best = null, bd = 4.2;
   for (const e of entities) {
     if (!e.alive || allied(e, PL.ent)) continue;
@@ -397,7 +396,7 @@ function updatePlayer(dt, now) {
     }
     if (!PL.knifeHit && PL.knifeT < KNIFE_DUR * (1 - KNIFE_HIT)) {
       PL.knifeHit = true;
-      if (T && T.alive && T.pos.distanceTo(e.pos) < 2.2) { sfxMelee(); bloodFx(entChest(T, new V3()), camFwd(new V3()), false); kcEvent('melee', { sid: e.kcI, p: entChest(T, new V3()), dir: camFwd(new V3()) }); T.lastForce = { dir: camFwd(new V3()), mag: 6, lift: 1.4, part: 'body' }; applyDamage(T, 200, e, _t('Couteau'), false, camFwd(new V3())); PL.vpY += 1.5; }
+      if (T && T.alive && T.pos.distanceTo(e.pos) < 2.2) { sfxMelee(); bloodFx(entChest(T, new V3()), efcActionForward(new V3()), false); kcEvent('melee', { sid: e.kcI, p: entChest(T, new V3()), dir: efcActionForward(new V3()) }); T.lastForce = { dir: efcActionForward(new V3()), mag: 6, lift: 1.4, part: 'body' }; applyDamage(T, 200, e, _t('Couteau'), false, efcActionForward(new V3())); PL.vpY += 1.5; }
     }
     if (PL.knifeT <= 0) { VM.lowerTarget = PL.knifeOut ? 1 : 0; PL.knifeTarget = null; }
   }
@@ -457,7 +456,7 @@ function updatePlayer(dt, now) {
   const lat = e.vel.x * Math.cos(PL.yaw) - e.vel.z * Math.sin(PL.yaw), fwd = -e.vel.x * Math.sin(PL.yaw) - e.vel.z * Math.cos(PL.yaw);
   let wall = 0;
   if ((PL.wallTick = (PL.wallTick || 0) + 1) % 2 === 0) {
-    const f = camFwd(_v1), h = rayWorld(camera.position.x, camera.position.y, camera.position.z, f.x, f.y, f.z, 0.95);
+    const f = efcActionForward(_v1), h = rayWorld(camera.position.x, camera.position.y, camera.position.z, f.x, f.y, f.z, 0.95);
     PL.wall = h ? clamp((0.9 - h.t) / 0.45, 0, 1) : 0;
   }
   wall = PL.wall || 0;

@@ -249,7 +249,7 @@ function ctlShoot(ent, now) {
   if (d.scope && ads < 0.95) spread = Math.max(spread, 0.06);
   let origin, f, muzzle;
   if (ent.isPlayer) {
-    origin = camera.position.clone(); f = camFwd(new V3());
+    origin = camera.position.clone(); f = efcActionForward(new V3());
     const right = new V3().crossVectors(f, UP).normalize();
     muzzle = origin.clone().addScaledVector(f, 0.7).addScaledVector(right, 0.12 * (1 - ads)).add(new V3(0, -0.09 * (1 - ads), 0));
   } else {

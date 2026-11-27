@@ -121,8 +121,17 @@ function botSearchPt(b) {
   return best < 0 ? null : new V3(NAV.nx[best], NAV.ny[best], NAV.nz[best]);
 }
 function botSearchStart(b) {
-  b.tactic = 'search'; b.stealth = undefined; b.searchN = 0; b.searchC = b.lastKnown.clone(); b.searchPts = [b.searchC.clone()];
-  botSearchNext(b, true);
+  return efcBarkAction(b, 'search', () => {
+    b.tactic = 'search'; b.stealth = undefined; b.searchN = 0; b.searchC = b.lastKnown.clone(); b.searchPts = [b.searchC.clone()];
+    botSearchNext(b, true);
+  }, () => !b.visible, 'tactic');
+}
+
+function efcBotBarkCover(b, cover) {
+  if (!cover) return false;
+  if (!efcBarkEligible(b) || !efcBarkAudible(b, EFC_BARKS.fall_back.range)) return setCover(b, cover);
+  efcBarkAction(b, 'fall_back', () => setCover(b, cover), () => b.cover !== cover, 'tactic');
+  return true;
 }
 /* Cachette suivante (sauf la dernière fois), puis balayage du regard d'ici : vers où l'adversaire courait au premier, sinon devant soi */
 function botSearchNext(b, first) {
@@ -153,7 +162,12 @@ function decideTactic(b, now) {
     const p = DOM.pts[b.sq.p];
     if (p && hyp(b.lastKnown.x - p.x, b.lastKnown.z - p.z) > 16 && hyp(b.pos.x - p.x, b.pos.z - p.z) > 12) hunting = false;
   }
-  if (!vis && !hunting) { if (b.tactic !== 'roam') { releaseCover(b); b.tactic = 'roam'; b.goal = null; b.atCover = false; } return; }
+  if (!vis && !hunting) {
+    if (b.tactic !== 'roam') efcBarkAction(b, 'all_clear', () => {
+      releaseCover(b); b.tactic = 'roam'; b.goal = null; b.atCover = false;
+    }, () => !b.visible && !botChasing(b, MATCH.time, D), 'tactic');
+    return;
+  }
   // un joueur qui tient une position (tireur d'élite au balcon, guetteur) ne la quitte pas sur un simple bruit
   const holding = b.holdT > 0 || (b.goal && b.goal.hold && b.goal.distanceTo(b.pos) < 5);
   if (!vis && holding && b.tactic === 'roam' && now - b.lastHitT > 2 && (def.ai.sniper || Math.random() < 0.6)) return;
@@ -169,7 +183,7 @@ function decideTactic(b, now) {
     const compromised = inPlace && vis && lineClear(eye, _cp.set(b.cover.x, b.cover.y + 0.75, b.cover.z));
     const stay = (hpLow || needReload) ? 99 : lerp(3.5, 1.6, b.aggr) + (def.ai.sniper ? 5 : 0);
     if (!compromised && (b.health < 80 && (hpLow || needReload) || b.suppr > 1.2 || b.inCoverT < stay) && !targetWeak) return;
-    if (compromised && (hpLow || needReload)) { const c = findCover(b, eye); if (c && setCover(b, c)) return; }
+    if (compromised && (hpLow || needReload)) { const c = findCover(b, eye); if (efcBotBarkCover(b, c)) return; }
   }
   const justLeft = now - (b.leftCoverT || -99) < 5;
   // se mettre à l'abri est un choix, pas un réflexe : pas sous le simple feu, mais blessé, à court de munitions, submergé ou vraiment
@@ -180,13 +194,18 @@ function decideTactic(b, now) {
   if (def.ai.sniper && vis && !justLeft) wantCover = wantCover || Math.random() < 0.45;
   let wantPush = !wantCover && (targetWeak || (def.ai.rush && dist > ideal + 4) || Math.random() < b.aggr * 0.35);
   if (vis) {
-    if (wantCover) { const c = findCover(b, eye, coverR); if (c && setCover(b, c)) return; }
-    releaseCover(b); b.atCover = false;
-    b.tactic = wantPush ? 'push' : 'fight';
-    if (wantPush) { setPath(b, T.pos); b.rush = Math.random() < (def.ai.rush ? 0.55 : 0.25) * (0.4 + b.pers.slide); }
+    if (wantCover) { const c = findCover(b, eye, coverR); if (efcBotBarkCover(b, c)) return; }
+    if (wantPush) {
+      const push = () => {
+        releaseCover(b); b.atCover = false; b.tactic = 'push';
+        setPath(b, T.pos); b.rush = Math.random() < (def.ai.rush ? 0.55 : 0.25) * (0.4 + b.pers.slide);
+      };
+      if (b.tactic === 'push') push();
+      else efcBarkAction(b, 'move_up', push, () => b.visible && T.alive && b.target === T, 'tactic');
+    } else { releaseCover(b); b.atCover = false; b.tactic = 'fight'; }
     return;
   }
-  if ((hpLow || needReload) && b.tactic !== 'cover') { const c = findCover(b, eye); if (c && setCover(b, c)) return; }
+  if ((hpLow || needReload) && b.tactic !== 'cover') { const c = findCover(b, eye); if (efcBotBarkCover(b, c)) return; }
   if (b.tactic === 'cover' && (hpLow || needReload)) return;
   // il fouille déjà les environs (botSearchStart) : il continue, sauf si un indice neuf (bruit, impact) a déplacé la piste
   if (b.tactic === 'search' && b.searchC && b.searchC.distanceTo(b.lastKnown) < 3) return;
@@ -195,11 +214,19 @@ function decideTactic(b, now) {
   const flankers = entities.filter((o) => o.alive && allied(o, b) && o.tactic === 'flank').length;
   if (b.tactic !== 'flank' && !def.ai.sniper && now - b.lastSeenT > 1.2 && flankers < 2 && Math.random() < 0.3 + b.aggr * 0.35) {
     const f = flankPoint(b, b.lastKnown);
-    if (f) { b.tactic = 'flank'; b.flankPt = f; setPath(b, f); return; }
+    if (f) {
+      const right = (f.x - b.pos.x) * Math.cos(b.yaw) - (f.z - b.pos.z) * Math.sin(b.yaw);
+      efcBarkAction(b, right < 0 ? 'flank_left' : 'flank_right', () => {
+        b.tactic = 'flank'; b.flankPt = f; setPath(b, f);
+      }, () => !b.visible, 'tactic');
+      return;
+    }
   }
   if (b.tactic === 'flank' && b.flankPt && b.flankPt.distanceTo(b.pos) > 2) return;
-  b.tactic = Math.random() < b.aggr + (b.lostWeak ? 0.35 : 0) ? 'push' : 'hunt'; // parti blessé ou en rechargeant : on le presse
-  setPath(b, b.lastKnown);
+  const push = Math.random() < b.aggr + (b.lostWeak ? 0.35 : 0);
+  if (push && b.tactic !== 'push') {
+    efcBarkAction(b, 'move_up', () => { b.tactic = 'push'; setPath(b, b.lastKnown); }, () => !b.visible, 'tactic');
+  } else { b.tactic = push ? 'push' : 'hunt'; setPath(b, b.lastKnown); }
 }
 
 function updateBot(b, dt, now) {

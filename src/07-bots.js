@@ -251,8 +251,10 @@ function botSense(b, now) {
       b.aimT = null;
       const T = b.target;
       if (T) { // il file : le bot vise un peu devant, retient où il courait (où le chercher) et s'il était mal en point (on le presse)
-        b.lastKnown.x += T.vel.x * 0.6; b.lastKnown.z += T.vel.z * 0.6; b.lostVX = T.vel.x; b.lostVZ = T.vel.z;
-        b.lostWeak = T.health < 60 || (T.isPlayer ? !!PL.reload : !!(T.arms && T.arms.reload));
+        const vx = T.vel.x, vz = T.vel.z, weak = T.health < 60 || (T.isPlayer ? !!PL.reload : !!T.arms?.reload);
+        efcBarkAction(b, 'lost', () => {
+          b.lastKnown.x += vx * 0.6; b.lastKnown.z += vz * 0.6; b.lostVX = vx; b.lostVZ = vz; b.lostWeak = weak;
+        }, () => !b.visible && b.target === T);
       }
     }
     b.visible = false;
@@ -511,13 +513,19 @@ function updateThrowKnives(dt) {
 /* Type de grenade d'un bot, tiré à chaque vie : la frag une fois sur deux, la flash et le fumigène une fois sur quatre */
 function botNadeType() { const r = Math.random(); return r < 0.5 ? 'frag' : r < 0.75 ? 'flash' : 'smoke'; }
 /* Un bot lance sa grenade vers target (la mèche part au lancer) ; une flash ouvre l'assaut : il fonce derrière elle */
-function botThrowNade(b, target) {
+function botThrowNade(b, target, barkReady = false) {
+  const type = NADE_TYPES[b.nadeType] ? b.nadeType : 'frag';
+  if (!barkReady && efcBarkEligible(b)) {
+    const destination = target.clone();
+    return efcBarkAction(b, type, () => botThrowNade(b, destination, true),
+      () => b.nades > 0 && b.onGround && botNadeClear(b, destination), 'grenade');
+  }
   const eye = entEye(b, new V3());
   const dx = target.x - eye.x, dz = target.z - eye.z, d = hyp(dx, dz);
   const vt = clamp(d * 0.9, 8, 19), tt = d / vt;
   const vy = ((target.y - eye.y) + 0.5 * NADE.g * tt * tt) / tt;
   const v = new V3((dx / d) * vt, clamp(vy, 2, 13), (dz / d) * vt);
-  const type = NADE_TYPES[b.nadeType] ? b.nadeType : 'frag', fu = Math.max(0.6, nadeFuse(type) - 0.3);
+  const fu = Math.max(0.6, nadeFuse(type) - 0.3);
   spawnNade(b, eye, v, fu, type);
   if (MATCH.online && b.netBot) netEvent({ k: 'nade', px: +eye.x.toFixed(2), py: +eye.y.toFixed(2), pz: +eye.z.toFixed(2), vx: +v.x.toFixed(2), vy: +v.y.toFixed(2), vz: +v.z.toFixed(2), fu, ty: type }, b);
   if (type === 'flash' && b.target && b.target.alive) { b.tactic = 'push'; setPath(b, target); b.rush = true; b.decideT = 2.4; } // il entre dans la foulée

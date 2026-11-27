@@ -217,10 +217,14 @@ function efcWardenGoal(b, now) {
 /* ---------- Group alert (radio call) ---------- */
 /* A Warden that sees an enemy or is hurt tells the mates of its post (not the other posts) where it is; they turn to it and converge
    through the engine's hunt and search tactics */
-function efcWardenAlert(b, foe, now) {
+function efcWardenAlert(b, foe, now, barkReady = false) {
   const p = efcWardenPost(b); if (!p || !foe || allied(foe, b) || efcCall('dev:ignorePlayer', foe)) return;
   b.efcPatrol = null;
   if (now - p.alertT < 1.5) return;
+  if (!barkReady && b.alive) {
+    efcCall('bark:before', b, 'spot', () => efcWardenAlert(b, foe, MATCH.time, true), () => foe.alive && !foe.out);
+    return;
+  }
   p.alertT = now;
   for (const o of entities) {
     if (o === b || !o.alive || o.isPlayer || o.isRemote || o.efcPost !== p.i || o.visible) continue;
@@ -273,7 +277,12 @@ efcOn('damage', (dmg, v, a, weapon, head) => {
 efcOn('died', (v, a) => {
   if (!efcRaidMode() || !v || v.isPlayer || v.isRemote || v.squad !== 'w') return;
   v.efcPatrol = null; v.efcWaitAt = 0;
-  if (a && a !== v) efcWardenAlert(v, a, MATCH.time);
+  if (a && a !== v) {
+    const survivor = efcWardenPost(v)?.members.find((member) => member !== v && member.alive && !member.off);
+    const respond = () => efcWardenAlert(v, a, MATCH.time, true);
+    if (survivor) efcCall('bark:before', survivor, 'man_down', respond, () => a.alive && !a.out);
+    else respond();
+  }
   efcCall('world:body', { x: v.pos.x, y: v.pos.y, z: v.pos.z }, efcCall('loot:roll', v.efcElite ? 'warden_elite' : 'warden') || [], v.name);
 });
 

@@ -9,15 +9,15 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Branch:**
 - **Started:** (date, time, session)
 - **Steps done:**
-- **Next step:** Resume C16-4 from `codex/c16-4-bark-voice-script` and take C17-1 from the new plan after C15-4 reaches `beta`.
+- **Next step:** Take C17-1 from the first-person legs plan. C16-5 waits for sample approval and the ElevenLabs connector.
 - **How to verify:** `node tools/dev/efc/test-minimal-hud.mjs`, `node tools/dev/efc/test-magcheck.mjs`, and `node tools/dev/efc/test-magcheck-net.mjs`.
 - **Checks so far:** `magazine key tap, hold, cancellation, and rebinding ok`, `both raid clients see held magazine detach, return and cancellation`, and `smoke ok`.
-- **Questions for the owner:** C16-5 requires approval of the five-line bark sample sheet before generation.
+- **Questions for the owner:** C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
 - **Watch out for:** C18 follows the per-card dependencies and owner defaults in section 5 of the new plan. C16-5 also requires the ElevenLabs connector.
 
 ## Next open cards, in order
 
-1. C16-4 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
+1. C16-5 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
 2. C17 and C18 may run alongside C16 after C15 reaches beta. Follow the dependencies in the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 3. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
 4. Then C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).
@@ -27,6 +27,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-28 Codex Sol: C16-4 integrated from `ef536b4`. The voice script has 180 takes across 15 cues and three voice groups, plus five sample lines for approval before recording.
 - 2026-11-28 Codex Sol: C15-4 done. Both clients see the magazine detach, return and cancel. Documented the raid HUD and captured rifle, pistol and pump shotgun checks. Build, declaration, translation, smoke, local and two-client checks passed.
 - 2026-11-27 Codex Sol: C15-3 done. Hold Reload to show and keep the magazine in view and release to put it back. Rough is the owner-selected default, and exact numbers are selectable. Browser pose/readout, insertion check and all base checks passed.
 - 2026-11-27 Codex Sol: C15-2 done. Tap Reload to reload, hold for 0.30 s to enter the local check. Focused tests ended with `magazine key tap, hold, cancellation, and rebinding ok` and `inventory keys ok`. Build, declaration, translation and smoke checks passed.

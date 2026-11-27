@@ -204,8 +204,8 @@ before starting).
 | C15-2 | Separate tap reload from hold magazine check | S | C15-1 | done |
 | C15-3 | Magazine check pose and ammo readout | M | C15-2 | done |
 | C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | done |
-| C16-4 | Invented language and the voice script | S | C16-1 | open |
-| C16-5 | Record the lines with ElevenLabs | M | C16-4 | open (needs the ElevenLabs connector) |
+| C16-4 | Invented language and the voice script | S | C16-1 | done |
+| C16-5 | Record the lines with ElevenLabs | M | C16-4 | blocked (owner approval of the five sample lines and ElevenLabs connector) |
 | C16-6 | Radio processing and packaging | S | C16-5 | open |
 | C16-7 | Voice playback in the game | S | C16-6, C16-2 | open |
 | C16-8 | Online barks and closing test | S | C16-7, C16-3 | open |

@@ -159,12 +159,56 @@ function hitDelta(q, q0, k) {
   _qD.copy(q).multiply(_qI.copy(q0).invert()).premultiply(_qF).multiply(_qI.copy(_qF).invert());
   return _qE.identity().slerp(_qD, k);
 }
+// Convert a low-stance point to the ordinary solver's look-relative frame.
+function efcOmniSoldierPoint(out, yaw, x, y, forward) {
+  const c = Math.cos(yaw), s = Math.sin(yaw);
+  return out.set(x * c - forward * s, y, -x * s - forward * c);
+}
+
+function efcOmniSoldierUpper(e, flat, bodyYaw, joints, shoulder, gun) {
+  const { onBack = false, side = 0 } = e.efcProneTurn || {};
+  const roll = (onBack ? Math.PI : 0) + side * Math.PI / 2;
+  _qT.setFromEuler(_eu.set(-Math.PI / 2, bodyYaw, 0));
+  _qT.multiply(_qL.setFromAxisAngle(_tmpG.set(0, 1, 0), roll));
+  efcOmniSoldierPoint(joints[J_PEL], bodyYaw, 0, flat[2].height, flat[2].forward);
+  efcOmniSoldierPoint(joints[J_CHE], bodyYaw, 0, flat[1].height, flat[1].forward);
+  efcOmniSoldierPoint(joints[J_HEAD], bodyYaw, 0, flat[0].height, flat[0].forward);
+  const aimYaw = angDiff(e.yaw, efcOmniAimYaw(e, e.yaw));
+  const aimPitch = efcOmniAimPitch(e, e.pitch);
+  _qH.setFromEuler(_eu.set(e.pitch * 0.55, 0, -side * 0.38 + (onBack ? Math.PI : 0)));
+  shoulder.set(0, SD.shY, 0).applyQuaternion(_qT).add(joints[J_CHE]);
+  joints[J_SHL].set(-SD.shX, 0, 0).applyQuaternion(_qT).add(shoulder);
+  joints[J_SHR].set(SD.shX, 0, 0).applyQuaternion(_qT).add(shoulder);
+  _qG.setFromEuler(_eu.set(aimPitch, aimYaw, side * 0.38 + (onBack ? 0.27 : 0.09)));
+  const gripHeight = onBack ? 0.43 : 0.30;
+  efcOmniSoldierPoint(gun, bodyYaw, side * 0.08, gripHeight, flat[1].forward);
+  gun.sub(_tmpG.copy(e.model.grips.R).applyQuaternion(_qG));
+}
+
+function efcOmniSoldierLegs(e, bodyYaw, joints) {
+  const turn = e.efcProneTurn;
+  const spread = Math.cos((turn?.onBack ? Math.PI : 0) + (turn?.side || 0) * Math.PI / 2);
+  for (let i = 0; i < 2; i++) {
+    const side = i === 0 ? -1 : 1;
+    const hip = joints[i === 0 ? J_HIL : J_HIR], knee = joints[i === 0 ? J_KNL : J_KNR];
+    const foot = joints[i === 0 ? J_FTL : J_FTR];
+    hip.set(side * SD.hipX, 0, 0).applyQuaternion(_qT).add(joints[J_PEL]);
+    efcOmniSoldierPoint(_tmpG, bodyYaw, side * 0.20 * spread, 0.095, -0.78);
+    efcOmniSoldierPoint(_pz.c, bodyYaw, side * 0.45 * spread, 0.035, -0.38);
+    ik2(hip, _tmpG, SD.thigh, SD.shin, _pz.c, knee, foot);
+    e.model.fy[i] = bodyYaw;
+    e.model.fp[i] = -0.4;
+  }
+}
+
 function poseSoldier(e, dt) {
   const S = e.model, J = S.J, L = _L;
   for (let i = 0; i < 15; i++) S.Jp[i].copy(J[i]);
   if (dt > 0) S.pdt = dt; // durée de cette image : le ragdoll en déduit la vitesse des articulations
   if (S.cyc === undefined) { S.cyc = Math.random(); S.hipYaw = 0; S.aimW = 1; S.aimWV = 0; S.ld = 0; S.ldV = 0; S.wt = 0; S.wtV = 0; S.lk = 0; S.lkV = 0; S.lkp = 0; S.lkpV = 0; S.rg = 0; S.rgV = 0; S.hr = 0; S.hrV = 0; S.lean = 0; S.leanV = 0; S.sroll = 0; S.srollV = 0; S.blade = 0; S.bladeV = 0; S.twist = 0; S.twistV = 0; S.gby = 0; S.gbyV = 0; S.gbw = 0; S.gbwV = 0; S.rk = 0; S.rkV = 0; S.runW = 0; S.sprW = 0; S.airW = 0; S.lastYaw = e.yaw; S.turn = 0; S.t = Math.random() * 10; S.lastV = 0; S.fp = [0, 0]; S.fy = [0, 0]; S.fyG = [0, 0]; S.amp = 0; S.wasAir = false; S.gyL = 0; S.gyR = 0; }
   S.t += dt;
+  const flat = efcOmniHitVolumes(e);
+  const lowYaw = flat ? angDiff(e.yaw, e.efcProneTurn?.bodyYaw ?? e.yaw) : 0;
   const v = hyp(e.vel.x, e.vel.z), c = e.crouchAmt || 0, K = S.kind || 'rifle', isP = K === 'pistol';
   // clips (06ac-loco.js)
   const clipOK = locoInit();
@@ -356,6 +400,7 @@ function poseSoldier(e, dt) {
   const arcK = Math.sin(Math.PI * clamp(S.aimW, 0, 1)) * (1 - sw) * (isP ? 0.6 : 1);
   gunP.add(_tmpG.set(0.01, 0.035, -0.08).applyQuaternion(_qT).multiplyScalar(arcK));
   _qG.slerpQuaternions(_qB, _qA, aw).slerp(_qS, sw);
+  if (flat) efcOmniSoldierUpper(e, flat, lowYaw, L, shc, gunP);
   const check = efcWeaponCheckPose(e);
   if (check) {
     _qL.setFromEuler(_eu.set(0.13 * check.tilt, 0.22 * check.tilt, -0.46 * check.tilt));
@@ -488,6 +533,7 @@ function poseSoldier(e, dt) {
     const gh = groundHeight(wx, wz, e.pos.y + 0.35, 0.06), g = VOID.on && gh <= VOID.floor + 1 ? 0 : clamp(gh - e.pos.y, -0.4, 0.35); // au bord du vide, le pied reste à plat
     if (i === 0) S.gyL = damp(S.gyL, g, 18, dt); else S.gyR = damp(S.gyR, g, 18, dt);
   }
+  if (flat) efcOmniSoldierLegs(e, lowYaw, L);
   // passage en coordonnées monde
   for (let i = 0; i < 15; i++) { const l = L[i]; J[i].set(e.pos.x + l.x * cy + l.z * sy, e.pos.y + l.y, e.pos.z - l.x * sy + l.z * cy); }
   _eu.set(0, e.yaw, 0); _qW.setFromEuler(_eu);

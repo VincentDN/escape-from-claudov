@@ -8,9 +8,9 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C9-8, weapon poses, aim limits and Alt free-look.
 - **Branch:** `codex/c9-omni`
 - **Started:** 2026-11-27, Codex Sol cloud session.
-- **Steps done:** C9-8a–c added the first-person holds and smooth transitions. C9-8d added hold-Alt free-look and bounded the low-stance weapon aim while keeping the camera free. The release frame restores shot alignment.
-- **Next step:** Integrate C9-8e third-person poses and the C9-8f first-person framing correction, then run the final combined checks.
-- **Checks so far:** `test-omni-prone-view.mjs` — First-person prone, supine and both side holds passed with bounded hand error and smooth return. `test-omni-free-look.mjs` — omni free-look and aim limits ok. `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `smoke.mjs` — smoke ok.
+- **Steps done:** C9-8a–c added the first-person holds and smooth transitions. C9-8d added hold-Alt free-look and bounded the low-stance weapon aim while keeping the camera free. The release frame restores shot alignment. C9-8e added matching third-person holds, verified between host and guest.
+- **Next step:** Apply the C9-8f first-person framing correction. Verify all three weapon families and both camera views, then close C9-8.
+- **Checks so far:** `test-omni-prone-view.mjs` — First-person prone, supine and both side holds passed with bounded hand error and smooth return. `test-omni-free-look.mjs` — omni free-look and aim limits ok. `test-omni-world-pose.mjs` — omni world poses ok. `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `smoke.mjs` — smoke ok.
 - **Questions for the owner:**
 - **Watch out for:** Re-run the pose tests with the Alt, aim limit and third-person integrations present.
 

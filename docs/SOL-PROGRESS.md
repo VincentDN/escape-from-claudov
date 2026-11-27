@@ -5,13 +5,13 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next eligible open card in section 4.
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:** Resume C16-4 from `codex/c16-4-bark-voice-script` and take C17-1 from the new plan after C15-4 reaches `beta`.
-- **How to verify:** `node tools/dev/efc/test-minimal-hud.mjs`, `node tools/dev/efc/test-magcheck.mjs`, and `node tools/dev/efc/test-magcheck-net.mjs`.
-- **Checks so far:** `magazine key tap, hold, cancellation, and rebinding ok`, `both raid clients see held magazine detach, return and cancellation`, and `smoke ok`.
+- **Card:** C17-1, first-person lower-body mesh
+- **Branch:** `codex/c17-1-self-legs`
+- **Started:** 2026-11-27 23:27 UTC
+- **Steps done:** 1. Filtered lower-body triangles and bound the mesh to the existing soldier skeleton.
+- **Next step:** 2. Gate legs visibility on the living first-person raid player.
+- **How to verify:** `node tools/dev/efc/test-self-legs.mjs` and the base checks.
+- **Checks so far:** `first-person legs mesh filters triangles and shares the soldier skeleton`, `smoke ok`, build asset list and translation check with `0 erreur(s)`. Declaration check exited 0.
 - **Questions for the owner:** C16-5 requires approval of the five-line bark sample sheet before generation.
 - **Watch out for:** C18 follows the per-card dependencies and owner defaults in section 5 of the new plan. C16-5 also requires the ElevenLabs connector.
 

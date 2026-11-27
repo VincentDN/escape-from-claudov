@@ -9,10 +9,11 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Branch:**
 - **Started:** (date, time, session)
 - **Steps done:**
-- **Next step:** Resume C16-4 from `codex/c16-4-bark-voice-script`. C17-1 may run alongside C16 once C15-4 is on `beta`.
-- **Checks so far:** (command and its last line)
-- **Questions for the owner:**
-- **Watch out for:**
+- **Next step:** Resume C16-4 from `codex/c16-4-bark-voice-script` and take C17-1 from the new plan after C15-4 reaches `beta`.
+- **How to verify:** `node tools/dev/efc/test-minimal-hud.mjs`, `node tools/dev/efc/test-magcheck.mjs`, and `node tools/dev/efc/test-magcheck-net.mjs`.
+- **Checks so far:** `magazine key tap, hold, cancellation, and rebinding ok`, `both raid clients see held magazine detach, return and cancellation`, and `smoke ok`.
+- **Questions for the owner:** C16-5 requires approval of the five-line bark sample sheet before generation.
+- **Watch out for:** C18 follows the per-card dependencies and owner defaults in section 5 of the new plan. C16-5 also requires the ElevenLabs connector.
 
 ## Next open cards, in order
 

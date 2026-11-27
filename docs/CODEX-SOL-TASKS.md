@@ -228,6 +228,8 @@ before starting).
 | C7-1 to C7-7 | Optimisation, part 1 (section 7) | XS to M | C6-6 | open |
 | C8-1 to C8-6 | Raid balance (section 7) | XS to M | C7-7 | open |
 | C14-1 to C14-5 | Second World War weapons (section 7) | S to M | C8-6, C9-4 | open |
+| C17-1 to C17-4 | First-person lower body: the player always sees their own legs and feet (cards in `docs/plans/2026-11-27-omnimovement-2.md`) | M total | C15-4 | open |
+| C18-1 to C18-16 | Omnimovement 2, aimed at the feel of Black Ops 6 (cards in `docs/plans/2026-11-27-omnimovement-2.md`, section 6 gives the order) | S to M each | C17-1 (C18-1) | open (owner: O1 to O5 in the plan) |
 
 ---
 

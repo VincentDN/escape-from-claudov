@@ -43,6 +43,16 @@ mergeable branch.
 | 14 | C14 | Second World War weapons: PPSh-41, Bren, Chauchat (in, but after the modern ones) | large |
 | done | C10 | Clean, modern menu fonts instead of the stencil face | small |
 
+## Planned: C17 first-person lower body and C18 Omnimovement 2 (owner, 27 November 2026)
+
+Cards in [`docs/plans/2026-11-27-omnimovement-2.md`](plans/2026-11-27-omnimovement-2.md) and in the table of
+[`docs/CODEX-SOL-TASKS.md`](CODEX-SOL-TASKS.md), for Sol or Astra, after C15 is on `beta`.
+
+| Task | What | Size |
+| --- | --- | --- |
+| C17 | The player always sees their own legs and feet in first person, in every stance and move (C17-1 to C17-4) | medium |
+| C18 | Omnimovement 2, aimed at the feel of Black Ops 6: hold-to-dive in any direction, landings by direction (backward dive lands on the back), free look and firing in the air, momentum chains, per-phase camera and weapon choreography, our own authored body clips made in a new `#omnilab` editor, online replication (C18-1 to C18-16) | very large |
+
 ## Waiting on the owner
 
 These cannot be done by an agent in a cloud sandbox:

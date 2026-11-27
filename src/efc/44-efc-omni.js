@@ -5,7 +5,10 @@ function efcOmniState(entity) {
   if (entity.efcTraversal) return entity.efcTraversal.kind;
   if (!entity.onGround) return entity.efcDiving ? 'dive' : 'air';
   if (entity.slideT > 0) return 'slide';
-  if (entity.efcProne) return 'prone';
+  if (entity.efcProne) {
+    const turn = entity.efcProneTurn;
+    return turn?.side ? 'side' : turn?.onBack ? 'supine' : 'prone';
+  }
   if (entity.sprinting) return entity.efcTactical > 0 ? 'tactical' : 'sprint';
   return entity.crouch ? 'crouch' : 'stand';
 }
@@ -103,6 +106,32 @@ function efcOmniProne(entity, sprint, diving, dt) {
   return entity.efcProne;
 }
 
+const EFC_PRONE_TURN = {
+  bodyRange: Math.PI / 4, bodySpeed: Math.PI, backEnter: 2 * Math.PI / 3, backExit: Math.PI / 2,
+};
+
+function efcOmniProneTurn(entity, prone, dt) {
+  if (!entity.isPlayer || !efcRaidMode()) return;
+  if (!prone || !entity.onGround) {
+    entity.efcProneTurn = null;
+    return;
+  }
+
+  const config = EFC_PRONE_TURN;
+  const turn = entity.efcProneTurn ??= {
+    anchorYaw: entity.yaw, bodyYaw: entity.yaw, onBack: false, side: 0,
+  };
+  const yaw = entity.yaw - turn.anchorYaw;
+  const offset = Math.atan2(Math.sin(yaw), Math.cos(yaw));
+  // The torso follows within an arc around the grounded prone orientation.
+  // The sine keeps the body target continuous at the rear yaw wrap.
+  const target = turn.anchorYaw + Math.sin(offset) * config.bodyRange;
+  const step = config.bodySpeed * dt;
+  turn.bodyYaw += clamp(target - turn.bodyYaw, -step, step);
+  turn.onBack = Math.abs(offset) >= (turn.onBack ? config.backExit : config.backEnter);
+  if (entity === PL.ent) turn.side = Number(!!KEYS.LeanR) - Number(!!KEYS.LeanL);
+}
+
 function efcOmniReset(entity) {
   entity.efcTraversal = null;
   entity.efcSprintTap = Infinity;
@@ -115,6 +144,7 @@ function efcOmniReset(entity) {
   entity.efcProne = false;
   entity.efcProneHeldFor = 0;
   entity.efcProneWaitRelease = false;
+  entity.efcProneTurn = null;
 }
 
 // Use the standing controller cylinder. The normal collision resolver permits steps;

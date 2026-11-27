@@ -52,6 +52,7 @@ function ctlMove(ent, dt) {
   const wasProne = ent.efcProne && ent.isPlayer && efcRaidMode();
   const diving = efcOmniDive(ent, sprint && !wasProne, dt);
   const prone = efcOmniProne(ent, sprint, diving, dt);
+  efcOmniProneTurn(ent, prone, dt);
   if (prone || wasProne) {
     sprint = false;
     I.slide = false;

@@ -257,3 +257,36 @@ function efcOmniTraversalStep(entity, dt) {
   entity.arms.sprintW = damp(entity.arms.sprintW, 0, 11, dt);
   return { landed: 0, jumped: started, slid: false };
 }
+
+const EFC_FLAT_HIT_LOWER_BODY = [
+  { forward: -0.04, height: 0.22, radius: 0.19, part: 'body' },
+  { forward: -0.36, height: 0.18, radius: 0.16, part: 'legs' },
+  { forward: -0.65, height: 0.14, radius: 0.13, part: 'legs' },
+];
+// Centres are in body space. The leading two rows also supply the head and chest aim points.
+const EFC_FLAT_HIT_VOLUMES = {
+  prone: [
+    { forward: 0.65, height: 0.30, radius: 0.14, part: 'head' },
+    { forward: 0.32, height: 0.24, radius: 0.21, part: 'body' },
+    ...EFC_FLAT_HIT_LOWER_BODY,
+  ],
+  supine: [
+    { forward: 0.65, height: 0.22, radius: 0.14, part: 'head' },
+    { forward: 0.32, height: 0.25, radius: 0.21, part: 'body' },
+    ...EFC_FLAT_HIT_LOWER_BODY,
+  ],
+};
+
+function efcOmniHitVolumes(entity) {
+  const human = entity.isPlayer || (entity.isRemote && entity.remoteBot === false);
+  if (!human || !entity.efcProne || !efcRaidMode()) return null;
+  const stance = efcOmniState(entity);
+  if (stance === 'side') return EFC_FLAT_HIT_VOLUMES[entity.efcProneTurn.onBack ? 'supine' : 'prone'];
+  return stance === 'prone' || stance === 'supine' ? EFC_FLAT_HIT_VOLUMES[stance] : null;
+}
+
+function efcOmniHitPoint(entity, volume, out) {
+  const yaw = entity.efcProneTurn?.bodyYaw ?? entity.yaw;
+  return out.set(entity.pos.x - Math.sin(yaw) * volume.forward, entity.pos.y + volume.height,
+    entity.pos.z - Math.cos(yaw) * volume.forward);
+}

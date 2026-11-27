@@ -523,6 +523,16 @@ function animSoldier(e, dt) {
 const HB = [{ y: 1.63, r: 0.15, part: 'head' }, { y: 1.34, r: 0.24, part: 'body' }, { y: 1.06, r: 0.23, part: 'body' }, { y: 0.72, r: 0.19, part: 'legs' }, { y: 0.34, r: 0.17, part: 'legs' }];
 const HS = []; for (let i = 0; i < 11; i++) HS.push({ c: new V3(), r: 0, part: 'body' });
 function hitSpheres(e) {
+  const flat = efcOmniHitVolumes(e);
+  if (flat) {
+    for (let i = 0; i < flat.length; i++) {
+      const volume = flat[i];
+      efcOmniHitPoint(e, volume, HS[i].c);
+      HS[i].r = volume.radius;
+      HS[i].part = volume.part;
+    }
+    return flat.length;
+  }
   if (!e.model || e.isPlayer) {
     const k = 1 - (e.crouchAmt || 0) * 0.33;
     for (let i = 0; i < HB.length; i++) { HS[i].c.set(e.pos.x, e.pos.y + HB[i].y * k, e.pos.z); efcLeanApply(e, HS[i].c, HB[i].y * k); HS[i].r = HB[i].r; HS[i].part = HB[i].part; } // penché : les volumes suivent (42-efc-lean.js)
@@ -541,15 +551,20 @@ function hitSpheres(e) {
 }
 function entEye(e, out) {
   if (e.isPlayer) return efcLeanApply(e, out.set(e.pos.x, e.pos.y + PL.eyeH, e.pos.z), PL.eyeH);
+  if (efcOmniHitVolumes(e)) return out.set(e.pos.x, e.pos.y + EFC_PRONE.eye, e.pos.z);
   if (e.model && e.alive) return out.copy(e.model.J[J_HEAD]).add(_tmpB.set(0, 0.03, 0));
   return out.set(e.pos.x, e.pos.y + lerp(1.62, 1.12, e.crouchAmt || 0), e.pos.z);
 }
 function entChest(e, out) {
+  const flat = efcOmniHitVolumes(e);
+  if (flat) return efcOmniHitPoint(e, flat[1], out);
   // penché : l'épaule exposée plutôt que le buste resté à couvert (ce que visent et voient les bots, 42-efc-lean.js)
   if (!e.isPlayer && e.model) { const J = e.model.J; out.lerpVectors(J[J_PEL], J[J_CHE], 0.62); return e.leanX ? efcLeanChest(e, out, J[e.leanX > 0 ? J_SHR : J_SHL]) : out; }
   const k = 1 - (e.crouchAmt || 0) * 0.33; out.set(e.pos.x, e.pos.y + 1.2 * k, e.pos.z); return e.leanX ? efcLeanChest(e, out) : out;
 }
 function entHead(e, out) {
+  const flat = efcOmniHitVolumes(e);
+  if (flat) return efcOmniHitPoint(e, flat[0], out);
   if (!e.isPlayer && e.model) return out.copy(e.model.J[J_HEAD]);
   const k = 1 - (e.crouchAmt || 0) * 0.33; return efcLeanApply(e, out.set(e.pos.x, e.pos.y + 1.63 * k, e.pos.z), 1.63 * k);
 }

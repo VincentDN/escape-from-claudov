@@ -5,15 +5,15 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next eligible open card in section 4.
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:** Take C17-1 from the first-person legs plan. C16-5 waits for sample approval and the ElevenLabs connector.
-- **How to verify:** `node tools/dev/efc/test-minimal-hud.mjs`, `node tools/dev/efc/test-magcheck.mjs`, and `node tools/dev/efc/test-magcheck-net.mjs`.
-- **Checks so far:** `magazine key tap, hold, cancellation, and rebinding ok`, `both raid clients see held magazine detach, return and cancellation`, and `smoke ok`.
-- **Questions for the owner:** C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
-- **Watch out for:** C18 follows the per-card dependencies and owner defaults in section 5 of the new plan. C16-5 also requires the ElevenLabs connector.
+- **Card:** C17-2, first-person legs framing
+- **Branch:** `codex/c17-2-legs-framing`
+- **Started:** 2026-11-27 23:36 UTC
+- **Steps done:** The branch includes C17-1 and the C17-2 offsets, camera clearance guard, and first pitch contact sheet.
+- **Next step:** Resume C17-2 once the standing −60° framing direction is confirmed. C16-5 waits for sample approval and the ElevenLabs connector.
+- **How to verify:** On the C17-2 branch, run `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
+- **Checks so far:** `first-person legs follow the soldier, retain body yaw, and hide on camera overlap or death`, `smoke ok`, and `eight standing and crouched pitch screenshots captured`. Standing boots are below frame at −60°.
+- **Questions for the owner:** Should C17-2 use forward compensation at steep pitch or keep the backward offset? C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
+- **Watch out for:** Keep the C17 code on its feature branch while visual acceptance is open. C18 follows the card dependencies and owner defaults in section 5 of the plan.
 
 ## Next open cards, in order
 

@@ -174,9 +174,12 @@ function ctlAction(ent, name, dur, data) {
   if (ent.isPlayer) vmStartAction(name, dur, data);
   kcEvent('vma', { sid: ent.kcI, name, dur, data: data ? { ...data } : {} });
 }
-function ctlStartReload(ent) {
+function ctlStartReload(ent, barkReady = false) {
   const A = ent.arms, w = armsW(ent), d = w.def;
   if (A.reload || ent.busy || A.knife || w.mag >= d.mag || w.reserve <= 0 || A.boltT > 0 || A.switching > 0) return false;
+  if (!barkReady && efcBarkEligible(ent)) {
+    return efcBarkAction(ent, 'reload', () => ctlStartReload(ent, true), () => ent.arms === A && armsW(ent) === w);
+  }
   if (d.tube) { A.reload = { tube: true, phase: 'start', t: 0, empty: w.mag === 0, stop: false }; ctlAction(ent, 'shellStart', 0.32); }
   else { const empty = w.mag === 0, dur = empty ? d.reloadEmpty : d.reload; A.reload = { t: 0, dur, empty, filled: false }; ctlAction(ent, 'reload', dur, { empty }); }
   // un adversaire qui recharge tout près s'entend (le chargeur qui sort, puis celui qui entre) : un repère pour le joueur
@@ -227,7 +230,7 @@ function ctlWeapon(ent, dt, now) {
   const canFire = !ent.busy && !A.reload && !A.knife && A.boltT <= 0 && A.switching <= 0 && A.sprintW < 0.3 && !ent.sprinting;
   const pressed = I.firePressed; I.firePressed = false;
   if ((I.fire || pressed) && canFire && A.fireCd <= 0) {
-    if (w.mag > 0 && (d.auto ? I.fire : pressed)) return ctlShoot(ent, now);
+    if (w.mag > 0 && (d.auto ? I.fire : pressed) && efcBarkFireReady(ent)) return ctlShoot(ent, now);
     if (w.mag <= 0 && pressed) { if (ent.isPlayer) sfxMech('empty'); if (w.reserve > 0) ctlStartReload(ent); }
   }
   return null;

@@ -20,7 +20,8 @@ function fixture() {
     efcRaidLive: () => context.live,
     efcIsHost: () => context.host,
     efcIsHumanEnt: (actor) => actor.isPlayer || (actor.isRemote && !actor.remoteBot),
-    efcOn: (kind, listener) => hooks.set(kind, listener),
+    efcOn: (kind, listener) => hooks.set(kind, [...(hooks.get(kind) || []), listener]),
+    efcProvide: () => {},
     efcEmit: (kind, event) => events.push([kind, event]),
   };
   const catalogue = runInNewContext(source + '\nEFC_BARKS;', context);
@@ -52,7 +53,7 @@ test('per-speaker and per-kind cooldowns expire and reset between raids', () => 
   context.MATCH.time = 4;
   assert.ok(bark(warden, 'spot'));
   context.MATCH.time = 0;
-  hooks.get('raid:begin')();
+  for (const listener of hooks.get('raid:begin')) listener();
   assert.ok(bark(warden, 'spot'));
 });
 
@@ -100,4 +101,63 @@ test('seeded choice and the event payload are deterministic', () => {
   assert.deepEqual(events, sample());
   assert.deepEqual(events[0], ['bark', { id: 1, kind: 'spot', line: 'Contact!', voice: 'w', pos: [10, 0, 0], at: 2 }]);
   assert.equal(events[1][1].voice, 's');
+});
+
+test('each action waits for the emitted cue and the full catalogue lead', () => {
+  const { catalogue } = fixture();
+  for (const [kind, rule] of Object.entries(catalogue)) {
+    const { context, warden, events, hooks } = fixture();
+    const tick = () => hooks.get('tick').forEach((listener) => listener());
+    const actions = [];
+    context.efcBarkAction(warden, kind, () => actions.push(context.MATCH.time));
+    assert.equal(events.length, 1, kind);
+    context.MATCH.time = rule.lead - 0.001;
+    tick();
+    assert.equal(actions.length, 0, kind);
+    context.MATCH.time = rule.lead;
+    tick();
+    assert.deepEqual(actions, [rule.lead], kind);
+    assert.ok(actions[0] - events[0][1].at >= 0.6, kind);
+  }
+});
+
+test('cooldown queues wait for an actual bark and cancel stale or duplicate actions', () => {
+  const { context, warden, bark, events, hooks } = fixture();
+  const tick = () => hooks.get('tick').forEach((listener) => listener());
+  const actions = [];
+  bark(warden, 'reload');
+  context.efcBarkAction(warden, 'reload', () => actions.push(context.MATCH.time));
+  context.efcBarkAction(warden, 'reload', () => actions.push('duplicate'));
+  context.MATCH.time = 4.9;
+  tick();
+  assert.equal(events.length, 1);
+  assert.deepEqual(actions, []);
+  context.MATCH.time = 5;
+  tick();
+  assert.equal(events[1][1].at, 5);
+  context.MATCH.time = 5.59;
+  tick();
+  assert.deepEqual(actions, []);
+  context.MATCH.time = 5.6;
+  tick();
+  assert.deepEqual(actions, [5.6]);
+  context.efcBarkAction(warden, 'spot', () => actions.push('stale'), () => false);
+  context.MATCH.time = 20;
+  tick();
+  assert.deepEqual(actions, [5.6]);
+});
+
+test('an audible firing burst waits for the warning while other modes are unaffected', () => {
+  const { context, warden, events } = fixture();
+  assert.equal(context.efcBarkFireReady(warden), false);
+  assert.equal(events[0][1].kind, 'suppress');
+  context.MATCH.time = 0.59;
+  assert.equal(context.efcBarkFireReady(warden), false);
+  context.MATCH.time = 0.6;
+  assert.equal(context.efcBarkFireReady(warden), true);
+  context.MATCH.time = 1.2;
+  assert.equal(context.efcBarkFireReady(warden), true);
+  context.live = false;
+  context.MATCH.time = 3;
+  assert.equal(context.efcBarkFireReady(warden), true);
 });

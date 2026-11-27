@@ -26,14 +26,19 @@ efcOn('raid:begin', () => {
   efcBarkKinds.clear();
 });
 
-function efcBark(bot, kind, data = {}) {
-  if (!efcRaidLive() || !efcIsHost() || !bot?.alive || bot.off || efcIsHumanEnt(bot) || bot.isRemote) return null;
-  if (!Object.hasOwn(EFC_BARKS, kind)) return null;
+function efcBarkEligible(bot) {
+  return efcRaidLive() && efcIsHost() && bot?.alive && !bot.off && !bot.out && !efcIsHumanEnt(bot) && !bot.isRemote;
+}
 
+function efcBarkAudible(bot, range) {
+  return entities.some((entity) => efcIsHumanEnt(entity) && entity.alive && !entity.off && !entity.out &&
+    entity.pos.distanceToSquared(bot.pos) <= range ** 2);
+}
+
+function efcBark(bot, kind, data = {}) {
+  if (!efcBarkEligible(bot) || !Object.hasOwn(EFC_BARKS, kind)) return null;
   const rule = EFC_BARKS[kind];
-  const audible = entities.some((entity) => efcIsHumanEnt(entity) && entity.alive && !entity.off && !entity.out &&
-    entity.pos.distanceToSquared(bot.pos) <= rule.range ** 2);
-  if (!audible) return null;
+  if (!efcBarkAudible(bot, rule.range)) return null;
 
   const now = MATCH.time;
   const last = efcBarkSpeakers.get(bot);
@@ -51,3 +56,65 @@ function efcBark(bot, kind, data = {}) {
   efcEmit('bark', bark);
   return bark;
 }
+
+/* Actions are advanced by raid simulation time, so pausing cannot consume their warning. */
+const efcBarkActions = new Map();
+let efcBarkBursts = new WeakMap();
+
+function efcBarkAction(bot, kind, action, valid = () => true, slot = kind) {
+  let actions = efcBarkActions.get(bot);
+  if (actions?.has(slot)) return false;
+  if (!efcBarkEligible(bot) || !efcBarkAudible(bot, EFC_BARKS[kind].range)) return action();
+  if (!actions) efcBarkActions.set(bot, actions = new Map());
+  const bark = efcBark(bot, kind);
+  actions.set(slot, { kind, action, valid, life: bot.spawnAt, at: bark ? bark.at + EFC_BARKS[kind].lead : null });
+  return false;
+}
+
+function efcBarkActionTick() {
+  if (!efcIsHost()) { efcBarkActions.clear(); return; }
+  for (const [bot, actions] of efcBarkActions) {
+    for (const [slot, pending] of actions) {
+      if (!efcBarkEligible(bot) || bot.spawnAt !== pending.life || !pending.valid()) {
+        actions.delete(slot);
+        continue;
+      }
+      if (pending.at === null && efcBarkAudible(bot, EFC_BARKS[pending.kind].range)) {
+        const bark = efcBark(bot, pending.kind);
+        if (bark) pending.at = bark.at + EFC_BARKS[pending.kind].lead;
+        continue;
+      }
+      if (pending.at !== null && MATCH.time < pending.at) continue;
+      actions.delete(slot);
+      pending.action();
+    }
+    if (!actions.size) efcBarkActions.delete(bot);
+  }
+}
+
+function efcBarkFireReady(bot) {
+  const kind = 'suppress';
+  if (!efcBarkEligible(bot) || !efcBarkAudible(bot, EFC_BARKS[kind].range)) return true;
+  const now = MATCH.time;
+  const burst = efcBarkBursts.get(bot);
+  if (burst && burst.life === bot.spawnAt) {
+    if (now < burst.ready) return false;
+    if (now - burst.lastShot <= 1.25) { burst.lastShot = now; return true; }
+  }
+  const bark = efcBark(bot, kind);
+  if (!bark) return false;
+  const ready = bark.at + EFC_BARKS[kind].lead;
+  efcBarkBursts.set(bot, { life: bot.spawnAt, ready, lastShot: ready });
+  return false;
+}
+
+function efcBarkActionReset() {
+  efcBarkActions.clear();
+  efcBarkBursts = new WeakMap();
+}
+
+efcProvide('bark:before', efcBarkAction);
+efcOn('tick', efcBarkActionTick);
+efcOn('raid:begin', efcBarkActionReset);
+efcOn('raid:over', efcBarkActionReset);
+efcOn('match:left', efcBarkActionReset);

@@ -5,19 +5,18 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C16-3, connect bark events to AI with lead time.
-- **Branch:** `codex/c16-3-bark-timing` (stacked on C16-2 at `49fb7e5`).
-- **Started:** 2026-11-27 18:30 CET, Codex Sol cloud session.
-- **Steps done:** The owner approved the three listed WARDEN hooks. Found two paths outside that scope: updateBot delegates Scavenger decisions to 43-efc-scavengers.js; ctlWeapon starts empty-magazine and automatic reloads in 07c-controller.js.
-- **Next step:** Confirm the additional files, then schedule warnings ahead of the actual behavior. For man_down, announce before the survivor reaction because the death has already occurred.
-- **How to verify:** Use the scripted C16-3 timing scenarios and record actual bark and action times. Run the base checks.
-- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok.
-- **Questions for the owner:** May C16-3 also edit `src/07c-controller.js` and `src/efc/43-efc-scavengers.js` to cover those paths?
-- **Watch out for:** The bark must precede the announced action. The caption card currently receives local events; online replication is C16-8.
+- **Card:** none in progress. Take the next eligible open card in section 4.
+- **Branch:**
+- **Started:** (date, time, session)
+- **Steps done:**
+- **Next step:**
+- **Checks so far:** (command and its last line)
+- **Questions for the owner:**
+- **Watch out for:**
 
 ## Next open cards, in order
 
-1. C16-3 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
+1. C16-4 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
 2. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
 3. Then C15, C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).
 
@@ -26,6 +25,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-27 Codex Sol: C16-3 done. Scheduled raid AI cues ahead of actions, including automatic reloads and Scavenger cues. All 15 lead-time scenarios and Warden/Scavenger regressions passed.
 - 2026-11-27 Codex Sol: C16-2 done. Added projected bark captions, an off-screen arrow feed, and a settings toggle. Verified ordering, 2.5 s expiry, reduced motion and the reference screenshot.
 - 2026-11-27 Codex Sol: C16-1 done. Added the host bark catalogue, hearing range, priorities and cooldowns. Five logic tests and all base checks passed.
 - 2026-11-27 Codex Sol: C9-8 done. Hold Alt for free-look. Low weapon holds passed first- and third-person review with AK-47, L96 and Remington 870, and both clients matched the replicated poses.

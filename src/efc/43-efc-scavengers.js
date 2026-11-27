@@ -52,20 +52,34 @@ efcProvide('scav:update', (bot, dt, now) => {
     const threats = entities.filter(e => efcIsHuman(e) && e.alive && !e.out && !efcCall('dev:ignorePlayer', e) && e.pos.distanceTo(bot.pos) <= 24 &&
       lineClear(eye, entChest(e, at)));
     const threat = threats.reduce((best, e) => !best || e.pos.distanceToSquared(bot.pos) < best.pos.distanceToSquared(bot.pos) ? e : best, null);
-    if (threat) { s.target = threat; s.seenAt = now; }
-    else if (now - s.seenAt > 8 || !s.target?.alive || s.target.out) s.target = null;
+    if (threat && threat === s.target) s.seenAt = now;
+    else if (threat) efcCall('bark:before', bot, 'spot', () => {
+      s.target = threat; s.seenAt = MATCH.time; s.next = MATCH.time;
+      bot.path = null; bot.goal = null;
+    }, () => threat.alive && !threat.out && lineClear(entEye(bot, new V3()), entChest(threat, new V3())));
+    else if (s.target && (now - s.seenAt > 8 || !s.target.alive || s.target.out)) {
+      const previous = s.target, seenAt = s.seenAt;
+      efcCall('bark:before', bot, 'lost', () => { s.target = null; s.next = MATCH.time; },
+        () => s.target === previous && s.seenAt === seenAt);
+    }
     if (s.target) {
       s.item = '';
       s.post = efcScavengerNearest(bot, efcCall('warden:posts') || []);
       s.phase = 'flee';
       if (s.post && hyp(bot.pos.x - s.post.x, bot.pos.z - s.post.z) <= s.post.r + 3) {
-        efcEmit('scav:alert', s.post.i, s.target, now);
+        const post = s.post, target = s.target;
+        efcCall('bark:before', bot, 'help', () => efcEmit('scav:alert', post.i, target, MATCH.time),
+          () => s.target === target && target.alive && s.post === post);
         s.phase = 'cornered';
       }
       if (s.phase === 'flee' && s.post && (!bot.goal || hyp(bot.goal.x - s.post.x, bot.goal.z - s.post.z) > 2)) {
-        setPath(bot, new V3(s.post.x, s.post.y, s.post.z));
+        const post = s.post;
+        efcCall('bark:before', bot, 'fall_back', () => {
+          setPath(bot, new V3(post.x, post.y, post.z));
+          if (!bot.path?.length) s.phase = 'cornered';
+        }, () => !!s.target?.alive && s.post === post && s.phase === 'flee');
       }
-      if (s.phase === 'flee' && (!bot.path?.length || s.target.pos.distanceTo(bot.pos) < 4)) s.phase = 'cornered';
+      if (s.phase === 'flee' && ((!s.post && !bot.path?.length) || s.target.pos.distanceTo(bot.pos) < 4)) s.phase = 'cornered';
     } else {
       s.phase = 'search'; s.post = null;
       const candidates = (efcCall('world:list') || []).filter(c => c.items.length && c.id !== s.visited &&

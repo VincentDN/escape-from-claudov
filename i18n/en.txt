@@ -464,6 +464,7 @@ Inverser l'axe vertical ⇒ Invert vertical axis
 Visée ⇒ Aiming
 Manette ⇒ Controller
 Interface ⇒ Interface
+ATH minimal en raid ⇒ Minimal raid HUD
 Image ⇒ Image
 Affichage et dépannage ⇒ Display and troubleshooting
 Touches du clavier ⇒ Keyboard keys

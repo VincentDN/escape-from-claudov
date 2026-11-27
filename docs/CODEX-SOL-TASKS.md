@@ -200,7 +200,7 @@ before starting).
 | C16-1 | Bark events, catalogue and rules (no sound, no UI) | S | C9-8 | done |
 | C16-2 | Captions over the hostile and in a feed | S | C16-1 | done |
 | C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | done |
-| C15-1 | Minimal raid HUD option | S | C1-2 | open |
+| C15-1 | Minimal raid HUD option | S | C1-2 | done |
 | C15-2 | Separate tap reload from hold magazine check | S | C15-1 | open |
 | C15-3 | Magazine check pose and ammo readout | M | C15-2 | open (owner: default count style) |
 | C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | open |

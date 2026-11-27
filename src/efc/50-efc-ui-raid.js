@@ -4,8 +4,13 @@
    pause (Escape, lost pointer lock) away from the soldier while a panel or the summary is open. */
 const EFC_UIR = { on: false, panel: null, cid: null, hold: null, near: null, sel: 0, all: null };
 const EFC_UIR_MOVE = new Set(['KeyW', 'KeyS', 'KeyA', 'KeyD', 'Space', 'ShiftLeft', 'ControlLeft', 'KeyC']);
+Settings.efcHudMinimal ??= true;
 
 efcProvide('ui:busy', () => !!EFC_UIR.panel);
+
+function efcUirHudSync() {
+  $('hud').classList.toggle('efc-hud-minimal', Settings.efcHudMinimal);
+}
 
 function efcUirCont() { const id = EFC_UIR.cid; return id == null ? null : (efcCall('world:list') || []).find((c) => c.id === id) || null; }
 function efcUirName(c) { return (c && c.name) || ({ crate: 'Crate', locker: 'Locker', bag: 'Bag', body: 'Body', drop: 'Dropped items' }[c && c.kind] || 'Container'); }
@@ -217,6 +222,7 @@ efcOn('world:changed', (id) => {
   }
 });
 efcOn('ui:init', () => {
+  efcUirHudSync();
   $('efcInv').addEventListener('click', efcUirClick); $('efcLoot').addEventListener('click', efcUirClick);
   $('efcLootList').addEventListener('focusin', (e) => { const b = e.target.closest('[data-take]'); if (b) { EFC_UIR.sel = +b.dataset.take; for (const x of $('efcLootList').querySelectorAll('.efc-it')) x.classList.toggle('sel', x === b); } });
 });

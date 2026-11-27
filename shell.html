@@ -1459,6 +1459,10 @@ body.touch .fpv-bat { right: 50%; transform: translateX(50%); } /* au doigt, le 
 #reserve::before { content: ""; display: inline-block; width: 2px; height: .95em; margin-right: calc(8 * var(--hu)); vertical-align: -.12em; background: var(--line-2); transform: skewX(-16deg); }
 #nades { grid-area: g; display: flex; align-items: center; gap: calc(4 * var(--hu)); padding-bottom: calc(6 * var(--hu)); font-size: max(var(--fs-xs), calc(16 * var(--hu))); }
 #nades kbd.key { margin: 0 calc(4 * var(--hu)) 0 0; }
+#hud.efc-raid.efc-hud-minimal .ammo { grid-template-columns: auto; grid-template-areas: "g"; }
+#hud.efc-raid.efc-hud-minimal :is(#wname, #pips, .ammo .nums) { display: none; }
+body:not(:has(#tacmap.show)) #hud.efc-raid.efc-hud-minimal:not(:has(#efcRaidBar.show))
+  #efcRaidHud > :is(.efc-h:first-child, .efc-ext) { display: none; }
 /* grenade dessinée : corps rond, bouchon et cuiller (pleine : en réserve ; estompée : lancée) */
 #nades i { position: relative; width: calc(11 * var(--hu)); height: calc(12 * var(--hu)); margin: calc(5 * var(--hu)) calc(2 * var(--hu)) 0 0; border-radius: 50% 50% 46% 46%; background: var(--paper); box-shadow: 0 0 1px rgba(0,0,0,.8); }
 #nades i::before, #nades i::after { content: ""; position: absolute; background: inherit; }

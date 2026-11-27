@@ -284,6 +284,7 @@ const OPT_TABS = [
     ['select', 'padRun', _t('Course à la manette'), [['click', _t('Appui sur le bâton gauche (L3)')], ['auto', _t('Bâton poussé à fond')]]],
     ['check', 'padVib', _t('Vibrations de la manette')],
     ['head', _t('Interface')],
+    ['check', 'efcHudMinimal', _t('ATH minimal en raid'), efcUirHudSync],
     ['check', 'efcWeaponCheck', 'Raid-start weapon check'],
     ['check', 'efcBarkCaptions', 'Enemy bark captions', efcBarkCaptionUpdate],
     ['select', 'lang', _t('Langue'), [['auto', _t('Automatique')], ['en', 'English'], ['fr', 'Français']], langApply, 'menu'],

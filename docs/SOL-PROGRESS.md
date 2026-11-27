@@ -5,18 +5,18 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next eligible open card in section 4.
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:** Split C15 Minimal HUD and hold-R magazine check into cards using section 6, then take C15-1.
-- **Checks so far:** (command and its last line)
+- **Card:** C15-1, Minimal raid HUD option
+- **Branch:** `codex/c15-1-minimal-hud`
+- **Started:** 2026-11-27 18:20 UTC
+- **Steps done:** Split C15 into four cards in section 6.
+- **Next step:** Add and verify the Minimal Raid HUD setting.
+- **Checks so far:** Base checks passed (`smoke ok`).
 - **Questions for the owner:**
 - **Watch out for:**
 
 ## Next open cards, in order
 
-1. C15-1 to C15-4, Minimal HUD and hold-R magazine check (split in section 6 first).
+1. C15-1 to C15-4, Minimal HUD and hold-R magazine check (cards in section 6).
 2. C16-4 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
 3. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
 4. Then C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).

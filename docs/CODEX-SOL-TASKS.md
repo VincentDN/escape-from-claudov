@@ -200,7 +200,10 @@ before starting).
 | C16-1 | Bark events, catalogue and rules (no sound, no UI) | S | C9-8 | done |
 | C16-2 | Captions over the hostile and in a feed | S | C16-1 | done |
 | C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | done |
-| C15-1 to C15-4 | Minimal HUD and hold-R magazine check (split in section 6 first) | M total | C1-2 | open |
+| C15-1 | Minimal raid HUD option | S | C1-2 | open |
+| C15-2 | Separate tap reload from hold magazine check | S | C15-1 | open |
+| C15-3 | Magazine check pose and ammo readout | M | C15-2 | open (owner: default count style) |
+| C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | open |
 | C16-4 | Invented language and the voice script | S | C16-1 | open |
 | C16-5 | Record the lines with ElevenLabs | M | C16-4 | open (needs the ElevenLabs connector) |
 | C16-6 | Radio processing and packaging | S | C16-5 | open |
@@ -671,11 +674,60 @@ not; confirm the thumbnail exists (`test-thumbs.mjs`); confirm it appears in a l
 Each item below must be split into cards of the shape above (XS to M, exact files, steps, verify, acceptance) before a Codex
 Sol agent starts it. A planning agent writes the split into this file first.
 
-- **C15 Minimal HUD** (next open priority, builds on C1's weapon check): HUD markup is `shell.html` around line 3021 (`.ammo`, `#wname`), styles around 1446.
-  Suggested cards: (1) a setting `efcHudMinimal` and hide `.ammo` and `#wname` in raids; (2) hold-R detection in
-  `src/08-player.js` line 56 with a 0.3 s threshold, tap keeps `startReload()`; (3) the check pose, reusing the inspect action
-  in `src/06d-reload.js`, with rough count text; (4) remote replication through the `weaponCheck`-style net event and
-  `docs/hud.md`. **Owner:** rough or exact count as default.
+### C15-1. Minimal raid HUD option (S)
+
+- **Read:** `docs/HANDOFF-CODEX.md` (C15), `shell.html` (ammo and HUD selectors), `src/09e-menus.js` (Interface options),
+  `src/efc/50-efc-ui-raid.js` (UI init and raid events), `src/efc/10-efc-raidhud.js` (read-only DOM contract), and `i18n/en.txt` (Interface).
+- **Edit:** `shell.html`, `src/09e-menus.js`, `src/efc/50-efc-ui-raid.js`, `i18n/en.txt`,
+  and new `tools/dev/efc/test-minimal-hud.mjs`.
+- **Steps:** Add a persisted `efcHudMinimal` option, enabled by default, and apply it to the existing raid HUD. Hide weapon
+  name, magazine pips, current rounds and reserve rounds. Keep grenades and combat, health and interaction cues. Show the
+  extracts list while extracting or while the tactical map is open. Test default, toggle, persistence and scope across match types.
+- **Verify:** `node tools/dev/efc/test-minimal-hud.mjs` and base checks.
+- **Acceptance:** Ammo and weapon name are hidden in a default raid. The checkbox restores the full HUD immediately and persists.
+  Non-raid HUDs keep their current presentation.
+
+### C15-2. Separate tap reload from hold magazine check (S)
+
+- **Read:** `src/08-player.js` (key handling and player tick), `src/efc/10-efc-weapon-check.js` (C1 lifecycle),
+  `src/efc/50-efc-ui-raid.js` (read-only capture behavior), `src/07c-controller.js` (read-only reload API),
+  and `tools/dev/efc/test-inventory-keys.mjs`.
+- **Edit:** `src/08-player.js`, new `src/efc/10-efc-raid-magcheck.js`, and new `tools/dev/efc/test-magcheck.mjs`.
+- **Steps:** Hold the bound Reload key for 0.30 s in a playable raid to enter a local magazine-check state. Tap release still
+  invokes the normal reload. End the check on release or interruption. Clear pending input when gameplay loses focus, a raid
+  panel takes keyboard input, or the current weapon changes. Keep the existing non-raid and non-keyboard reload behavior.
+- **Verify:** `node tools/dev/efc/test-magcheck.mjs`, `node tools/dev/efc/test-inventory-keys.mjs`, and base checks.
+- **Acceptance:** A tap reloads and a hold never reloads. Repeats, blocked input, firing, ADS, sprinting and switching clear or
+  suppress the check as appropriate. The held check leaves loaded and reserve ammunition intact.
+
+### C15-3. Magazine check pose and ammo readout (M)
+
+- **Owner:** Choose rough or exact as the default for the count style. The handoff proposes rough with an exact option.
+- **Read:** `src/efc/10-efc-weapon-check.js`, `src/efc/10-efc-raid-magcheck.js`, `src/06d-reload.js` (existing handling
+  choreography), `src/09e-menus.js` (Interface options), `shell.html` (HUD), and `i18n/en.txt`.
+- **Edit:** `src/efc/10-efc-raid-magcheck.js`, `src/efc/10-efc-weapon-check.js`, `src/06d-reload.js`, `src/09e-menus.js`,
+  `shell.html`, `i18n/en.txt`, and `tools/dev/efc/test-magcheck.mjs`. Coordinate the engine choreography and UI hooks with
+  their package owners before editing.
+- **Steps:** Reuse the C1 and reload poses to open, hold and return the weapon. Handle detachable, fixed, tube and drum
+  magazines. Add the selectable count style and show a small readout while the check is held. Account for the chamber
+  separately where modeled. Test the output and the pose through cancellation and release.
+- **Verify:** `node tools/dev/efc/test-magcheck.mjs`, `node tools/dev/efc/test-weapon-check.mjs`, and base checks.
+- **Acceptance:** The pose and readout describe the actual magazine. The visual clears when the check ends and leaves the
+  weapon ready for normal handling.
+
+### C15-4. Replicate magazine checks and document the HUD (M)
+
+- **Read:** `src/efc/10-efc-raid-magcheck.js`, `src/efc/10-efc-weapon-check.js` (remote event and pose),
+  `src/06b-soldier.js` (remote pose), `src/09c-net.js` (event encoding), and `tools/dev/efc/test-weapon-check-net.mjs`.
+- **Edit:** the magazine-check and existing weapon-check modules, `src/06b-soldier.js`, `src/09c-net.js` if required by the
+  existing event, new `tools/dev/efc/test-magcheck-net.mjs`, `docs/hud.md`, and `docs/hud/` screenshots. Coordinate remote
+  engine hooks with their package owners before editing.
+- **Steps:** Use the existing weapon-check event and pose path to replicate start and end, including interruption. Verify
+  playback on both clients. Document field visibility, controls and the count setting. Capture first-person checks for a
+  rifle, pistol and pump shotgun.
+- **Verify:** `node tools/dev/efc/test-magcheck-net.mjs`, `node tools/dev/efc/test-weapon-check-net.mjs`, and base checks.
+- **Acceptance:** A second client sees the check pose and its cleanup. The HUD documentation and three screenshots are committed.
+
 - **C11 Map and flares** (after C15): reuse `drawTacMap` (`src/08b-killstreaks.js` line 406) and `drawMinimap`
   (`src/09-game.js` line 248). Cards: (1) `M` opens a full-screen canvas map with player and extracts; (2) zoom, pan, legend,
   keyboard; (3) flare columns per open extract.

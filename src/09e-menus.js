@@ -285,6 +285,7 @@ const OPT_TABS = [
     ['check', 'padVib', _t('Vibrations de la manette')],
     ['head', _t('Interface')],
     ['check', 'efcHudMinimal', _t('ATH minimal en raid'), efcUirHudSync],
+    ['select', 'efcMagCount', _t('Affichage du contenu du chargeur'), [['rough', _t('Approximatif')], ['exact', _t('Exact')]]],
     ['check', 'efcWeaponCheck', 'Raid-start weapon check'],
     ['check', 'efcBarkCaptions', 'Enemy bark captions', efcBarkCaptionUpdate],
     ['select', 'lang', _t('Langue'), [['auto', _t('Automatique')], ['en', 'English'], ['fr', 'Français']], langApply, 'menu'],
@@ -348,6 +349,19 @@ function padHelpKey(k) {
    choix suivant, LB et RB changent d'onglet. La souris et le doigt touchent directement les choix. */
 /* Rangée maniée en entier : adj(d) la règle d'un cran (gauche, droite), act() répond à A, Entrée ou un clic sur la rangée elle-même ; les
    commandes qu'elle contient ne prennent plus le focus (la souris et le doigt les touchent toujours) */
+function efcRaidMagCheckText(weapon) {
+  const { mag, def } = weapon;
+  const small = def.tube || def.id === 'sks' || (def.fam === 'pistol' && def.mag <= 15);
+  if (Settings.efcMagCount === 'exact' || small) return mag === 1 ? _t('1 cartouche') : _t('{0} cartouches', mag);
+  if (!mag) return _t('Chargeur vide');
+  const fill = mag / def.mag;
+  if (fill >= 1) return _t('Chargeur plein');
+  if (fill >= 0.75) return _t('Presque plein');
+  if (fill >= 0.4) return _t('Environ à moitié');
+  if (fill >= 0.2) return _t('Peu de cartouches');
+  return _t('Presque vide');
+}
+
 function optNav(row, adj, act) {
   row.tabIndex = 0; row.classList.add('onav');
   if (adj) { row._adj = adj; row._adjK = true; }

@@ -9,14 +9,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Branch:**
 - **Started:** (date, time, session)
 - **Steps done:**
-- **Next step:** C15-3, magazine check pose and ammo readout. The owner chose rough counts by default, with exact counts selectable.
+- **Next step:** C15-4, replicate magazine checks and document the HUD.
 - **Checks so far:** (command and its last line)
 - **Questions for the owner:**
 - **Watch out for:**
 
 ## Next open cards, in order
 
-1. C15-3 and C15-4, hold-R magazine check (cards in section 6).
+1. C15-4, online magazine check and HUD documentation (card in section 6).
 2. C16-4 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
 3. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
 4. Then C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).
@@ -26,6 +26,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-27 Codex Sol: C15-3 done. Hold Reload to show and keep the magazine in view and release to put it back. Rough is the owner-selected default, and exact numbers are selectable. Browser pose/readout, insertion check and all base checks passed.
 - 2026-11-27 Codex Sol: C15-2 done. Tap Reload to reload, hold for 0.30 s to enter the local check. Focused tests ended with `magazine key tap, hold, cancellation, and rebinding ok` and `inventory keys ok`. Build, declaration, translation and smoke checks passed.
 - 2026-11-27 Codex Sol: C15-1 done. The default raid HUD hides ammo and weapon names, with a persisted full-HUD toggle. Browser check ended with `minimal raid HUD default, cues, visibility, toggle and persistence ok`. Build, declaration, translation and smoke checks passed.
 - 2026-11-27 Codex Sol: Raid healing follow-up done. Hold H to use a carried medical item with a first-person bandage wrap. Build, declaration and translation checks passed. Browser checks ended with `bandage hold, animation, cancellation, consumption and rebinding ok`, `items ok` and `smoke ok`.

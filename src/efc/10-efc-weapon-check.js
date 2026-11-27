@@ -41,17 +41,21 @@ function efcWeaponCheckKind(def) {
   if (def.pump) return 'pump';
   return !def.tube ? 'mag' : 'pump';
 }
-function efcWeaponCheckCancel() {
-  efcWeaponCheckPending = false;
-  if (VM.action !== 'raidCheck') return;
+function efcWeaponCheckResetPose() {
   VM.action = null;
   vmResetHandling(VM.cur);
   if (VM.cur?.bolt) { VM.cur.bolt.position.set(0.02, 0.045, 0.07); VM.cur.bolt.rotation.set(0, 0, 0); }
   if (VM.cur?.pump) VM.cur.pump.position.z = 0;
+}
+function efcWeaponCheckCancel() {
+  efcWeaponCheckPending = false;
+  if (VM.action !== 'raidCheck' || VM.actionData.magazine) return;
+  efcWeaponCheckResetPose();
   PL.ent.efcWeaponCheck = null;
   if (MATCH.online) netEvent({ k: 'weaponCheck', on: false });
 }
 function efcWeaponCheckTick(input, hold) {
+  if (VM.action === 'raidCheck' && VM.actionData.magazine) return;
   if (!efcWeaponCheckPending && VM.action !== 'raidCheck') return;
   const interrupted = input.ads || input.fire || input.firePressed || input.sprint || input.jump || input.crouch || efcLeanWant() ||
     PL.reload || PL.switching > 0 || PL.knifeOut || busy() || efcCall('ui:busy') || PL.ent.pos.distanceToSquared(EFC_WEAPON_CHECK_ORIGIN) > 1.8 ** 2;

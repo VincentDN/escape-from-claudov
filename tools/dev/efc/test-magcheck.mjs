@@ -17,9 +17,10 @@ try {
       checking: !!efcRaidMagCheck?.active, pending: !!efcRaidMagCheck && !efcRaidMagCheck.active,
       reloading: !!PL.reload, mag: curW().mag, reserve: curW().reserve,
     });
+    const readout = () => $('efcMagCheck').classList.contains('show') ? $('efcMagCheck').textContent : '';
     for (const ent of entities) if (ent !== PL.ent) ent.alive = false;
     PL.noFireT = 0;
-    curW().mag = 10;
+    curW().mag = Math.round(curW().def.mag / 2);
     const initial = status();
 
     key(true);
@@ -28,7 +29,7 @@ try {
     key(false);
     const tapUp = status();
     step(300);
-    curW().mag = 10;
+    curW().mag = Math.round(curW().def.mag / 2);
     const ready = status();
 
     key(true);
@@ -37,10 +38,25 @@ try {
     key(true, reloadKey, true);
     step(4);
     const holding = status();
+    const initialReadout = readout();
     step(75);
     const sustained = status();
+    const rough = readout();
+    const heldPose = VM.rlS;
+    const detached = VM.cur.mag.position.distanceTo(VM.cur.magHome);
+    const readoutOption = [...$('optMenu').querySelectorAll('.orow')].find((row) => row.textContent.includes('Magazine check readout'));
+    const choose = (style) => [...readoutOption.querySelectorAll('button')].find((button) => button.textContent === style).click();
+    choose('Exact');
+    step(10);
+    const exact = readout();
+    const sameHeldPose = VM.rlS;
+    choose('Rough');
+    const small = efcRaidMagCheckText({ mag: 1, def: WEAPONS.sks });
     key(false);
     const released = status();
+    const releasedReadout = readout(), returning = VM.action === 'raidCheck';
+    step(30);
+    const home = VM.cur.mag.position.distanceTo(VM.cur.magHome);
 
     const interrupt = (action, reset) => {
       key(true);
@@ -74,7 +90,8 @@ try {
     step(20);
     const rebound = status();
     key(false);
-    return { initial, tapDown, tapUp, ready, beforeThreshold, holding, sustained, released, panel, blur, ads, sprint, fire, switched, oldKey, rebound };
+    return { initial, tapDown, tapUp, ready, beforeThreshold, holding, sustained, released, panel, blur, ads, sprint, fire, switched, oldKey, rebound,
+      initialReadout, rough, exact, small, heldPose, sameHeldPose, detached, releasedReadout, returning, home };
   });
   assert.equal(result.tapDown.pending, true);
   assert.equal(result.tapDown.reloading, false);
@@ -84,6 +101,15 @@ try {
   assert.deepEqual(result.holding, { ...result.ready, checking: true });
   assert.deepEqual(result.sustained, result.holding);
   assert.deepEqual(result.released, result.ready);
+  assert.equal(result.initialReadout, '');
+  assert.equal(result.rough, 'About half');
+  assert.equal(result.exact, `${result.ready.mag} rounds`);
+  assert.equal(result.small, '1 round');
+  assert.equal(result.heldPose, result.sameHeldPose);
+  assert.ok(result.detached > 0.02);
+  assert.equal(result.releasedReadout, '');
+  assert.equal(result.returning, true);
+  assert.ok(result.home < 0.001);
   for (const name of ['panel', 'blur', 'ads', 'sprint', 'fire', 'switched']) {
     assert.equal(result[name].before, true, name);
     assert.equal(result[name].after.checking, false, name);

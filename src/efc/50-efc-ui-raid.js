@@ -209,6 +209,11 @@ for (const ev of ['mousedown', 'mousemove', 'wheel']) addEventListener(ev, (e) =
 document.addEventListener('pointerlockchange', (e) => { if (document.pointerLockElement !== canvas && (EFC_UIR.panel || efcUiOverlayOpen())) e.stopImmediatePropagation(); }, true);
 
 /* ---------- Events ---------- */
+efcOn('mag:readout', (weapon) => {
+  const el = $('efcMagCheck');
+  hudText(el, weapon ? efcRaidMagCheckText(weapon) : '');
+  hudCls(el, 'show', !!weapon);
+});
 efcOn('raid:begin', () => { efcUirClose(true); EFC_UIR.on = true; EFC_UIR.hold = null; EFC_UIR.near = null; });
 efcOn('raid:over', () => { efcUirClose(true); EFC_UIR.on = false; EFC_UIR.hold = null; EFC_UIR.near = null; efcUirPrompt(''); efcUirHeal(); });
 efcOn('tick', efcUirTick);

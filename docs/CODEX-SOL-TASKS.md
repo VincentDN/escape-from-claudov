@@ -202,7 +202,7 @@ before starting).
 | C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | done |
 | C15-1 | Minimal raid HUD option | S | C1-2 | done |
 | C15-2 | Separate tap reload from hold magazine check | S | C15-1 | done |
-| C15-3 | Magazine check pose and ammo readout | M | C15-2 | open |
+| C15-3 | Magazine check pose and ammo readout | M | C15-2 | done |
 | C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | open |
 | C16-4 | Invented language and the voice script | S | C16-1 | open |
 | C16-5 | Record the lines with ElevenLabs | M | C16-4 | open (needs the ElevenLabs connector) |
@@ -704,9 +704,9 @@ Sol agent starts it. A planning agent writes the split into this file first.
 
 - **Owner decision (27 November 2026):** default to rough counts, with exact counts selectable.
 - **Read:** `src/efc/10-efc-weapon-check.js`, `src/efc/10-efc-raid-magcheck.js`, `src/06d-reload.js` (existing handling
-  choreography), `src/09e-menus.js` (Interface options), `shell.html` (HUD), and `i18n/en.txt`.
+  choreography), `src/09e-menus.js` (Interface options), `src/efc/50-efc-ui-raid.js` (HUD events), `shell.html` (HUD), and `i18n/en.txt`.
 - **Edit:** `src/efc/10-efc-raid-magcheck.js`, `src/efc/10-efc-weapon-check.js`, `src/06d-reload.js`, `src/09e-menus.js`,
-  `shell.html`, `i18n/en.txt`, and `tools/dev/efc/test-magcheck.mjs`. Keep the choreography in the existing viewmodel hook and the setting and markup in the UI.
+  `src/efc/50-efc-ui-raid.js`, `shell.html`, `i18n/en.txt`, and `tools/dev/efc/test-magcheck.mjs`. Keep the choreography in the existing viewmodel hook and the setting and markup in the UI.
 - **Steps:** Reuse the C1 and reload poses to open, hold and return the weapon. Handle detachable, fixed, tube and drum
   magazines. Add the selectable count style and show a small readout while the check is held. Account for the chamber
   separately where modeled. Test the output and the pose through cancellation and release.
@@ -717,10 +717,10 @@ Sol agent starts it. A planning agent writes the split into this file first.
 ### C15-4. Replicate magazine checks and document the HUD (M)
 
 - **Read:** `src/efc/10-efc-raid-magcheck.js`, `src/efc/10-efc-weapon-check.js` (remote event and pose),
-  `src/06b-soldier.js` (remote pose), `src/09c-net.js` (event encoding), and `tools/dev/efc/test-weapon-check-net.mjs`.
-- **Edit:** the magazine-check and existing weapon-check modules, `src/06b-soldier.js`, `src/09c-net.js` if required by the
-  existing event, new `tools/dev/efc/test-magcheck-net.mjs`, `docs/hud.md`, and `docs/hud/` screenshots. Coordinate remote
-  engine hooks with their package owners before editing.
+  `src/06b-soldier.js` (remote pose), `src/06-weapons.js` (world-gun meshes), `src/09c-net.js` (event encoding),
+  and `tools/dev/efc/test-weapon-check-net.mjs`.
+- **Edit:** the magazine-check and existing weapon-check modules, `src/06b-soldier.js`, `src/06-weapons.js` (the magazine
+  is currently baked into the remote gun mesh), new `tools/dev/efc/test-magcheck-net.mjs`, `docs/hud.md`, and `docs/hud/` screenshots.
 - **Steps:** Use the existing weapon-check event and pose path to replicate start and end, including interruption. Verify
   playback on both clients. Document field visibility, controls and the count setting. Capture first-person checks for a
   rifle, pistol and pump shotgun.

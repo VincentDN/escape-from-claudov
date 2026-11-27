@@ -329,7 +329,7 @@ function vmChoreo(name, tFrac, D, def, m) {
   else if (name === 'raidCheck') T = EFC_WEAPON_CHECK_TIMELINES[D.kind];
   else if (RELOAD.shotgun && (name === 'shellStart' || name === 'shell' || name === 'shellEnd')) T = RELOAD.shotgun[name === 'shellEnd' && !D.empty ? 'shellEndQuick' : name];
   if (!T) return null;
-  const R = vmRythme(T), ts = R ? keyM(R, tFrac * T.dur)[0] : tFrac * T.dur; // horloge de la chorégraphie, déformée par son allure
+  const R = vmRythme(T), ts = D.magazine ? efcRaidMagCheckPoseTime(D, T.dur) : R ? keyM(R, tFrac * T.dur)[0] : tFrac * T.dur; // horloge de la chorégraphie, déformée par son allure
   VM.rlT = T; VM.rlS = ts; VM.rlD = D;
   const g = keyN(T.gun, ts);
   _rl.gun[0] = g[0]; _rl.gun[1] = g[1]; _rl.gun[2] = g[2]; _rl.gun[3] = g[3]; _rl.gun[4] = g[4]; _rl.gun[5] = g[5];

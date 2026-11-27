@@ -2589,6 +2589,7 @@ body.touch #perf { top: auto; right: auto; left: var(--sl); bottom: var(--sb); }
 .efc-pbar { display: block; width: 220px; height: 4px; background: rgba(242,238,227,.18); }
 .efc-pbar > i { display: block; height: 100%; width: 100%; background: var(--acc); transform-origin: left; transform: scaleX(0); }
 .efc-heal { top: auto; bottom: 22%; font-size: 19px; }
+.efc-mag-check { top: auto; bottom: 22%; white-space: nowrap; }
 .efc-heal .efc-pbar > i { background: var(--ally); }
 /* In-raid panels and the summary: over the running match, the cursor free */
 .efc-ov { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(6,7,5,.62); color: var(--paper); }
@@ -3052,6 +3053,7 @@ body:has(.efc-op-ghost) .efc-prev { visibility: hidden; }
   <div id="rankUp" class="ru" aria-hidden="true"></div>
   <div id="efcPrompt" class="efc-prompt" aria-live="polite"><span id="efcPromptT"></span><i class="efc-pbar"><i id="efcPromptBar"></i></i></div>
   <div id="efcHeal" class="efc-prompt efc-heal" aria-live="polite"><span id="efcHealT"></span><i class="efc-pbar"><i id="efcHealBar"></i></i></div>
+  <div id="efcMagCheck" class="efc-prompt efc-mag-check" aria-live="polite"></div>
   <div id="hp"><b id="hpN">100</b><div class="hpbar"><div id="hpFill"></div></div></div>
 </div>
 

@@ -465,6 +465,17 @@ Visée ⇒ Aiming
 Manette ⇒ Controller
 Interface ⇒ Interface
 ATH minimal en raid ⇒ Minimal raid HUD
+Affichage du contenu du chargeur ⇒ Magazine check readout
+Approximatif ⇒ Rough
+Exact ⇒ Exact
+1 cartouche ⇒ 1 round
+{0} cartouches ⇒ {0} rounds
+Chargeur vide ⇒ Empty
+Chargeur plein ⇒ Full
+Presque plein ⇒ Nearly full
+Environ à moitié ⇒ About half
+Peu de cartouches ⇒ Low
+Presque vide ⇒ Nearly empty
 Image ⇒ Image
 Affichage et dépannage ⇒ Display and troubleshooting
 Touches du clavier ⇒ Keyboard keys

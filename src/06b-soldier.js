@@ -8,6 +8,7 @@ function setSoldierGun(model, key) {
   gunSoundPrepare(weaponDefByKey(key).sound);
   if (model.gun) model.root.remove(model.gun);
   const g = buildWorldGun(key);
+  model.magParts = g.magParts;
   setGunLod(g.group, !!(model.lod && model.lod.hiOn), model.shadowOnly);
   model.root.add(g.group); model.gun = g.group; model.muzzleLocal = g.muzzle; model.gunKey = key; model.kind = g.kind; model.grips = gripsFor(key);
 }
@@ -404,6 +405,8 @@ function poseSoldier(e, dt) {
   _qG.slerpQuaternions(_qB, _qA, aw).slerp(_qS, sw);
   if (flat) efcOmniSoldierUpper(e, flat, lowYaw, L, shc, gunP);
   const check = efcWeaponCheckPose(e);
+  const magPull = check?.magPull || 0;
+  for (const part of S.magParts) part.position.set(-0.06 * magPull, -0.105 * magPull, 0.04 * magPull);
   if (check) {
     _qL.setFromEuler(_eu.set(0.13 * check.tilt, 0.22 * check.tilt, -0.46 * check.tilt));
     _qG.multiply(_qL);
@@ -458,7 +461,8 @@ function poseSoldier(e, dt) {
     wR.lerp(_tmpG.set(0.075, 0.035, z).applyQuaternion(_qG).add(gunP), check.reach);
   } else if (check) {
     const mg = S.grips.magP;
-    const contact = check.kind === 'pump' ? _tmpG.copy(S.grips.L).add(_tmpH.set(0, 0, 0.04)) : _tmpG.set(mg[0] - 0.03, mg[1] - 0.07, mg[2]);
+    const contact = check.kind === 'pump' ? _tmpG.copy(S.grips.L).add(_tmpH.set(0, 0, 0.04)) :
+      _tmpG.set(mg[0] - 0.03 - 0.06 * magPull, mg[1] - 0.07 - 0.105 * magPull, mg[2] + 0.04 * magPull);
     wL.lerp(contact.applyQuaternion(_qG).add(gunP), check.reach);
   }
   // lancer de grenade : bras droit armé derrière la tête puis projeté vers l'avant, buste en torsion

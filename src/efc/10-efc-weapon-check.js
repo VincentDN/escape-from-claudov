@@ -68,14 +68,33 @@ function efcWeaponCheckTick(input, hold) {
   if (MATCH.online) netEvent({ k: 'weaponCheck', on: true, kind });
 }
 function efcWeaponCheckRemote(entity, event) {
-  entity.efcWeaponCheck = event.on === true && Object.hasOwn(EFC_WEAPON_CHECK_TIMELINES, event.kind) ? { kind: event.kind, start: MATCH.time } : null;
+  if (event.on === true && Object.hasOwn(EFC_WEAPON_CHECK_TIMELINES, event.kind)) {
+    entity.efcWeaponCheck = { kind: event.kind, start: MATCH.time, held: event.held === true, weapon: entity.weapon };
+  } else if (event.held === true && event.stow === true && entity.efcWeaponCheck?.held) {
+    const check = entity.efcWeaponCheck;
+    check.returnFrom = Math.min(MATCH.time - check.start, EFC_MAG_CHECK_VIEW);
+    check.returnStart = MATCH.time;
+  } else entity.efcWeaponCheck = null;
 }
 function efcWeaponCheckPose(entity) {
   const check = entity.efcWeaponCheck;
   if (!check) return null;
-  const t = MATCH.time - check.start;
+  let t = MATCH.time - check.start;
+  if (check.held) {
+    if (entity.alive === false || entity.weapon !== check.weapon) {
+      entity.efcWeaponCheck = null;
+      return null;
+    }
+    if (check.returnStart === undefined) t = Math.min(t, EFC_MAG_CHECK_VIEW);
+    else {
+      const returning = (MATCH.time - check.returnStart) / EFC_MAG_CHECK_RETURN;
+      if (returning >= 1) { entity.efcWeaponCheck = null; return null; }
+      t = lerp(check.returnFrom, EFC_WEAPON_CHECK_DURATION, clamp(returning, 0, 1));
+    }
+  }
   if (t >= EFC_WEAPON_CHECK_DURATION || t < 0) return null;
-  return { kind: check.kind, tilt: env(t, 0, 0.45, 0.95, EFC_WEAPON_CHECK_DURATION), reach: env(t, 0.20, 0.48, 0.98, 1.26) };
+  const magPull = check.held && check.kind === 'mag' ? env(t, 0.4, 0.65, 0.78, 1.04) : 0;
+  return { kind: check.kind, tilt: env(t, 0, 0.45, 0.95, EFC_WEAPON_CHECK_DURATION), reach: env(t, 0.20, 0.48, 0.98, 1.26), magPull };
 }
 efcOn('raid:begin', () => {
   efcWeaponCheckPending = Settings.efcWeaponCheck !== false && location.hash !== '#artlab' && location.hash !== '#bench';

@@ -203,34 +203,42 @@ function worldGunGeometry(key) {
   const info = buildGunModel(key);
   info.group.updateMatrixWorld(true);
   const L = { hi: {}, lo: {} };
-  for (const lv of ['hi', 'lo']) for (const k of WORLD_GUN_KEYS) L[lv][k] = [];
-  const visit = (o) => {
+  const magParts = { hi: {}, lo: {} };
+  for (const lv of ['hi', 'lo']) for (const k of WORLD_GUN_KEYS) { L[lv][k] = []; magParts[lv][k] = []; }
+  const visit = (o, inMag = false) => {
     if (!o.visible) return; // pièce cachée du modèle (chargeur interne du fusil à pompe)
+    const movingMag = inMag || (o === info.mag && !info.tubeFed);
+    const parts = movingMag ? magParts : L;
     if (o.isMesh && !o.material.transparent && !o.material.isMeshBasicMaterial && o.geometry.attributes.normal) {
       /* camouflage : une matière à part ; sinon teinte chaude (olive, sable ; couleurs en espace linéaire) : garnitures
          claires ; métal et polymère gris : sombre */
       const c = o.material.color, k = o.material.userData.camo ? 'camo' : o.material === GM.wood ? 'wood' : o.material === GM.woodR ? 'woodR' : o.material === GM.woodB ? 'woodB' : o.material === GM.taupe ? 'taupe' : o.material === GM.gray ? 'gray' : o.material === GM.tan || o.material === GM.fde ? 'tan' : o.material === GM.drab ? 'light' : o.material === GM.steel ? 'steel' : c.r - c.b > 0.025 ? 'light' : 'dark';
-      L.hi[k].push({ geo: o.geometry, m: o.matrixWorld });
-      if (!gunPartSmall(o)) L.lo[k].push({ geo: lowPolyGeometry(o.geometry), m: o.matrixWorld });
+      parts.hi[k].push({ geo: o.geometry, m: o.matrixWorld });
+      if (!gunPartSmall(o)) parts.lo[k].push({ geo: lowPolyGeometry(o.geometry), m: o.matrixWorld });
     }
-    for (const c of o.children) visit(c);
+    for (const c of o.children) visit(c, movingMag);
   };
   visit(info.group);
-  const G = { muzzle: info.muzzle.position.clone(), kind: info.kind, grips: gunGrips(info), hi: {}, lo: {} };
-  for (const lv of ['hi', 'lo']) for (const k of WORLD_GUN_KEYS) G[lv][k] = mergeGunParts(L[lv][k]);
+  const G = { muzzle: info.muzzle.position.clone(), kind: info.kind, grips: gunGrips(info), hi: {}, lo: {}, mag: { hi: {}, lo: {} } };
+  for (const lv of ['hi', 'lo']) for (const k of WORLD_GUN_KEYS) {
+    G[lv][k] = mergeGunParts(L[lv][k]);
+    G.mag[lv][k] = mergeGunParts(magParts[lv][k]);
+  }
   return (WORLD_GUN_GEO[key] = G);
 }
 /* Arme prête à poser dans la scène : un maillage par matière et par niveau de détail, dont les calques sont réglés par setGunLod */
 function buildWorldGun(key) {
   const G = worldGunGeometry(key), out = new THREE.Group(), camo = gunSpec(key).camo;
-  for (const lv of ['hi', 'lo']) for (const k of WORLD_GUN_KEYS) {
-    if (!G[lv][k]) continue;
-    const mesh = new THREE.Mesh(G[lv][k], k === 'camo' ? camoWorldMaterial(camo) : WORLD_GUN_MATS[k]);
+  const magParts = [];
+  for (const parts of [G, G.mag]) for (const lv of ['hi', 'lo']) for (const k of WORLD_GUN_KEYS) {
+    if (!parts[lv][k]) continue;
+    const mesh = new THREE.Mesh(parts[lv][k], k === 'camo' ? camoWorldMaterial(camo) : WORLD_GUN_MATS[k]);
     mesh.castShadow = lv === 'lo'; mesh.userData.noPrepass = true; mesh.userData.gunLod = lv;
     out.add(mesh);
+    if (parts === G.mag) magParts.push(mesh);
   }
   setGunLod(out, false);
-  return { group: out, muzzle: G.muzzle.clone(), kind: G.kind };
+  return { group: out, muzzle: G.muzzle.clone(), kind: G.kind, magParts };
 }
 /* Niveau de détail d'une arme : le modèle allégé projette toujours l'ombre ; quand le détaillé est affiché, l'allégé
    ne sert plus qu'à ça (calque d'ombre seule). shadowOnly : arme du corps du joueur, qui ne s'affiche jamais. */

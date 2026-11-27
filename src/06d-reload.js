@@ -333,6 +333,7 @@ function vmChoreo(name, tFrac, D, def, m) {
   VM.rlT = T; VM.rlS = ts; VM.rlD = D;
   const g = keyN(T.gun, ts);
   _rl.gun[0] = g[0]; _rl.gun[1] = g[1]; _rl.gun[2] = g[2]; _rl.gun[3] = g[3]; _rl.gun[4] = g[4]; _rl.gun[5] = g[5];
+  if (D.magazine && D.kind === 'mag') _rl.gun[1] += 0.105 * env(ts, 0.23, 0.66, 0.86, 1.35);
   VM.slideHold = !!(T.slideHoldUntil && ts < T.slideHoldUntil);
   // culasse : la poignée se lève et recule ; sa boule sert d'ancre à la main droite
   if (T.bolt && m.bolt) { const b = keyN(T.bolt, ts); m.bolt.rotation.z = b[0]; m.bolt.position.z = 0.07 + b[1]; VM.boltRot = b[0]; VM.boltPull = b[1]; } else { VM.boltRot = 0; VM.boltPull = 0; }

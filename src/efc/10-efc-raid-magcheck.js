@@ -19,12 +19,20 @@ function efcRaidMagCheckPose() {
   return VM.action === 'raidCheck' && VM.actionData.magazine ? VM.actionData : null;
 }
 
+function efcRaidMagCheckSend(on, kind, stow = false) {
+  const event = { k: 'weaponCheck', held: true, on, kind, stow };
+  efcWeaponCheckRemote(PL.ent, event);
+  if (MATCH.online) netEvent(event);
+}
+
 function efcRaidMagCheckCancel(putBack = false) {
-  if (efcRaidMagCheck?.active) efcEmit('mag:readout', null);
-  efcRaidMagCheck = null;
   const pose = efcRaidMagCheckPose();
+  const stow = putBack === true && pose && VM.actionT >= 0.58;
+  if (efcRaidMagCheck?.active) efcEmit('mag:readout', null);
+  if (efcRaidMagCheck?.active || pose) efcRaidMagCheckSend(false, undefined, !!stow);
+  efcRaidMagCheck = null;
   if (!pose) return;
-  if (putBack === true && VM.actionT >= 0.58) {
+  if (stow) {
     pose.returnStart = VM.actionT;
     VM.actionDur = VM.actionT + EFC_MAG_CHECK_RETURN;
   } else efcWeaponCheckResetPose();
@@ -62,7 +70,9 @@ function efcRaidMagCheckTick(input, hold) {
   if (!check.active) {
     efcWeaponCheckCancel();
     check.active = true;
-    vmStartAction('raidCheck', Infinity, { kind: efcWeaponCheckKind(check.weapon.def), magazine: true });
+    const kind = efcWeaponCheckKind(check.weapon.def);
+    vmStartAction('raidCheck', Infinity, { kind, magazine: true });
+    efcRaidMagCheckSend(true, kind);
   } else if (VM.actionT >= 0.62) efcEmit('mag:readout', check.weapon);
 }
 

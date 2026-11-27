@@ -28,7 +28,7 @@ mergeable branch.
 | done | C0 | Finish the grid inventory: raid drag test (`test-inventory-drag.mjs`), R-key test (`test-inventory-keys.mjs`), unmount cue and one shared sound gap (cards C0-1 to C0-4, PR #15 on `beta`); K10 added a "Drop here to leave it on the ground" zone under the operator, since the raid panel fills the screen | small |
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
-| 3 (next) | C15 | Minimal HUD: hide ammo and weapon name in raids. Hold R to pull the magazine and check the rounds. | medium |
+| done | C15 | Minimal HUD hides ammo and weapon name in raids. Tap R to reload and hold R to check the magazine. See [Raid HUD](hud.md). | medium |
 | 4 | C16 | Enemy combat barks: every hostile action announced before it happens, with an on-screen caption and an ElevenLabs radio voice in an invented gibberish language (owner, 26 November); plus a downed state and the execution of a downed player (a hostile walks up, taunts, draws a pistol, last line, finishing shot), telegraphed so teammates can save them | large |
 | 4b | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3. Integrate Partisan’s modding system and assets with Riposte’s base weapons in the same workbench. Use the StG 44 bench only for lighting, background, floor and canted weapon view. | large |
 | 5 | C11 | `M` opens a full-screen map with extracts and points of interest; green smoke flares over open extracts | medium |

@@ -203,7 +203,7 @@ before starting).
 | C15-1 | Minimal raid HUD option | S | C1-2 | done |
 | C15-2 | Separate tap reload from hold magazine check | S | C15-1 | done |
 | C15-3 | Magazine check pose and ammo readout | M | C15-2 | done |
-| C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | open |
+| C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | done |
 | C16-4 | Invented language and the voice script | S | C16-1 | open |
 | C16-5 | Record the lines with ElevenLabs | M | C16-4 | open (needs the ElevenLabs connector) |
 | C16-6 | Radio processing and packaging | S | C16-5 | open |
@@ -717,10 +717,10 @@ Sol agent starts it. A planning agent writes the split into this file first.
 ### C15-4. Replicate magazine checks and document the HUD (M)
 
 - **Read:** `src/efc/10-efc-raid-magcheck.js`, `src/efc/10-efc-weapon-check.js` (remote event and pose),
-  `src/06b-soldier.js` (remote pose), `src/06-weapons.js` (world-gun meshes), `src/09c-net.js` (event encoding),
+  `src/06b-soldier.js` (remote pose), `src/06-weapons.js` (world-gun meshes), `src/06d-reload.js` (first-person framing), `src/09c-net.js` (event encoding),
   and `tools/dev/efc/test-weapon-check-net.mjs`.
 - **Edit:** the magazine-check and existing weapon-check modules, `src/06b-soldier.js`, `src/06-weapons.js` (the magazine
-  is currently baked into the remote gun mesh), new `tools/dev/efc/test-magcheck-net.mjs`, `docs/hud.md`, and `docs/hud/` screenshots.
+  is currently baked into the remote gun mesh), `src/06d-reload.js`, new `tools/dev/efc/test-magcheck-net.mjs`, `docs/hud.md`, and `docs/hud/` screenshots.
 - **Steps:** Use the existing weapon-check event and pose path to replicate start and end, including interruption. Verify
   playback on both clients. Document field visibility, controls and the count setting. Capture first-person checks for a
   rifle, pistol and pump shotgun.

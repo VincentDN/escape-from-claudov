@@ -581,7 +581,7 @@ everything on `entity.isPlayer && efcRaidMode()`, and add a test that drives the
 - **C9-8 (C9b):** weapon held across the chest on the back, rolled on a side, aim limits, third person matches. Split into cards
   before starting: write the split in this file and get it reviewed.
 
-#### Proposed sequence for C9-8 (owner review)
+#### Approved sequence for C9-8
 
 C9-8a requires C9-7. Every later step requires the preceding step. C9-8 stays open until C9-8f passes.
 
@@ -591,15 +591,15 @@ C9-8a requires C9-7. Every later step requires the preceding step. C9-8 stays op
    to prone in both turn directions.
 3. **C9-8c. First-person side.** Pose the weapon for the existing left and right Lean controls. Verify hand placement and return
    to the underlying prone or supine pose on release.
-4. **C9-8d. Aim limits.** Use body-relative yaw and pitch limits, with the reviewed camera and firing behavior outside the
-   bounds. Verify limit edges and yaw wrap, and restore normal aim on rise.
+4. **C9-8d. Aim limits and Alt free-look.** Use body-relative yaw and pitch limits while preserving free camera look.
+   Hold either Alt key to turn the camera without changing the weapon direction. Verify the aim limits, yaw wrap,
+   trigger handling and return to normal aim.
 5. **C9-8e. Third-person poses.** Use the replicated stance and body yaw to mirror prone, supine, and both side poses.
    Verify that both clients see each pose and the return to standing.
 6. **C9-8f. Verification.** Exercise a magazine rifle, a manually cycled rifle, and a pump through pose entry, limits, weapon
    changes and reset. Review first- and third-person captures for weapon visibility and hand contact, then close C9-8.
 
-Owner review: confirm the split and decide whether the camera keeps free-look and firing is blocked outside the aim bounds,
-or whether aiming clamps the camera.
+The owner approved the split and requested hold-Alt free-look.
 
 ### C2-1. Port Partisan's rail and compatibility rules (M)
 

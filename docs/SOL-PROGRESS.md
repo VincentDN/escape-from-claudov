@@ -5,15 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C9-8, weapon poses and aim limits for low stances.
+- **Card:** C9-8, weapon poses, aim limits and Alt free-look.
 - **Branch:** `codex/c9-omni`
-- **Started:** 2026-11-27 08:15 CET, Codex Sol cloud session.
-- **Steps done:** Wrote the proposed six-step split in CODEX-SOL-TASKS.md. Prerequisite C9-7 passed and is pushed at `6ce12d7`.
-- **Next step:** Get the split reviewed, then start C9-8a with the existing equipped viewmodel.
-- **How to verify:** Each proposed step includes its own verification. C9-8f closes with local and two-client weapon pose review.
-- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok.
-- **Questions for the owner:** Approve the six-step split? Beyond the weapon aim bounds, keep camera free-look and block firing, or clamp the camera while aiming?
-- **Watch out for:** The pose work uses C9-5 camera/body separation and the C9-7 replicated stance.
+- **Started:** 2026-11-27, Codex Sol cloud session.
+- **Steps done:** C9-8a–c implemented the first-person prone, supine and both side holds. Smooth entry/return and the hand contact bounds passed.
+- **Next step:** Finish integration checks for C9-8d (aim limits and hold-Alt free-look), then integrate C9-8e and review C9-8f.
+- **Checks so far:** `test-omni-prone-view.mjs` — First-person prone, supine and both side holds passed with bounded hand error and smooth return. `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `smoke.mjs` — smoke ok.
+- **Questions for the owner:**
+- **Watch out for:** Re-run the pose tests with the Alt, aim limit and third-person integrations present.
 
 ## Next open cards, in order
 

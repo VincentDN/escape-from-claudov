@@ -4,6 +4,7 @@ const EFC_SELF_LEG_BONES = new Set([
   SB.THL, SB.KNL, SB.SHL, SB.FTL, SB.TOL, SB.SHHL,
   SB.THR, SB.KNR, SB.SHR, SB.FTR, SB.TOR, SB.SHHR,
 ]);
+const EFC_SELF_LEGS = { back: 0.14, crouchedBack: 0.10, downBack: 0.08, maxDown: Math.PI / 3 };
 let efcSelfLegsMesh = null;
 
 function efcSelfLegsBuild(model, skin) {
@@ -29,6 +30,7 @@ function efcSelfLegsBuild(model, skin) {
   geometry.setIndex(legs);
   const mesh = new THREE.SkinnedMesh(geometry, soldierMaterial(skin, model.lod.rel));
   mesh.bind(model.lod.lo.skeleton, model.lod.lo.bindMatrix);
+  mesh.bindMode = 'detached'; // The shared bones stay in world space while this mesh is shifted.
   mesh.layers.mask = MASK_SCREEN;
   mesh.frustumCulled = false;
   mesh.userData.noPrepass = true;
@@ -47,7 +49,11 @@ function efcSelfLegsTick(e) {
     efcSelfLegsHide();
     return;
   }
-  efcSelfLegsBuild(e.model, e.model.lod.skin).visible = true;
+  const mesh = efcSelfLegsBuild(e.model, e.model.lod.skin);
+  const down = clamp(-camera.rotation.x / EFC_SELF_LEGS.maxDown, 0, 1);
+  const back = lerp(EFC_SELF_LEGS.back, EFC_SELF_LEGS.crouchedBack, e.crouchAmt || 0) + EFC_SELF_LEGS.downBack * down;
+  mesh.position.set(Math.sin(e.yaw) * back, 0, Math.cos(e.yaw) * back);
+  mesh.visible = true;
 }
 
 efcOn('died', (victim) => { if (victim === PL.ent) efcSelfLegsHide(); });

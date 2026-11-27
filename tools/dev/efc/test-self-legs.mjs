@@ -23,9 +23,17 @@ try {
     for (let i = 0; i < 24; i++) matchTick(1 / 60, true);
     const crouched = samplePose();
     const maxPoseChange = Math.max(...standing.map((vertex, i) => vertex.distanceTo(crouched[i])));
-    const maxPoseError = Math.max(...crouched.map((vertex, i) => vertex.distanceTo(worldVertex(model.lod.lo, vertices[i]))));
+    const maxPoseError = Math.max(...crouched.map((vertex, i) =>
+      vertex.distanceTo(worldVertex(model.lod.lo, vertices[i]).add(mesh.position))));
     const bodyHidden = !model.root.visible;
     const playing = mesh.visible;
+    const offset = (pitch, crouch) => {
+      camera.rotation.x = pitch;
+      PL.ent.crouchAmt = crouch;
+      efcSelfLegsTick(PL.ent);
+      return mesh.position.length();
+    };
+    const offsets = [offset(0, 0), offset(-Math.PI / 3, 0), offset(0, 1), offset(-Math.PI / 2, 1)];
     VM.root.visible = false;
     efcSelfLegsTick(PL.ent);
     const outsideFirstPerson = mesh.visible;
@@ -42,7 +50,7 @@ try {
       castsShadow: mesh.castShadow,
       playing, outsideFirstPerson, backInFirstPerson,
       dead: mesh.visible,
-      maxPoseChange, maxPoseError, bodyHidden,
+      maxPoseChange, maxPoseError, bodyHidden, offsets,
     };
   });
   assert.ok(result.triangles > 0 && result.triangles < result.originalTriangles);
@@ -57,6 +65,7 @@ try {
   assert.equal(result.bodyHidden, true);
   assert.ok(result.maxPoseChange > 0.05, 'legs follow crouching');
   assert.ok(result.maxPoseError < 0.00001, 'legs match the hidden soldier in world space');
+  assert.deepEqual(result.offsets.map((value) => +value.toFixed(3)), [0.14, 0.22, 0.10, 0.18]);
   assert.deepEqual(errors, []);
   console.log('first-person legs follow the hidden soldier pose and hide outside the live first-person view');
 } finally {

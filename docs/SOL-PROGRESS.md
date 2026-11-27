@@ -8,11 +8,11 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C16-3, connect bark events to AI with lead time.
 - **Branch:** `codex/c16-3-bark-timing` (stacked on C16-2 at `49fb7e5`).
 - **Started:** 2026-11-27 18:30 CET, Codex Sol cloud session.
-- **Steps done:** Confirmed the contract assigns the AI integration files to WARDEN. C16-1 and C16-2 are complete and pushed.
-- **Next step:** After the owner authorizes the WARDEN hooks, locate the announcement and action points and verify the lead time for each kind.
+- **Steps done:** The owner approved the three listed WARDEN hooks. Found two paths outside that scope: updateBot delegates Scavenger decisions to 43-efc-scavengers.js; ctlWeapon starts empty-magazine and automatic reloads in 07c-controller.js.
+- **Next step:** Confirm the additional files, then schedule warnings ahead of the actual behavior. For man_down, announce before the survivor reaction because the death has already occurred.
 - **How to verify:** Use the scripted C16-3 timing scenarios and record actual bark and action times. Run the base checks.
 - **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok.
-- **Questions for the owner:** May C16-3 add its timing hooks in the listed WARDEN AI files (`src/07-bots.js`, `src/07b-tactics.js`, and `src/efc/40-efc-wardens.js`)?
+- **Questions for the owner:** May C16-3 also edit `src/07c-controller.js` and `src/efc/43-efc-scavengers.js` to cover those paths?
 - **Watch out for:** The bark must precede the announced action. The caption card currently receives local events; online replication is C16-8.
 
 ## Next open cards, in order

@@ -14,7 +14,7 @@
    séries). Modèle « le tireur décide » : celui qui tire calcule ses touches
    et les adresse à la victime, qui applique les dégâts et annonce sa mort.
    ========================================================================== */
-const NET_PROTO = 14, NET_LOAD_WAIT = 45, NET_MAX = 8, NET_TEAM = 6, NET_PREFIX = EFC_BETA_PAGES ? 'cod-beta-lc1-' : 'cod-lc1-', NET_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const NET_PROTO = 15, NET_LOAD_WAIT = 45, NET_MAX = 8, NET_TEAM = 6, NET_PREFIX = EFC_BETA_PAGES ? 'cod-beta-lc1-' : 'cod-lc1-', NET_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const NET_WSPECIAL = { nade: _t('Grenade'), tknife: _t('Couteau de lancer'), air: _t('Frappe aérienne'), knife: _t('Couteau'), heli: _t('Hélicoptère'), drone: _t('Drone kamikaze'), mecha: _t('Mecha'), fall: _t('Chute'), zone: _t('Désert') }; // fall : chute dans le vide (voidDeath) ; zone : resté hors de la zone ronde (zoneDeath, 02-relief.js)
 const NET = {
   role: 'off', peer: null, hostConn: null, me: '', code: '', joined: false, t0: 0, hostSeen: 0, hbT: 0, lastSend: 0,
@@ -940,6 +940,14 @@ function netApply(id, P) {
   e.crouch = !!s[7]; e.slide = s[7] === 2; e.sprinting = !!s[8]; e.arms.adsW = s[10] ? 1 : 0; // 2 : accroupi et en glissade
   e.net.lean = clamp(numOr(s[12]), -0.4, 0.4); // penché (lissé par updateRemote)
   const alive = !!s[9];
+  const pose = P.po; // Raid player pose: body yaw, back flag, signed side.
+  e.efcProne = alive && !e.remoteBot && efcNetIsRaid() && Array.isArray(pose) && pose.length === 3 &&
+    Number.isFinite(pose[0]) && Math.abs(pose[0]) <= Math.PI + 0.001 &&
+    (pose[1] === 0 || pose[1] === 1) && (pose[2] === -1 || pose[2] === 0 || pose[2] === 1);
+  if (e.efcProne) {
+    e.onGround = true;
+    e.efcProneTurn = { anchorYaw: pose[0], bodyYaw: pose[0], onBack: pose[1] === 1, side: pose[2] };
+  } else e.efcProneTurn = null;
   e.health = clamp(numOr(s[11]), 0, 100);
   if (e.remoteBot && efcNetIsRaid()) e.efcNetRespawn = Number.isFinite(P.wr) ? clamp(P.wr, 0, EFC.cfg.wardenRespawn) : undefined;
   if (P.ak && typeof P.ak === 'object') NET.ak.set(id, P.ak); // événements appliqués par cet expéditeur, par expéditeur (netAckOf) : lu avant ses événements, qui le suivent dans le même état
@@ -1212,6 +1220,11 @@ function netPresence(e, now) {
     if (efcNetIsRaid() && !e.alive && Number.isFinite(e.respawnT)) p.wr = r(e.respawnT, 1);
   }
   else { // accusé (netPredHealth, netTradeOpen) : dernier événement appliqué de chaque expéditeur des 3 dernières secondes, avant une touche en attente
+    if (e.alive && e.onGround && e.efcProne && efcNetIsRaid()) {
+      const turn = e.efcProneTurn;
+      const yaw = turn?.bodyYaw ?? e.yaw;
+      p.po = [r(Math.atan2(Math.sin(yaw), Math.cos(yaw)), 3), turn?.onBack ? 1 : 0, turn?.side || 0];
+    }
     let ak = null;
     for (const [id, t] of NET.seenT) { if (now - t > 3000) { NET.seenT.delete(id); continue; } (ak || (ak = {}))[id] = NET.seen.get(id) || 0; }
     for (const h of NET.held) { const id = netIdOf(h.x); if (ak && id in ak) ak[id] = Math.min(ak[id], h.ev.i - 1); }

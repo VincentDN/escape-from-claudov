@@ -50,6 +50,8 @@ try {
         const distance = displacement.length();
         const direction = displacement.normalize().dot(heading);
 
+        jump(e); // Rise from prone before testing another airborne request.
+        ctlMove(e, dt); // Release Jump for the next press.
         jump(e);
         e.input.crouch = true;
         ctlMove(e, dt);
@@ -97,13 +99,13 @@ try {
   for (const entry of result.cases) {
     const label = JSON.stringify(entry);
     assert.equal(entry.began, 'dive', label);
-    assert.equal(entry.landed, 'crouch', label);
+    assert.equal(entry.landed, 'prone', label);
     assert.ok(entry.distance > 2 && entry.direction > 0.99, label);
     assert.equal(entry.duringCooldown, 'air', label);
     assert.equal(entry.afterCooldown, 'dive', label);
   }
   assert.equal(result.wall.began, 'dive');
-  assert.equal(result.wall.landed, 'crouch');
+  assert.equal(result.wall.landed, 'prone');
   assert.ok(result.wall.clearance >= 0.35 && result.wall.clearance <= 0.5, JSON.stringify(result.wall));
   assert.equal(result.grounded, 'slide');
   assert.equal(result.wardenState, 'air');
@@ -130,7 +132,7 @@ try {
   });
   assert.deepEqual(inputState, { before: 'air', after: 'dive' });
   assert.deepEqual(errors, []);
-  console.log('Dive passed in eight directions, stops at a wall, lands crouched, respects cooldown and preserves grounded Slide');
+  console.log('Dive passed in eight directions, stops at a wall, lands prone, respects cooldown and preserves grounded Slide');
 } finally {
   await browser.close();
 }

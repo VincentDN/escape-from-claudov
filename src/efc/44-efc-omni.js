@@ -5,6 +5,10 @@ function efcOmniState(entity) {
   if (entity.efcTraversal) return entity.efcTraversal.kind;
   if (!entity.onGround) return entity.efcDiving ? 'dive' : 'air';
   if (entity.slideT > 0) return 'slide';
+  if (entity.efcProne) {
+    const turn = entity.efcProneTurn;
+    return turn?.side ? 'side' : turn?.onBack ? 'supine' : 'prone';
+  }
   if (entity.sprinting) return entity.efcTactical > 0 ? 'tactical' : 'sprint';
   return entity.crouch ? 'crouch' : 'stand';
 }
@@ -57,6 +61,75 @@ function efcOmniDiveLand(entity) {
   entity.efcDiving = false;
   entity.efcDiveCooldown = EFC_DIVE.cooldown;
   entity.crouch = true;
+  entity.efcProne = true;
+  entity.efcProneHeldFor = 0;
+  entity.efcProneWaitRelease = efcOmniCrouchHeld(entity);
+}
+
+const EFC_PRONE = { hold: 0.4, speed: 0.9, height: 0.5, eye: 0.35 };
+
+function efcOmniCrouchHeld(entity) {
+  return entity === PL.ent && !!(KEYS.KeyC || KEYS.ControlLeft);
+}
+
+function efcOmniProne(entity, sprint, diving, dt) {
+  if (!entity.isPlayer || !efcRaidMode()) return false;
+  const input = entity.input;
+  const canHold = entity === PL.ent && !entity.busy && !playHold() && !KS.map.open;
+  const crouchHeld = efcOmniCrouchHeld(entity);
+  if (!crouchHeld) entity.efcProneWaitRelease = false;
+  const trackingHold = canHold && crouchHeld && !entity.efcProneWaitRelease;
+  const heldFor = entity.efcProneHeldFor || 0;
+
+  if (entity.efcProne) {
+    entity.efcProneHeldFor = trackingHold ? heldFor + dt : 0;
+    const tapped = canHold && !crouchHeld && heldFor > 0 && heldFor < EFC_PRONE.hold - 1e-6;
+    const jumpPressed = input.jump && !entity.jumpHeld;
+    if (entity.onGround && (tapped || jumpPressed) &&
+        ceilingAbove(entity.pos.x, entity.pos.z, entity.pos.y + 0.3, 0.36) >= entity.pos.y + 1.8) {
+      entity.efcProne = false;
+      entity.efcProneHeldFor = 0;
+      entity.efcProneWaitRelease = crouchHeld;
+      entity.crouch = input.crouch = false;
+      if (entity === PL.ent) PL.crouchToggle = false;
+    }
+    return entity.efcProne;
+  }
+
+  const canEnter = entity.onGround && !sprint && !diving && !input.slide && !(entity.slideT > 0);
+  entity.efcProneHeldFor = trackingHold && canEnter ? heldFor + dt : 0;
+  entity.efcProne = entity.efcProneHeldFor >= EFC_PRONE.hold - 1e-6;
+  if (entity.efcProne) {
+    entity.efcProneHeldFor = 0;
+    entity.efcProneWaitRelease = true;
+  }
+  return entity.efcProne;
+}
+
+const EFC_PRONE_TURN = {
+  bodyRange: Math.PI / 4, bodySpeed: Math.PI, backEnter: 2 * Math.PI / 3, backExit: Math.PI / 2,
+};
+
+function efcOmniProneTurn(entity, prone, dt) {
+  if (!entity.isPlayer || !efcRaidMode()) return;
+  if (!prone || !entity.onGround) {
+    entity.efcProneTurn = null;
+    return;
+  }
+
+  const config = EFC_PRONE_TURN;
+  const turn = entity.efcProneTurn ??= {
+    anchorYaw: entity.yaw, bodyYaw: entity.yaw, onBack: false, side: 0,
+  };
+  const yaw = entity.yaw - turn.anchorYaw;
+  const offset = Math.atan2(Math.sin(yaw), Math.cos(yaw));
+  // The torso follows within an arc around the grounded prone orientation.
+  // The sine keeps the body target continuous at the rear yaw wrap.
+  const target = turn.anchorYaw + Math.sin(offset) * config.bodyRange;
+  const step = config.bodySpeed * dt;
+  turn.bodyYaw += clamp(target - turn.bodyYaw, -step, step);
+  turn.onBack = Math.abs(offset) >= (turn.onBack ? config.backExit : config.backEnter);
+  if (entity === PL.ent) turn.side = Number(!!KEYS.LeanR) - Number(!!KEYS.LeanL);
 }
 
 function efcOmniReset(entity) {
@@ -68,6 +141,10 @@ function efcOmniReset(entity) {
   entity.efcDiving = false;
   entity.efcDiveCrouchHeld = false;
   entity.efcDiveCooldown = 0;
+  entity.efcProne = false;
+  entity.efcProneHeldFor = 0;
+  entity.efcProneWaitRelease = false;
+  entity.efcProneTurn = null;
 }
 
 // Use the standing controller cylinder. The normal collision resolver permits steps;
@@ -144,7 +221,7 @@ function efcOmniTraversalStep(entity, dt) {
   let traversal = entity.efcTraversal;
   const started = !traversal;
   if (started) {
-    if (!input.jump || entity.jumpHeld || !entity.onGround || entity.crouch || input.crouch ||
+    if (!input.jump || entity.jumpHeld || !entity.onGround || entity.efcProne || entity.crouch || input.crouch ||
         entity.slideT > 0 || input.slide || entity.slideBuf > 0) return null;
     traversal = efcOmniTraversalPlan(entity);
     if (!traversal) return null;
@@ -179,4 +256,37 @@ function efcOmniTraversalStep(entity, dt) {
   entity.slideAmt = damp(entity.slideAmt || 0, 0, 7, dt);
   entity.arms.sprintW = damp(entity.arms.sprintW, 0, 11, dt);
   return { landed: 0, jumped: started, slid: false };
+}
+
+const EFC_FLAT_HIT_LOWER_BODY = [
+  { forward: -0.04, height: 0.22, radius: 0.19, part: 'body' },
+  { forward: -0.36, height: 0.18, radius: 0.16, part: 'legs' },
+  { forward: -0.65, height: 0.14, radius: 0.13, part: 'legs' },
+];
+// Centres are in body space. The leading two rows also supply the head and chest aim points.
+const EFC_FLAT_HIT_VOLUMES = {
+  prone: [
+    { forward: 0.65, height: 0.30, radius: 0.14, part: 'head' },
+    { forward: 0.32, height: 0.24, radius: 0.21, part: 'body' },
+    ...EFC_FLAT_HIT_LOWER_BODY,
+  ],
+  supine: [
+    { forward: 0.65, height: 0.22, radius: 0.14, part: 'head' },
+    { forward: 0.32, height: 0.25, radius: 0.21, part: 'body' },
+    ...EFC_FLAT_HIT_LOWER_BODY,
+  ],
+};
+
+function efcOmniHitVolumes(entity) {
+  const human = entity.isPlayer || (entity.isRemote && entity.remoteBot === false);
+  if (!human || !entity.efcProne || !efcRaidMode()) return null;
+  const stance = efcOmniState(entity);
+  if (stance === 'side') return EFC_FLAT_HIT_VOLUMES[entity.efcProneTurn.onBack ? 'supine' : 'prone'];
+  return stance === 'prone' || stance === 'supine' ? EFC_FLAT_HIT_VOLUMES[stance] : null;
+}
+
+function efcOmniHitPoint(entity, volume, out) {
+  const yaw = entity.efcProneTurn?.bodyYaw ?? entity.yaw;
+  return out.set(entity.pos.x - Math.sin(yaw) * volume.forward, entity.pos.y + volume.height,
+    entity.pos.z - Math.cos(yaw) * volume.forward);
 }

@@ -39,6 +39,7 @@ function curW() { return armsW(PL.ent); }
 
 /* ---------- Entrées ---------- */
 function onKey(e, down) {
+  if (efcFreeLookKey(e, down)) return;
   if (CHAT.open) return; // saisie d'un message : les touches ne commandent plus le soldat
   if (down && (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyF') && (MATCH.state === 'killcam' || (MATCH.state === 'playing' && !PL.ent.alive))) { e.preventDefault(); kcSkip(); return; }
   if (MATCH.state !== 'playing' && MATCH.state !== 'paused') return;
@@ -89,6 +90,7 @@ addEventListener('mousedown', (e) => {
   if (TOUCH.on && performance.now() - TOUCH.lastT < 800) return;
   if (e.button === 0 && (MATCH.state === 'killcam' || (MATCH.state === 'playing' && !PL.ent.alive && pointerActive()))) { kcSkip(); return; }
   if (MATCH.state !== 'playing' || !pointerActive() || CHAT.open) return;
+  if (e.button === 0 && efcFreeLookHeld()) return;
   if (performance.now() < PL.noFireT) return; // second clic d'un double clic sur Déployer ou Reprendre : pas un tir
   if (KS.map.open) { if (e.button === 0) ksConfirm(); else if (e.button === 2) ksCancel(); return; }
   if (e.button === 0) { if (trackpadOn()) trackpadClick(e); else { PL.held = true; PL.queued = true; } } // pavé tactile : tir automatique, double clic pour viser (09qe-pavetactile.js)
@@ -299,18 +301,23 @@ function playerShotFx(d, ads, f, muzzle, kv, kh, hitAny) {
 /* ---------- Mise à jour ---------- */
 function updatePlayer(dt, now) {
   const e = PL.ent;
-  if (!e.alive) { if (e.leanX) efcLeanReset(); updateDeadPlayer(dt); return; }
+  if (!e.alive) { efcFreeLookReset(); if (e.leanX) efcLeanReset(); updateDeadPlayer(dt); return; }
   const w = curW(), d = w.def;
   // regard
   if (KS.map.open) { ksMapMouse(mouseDX, mouseDY); mouseDX = 0; mouseDY = 0; }
   const zoom = camera.fov / Settings.fov;
   const s = 0.0021 * (trackpadOn() ? Settings.tpSens : Settings.sens) * (0.35 + 0.65 * zoom) * adsLookMul(Settings.adsMul); // au pavé tactile, sa propre sensibilité (09qe-pavetactile.js)
-  const ak = PILOT.d ? 1 : aimAssist(dt); // (à bord du mecha aussi : au doigt, son tir automatique tient la détente, mechaPilot) // assistance à la visée au doigt et à la manette : ralentissement, accroche, suivi, tir automatique (09qd-visee.js)
-  const pitch0 = PL.pitch;
-  PL.yaw -= mouseDX * s * ak; PL.pitch -= mouseDY * s * ak * (Settings.invertY ? -1 : 1);
-  VM.swayTX += mouseDX * 0.0006; VM.swayTY += mouseDY * 0.0006;
+  let pitch0 = PL.pitch;
+  const dy = -mouseDY * s * (Settings.invertY ? -1 : 1);
+  const freeLook = efcFreeLookTick(-mouseDX * s, dy);
+  if (!freeLook) {
+    const ak = PILOT.d ? 1 : aimAssist(dt);
+    pitch0 = PL.pitch;
+    PL.yaw -= mouseDX * s * ak; PL.pitch += dy * ak;
+    VM.swayTX += mouseDX * 0.0006; VM.swayTY += mouseDY * 0.0006;
+  }
   mouseDX = 0; mouseDY = 0;
-  if (PAD.drive) padLook(dt); // manette (09qc-manette.js)
+  if (!freeLook && PAD.drive) padLook(dt); // manette (09qc-manette.js)
   recoilTick(dt, now, PL.pitch - pitch0); // retour de la visée après un tir ; ce que le joueur vient de reprendre à la main compte (07ca-recul.js)
   PL.pitch = clamp(PL.pitch, -1.5, 1.5);
   if ((MECHA_P.me || PILOT.d) && e.leanX) efcLeanReset();
@@ -416,8 +423,12 @@ function updatePlayer(dt, now) {
     }
   }
   // couteau en main : le clic donne des coups (tant qu'il est tenu, un coup après l'autre) à la place des tirs ; la main sort et rentre avec knifeHold
+  const aimBlocked = efcOmniAimBlocked(e, PL.yaw, PL.pitch);
+  const aimReady = !aimBlocked && !efcOmniAimBlocked(e, camera.rotation.y, camera.rotation.x);
+  if (!aimReady) I.fire = I.firePressed = false;
+  if (aimBlocked) PL.held = PL.queued = PL.runShot = false;
   knifeButtonTick(dt);
-  if (PL.knifeOut) { if ((PL.queued || PL.held) && !hold) knife(); PL.queued = false; }
+  if (PL.knifeOut) { if ((PL.queued || PL.held) && !hold && aimReady) knife(); PL.queued = false; }
   PL.knifeHold = damp(PL.knifeHold, PL.knifeOut && !PL.nadeState && !KS.mode && !(PL.knifeT > 0 && !PL.knifeNew) ? 1 : 0, PL.knifeOut ? 8 : 12, dt); // la sortie se voit (0,3 s), le rangement est plus vif
   // arme : même contrôleur que les bots
   const shotsBefore = e.arms.shots;
@@ -426,7 +437,7 @@ function updatePlayer(dt, now) {
   if (e.arms.shots !== shotsBefore) PL.runShot = false;
   PL.yaw = e.yaw; PL.pitch = e.pitch;
   // souffle retenu en lunette
-  const scoped = d.scope && VM.ads > 0.9;
+  const scoped = !freeLook && d.scope && VM.ads > 0.9;
   PL.holding = scoped && (KEYS.ShiftLeft || PAD.l3) && PL.breath > 0;
   PL.breath = clamp(PL.breath + (PL.holding ? -dt / 4 : dt / 5), 0, 1);
   // régénération
@@ -518,10 +529,13 @@ function applyCamera(dt, now, scoped) {
   camera.position.x += Math.cos(PL.yaw) * Math.cos(PL.bobT) * 0.007 * bob; camera.position.z -= Math.sin(PL.yaw) * Math.cos(PL.bobT) * 0.007 * bob;
   camera.position.x -= Math.sin(PL.yaw) * PL.lunge; camera.position.z -= Math.cos(PL.yaw) * PL.lunge;
   camera.rotation.set(PL.pitch + PL.punchP + sy + (Math.random() - 0.5) * sh + Math.sin(PL.bobT * 2) * 0.004 * sw * bob, PL.yaw + PL.punchY + sx + (Math.random() - 0.5) * sh, Math.cos(PL.bobT) * (0.003 + 0.005 * sw) * bob + VM.swayX * -0.02 + PL.rollP + (e.slideAmt || 0) * 0.045);
+  vmCamera.rotation.x = vmCamera.rotation.y = 0;
   efcLeanCam(); // se pencher : l'œil se décale et la vue roule (src/efc/42-efc-lean.js)
+  efcFreeLookCamera(e);
   PL.yawReal = PL.yaw;
   PL.fovK = damp(PL.fovK || 0, 0, 7, dt);
-  const fovT = Settings.fov * lerp(1, d.adsFov, smoothstep(0, 1, VM.ads)) * (1 + 0.085 * sw + (e.slideAmt || 0) * 0.09) + PL.fovK * lerp(1, 0.35, VM.ads);
+  const viewAds = EFC_FREE_LOOK.active ? 0 : VM.ads;
+  const fovT = Settings.fov * lerp(1, d.adsFov, smoothstep(0, 1, viewAds)) * (1 + 0.085 * sw + (e.slideAmt || 0) * 0.09) + PL.fovK * lerp(1, 0.35, VM.ads);
   if (Math.abs(camera.fov - fovT) > 0.01) { camera.fov = damp(camera.fov, fovT, 26, dt); camera.updateProjectionMatrix(); onResizeFx(); }
   const vf = vmFovAt(VM.fovHip, VM.ads);
   if (Math.abs(vmCamera.fov - vf) > 0.01) { vmCamera.fov = vf; vmCamera.updateProjectionMatrix(); }

@@ -265,6 +265,7 @@ const VM = {
   ads: 0, sprint: 0, bobT: 0, bobAmt: 0, swayX: 0, swayY: 0, swayTX: 0, swayTY: 0,
   rec: { z: 0, vz: 0, rx: 0, vrx: 0, ry: 0, vry: 0, rz: 0, vrz: 0, y: 0, vy: 0 },
   fovHip: 58, lastGo: [0, 0, 0, 0, 0, 0], popO: [0, 0, 0, 0, 0, 0], popV: [0, 0, 0, 0, 0, 0], gV: [0, 0, 0, 0, 0, 0], camK: [0, 0, 0, 0], chocO: [0, 0, 0, 0, 0, 0], chocV: [0, 0, 0, 0, 0, 0], lastAct: '', actK: 1, actFade: false, sprV: 0, sprK: 0, tilt: 0, push: 0, wall: 0, trig: 0, trigT: 0, land: 0, vland: 0, lower: 0, lowerTarget: 0, lowV: 0, lowerUp: true, lowArr: true, lhOk: false, sling: 0, action: null, actionT: 0, actionDur: 1, actionData: null,
+  efcLowPose: [0, 0, 0, 0, 0, 0],
   flashT: 0, flashT0: 0.05, flashM: null, crouch: 0, knifeRig: null, nadeRig: null, sunVis: 1, breath: 0, jump: 0, bobO: new THREE.Vector3(), bobR: new THREE.Vector3(),
 };
 /* Position de l'arme à la hanche, par modèle : décalage x, y, z puis tangage, lacet (le canon converge vers le centre de
@@ -505,6 +506,12 @@ function updateViewmodel(dt, S) {
   // glissade : l'arme s'incline vers l'extérieur et descend, avec un léger tremblement de la vitesse
   const sl = (S.slide || 0) * (1 - a);
   if (sl > 0.01) { x += 0.03 * sl; y -= 0.025 * sl; z += 0.02 * sl; rx += 0.12 * sl; ry -= 0.1 * sl; rz += (0.32 + Math.sin(VM.breath * 40) * 0.01) * sl; }
+  // Low holds blend into the gun transform before the existing handling and hand placement.
+  const lowPose = VM.efcLowPose;
+  efcOmniViewPose(PL.ent, lowPose, dt);
+  const lowWeight = (1 - a) * (1 - fk) * (1 - clamp(VM.lower, 0, 1)) * (1 - clamp(VM.sling || 0, 0, 1));
+  x += lowPose[0] * lowWeight; y += lowPose[1] * lowWeight; z += lowPose[2] * lowWeight;
+  rx += lowPose[3] * lowWeight; ry += lowPose[4] * lowWeight; rz += lowPose[5] * lowWeight;
   // abaissement (changement d'arme)
   // l'arme plonge en tournant vers l'extérieur (et remonte de même) plutôt que de descendre tout droit
   y -= VM.lower * 0.28; rx -= VM.lower * 0.9; rz += VM.lower * 0.32; x += VM.lower * 0.05; ry -= VM.lower * 0.18;

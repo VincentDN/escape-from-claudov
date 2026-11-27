@@ -37,6 +37,10 @@ function efcLeanRight(e, out) { return out.set(Math.cos(e.yaw), 0, -Math.sin(e.y
 /* Per frame, from updatePlayer before the camera: eases the lean and shortens it against geometry */
 function efcLeanTick(dt) {
   const e = PL.ent, L = EFC_LEAN;
+  if (e.isPlayer && e.efcProne && efcRaidMode()) {
+    efcLeanReset();
+    return;
+  }
   const blocked = efcLeanBlocked(e);
   if (blocked) L.tog = 0;
   const want = blocked ? 0 : efcLeanWant(), step = dt / L.ease;

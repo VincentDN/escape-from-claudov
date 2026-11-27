@@ -78,10 +78,11 @@ try {
   ok(Math.abs(right.side - 0.35) < 0.02 && Math.abs(right.eyeSide - 0.35) < 0.02, '(1) leaning right moves the eye 0.35 m to the right in the open', right);
   ok(half > 0.05 && half < 0.34, '(1) the lean eases in (part way after 0.1 s, full by 0.3 s)', { half });
   ok(Math.abs(right.roll * 180 / Math.PI + 15) < 1.5 && right.gun > 0.05, '(1) camera rolls about 15 degrees, the weapon cants with it', { rollDeg: right.roll * 180 / Math.PI, gun: right.gun });
-  await run(0.3, 'KEYS.LeanR = false; KEYS.LeanL = true;');
+  await page.evaluate(() => { KEYS.LeanR = false; KEYS.LeanL = true; });
+  await run(0.3);
   const left = await page.evaluate(() => LT.side(PL.ent, camera.position));
   ok(Math.abs(left + 0.35) < 0.02, '(1) leaning left moves the eye 0.35 m to the left', left);
-  await run(0.6, 'KEYS.LeanL = false; KEYS.ControlLeft = true; KEYS.LeanR = true;');
+  await run(0.6, 'KEYS.LeanL = false; PL.crouchToggle = true; KEYS.LeanR = true;');
   const crouch = await page.evaluate(() => ({ side: LT.side(PL.ent, camera.position), crouch: PL.ent.crouchAmt }));
   ok(crouch.crouch > 0.9 && Math.abs(crouch.side - 0.25) < 0.03, '(1) crouched, the lean is shorter (0.25 m)', crouch);
   await run(0.8, 'KEYS.ControlLeft = false; PL.crouchToggle = false; KEYS.LeanR = true; PL.adsWant = true;');

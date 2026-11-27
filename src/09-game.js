@@ -355,15 +355,16 @@ function updateHud(dt) {
   HUD.xhairGap = damp(HUD.xhairGap, 6 + Math.tan(spread) * focal, 20, dt);
   HUD.kick = damp(HUD.kick, 0, 14, dt);
   const xh = $('xhair'), gap = HUD.xhairGap + HUD.kick;
-  hudStyle(xh, 'opacity', !e.alive || ads > 0.6 || PL.sprinting || PL.knifeT > 0 || PL.knifeOut || KS.mode || playHold() ? '0' : '0.9'); // (décompte : l'anneau prend sa place)
+  const aimDetached = EFC_FREE_LOOK.active || efcOmniAimBlocked(e, PL.yaw, PL.pitch);
+  hudStyle(xh, 'opacity', !e.alive || aimDetached || ads > 0.6 || PL.sprinting || PL.knifeT > 0 || PL.knifeOut || KS.mode || playHold() ? '0' : '0.9'); // (décompte : l'anneau prend sa place)
   hudVar(xh, '--gap', (Math.round(gap * 2) / 2).toFixed(1) + 'px'); // demi-pixel : pas de nouveau style pour un écart invisible
-  const scoped = !!(d.scope && ads > 0.92 && e.alive);
+  const scoped = !!(!aimDetached && d.scope && ads > 0.92 && e.alive);
   $('scope').classList.toggle('on', scoped);
   if (scoped) {
     hudStyle($('breath'), 'transform', `scaleX(${clamp(PL.breath, 0, 1).toFixed(3)})`);
     const g = actGlyph('sprint'); hudHtml($('breathHint'), g ? _t('{0} Retenir son souffle', g) : ''); // au doigt : le bouton (s'il est gardé)
   }
-  FinalShader.uniforms.uAberr.value = Math.max(d.scope && ads > 0.92 ? 1.6 : 0.0, PL.aberr || 0);
+  FinalShader.uniforms.uAberr.value = Math.max(scoped ? 1.6 : 0.0, PL.aberr || 0);
   { const k = PL.boltT > 0 ? Math.sin(clamp((1 - PL.boltT / 1.05) * 1.25, 0, 1) * Math.PI) : 0; hudStyle($('scopeMask'), 'transform', k ? `translate(${k * 6}px, ${k * 22}px) rotate(${k * 1.6}deg)` : ''); }
   // indicateurs de dégâts
   const box = $('dmgind');

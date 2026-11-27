@@ -192,11 +192,11 @@ before starting).
 | C9-1 | Movement state machine skeleton and transition table | S | C1-2 | done |
 | C9-2 | Dive | M | C9-1 | done |
 | C9-3 | Mantle and vault | M | C9-1 | done |
-| C9-4 | Prone: enter, crawl, get up | M | C9-1 | open |
-| C9-5 | Prone: free turn, roll to back and sides | M | C9-4 | open |
-| C9-6 | Hit volumes follow the stance | M | C9-4 | open |
-| C9-7 | Replicate stances online | S | C9-6 | open |
-| C9-8 | C9b: the weapon follows the body | L | C9-7 | open |
+| C9-4 | Prone: enter, crawl, get up | M | C9-1 | done |
+| C9-5 | Prone: free turn, roll to back and sides | M | C9-4 | done |
+| C9-6 | Hit volumes follow the stance | M | C9-4 | done |
+| C9-7 | Replicate stances online | S | C9-6 | done |
+| C9-8 | C9b: the weapon follows the body | L | C9-7 | done |
 | C16-1 | Bark events, catalogue and rules (no sound, no UI) | S | C9-8 | open |
 | C16-2 | Captions over the hostile and in a feed | S | C16-1 | open |
 | C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | open |
@@ -585,6 +585,26 @@ everything on `entity.isPlayer && efcRaidMode()`, and add a test that drives the
   the two-client rig (`net2.mjs`) shows the same stance.
 - **C9-8 (C9b):** weapon held across the chest on the back, rolled on a side, aim limits, third person matches. Split into cards
   before starting: write the split in this file and get it reviewed.
+
+#### Approved sequence for C9-8
+
+C9-8a requires C9-7. Every later step requires the preceding step. C9-8 stays open until C9-8f passes.
+
+1. **C9-8a. First-person prone.** Blend the equipped viewmodel into a low, body-relative hold on entry and back out on rise.
+   Verify prone entry, crawl and rise with the same equipped weapon.
+2. **C9-8b. First-person supine.** Hold the weapon across the chest while on the back. Verify automatic back rolls and return
+   to prone in both turn directions.
+3. **C9-8c. First-person side.** Pose the weapon for the existing left and right Lean controls. Verify hand placement and return
+   to the underlying prone or supine pose on release.
+4. **C9-8d. Aim limits and Alt free-look.** Use body-relative yaw and pitch limits while preserving free camera look.
+   Hold either Alt key to turn the camera without changing the weapon direction. Verify the aim limits, yaw wrap,
+   trigger handling and return to normal aim.
+5. **C9-8e. Third-person poses.** Use the replicated stance and body yaw to mirror prone, supine, and both side poses.
+   Verify that both clients see each pose and the return to standing.
+6. **C9-8f. Verification.** Exercise a magazine rifle, a manually cycled rifle, and a pump through pose entry, limits, weapon
+   changes and reset. Review first- and third-person captures for weapon visibility and hand contact, then close C9-8.
+
+The owner approved the split and requested hold-Alt free-look.
 
 ### C2-1. Port Partisan's rail and compatibility rules (M)
 

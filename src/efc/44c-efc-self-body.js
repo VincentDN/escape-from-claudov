@@ -52,7 +52,8 @@ function efcSelfLegsTick(e) {
   const mesh = efcSelfLegsBuild(e.model, e.model.lod.skin);
   const down = clamp(-camera.rotation.x / EFC_SELF_LEGS.maxDown, 0, 1);
   const back = lerp(EFC_SELF_LEGS.back, EFC_SELF_LEGS.crouchedBack, e.crouchAmt || 0) + EFC_SELF_LEGS.downBack * down;
-  mesh.position.set(Math.sin(e.yaw) * back, 0, Math.cos(e.yaw) * back);
+  const bodyYaw = e.efcProneTurn?.bodyYaw ?? e.yaw;
+  mesh.position.set(Math.sin(bodyYaw) * back, 0, Math.cos(bodyYaw) * back);
   mesh.visible = true;
 }
 

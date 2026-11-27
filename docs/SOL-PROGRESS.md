@@ -8,8 +8,8 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 - **Card:** C17-2, first-person legs framing
 - **Branch:** `codex/c17-2-legs-framing`
 - **Started:** 2026-11-27 23:36 UTC
-- **Steps done:** 1. Added the standing, crouched and downward-look offsets outside the shared skeleton.
-- **Next step:** 2. Anchor the offset to body yaw during free-look and prone turning.
+- **Steps done:** 1. Added standing, crouched and downward-look offsets. 2. Anchored them to body yaw during free-look and prone turning.
+- **Next step:** 3. Hide the legs when the camera is too close to the pelvis and capture the pitch contact sheet.
 - **How to verify:** `node tools/dev/efc/test-self-legs.mjs` and the base checks.
 - **Checks so far:** `first-person legs follow the hidden soldier pose and hide outside the live first-person view`, `smoke ok`, build asset list and translation check with `0 erreur(s)`. Declaration check exited 0.
 - **Questions for the owner:** C16-5 requires approval of the five-line bark sample sheet before generation.

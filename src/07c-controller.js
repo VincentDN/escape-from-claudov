@@ -49,7 +49,14 @@ function ctlMove(ent, dt) {
   const traversal = efcOmniTraversalStep(ent, dt);
   if (traversal) return traversal;
   let sprint = I.sprint && efcOmniSprintDirection(ent, I) && !I.ads && !ent.blockSprint && A.boltT <= 0 && (!ent.busy || ent.sprintBusyOk);
-  const diving = efcOmniDive(ent, sprint, dt);
+  const wasProne = ent.efcProne && ent.isPlayer && efcRaidMode();
+  const diving = efcOmniDive(ent, sprint && !wasProne, dt);
+  const prone = efcOmniProne(ent, sprint, diving, dt);
+  if (prone || wasProne) {
+    sprint = false;
+    I.slide = false;
+    ent.slideBuf = 0;
+  }
   // glissade : démarrage, puis la course n'est plus « un sprint » (on peut tirer et viser)
   ent.slideCd = Math.max(0, (ent.slideCd || 0) - dt);
   let slid = false, sliding = (ent.slideT || 0) > 0;
@@ -66,7 +73,7 @@ function ctlMove(ent, dt) {
     }
   }
   if (sliding || diving) sprint = false;
-  if (sliding || diving) ent.crouch = true;
+  if (sliding || diving || prone) ent.crouch = true;
   else if (I.crouch && !sprint) ent.crouch = true;
   else if (ent.crouch && ceilingAbove(ent.pos.x, ent.pos.z, ent.pos.y + 1.0, 0.3) > ent.pos.y + 1.8) ent.crouch = false;
   ent.crouchAmt = damp(ent.crouchAmt, ent.crouch ? 1 : 0, 10, dt);
@@ -76,6 +83,7 @@ function ctlMove(ent, dt) {
   const tactical = efcOmniTacticalSprint(ent, sprint, dt);
   if (sprint) spd *= SPRINT_MUL * tactical; else if (A.adsW > 0.5) spd *= d.scope ? 0.4 : 0.58;
   if (ent.crouch) spd *= 0.6;
+  if (prone) spd = EFC_PRONE.speed;
   const fx = -Math.sin(ent.yaw), fz = -Math.cos(ent.yaw), rx = Math.cos(ent.yaw), rz = -Math.sin(ent.yaw);
   let wx = fx * I.mz + rx * I.mx, wz = fz * I.mz + rz * I.mx; const wl = hyp(wx, wz);
   if (wl > 1) { wx /= wl; wz /= wl; }
@@ -97,7 +105,7 @@ function ctlMove(ent, dt) {
     if (ent.slideT <= 0) { ent.slideT = 0; ent.slideCd = SLIDE.cd; }
   } else if (!diving) { ent.vel.x = damp(ent.vel.x, wx * spd, acc, dt); ent.vel.z = damp(ent.vel.z, wz * spd, acc, dt); }
   let jumped = false;
-  if (I.jump && ent.onGround && !ent.jumpHeld) { // on saute même en lançant une grenade ou en changeant d'arme
+  if (!prone && !wasProne && I.jump && ent.onGround && !ent.jumpHeld) { // on saute même en lançant une grenade ou en changeant d'arme
     if (sliding) { ent.slideT = 0; ent.slideCd = SLIDE.cd; ent.crouch = false; sliding = false; ent.vy = 6.3; ent.onGround = false; jumped = true; } // saut de glissade : l'élan est gardé
     else if (ent.crouch) ent.crouch = false; else { ent.vy = 6.3; ent.onGround = false; jumped = true; }
   }
@@ -108,7 +116,7 @@ function ctlMove(ent, dt) {
   // automatique hisse le soldat sur le meuble, sa tête entre dans la dalle) : il s'accroupit. Debout, collideCircle prendrait la dalle pour
   // un mur et le repousserait jusqu'à son bord, à l'autre bout de la pièce
   if (!ent.crouch && ent.onGround && ceilingAbove(ent.pos.x, ent.pos.z, ent.pos.y + 0.3, 0.3) < ent.pos.y + 1.77) ent.crouch = true;
-  const height = ent.crouch ? 1.2 : 1.75;
+  const height = prone ? EFC_PRONE.height : ent.crouch ? 1.2 : 1.75;
   if (MATCH.time - (ent.spawnAt || -99) < 3) spawnPush(ent, dt);
   collideCircle(ent.pos, ent.isPlayer ? 0.36 : 0.34, height);
   // bot au bord du vide (îles flottantes) : un pas sans appui, ou qui en manquera un quart de mètre plus loin, est refusé, axe par axe
@@ -139,7 +147,7 @@ function ctlMove(ent, dt) {
   if (diving && ent.onGround) efcOmniDiveLand(ent);
   if (sliding && !ent.onGround) { ent.slideT = 0; ent.slideCd = SLIDE.cd; sliding = false; } // plus de sol : fin de la glissade
   ent.slideAmt = damp(ent.slideAmt || 0, sliding ? 1 : 0, sliding ? 12 : 7, dt);
-  ent.eyeH = damp(ent.eyeH, sliding ? 0.85 : ent.crouch ? 1.1 : 1.62, sliding ? 22 : 12, dt);
+  ent.eyeH = damp(ent.eyeH, prone || (diving && ent.onGround) ? EFC_PRONE.eye : sliding ? 0.85 : ent.crouch ? 1.1 : 1.62, sliding ? 22 : 12, dt);
   ent.sprinting = sprint && hyp(ent.vel.x, ent.vel.z) > 3;
   A.sprintW = damp(A.sprintW, ent.sprinting ? 1 : 0, 11, dt); // (9 avant la 5.1 : on tire plus tôt en sortant du sprint)
   return { landed, jumped, slid };

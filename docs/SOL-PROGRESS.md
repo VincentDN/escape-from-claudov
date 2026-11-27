@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** none in progress. Take the next eligible card in section 4.
-- **Branch:**
-- **Started:** (date, time, session)
-- **Steps done:**
-- **Next step:**
-- **Checks so far:** (command and its last line)
+- **Card:** C9-4, enter, crawl and rise from prone.
+- **Branch:** `codex/c9-omni`, based on C9-3's closing checkpoint.
+- **Started:** 2026-11-27 07:58 CET, Codex Sol cloud session resumed.
+- **Steps done:** Added 0.4 s Crouch hold, all-direction crawl, lowered collision height and eye height, headroom checks for Jump and Crouch tap, and Dive-to-Prone. Prone Jump takes priority over traversal.
+- **Next step:** Finish the combined Dive, Traversal, Sprint, movement state and Warden regressions, then close C9-4.
+- **Checks so far:** `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `node tools/dev/efc/smoke.mjs` — smoke ok. `node tools/dev/efc/test-omni-prone.mjs` — Prone holds, crawls in all eight directions, respects headroom, and follows Dive.
 - **Questions for the owner:**
-- **Watch out for:**
+- **Watch out for:** An entry or Dive Crouch release must keep Prone. A blocked rise needs a new press after clearance returns.
 
 ## Next open cards, in order
 

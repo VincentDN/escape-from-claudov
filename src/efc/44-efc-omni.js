@@ -5,6 +5,7 @@ function efcOmniState(entity) {
   if (entity.efcTraversal) return entity.efcTraversal.kind;
   if (!entity.onGround) return entity.efcDiving ? 'dive' : 'air';
   if (entity.slideT > 0) return 'slide';
+  if (entity.efcProne) return 'prone';
   if (entity.sprinting) return entity.efcTactical > 0 ? 'tactical' : 'sprint';
   return entity.crouch ? 'crouch' : 'stand';
 }
@@ -57,6 +58,49 @@ function efcOmniDiveLand(entity) {
   entity.efcDiving = false;
   entity.efcDiveCooldown = EFC_DIVE.cooldown;
   entity.crouch = true;
+  entity.efcProne = true;
+  entity.efcProneHeldFor = 0;
+  entity.efcProneWaitRelease = efcOmniCrouchHeld(entity);
+}
+
+const EFC_PRONE = { hold: 0.4, speed: 0.9, height: 0.5, eye: 0.35 };
+
+function efcOmniCrouchHeld(entity) {
+  return entity === PL.ent && !!(KEYS.KeyC || KEYS.ControlLeft);
+}
+
+function efcOmniProne(entity, sprint, diving, dt) {
+  if (!entity.isPlayer || !efcRaidMode()) return false;
+  const input = entity.input;
+  const canHold = entity === PL.ent && !entity.busy && !playHold() && !KS.map.open;
+  const crouchHeld = efcOmniCrouchHeld(entity);
+  if (!crouchHeld) entity.efcProneWaitRelease = false;
+  const trackingHold = canHold && crouchHeld && !entity.efcProneWaitRelease;
+  const heldFor = entity.efcProneHeldFor || 0;
+
+  if (entity.efcProne) {
+    entity.efcProneHeldFor = trackingHold ? heldFor + dt : 0;
+    const tapped = canHold && !crouchHeld && heldFor > 0 && heldFor < EFC_PRONE.hold - 1e-6;
+    const jumpPressed = input.jump && !entity.jumpHeld;
+    if (entity.onGround && (tapped || jumpPressed) &&
+        ceilingAbove(entity.pos.x, entity.pos.z, entity.pos.y + 0.3, 0.36) >= entity.pos.y + 1.8) {
+      entity.efcProne = false;
+      entity.efcProneHeldFor = 0;
+      entity.efcProneWaitRelease = crouchHeld;
+      entity.crouch = input.crouch = false;
+      if (entity === PL.ent) PL.crouchToggle = false;
+    }
+    return entity.efcProne;
+  }
+
+  const canEnter = entity.onGround && !sprint && !diving && !input.slide && !(entity.slideT > 0);
+  entity.efcProneHeldFor = trackingHold && canEnter ? heldFor + dt : 0;
+  entity.efcProne = entity.efcProneHeldFor >= EFC_PRONE.hold - 1e-6;
+  if (entity.efcProne) {
+    entity.efcProneHeldFor = 0;
+    entity.efcProneWaitRelease = true;
+  }
+  return entity.efcProne;
 }
 
 function efcOmniReset(entity) {
@@ -68,6 +112,9 @@ function efcOmniReset(entity) {
   entity.efcDiving = false;
   entity.efcDiveCrouchHeld = false;
   entity.efcDiveCooldown = 0;
+  entity.efcProne = false;
+  entity.efcProneHeldFor = 0;
+  entity.efcProneWaitRelease = false;
 }
 
 // Use the standing controller cylinder. The normal collision resolver permits steps;
@@ -144,7 +191,7 @@ function efcOmniTraversalStep(entity, dt) {
   let traversal = entity.efcTraversal;
   const started = !traversal;
   if (started) {
-    if (!input.jump || entity.jumpHeld || !entity.onGround || entity.crouch || input.crouch ||
+    if (!input.jump || entity.jumpHeld || !entity.onGround || entity.efcProne || entity.crouch || input.crouch ||
         entity.slideT > 0 || input.slide || entity.slideBuf > 0) return null;
     traversal = efcOmniTraversalPlan(entity);
     if (!traversal) return null;

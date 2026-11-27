@@ -196,7 +196,7 @@ before starting).
 | C9-5 | Prone: free turn, roll to back and sides | M | C9-4 | done |
 | C9-6 | Hit volumes follow the stance | M | C9-4 | done |
 | C9-7 | Replicate stances online | S | C9-6 | done |
-| C9-8 | C9b: the weapon follows the body | L | C9-7 | open |
+| C9-8 | C9b: the weapon follows the body | L | C9-7 | done |
 | C16-1 | Bark events, catalogue and rules (no sound, no UI) | S | C9-8 | open |
 | C16-2 | Captions over the hostile and in a feed | S | C16-1 | open |
 | C16-3 | Hook barks into the existing AI, with lead time | M | C16-1 | open |

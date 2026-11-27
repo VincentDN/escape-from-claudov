@@ -2,9 +2,8 @@ import assert from 'node:assert/strict';
 import { openGame, startSolo } from './harness.mjs';
 
 const { browser, page, errors } = await openGame({ settings: { mode: 'raid', map: 'simoun' } });
-try {
-  await startSolo(page);
-  const result = await page.evaluate(() => {
+async function checkWeapon(weapon) {
+  const result = await page.evaluate((weapon) => {
     groundHeight = () => 30;
     ceilingAbove = () => Infinity;
     collideCircle = () => {};
@@ -13,7 +12,7 @@ try {
     for (const other of entities) {
       if (!other.isPlayer) other.off = true;
     }
-    entity.arms = makeArms(['ak47']);
+    entity.arms = makeArms([weapon]);
     vmEquip(curW().def);
 
     const dt = 1 / 30;
@@ -91,7 +90,7 @@ try {
       standing, firstEntry, prone, crawl, crawlDistance, frontSides, backRight, backSides,
       returnRight, backLeft, returnLeft, firstRise, risen,
     };
-  });
+  }, weapon);
 
   const { standing, firstEntry, prone, crawl, crawlDistance, frontSides, backRight, backSides,
     returnRight, backLeft, returnLeft, firstRise, risen } = result;
@@ -125,7 +124,7 @@ try {
     backSides.left, backSides.right, risen,
   ];
   for (const view of views) {
-    assert.equal(view.id, 'ak47');
+    assert.equal(view.id, weapon);
     assert.ok(view.visible && view.projectedCenter.slice(0, 2).every((v) => Math.abs(v) < 1),
       JSON.stringify(view));
     assert.ok(view.gripErrors.every((v) => v < 0.05), JSON.stringify(view));
@@ -135,8 +134,13 @@ try {
   assert.ok(firstRise.pose[1] < 0 && firstRise.pose[1] > prone.pose[1]);
   assert.equal(risen.state, 'stand');
   assert.deepEqual(risen.pose, standing.pose);
+}
+
+try {
+  await startSolo(page);
+  for (const weapon of ['ak47', 'l96', 'rem870']) await checkWeapon(weapon);
   assert.deepEqual(errors, []);
-  console.log('First-person prone, supine and both side holds passed with bounded hand error and smooth return');
+  console.log('First-person prone, supine and side holds passed for AK-47, L96 and Remington 870');
 } finally {
   await browser.close();
 }

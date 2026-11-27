@@ -20,6 +20,7 @@ try {
         position: s.gun.position.clone().sub(e.pos).toArray(),
         orientation: s.gun.quaternion.toArray(),
         headHeight: s.J[J_HEAD].y - e.pos.y,
+        neckLength: s.J[J_HEAD].distanceTo(s.J[J_CHE]),
         shoulderRoll: s.J[J_SHR].y - s.J[J_SHL].y,
         gripDistance: s.J[J_HAR].distanceTo(grip),
         state: efcOmniState(e), side: e.efcProneTurn?.side || 0,
@@ -44,6 +45,7 @@ try {
         if (name === 'stand') assert.ok(sample.headHeight > 1);
         else {
           assert.ok(sample.headHeight <= 0.35, 'body geometry stays low');
+          assert.ok(sample.neckLength < 0.22, 'head stays attached to the torso');
           assert.ok(sample.gripDistance < 0.25, 'right hand reaches the weapon');
           if (side) assert.ok(sample.shoulderRoll * side > 0.25, 'supine side roll cants the shoulders');
           else assert.ok(Math.abs(sample.shoulderRoll) < 0.01, 'unrolled shoulders stay level');

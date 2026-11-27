@@ -5,14 +5,14 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C9-8, weapon poses, aim limits and Alt free-look.
-- **Branch:** `codex/c9-omni`
-- **Started:** 2026-11-27, Codex Sol cloud session.
-- **Steps done:** C9-8a–c added the first-person holds and smooth transitions. C9-8d added hold-Alt free-look and bounded the low-stance weapon aim while keeping the camera free. The release frame restores shot alignment. C9-8e added matching third-person holds, verified between host and guest.
-- **Next step:** Apply the C9-8f first-person framing correction. Verify all three weapon families and both camera views, then close C9-8.
-- **Checks so far:** `test-omni-prone-view.mjs` — First-person prone, supine and both side holds passed with bounded hand error and smooth return. `test-omni-free-look.mjs` — omni free-look and aim limits ok. `test-omni-world-pose.mjs` — omni world poses ok. `python3 build.py` — liste des assets : 221 prefabs, 39 props, 47 surfaces photo, 62 procédurales, 20 armes, 18 accessoires. `python3 tools/dev/check_decl.py` — no output, exit 0. `python3 tools/dev/check_i18n.py` — 1687 entrées anglaises, 1687 textes à traduire, 0 erreur(s). `smoke.mjs` — smoke ok.
+- **Card:** none in progress. Take the next eligible card in section 4.
+- **Branch:**
+- **Started:** (date, time, session)
+- **Steps done:**
+- **Next step:**
+- **Checks so far:** (command and its last line)
 - **Questions for the owner:**
-- **Watch out for:** Re-run the pose tests with the Alt, aim limit and third-person integrations present.
+- **Watch out for:**
 
 ## Next open cards, in order
 
@@ -28,6 +28,7 @@ Blocked on the owner: K8 (stash names, one line or two), C12 (reference image mi
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-27 Codex Sol: C9-8 done. Hold Alt for free-look. Low weapon holds passed first- and third-person review with AK-47, L96 and Remington 870, and both clients matched the replicated poses.
 - 2026-11-27 Codex Sol: C9-7 done. Both clients saw prone, supine, both side rolls and get-up. Body yaw matched in all eight headings. Network protocol 15 and regressions passed.
 - 2026-11-27 Codex Sol: C9-6 done. Prone, supine and side hit spheres share body-relative Warden aim points. Fixed rays and Warden aim passed in eight directions, and remote bots kept their legacy volumes.
 - 2026-11-27 Codex Sol: C9-5 done. Prone camera yaw stays free, body yaw is bounded, and turning to the rear or holding a Lean key updates roll state. Full Lean, prone and base checks passed.

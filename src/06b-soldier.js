@@ -171,7 +171,9 @@ function efcOmniSoldierUpper(e, flat, bodyYaw, joints, shoulder, gun) {
   _qT.setFromEuler(_eu.set(-Math.PI / 2, bodyYaw, 0));
   _qT.multiply(_qL.setFromAxisAngle(_tmpG.set(0, 1, 0), roll));
   efcOmniSoldierPoint(joints[J_PEL], bodyYaw, 0, flat[2].height, flat[2].forward);
-  efcOmniSoldierPoint(joints[J_CHE], bodyYaw, 0, flat[1].height, flat[1].forward);
+  // Keep the head at its hit centre without stretching the visual neck beyond the rig.
+  const chestForward = Math.max(flat[1].forward, flat[0].forward - SD.head[1]);
+  efcOmniSoldierPoint(joints[J_CHE], bodyYaw, 0, flat[1].height, chestForward);
   efcOmniSoldierPoint(joints[J_HEAD], bodyYaw, 0, flat[0].height, flat[0].forward);
   const aimYaw = angDiff(e.yaw, efcOmniAimYaw(e, e.yaw));
   const aimPitch = efcOmniAimPitch(e, e.pitch);

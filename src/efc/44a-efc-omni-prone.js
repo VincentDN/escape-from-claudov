@@ -1,6 +1,6 @@
 /* C9b low first-person holds. Offsets are in view space, before the existing hand solver. */
-const EFC_PRONE_VIEW = [-0.025, -0.032, -0.025, -0.035, -0.05, 0.09];
-const EFC_SUPINE_VIEW = [-0.065, 0.018, -0.075, 0.10, 0.64, 0.27];
+const EFC_PRONE_VIEW = [-0.025, -0.032, -0.100, -0.035, -0.05, 0.09];
+const EFC_SUPINE_VIEW = [-0.065, 0.018, -0.140, 0.10, 0.64, 0.27];
 
 function efcOmniViewPose(entity, offsets, dt) {
   if (!entity.isPlayer || !efcRaidMode()) {

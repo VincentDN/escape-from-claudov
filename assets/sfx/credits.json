@@ -363,6 +363,13 @@
    "url": "https://github.com/AU-14/ColonialMarinesUniverse/tree/master/Content.CMU/Resources/Audio/CMU14/Fighter",
    "preuve": "attributions.yml du dossier : « files: [jet-pass.ogg] license: CC0-1.0 copyright: \"F-18 fly-over-and-circle above-DR070cut.wav by Ears68 ...\" source: https://freesound.org/people/Ears68/sounds/150328/ »"
   },
+  "elevenlabs-c13": {
+   "nom": "ElevenLabs Sound Effects v2",
+   "auteur": "Generated on Vincent De Nil’s ElevenLabs account for Escape From Claudov",
+   "licence": "ElevenLabs paid-plan terms for generated output",
+   "url": "https://elevenlabs.io/app/flows/vQsk8E9AhsFfD2yPfZrR",
+   "preuve": "The owner confirmed game usage rights on 20 November 2026 (docs/HANDOFF-CODEX.md, C13)."
+  },
   "erbsland": {
    "nom": "« Large ceramic plate hit » (freesound 634154)",
    "auteur": "Erbsland-Music",
@@ -6127,6 +6134,27 @@
    "source": "fs-371199",
    "fichier": "Partisan Project assets/audio/shooter/shells/shells-2.mp3",
    "detail": "start at the onset, at most 0.35 s, high-pass 60 Hz, level matched to the pack, limiter at -1 dBFS"
+  },
+  {
+   "id": "wf_rifle_magin_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13",
+   "fichier": "dtPcnFBrh6Wq0shCxxmO",
+   "detail": "Generated 28 November 2026. Source window 375–441 ms, mono, filtered, 6 ms attack alignment and level matched."
+  },
+  {
+   "id": "wf_rifle_magout_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13",
+   "fichier": "4n6U4Tu0zCkwH2H52Aaq",
+   "detail": "Generated 28 November 2026. Source window 260–300 ms, mono, filtered, 6 ms attack alignment and level matched."
+  },
+  {
+   "id": "wf_rifle_slap_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13",
+   "fichier": "LXUIXTFUzjeY9Eti0Vkr",
+   "detail": "Generated 28 November 2026. Source window 44–107 ms, mono, filtered, 6 ms attack alignment and level matched."
   }
  ]
 }

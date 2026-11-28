@@ -26,6 +26,7 @@ import common  # noqa: E402
 
 FAMILLES = ['armes', 'maniement', 'impacts', 'series', 'ambiances', 'interface', 'mecha', 'partisan']
 OUT = ROOT / 'assets' / 'sfx'
+EXTERNAL_PACKS = {'handling', 'weapon_foley'}
 
 # Encodage par paquet : (fréquence du MP3, qualité VBR de LAME : 0 meilleure, 9 plus légère). Les masters restent à 48 kHz ;
 # le jeu décode à la fréquence de son contexte audio.
@@ -130,8 +131,8 @@ def main():
         return
     # encodage des masters
     packs = sorted(p.name for p in common.MASTERS.iterdir() if p.is_dir()) if common.MASTERS.exists() else []
-    # The committed ElevenLabs handling bank is managed separately from the legacy source recordings.
-    packs = [p for p in packs if p != 'handling']
+    # Committed Foley banks with independent source workflows.
+    packs = [p for p in packs if p not in EXTERNAL_PACKS]
     if a.paquet: packs = [p for p in packs if p in a.paquet.split(',')]
     total = 0
     for pack in packs:
@@ -145,6 +146,14 @@ def main():
         if p.exists(): entries += json.loads(p.read_text(encoding='utf-8'))
         m = mods.get(f) or (importlib.import_module(f) if (ROOT / 'tools' / 'sfx' / f'{f}.py').exists() else None)
         if m: sources.update(getattr(m, 'SOURCES', {}))
+    ledger = OUT / 'credits.json'
+    if ledger.exists():
+        committed = json.loads(ledger.read_text(encoding='utf-8'))
+        entries = [entry for entry in entries if entry['pack'] != 'weapon_foley']
+        for entry in committed['sons']:
+            if entry['pack'] == 'weapon_foley':
+                entries.append(entry)
+                sources[entry['source']] = committed['sources'][entry['source']]
     used = sorted({e['source'] for e in entries})
     missing = [s for s in used if s not in sources]
     if missing: raise SystemExit('crédits : sources non décrites dans SOURCES : ' + ', '.join(missing))

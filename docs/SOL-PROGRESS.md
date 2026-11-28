@@ -5,16 +5,16 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C13-2 in progress on `codex/c13-2-weapon-foley`, based on C13-1 at `e430d2d`. ElevenLabs finished three Batch A pilots, recorded in the [weapon Foley shot list](weapon-foley-shot-list.md#batch-a-pilot).
-- **Next step:** Retrieve the existing pilots, then trim, level and test them on the rifle reload before generating the rest of Batch A. The workspace proxy returned HTTP 403 for `elevenlabsusercontent.com` and the published cloud configuration rejected a grant for the host. Resume with an allowed download or the three attached exports.
+- **Card:** C13-2 in progress on `codex/c13-2-weapon-foley`, based on C13-1 at `e430d2d`. Three Batch A pilots were downloaded, trimmed, levelled and credited. See the [pilot record](weapon-foley-shot-list.md#batch-a-pilot).
+- **Next step:** Audition the three prepared takes on the rifle reload and verify the game loader and timing before generating the rest of Batch A.
 - **How to verify:** Use `node tools/dev/efc/test-sounds.mjs` for the reload choreography and `#sounds` for the old/new audition. The shot list has 76 action/family pairs and four slots per pair. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** Build, declaration check, and raid smoke passed. Foley audit confirmed 76 pairs, 304 slots, 19 credited candidates, 285 new takes and 3 recorded pilots. The C17-2 browser checks passed. Standing boots are below frame at −60°.
+- **Checks so far:** Build, declaration check and raid smoke passed. Existing sounds suite passed 66/66. The three decoded pilots attack at 6 ms, range from −18.6 to −17.1 dBFS active RMS and peak below 0 dBFS. The C17-2 browser checks passed. Standing boots are below frame at −60°.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
-- **Watch out for:** C13-2 can generate through ElevenLabs. The three pilots still need local audio and in-game audition. The current first-person legs are on beta for staging. C17-2 remains open and C17-3 waits on its visual acceptance.
+- **Watch out for:** The current chat can download from `elevenlabsusercontent.com`. The current first-person legs are on beta for staging. C17-2 remains open and C17-3 waits on its visual acceptance.
 
 ## Next open cards, in order
 
-1. C13-2 to C13-5, sound design and weapon foley. Three Batch A pilots are rendered and await import and in-game verification.
+1. C13-2 to C13-5, sound design and weapon foley. Three Batch A pilots are edited and await in-game verification.
 2. C16-5 to C16-13, enemy combat barks, downed state and enemy execution.
 3. C17 and C18 can run alongside C16. Follow the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 4. C2-1 to C2-8, Partisan modding and weapons.

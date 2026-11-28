@@ -35,6 +35,51 @@ function efcOmniTacticalSprint(entity, allowed, dt) {
 }
 
 const EFC_DIVE = { boost: 1.3, minSpeed: 7.5, maxSpeed: 10.3, lift: 2.5, cooldown: 0.65 };
+Settings.efcSlideDive ??= 'tap-slide';
+
+function efcOmniGroundDive(entity, sprint, requested, dt) {
+  if (entity !== PL.ent) return false;
+  const input = entity.input, mode = Settings.efcSlideDive;
+  const canStart = mode !== 'slide-only' && entity.onGround && sprint && entity.sprinting && !entity.efcProne &&
+    !(entity.slideT > 0) && !input.jump && hyp(entity.vel.x, entity.vel.z) > 3;
+  if (!canStart) { entity.efcGroundDive = null; return false; }
+  const held = efcOmniCrouchHeld(entity);
+  if (!entity.efcGroundDive && (!requested || (!held && mode !== 'tap-dive'))) return false;
+
+  const gesture = entity.efcGroundDive ??= { phase: 'hold', t: 0, dir: 0, yaw: 0 };
+  input.slide = false;
+  if (gesture.phase === 'hold') {
+    if (held && (gesture.t += dt) < efcOmniTune('crouch', 'diveHold')) return false;
+    const wantsDive = mode === 'tap-dive' ? !held : held;
+    if (!wantsDive || entity.efcDiveCooldown > 0) {
+      entity.efcGroundDive = null;
+      input.slide = true;
+      return false;
+    }
+    gesture.phase = 'anticipation';
+    gesture.t = 0;
+    gesture.dir = Math.atan2(input.mx, input.mz);
+    gesture.yaw = entity.yaw - gesture.dir;
+    return false;
+  }
+  if ((gesture.t += dt) < efcOmniTune('dive', 'anticipation')) return false;
+
+  // ctlMove integrates gravity before position. Compensate for half a step to preserve the apex across frame rates.
+  const gravity = 19;
+  const lift = Math.sqrt(2 * gravity * efcOmniTune('dive', 'apex'));
+  const distance = entity.efcTactical > 0 ? efcOmniTune('dive', 'boostedDistance') :
+    (efcOmniTune('dive', 'minDistance') + efcOmniTune('dive', 'maxDistance')) / 2;
+  const speed = distance / (2 * lift / gravity);
+  entity.vel.x = -Math.sin(gesture.yaw) * speed;
+  entity.vel.z = -Math.cos(gesture.yaw) * speed;
+  entity.vy = lift + gravity * dt / 2;
+  entity.onGround = false;
+  entity.efcDiving = true;
+  entity.slideBuf = 0;
+  gesture.phase = 'launch';
+  gesture.t = 0;
+  return true;
+}
 
 function efcOmniDive(entity, sprint, dt) {
   if (!entity.isPlayer || !efcRaidMode()) return false;
@@ -42,7 +87,12 @@ function efcOmniDive(entity, sprint, dt) {
   const crouchPressed = input.slide || (input.crouch && !entity.efcDiveCrouchHeld);
   entity.efcDiveCrouchHeld = !!input.crouch;
   entity.efcDiveCooldown = Math.max(0, (entity.efcDiveCooldown || 0) - dt);
-  if (entity.efcDiving) return true;
+  if (entity.efcDiving) {
+    const gesture = entity.efcGroundDive;
+    if (gesture?.phase === 'launch' && (gesture.t += dt) >= efcOmniTune('dive', 'launch')) gesture.phase = 'flight';
+    return true;
+  }
+  if (efcOmniGroundDive(entity, sprint, input.slide, dt)) return true;
   if (entity.onGround || !sprint || !entity.sprinting || !crouchPressed || entity.efcDiveCooldown > 0) return false;
 
   const speed = hyp(entity.vel.x, entity.vel.z);
@@ -59,6 +109,7 @@ function efcOmniDive(entity, sprint, dt) {
 
 function efcOmniDiveLand(entity) {
   entity.efcDiving = false;
+  entity.efcGroundDive = null;
   entity.efcDiveCooldown = EFC_DIVE.cooldown;
   entity.crouch = true;
   entity.efcProne = true;
@@ -139,6 +190,7 @@ function efcOmniReset(entity) {
   entity.efcTactical = 0;
   entity.efcTacticalCooldown = 0;
   entity.efcDiving = false;
+  entity.efcGroundDive = null;
   entity.efcDiveCrouchHeld = false;
   entity.efcDiveCooldown = 0;
   entity.efcProne = false;

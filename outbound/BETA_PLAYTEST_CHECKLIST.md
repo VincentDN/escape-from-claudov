@@ -33,4 +33,9 @@
 - [ ] Change the equipped weapon, armour and backpack. Rotate the preview with the mouse and arrow keys. Check framing and clarity at your usual browser zoom.
 - [ ] Enable your system's reduced-motion setting. Confirm the idle pauses and manual rotation remains available.
 
+## Sprint, slide and dive
+
+- [ ] In raid settings, try all three **Slide and dive** options. With the default, tap Crouch during a ground sprint to slide and hold it to dive. Check the reversed option and the slide-only option.
+- [ ] Sprint and dive in all eight directions. Check that travel follows your movement and stops at a wall. Jump and crouch from a sprint to check that the airborne dive still works.
+
 Attach a screenshot or short clip for visual issues, along with the weapon, location and controls used to reproduce it.

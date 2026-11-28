@@ -10,7 +10,7 @@ run() {
   test_number=$((test_number + 1))
   local log=/tmp/efc-run.log
   if [ -n "${EFC_TEST_LOG_DIR:-}" ]; then log="$EFC_TEST_LOG_DIR/$test_number.log"; fi
-  if "$@" > "$log" 2>&1; then tail -1 "$log"; else tail -5 "$log"; echo "FAILED: $*"; fail=1; fi
+  if "$@" > "$log" 2>&1; then tail -1 "$log"; else grep -E '^FAIL |^ECHEC' "$log" || true; tail -5 "$log"; echo "FAILED: $*"; fail=1; fi
 }
 run python3 build.py
 run python3 tools/dev/check_decl.py

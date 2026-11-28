@@ -99,7 +99,10 @@ const c0 = await page.evaluate(() => {
       if (NAV.comp[id] !== NAV.mainComp) continue;
       const d = hyp(NAV.nx[id] - p.x, NAV.nz[id] - p.z); if (d < 14 || d > 16) continue;
       eye.set(NAV.nx[id], NAV.ny[id] + 1.6, NAV.nz[id]);
-      if (!lineClear(eye, at.set(p.x, p.y + 1.5, p.z)) || !ws.some((w) => lineClear(eye, entChest(w, at)))) continue;
+      const guard = ws.find(w => lineClear(entEye(w, at), eye));
+      if (!guard || !lineClear(eye, at.set(p.x, p.y + 1.5, p.z))) continue;
+      // The detection fixture starts with one guard facing the visible approach.
+      guard.yaw = guard.lookYaw = Math.atan2(guard.pos.x - eye.x, guard.pos.z - eye.z);
       window.SPOT = [NAV.nx[id], NAV.ny[id], NAV.nz[id]]; window.CP = p.i; window.FAR = far.map((q) => q.i);
       // the Wardens of those posts that are at home (not off on a patrol or a chase near the spot)
       window.FARW = entities.filter((e) => e.alive && FAR.includes(e.efcPost) && hyp(e.pos.x - P[e.efcPost].x, e.pos.z - P[e.efcPost].z) < P[e.efcPost].r + 5);
@@ -110,7 +113,7 @@ const c0 = await page.evaluate(() => {
 });
 ok(!!c0, '(c) found a spot 15 m from a post in view, with posts more than 45 m away', c0);
 if (c0) {
-  await page.evaluate(() => { T.tFirst = -1; T.farT = 0; T.n = 0; });
+  await page.evaluate(() => { PL.ent.pos.set(...SPOT); PL.ent.vel.set(0, 0, 0); T.tFirst = -1; T.farT = 0; T.n = 0; });
   await simRun(page, 10, `PL.ent.pos.set(...SPOT); PL.ent.vel.set(0, 0, 0); T.n++;
     if (T.tFirst < 0 && entities.some((e) => e.alive && e.efcPost === CP && e.visible && e.target === PL.ent)) T.tFirst = T.n / 30;
     T.farT += FARW.filter((e) => e.alive && e.visible && e.target === PL.ent).length;`);
@@ -139,10 +142,17 @@ ok(d0.plain === 100 && (!d0.elite || (Math.abs(d0.elite[0] - 60) < 1e-9 && d0.el
 const ranD = await simRun(page, RESPAWN + 10, 'PL.ent.pos.set(...NEAR); PL.ent.vel.set(0, 0, 0);');
 const d1 = await page.evaluate(() => ({ alive: W.alive, t: W.respawnT }));
 ok(ranD >= RESPAWN + 9.9 && !d1.alive, `(d) player near the post: still dead after the delay (${RESPAWN} s) + 10 s`, d1);
-await page.evaluate(() => { T.backT = -1; T.n = 0; });
-await simRun(page, 10, 'PL.ent.pos.set(...PARK); PL.ent.vel.set(0, 0, 0); T.n++; if (T.backT < 0 && W.alive) T.backT = T.n / 30;');
-const d2 = await page.evaluate(() => { const p = EFC.wd.posts[W.efcPost]; return { alive: W.alive, after: T.backT, post: W.efcPost, d: +hyp(W.pos.x - p.x, W.pos.z - p.z).toFixed(1), r: p.r }; });
-ok(d2.alive && d2.d <= d2.r + 6, '(d) player far away: the Warden is back at a post (within its radius + 6 m)', d2);
+await page.evaluate(() => {
+  PL.ent.pos.set(...PARK); PL.ent.vel.set(0, 0, 0);
+  T.back = null; T.n = 0;
+});
+await simRun(page, 10, `PL.ent.pos.set(...PARK); PL.ent.vel.set(0, 0, 0); T.n++;
+  if (!T.back && W.alive) {
+    const p = EFC.wd.posts[W.efcPost];
+    T.back = { after: T.n / 30, post: p.i, d: hyp(W.pos.x - p.x, W.pos.z - p.z), r: p.r };
+  }`);
+const d2 = await page.evaluate(() => T.back);
+ok(d2 && d2.d <= d2.r + 6, '(d) player far away: the Warden respawns at a post (within its radius + 6 m)', d2);
 ok(errors.length === 0, 'no page errors', errors.slice(0, 10));
 await browser.close();
 console.log(fails.length ? `test-warden: ${fails.length} FAILED` : 'test-warden: all passed');

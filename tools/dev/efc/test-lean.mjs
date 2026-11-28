@@ -213,14 +213,14 @@ if (process.env.NET !== '0') {
     await stepBoth([rig.host, rig.guest], 1, 'PL.ent.health = 100;');
     const gid = await rig.guest.evaluate(() => NET.me);
     const before = await rig.host.evaluate((gid) => { const e = NET.remotes.get(gid); return e ? e.leanX || 0 : null; }, gid);
-    // the guest leans; both pages stepped in two-tick slices (guest first): game time from the press until the guest's lean is complete
+    // the guest leans; both pages stepped one tick at a time (guest first): game time from the press until the guest's lean is complete
     // and the host copy is within 3 cm of it
     let tGame = 0, gx = 0, gPrev = -1, hx = 0, head = null;
     const tick = (p, n, lean) => p.evaluate(([n, lean]) => { for (let i = 0; i < n; i++) { KEYS.LeanR = lean; PL.ent.health = 100; matchTick(1 / 30, false); } }, [n, lean]);
     const hostCopy = () => rig.host.evaluate((gid) => { const e = NET.remotes.get(gid); if (!e) return null; const hd = entHead(e, new V3()); return { x: e.leanX || 0, headSide: (hd.x - e.pos.x) * Math.cos(e.yaw) - (hd.z - e.pos.z) * Math.sin(e.yaw) }; }, gid);
     for (let i = 0; i < 15; i++) {
-      await tick(rig.guest, 2, true); await new Promise((r) => setTimeout(r, 15)); await tick(rig.host, 2, false);
-      tGame += 2 / 30;
+      await tick(rig.guest, 1, true); await new Promise((r) => setTimeout(r, 15)); await tick(rig.host, 1, false);
+      tGame += 1 / 30;
       gPrev = gx; gx = await rig.guest.evaluate(() => PL.ent.leanX);
       head = await hostCopy(); hx = head ? head.x : 0;
       if (gx > 0.1 && Math.abs(gx - gPrev) < 1e-4 && Math.abs(hx - gx) < 0.03) break;

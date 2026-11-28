@@ -73,6 +73,8 @@ The committed pilot MP3s are mono, 48 kHz and encoded as LAME V5 through `tools/
 
 The M4 reload played the three cues in order with a 50 ms seating-to-slap schedule and browser-decoded attacks at 6.3–6.6 ms. `#sounds` offers each pilot alone and in both M4 reloads alongside the existing sounds. Normal play uses the shared takes while the recorded banks have fewer than four takes on desktop. The pilot pack adds 6,120 bytes to the built audio download.
 
+The [Batch A generation manifest](weapon-foley-batch-a.json) records the other 37 completed renders, quoted at 284.9 credits. The completed generation records report 86.3247 credits for these renders and 93.324 total including the three pilots. The start responses listed 74 and 80 credits, respectively. The remaining renders still need editing and in-game checks.
+
 ## Mapping and verification
 
 - Existing keys cover magazine out and in, slap, charging, bolt opening, pump, shell, draw, stow, aim, inspect, dry fire and pickup. Separate semiautomatic sniper charging from bolt closure in the mapping. Keep the hold-R magazine check on the matching magout and insert cues.

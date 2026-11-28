@@ -1,0 +1,195 @@
+{
+  "flow": "https://elevenlabs.io/app/flows/fGI5t2npBQAFra6A9MhL",
+  "model": "eleven_text_to_sound_v2",
+  "date": "2026-11-28",
+  "quoted_credits": 284.9,
+  "reported_credits": 86.3247,
+  "startup_credits": 74,
+  "takes": [
+    {
+      "file": "wf_pistol_magin_02.mp3",
+      "generation_id": "xDmFmNnne12mZFt7Zncj",
+      "session_id": "sH82fXpoI31S7NE1nW4n"
+    },
+    {
+      "file": "wf_pistol_magin_03.mp3",
+      "generation_id": "0ATE2USw98TCyVTa3VzV",
+      "session_id": "9AZjfTs3lknWp7MLi1bK"
+    },
+    {
+      "file": "wf_pistol_magin_04.mp3",
+      "generation_id": "Ntqio41MGIm2cnk8Z8I4",
+      "session_id": "OQToTvZPvvAeupcdCrNx"
+    },
+    {
+      "file": "wf_pistol_magout_02.mp3",
+      "generation_id": "B2PstV0U5zRBfd8hOtnH",
+      "session_id": "tyLxron4a9Oh1jlMqsEg"
+    },
+    {
+      "file": "wf_pistol_magout_03.mp3",
+      "generation_id": "iFUO2w5dM4U5r0lb7Qyu",
+      "session_id": "q9ju0TDdj8ApeDbM2f2S"
+    },
+    {
+      "file": "wf_pistol_magout_04.mp3",
+      "generation_id": "HLnx0F80IbtuZETWZ75v",
+      "session_id": "ofgvKcMoUyujPlJNqQHP"
+    },
+    {
+      "file": "wf_pistol_slap_01.mp3",
+      "generation_id": "L0p6hSydvzxBulK19BVx",
+      "session_id": "YN6gRRGNSFtIkMtKyWCC"
+    },
+    {
+      "file": "wf_pistol_slap_02.mp3",
+      "generation_id": "9WLnRIb2hWRaeRUJ4EMZ",
+      "session_id": "NUIn34qaJbEKmnQzS79X"
+    },
+    {
+      "file": "wf_pistol_slap_03.mp3",
+      "generation_id": "Nf0C4XKy5crFwdHpP9Qz",
+      "session_id": "hDkzDVjHW3jalmkAeytJ"
+    },
+    {
+      "file": "wf_pistol_slap_04.mp3",
+      "generation_id": "DrVt28iw7qk4DTh04Khu",
+      "session_id": "nxdkV4bOPMsQMRcufQja"
+    },
+    {
+      "file": "wf_rifle_magin_04.mp3",
+      "generation_id": "7bUiOXijevCkydtlSqL1",
+      "session_id": "OBf53AN82mukkKoZgySr"
+    },
+    {
+      "file": "wf_rifle_magout_04.mp3",
+      "generation_id": "hvL6dO9ZPocwm5AGxrgO",
+      "session_id": "vsuYfG3wOSp7IBWbs8hf"
+    },
+    {
+      "file": "wf_rifle_slap_02.mp3",
+      "generation_id": "l0VDBqZ60jlshuzg5s0k",
+      "session_id": "wXr8PG0oK4NwVkIALlMH"
+    },
+    {
+      "file": "wf_rifle_slap_03.mp3",
+      "generation_id": "Lr0lWyezst8IBYtQc1IL",
+      "session_id": "Rz1YrUwxG9TLWEnr2fNQ"
+    },
+    {
+      "file": "wf_rifle_slap_04.mp3",
+      "generation_id": "AxRY4LSPH0M2u7JPnB01",
+      "session_id": "uSwHJcbKQGh8mD0zRNVx"
+    },
+    {
+      "file": "wf_smg_magin_02.mp3",
+      "generation_id": "EeoibEH6HOLIP1fS2Gy2",
+      "session_id": "IAojY03LoyELhKuKqHiB"
+    },
+    {
+      "file": "wf_smg_magin_03.mp3",
+      "generation_id": "u3V9NLWSEsYdPJFUG5gq",
+      "session_id": "uEE4OhAFtMjtg8xxjopQ"
+    },
+    {
+      "file": "wf_smg_magin_04.mp3",
+      "generation_id": "Z0Klm6kBpsStFt2tIMfB",
+      "session_id": "yXw9hwvK5A2LVOFTSzRe"
+    },
+    {
+      "file": "wf_smg_magout_02.mp3",
+      "generation_id": "LYHHPE3zHduvo98suwkY",
+      "session_id": "C2TZct8g1ZiKspYWCxUx"
+    },
+    {
+      "file": "wf_smg_magout_03.mp3",
+      "generation_id": "TrC3TUtjfnrZ9eCVGze5",
+      "session_id": "LOLOy7ehupOuRButwrW2"
+    },
+    {
+      "file": "wf_smg_magout_04.mp3",
+      "generation_id": "lDOqxZZcow8YlAa02RPZ",
+      "session_id": "MoIRKXh0MOX0uRsocGam"
+    },
+    {
+      "file": "wf_smg_slap_01.mp3",
+      "generation_id": "FrZ9e2piZOLFjvUHqAkv",
+      "session_id": "GK6fNn2KwwFRaYXGsNNa"
+    },
+    {
+      "file": "wf_smg_slap_02.mp3",
+      "generation_id": "jyiZGE8HEjFR1blplPp3",
+      "session_id": "pu7bATvIyocfM1eIlYKY"
+    },
+    {
+      "file": "wf_smg_slap_03.mp3",
+      "generation_id": "iyzhitJ3JLAqZP9lbwyY",
+      "session_id": "8ESqxhNEQ2Be5OxYOYCD"
+    },
+    {
+      "file": "wf_smg_slap_04.mp3",
+      "generation_id": "ouKgWcsJV94gg1HXUGt5",
+      "session_id": "wA5DFIZ91hbzBaKoLUQo"
+    },
+    {
+      "file": "wf_sniper_magin_01.mp3",
+      "generation_id": "6nhGDefb4hnEZxVumsg0",
+      "session_id": "OjT6ZQfSlNttq6rswV9n"
+    },
+    {
+      "file": "wf_sniper_magin_02.mp3",
+      "generation_id": "kq8UqOkRbiRVAPRUsGWz",
+      "session_id": "sicnxdiGRcSQBR95kaBw"
+    },
+    {
+      "file": "wf_sniper_magin_03.mp3",
+      "generation_id": "TZhiwJoJLNjgDeemYq1i",
+      "session_id": "pwQHoEpsue9GUMIZ3oKb"
+    },
+    {
+      "file": "wf_sniper_magin_04.mp3",
+      "generation_id": "e2qap8Xdt3ZLLm68Co0j",
+      "session_id": "SoaReofretTqSQmsuKxP"
+    },
+    {
+      "file": "wf_sniper_magout_01.mp3",
+      "generation_id": "S8Xp19pM7n6wDSjp3K03",
+      "session_id": "rc25It3JCttxsk34PTnO"
+    },
+    {
+      "file": "wf_sniper_magout_02.mp3",
+      "generation_id": "KXmWwyKsOUTii69tcO8c",
+      "session_id": "aUfJwmHUFd5KZTupFApI"
+    },
+    {
+      "file": "wf_sniper_magout_03.mp3",
+      "generation_id": "tTlMMu0gYNZrQEnOllXr",
+      "session_id": "9udNjk7y1iD5hO6XR63S"
+    },
+    {
+      "file": "wf_sniper_magout_04.mp3",
+      "generation_id": "9o4YubT0NiBUrHDdf040",
+      "session_id": "cc0u3Z2EGQdqvqFq2mrM"
+    },
+    {
+      "file": "wf_sniper_slap_01.mp3",
+      "generation_id": "9gBGC5s1P1xK1Hv8Fxao",
+      "session_id": "3X6OwQTFR38E3htCvIpO"
+    },
+    {
+      "file": "wf_sniper_slap_02.mp3",
+      "generation_id": "ydFBvFMzkS1ReCbWZHFc",
+      "session_id": "VGgu0F3Z5OM9AuGWogp0"
+    },
+    {
+      "file": "wf_sniper_slap_03.mp3",
+      "generation_id": "mp1gdF6YCYNy4MdecaCN",
+      "session_id": "zDKb2rCHIFud983w72jQ"
+    },
+    {
+      "file": "wf_sniper_slap_04.mp3",
+      "generation_id": "5e7DA0a6h1c10BlqunSy",
+      "session_id": "aR2nj8IhXHctTQJv3j8p"
+    }
+  ]
+}

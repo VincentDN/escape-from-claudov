@@ -5,8 +5,8 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C13-2 in progress on `codex/c13-2-weapon-foley`, based on C13-1 at `e430d2d`. Three Batch A pilots passed in-game playback and timing checks. See the [pilot record](weapon-foley-shot-list.md#batch-a-pilot).
-- **Next step:** Render the other 37 Batch A takes, verify the eight credited reuse candidates and edit and verify all 48 magazine slots.
+- **Card:** C13-2 in progress on `codex/c13-2-weapon-foley`, based on C13-1 at `e430d2d`. Three Batch A pilots passed in-game checks and the other 37 takes are rendered. See the [Batch A generation manifest](weapon-foley-batch-a.json).
+- **Next step:** Edit and level the 37 Batch A renders, check the eight credited reuse candidates, then verify four distinct takes for each of the 12 magazine action and family pairs.
 - **How to verify:** Use `node tools/dev/efc/test-sounds.mjs` for the reload choreography and `#sounds` for the old/new audition. The shot list has 76 action/family pairs and four slots per pair. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
 - **Checks so far:** Build, declaration check and raid smoke passed. `test-sounds.mjs` passed 72/72 and measured 362 KB for handling, ballistics and weapon Foley together. The M4 pilots attacked within 6.6 ms and played from `#sounds`. The C17-2 browser checks passed. Standing boots are below frame at −60°.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.

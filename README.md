@@ -1,5 +1,10 @@
 # Escape From Claudov
 
+**Loot. Extract. Fork it.**
+
+Escape From Claudov is a free, open-source extraction shooter template. It's PvE-first, built for casual players, and runs in
+the browser. Raid, loot and extract, then fork the whole thing under MIT and make it your own.
+
 An extraction shooter played in the browser, on desktop. Pick a loadout from your stash, insert into the sealed port town of
 Claudov alone or as a squad of up to three, fight the Wardens and other squads, loot bodies and containers, and reach an extraction
 point before the raid timer runs out. What you carry out is yours. If you die, it stays on your body for someone else.

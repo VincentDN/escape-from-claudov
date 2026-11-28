@@ -11,6 +11,7 @@ const stage = document.getElementById('stage'), status = document.getElementById
 const ak = new URLSearchParams(location.search).get('model') === 'ak47';
 const mats = materials(), pivot = new THREE.Group(), rifle = new THREE.Group(), mounted = new Map();
 let dirty = false, turn = null, yaw = -.35, pitch = .12, distance = 2.15;
+const turnCueDistance = .55;
 const { renderer, scene, camera } = buildStage(stage, draw);
 scene.add(pivot);
 pivot.add(rifle);
@@ -115,18 +116,38 @@ try {
   status.textContent = 'The weapon preview could not load.';
   console.error(error);
 }
+function benchFoley(cue, intensity) {
+  if (parent !== window) parent.postMessage({ type: 'efc:bench-foley', cue, intensity }, location.origin);
+}
 stage.addEventListener('pointerdown', event => {
+  if (!build || turn || event.button !== 0) return;
   stage.setPointerCapture(event.pointerId);
-  turn = [event.clientX, event.clientY];
+  turn = { id: event.pointerId, x: event.clientX, y: event.clientY, distance: 0, lastMove: 0 };
+  benchFoley('handle', .6);
 });
 stage.addEventListener('pointermove', event => {
-  if (!turn) return;
-  yaw += (event.clientX - turn[0]) * .008;
-  pitch = THREE.MathUtils.clamp(pitch + (event.clientY - turn[1]) * .006, -.9, 1.2);
-  turn = [event.clientX, event.clientY];
+  if (turn?.id !== event.pointerId) return;
+  const dx = (event.clientX - turn.x) * .008;
+  const nextPitch = THREE.MathUtils.clamp(pitch + (event.clientY - turn.y) * .006, -.9, 1.2);
+  const amount = Math.abs(dx) + Math.abs(nextPitch - pitch);
+  yaw += dx;
+  pitch = nextPitch;
+  turn.x = event.clientX;
+  turn.y = event.clientY;
+  if (amount > .004) turn.lastMove = event.timeStamp;
+  turn.distance += amount;
+  if (turn.distance >= turnCueDistance) {
+    turn.distance %= turnCueDistance;
+    benchFoley('handle', .35 + Math.min(.5, amount * 6));
+  }
   draw();
 });
-stage.addEventListener('lostpointercapture', () => { turn = null; });
+stage.addEventListener('pointerup', event => {
+  if (turn?.id !== event.pointerId) return;
+  if (!turn.lastMove || event.timeStamp - turn.lastMove >= 100) benchFoley('hit', .5);
+  turn = null;
+});
+stage.addEventListener('lostpointercapture', event => { if (turn?.id === event.pointerId) turn = null; });
 stage.addEventListener('wheel', event => {
   event.preventDefault();
   distance = THREE.MathUtils.clamp(distance * (event.deltaY > 0 ? 1.1 : .9), .95, 3.5);
@@ -137,8 +158,10 @@ stage.addEventListener('keydown', event => {
     '+': [0, 0, .9], '=': [0, 0, .9], '-': [0, 0, 1.1] }[event.key];
   if (!move) return;
   event.preventDefault();
+  const oldPitch = pitch;
   yaw += move[0];
   pitch = THREE.MathUtils.clamp(pitch + move[1], -.9, 1.2);
   distance = THREE.MathUtils.clamp(distance * move[2], .95, 3.5);
+  if (build && (move[0] || pitch !== oldPitch)) benchFoley('handle', .3);
   draw();
 });

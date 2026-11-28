@@ -6,9 +6,9 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 ## Current card
 
 - **Card:** C13-2 in progress on `codex/c13-2-weapon-foley`, based on C13-1 at `e430d2d`. Batch A is mapped and checked with 48 takes from 40 renders and eight credited source cuts. See the [Batch A generation manifest](weapon-foley-batch-a.json).
-- **Next step:** Add the requested Partisan-style workbench turn Foley, then continue with B–E and verify the remaining banks.
+- **Next step:** Import, edit and map B–E and verify the remaining banks. Workbench rotation now uses the Partisan-style grip, turn and settle cues.
 - **How to verify:** Use `node tools/dev/efc/test-sounds.mjs` for the reload choreography and `#sounds` for the old/new audition. The shot list has 76 action/family pairs and four slots per pair. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** Build, declaration check and raid smoke passed. `test-sounds.mjs` passed 83/83. Batch A has 12 banks of four, peaks below 0 dBFS and adds 119,482 bytes. The C17-2 browser checks passed. Standing boots are below frame at −60°.
+- **Checks so far:** Build, declaration check and raid smoke passed. `test-sounds.mjs` passed 83/83. `test-weaponmods.mjs` confirmed workbench grip, drag thresholds, settle, arrow-key Foley and silent zoom. Batch A has 12 banks of four, peaks below 0 dBFS and adds 119,482 bytes. The C17-2 browser checks passed. Standing boots are below frame at −60°.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
 - **Watch out for:** The current chat can download from `elevenlabsusercontent.com`. The current first-person legs are on beta for staging. C17-2 remains open and C17-3 waits on its visual acceptance.
 

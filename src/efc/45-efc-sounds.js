@@ -127,6 +127,15 @@ efcOn('ui:inventory-gesture', (kind, item) => {
   if (key) efcInvSound(key, efcSndWeightRate(def ? def.w * (item.n || 1) : 1));
 });
 
+/* The workbench shares the Partisan preview's handling and hit banks, through the menu mix. */
+function efcWorkbenchTurnSound(cue, intensity) {
+  if (!AU.ready || !EFC_SND.on) return false;
+  const id = 'hf_' + cue, gain = cue === 'hit' ? 0.22 : 0.44 * (0.5 + 0.5 * intensity);
+  return !!sfxPlay(id, uiOut(gain), AU.ctx.currentTime + 0.01, { rate: rand(0.97, 1.03) });
+}
+efcOn('workbench:preview-open', () => { initAudio(); sfxLoad('handling'); });
+efcOn('workbench:turn-foley', efcWorkbenchTurnSound);
+
 /* ---------- Inventory diff: what the last inv:changed did ---------- */
 function efcSndInvSnap(inv) {
   if (!inv || !Array.isArray(inv.bag)) return null;

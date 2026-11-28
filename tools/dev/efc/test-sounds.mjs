@@ -174,7 +174,7 @@ const bootAudio = () => (async () => {
 
   // ---------- 3. inventory foley from events; sounds off restore the engine path ----------
   const I = await page.evaluate(() => {
-    EFC_SND.log = []; EFC_SND.last = {};
+    EFC_SND.log = []; EFC_SND.last = {}; EFC_SND.invLast = -1;
     efcEmit('loot:give', { id: 'med_bandage', n: 1 }, 'x');
     const take = EFC_SND.log.filter((l) => l.kind === 'inv_take').length;
     const inv = { bag: [{ id: 'med_bandage', n: 2 }, { id: 'w_m4', n: 1 }], slots: { primary: null } };

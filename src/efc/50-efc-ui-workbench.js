@@ -115,6 +115,13 @@ function efcBenchDialog() {
     EFC_BENCH.session = null;
     dialog.querySelector('.efc-bench-stage').replaceChildren();
   });
+  window.addEventListener('message', event => {
+    if (!dialog.open || event.origin !== location.origin || event.data?.type !== 'efc:bench-foley') return;
+    const frame = dialog.querySelector('.efc-bench-stage iframe');
+    if (frame?.contentWindow !== event.source) return;
+    const { cue, intensity } = event.data;
+    if ((cue === 'handle' || cue === 'hit') && Number.isFinite(intensity)) efcEmit('workbench:turn-foley', cue, clamp(intensity, 0, 1));
+  });
   return dialog;
 }
 function efcBenchOpen(where) {
@@ -141,6 +148,7 @@ function efcBenchOpen(where) {
     frame.addEventListener('load', efcBenchPreview);
     frame.src = 'showcase/workbench/stg44/raid-preview.html?model=' + def.weapon.wkey;
     stage.replaceChildren(frame);
+    efcEmit('workbench:preview-open');
   } else stage.innerHTML = efcThumbImg(item.id, def.kind, 'big');
   efcBenchOptions();
   efcBenchPreview();

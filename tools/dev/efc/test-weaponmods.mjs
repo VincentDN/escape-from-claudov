@@ -34,7 +34,36 @@ try {
   assert.match(await bench.locator('.efc-bench-stats').textContent(), /40 rounds/);
   if (process.env.EFC_TEST_URL?.startsWith('http')) {
     const preview = page.frameLocator('.efc-bench iframe');
-    await preview.locator('#stage[data-mods*="reddot"][data-mods*="kurz40"] canvas').waitFor({ timeout: 120000 });
+    const canvas = preview.locator('#stage[data-mods*="reddot"][data-mods*="kurz40"] canvas');
+    await canvas.waitFor({ timeout: 120000 });
+    await page.waitForFunction(() => sfxHas('hf_handle') && sfxHas('hf_hit'));
+    await page.evaluate(() => {
+      const play = sfxPlay;
+      window.benchTurnSounds = [];
+      sfxPlay = (id, ...args) => {
+        const voice = play(id, ...args);
+        if (voice && (id === 'hf_handle' || id === 'hf_hit')) benchTurnSounds.push(id);
+        return voice;
+      };
+      window.restoreBenchTurnSounds = () => { sfxPlay = play; };
+    });
+    const bounds = await canvas.boundingBox();
+    await page.mouse.move(bounds.x + bounds.width * 0.25, bounds.y + bounds.height * 0.5);
+    await page.mouse.down();
+    await page.waitForFunction(() => benchTurnSounds.join() === 'hf_handle');
+    await page.mouse.move(bounds.x + bounds.width * 0.25 + 25, bounds.y + bounds.height * 0.5);
+    assert.deepEqual(await page.evaluate(() => benchTurnSounds), ['hf_handle']);
+    await page.mouse.move(bounds.x + bounds.width * 0.25 + 100, bounds.y + bounds.height * 0.5);
+    await page.waitForFunction(() => benchTurnSounds.join() === 'hf_handle,hf_handle');
+    await page.waitForTimeout(110);
+    await page.mouse.up();
+    await page.waitForFunction(() => benchTurnSounds.join() === 'hf_handle,hf_handle,hf_hit');
+    await preview.locator('#stage').press('ArrowLeft');
+    await page.waitForFunction(() => benchTurnSounds.join() === 'hf_handle,hf_handle,hf_hit,hf_handle');
+    await preview.locator('#stage').press('+');
+    await page.mouse.wheel(0, 90);
+    assert.deepEqual(await page.evaluate(() => { restoreBenchTurnSounds(); return benchTurnSounds; }), ['hf_handle', 'hf_handle', 'hf_hit', 'hf_handle']);
+    console.log('Workbench grip, drag rotation, settle and keyboard Foley passed; zoom remained silent');
     if (process.env.EFC_BENCH_SHOT) await page.screenshot({ path: process.env.EFC_BENCH_SHOT, timeout: 120000 });
   }
   await bench.locator('.efc-bench-save').click();

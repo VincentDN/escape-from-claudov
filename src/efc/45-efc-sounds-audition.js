@@ -87,7 +87,8 @@ function efcAudHtml() {
   h += '</table><h2>Bullets</h2><table>' + row('Ricochet', 'b:i_ric', 'b:pt_ric') + row('Fly-by', 'b:i_whiz', 'b:pt_flyby') + '</table>';
   h += '<h2>Inventory and looting (old: no sound)</h2><table>';
   for (const [label, k] of EFC_AUD.inv) h += row(label, null, 'i:' + k);
-  return h + '</table>';
+  return h + '</table><h2>Workbench rotation</h2><p><button data-a="w:grip">Grip</button> '
+    + '<button data-a="w:turn">Turn</button> <button data-a="w:settle">Settle</button></p>';
 }
 function efcAudClick(e) {
   const b = e.target.closest && e.target.closest('button'); if (!b) return;
@@ -102,6 +103,7 @@ function efcAudClick(e) {
   else if (k === 'c0' || k === 'c1') efcAudCasing(k === 'c1', v);
   else if (k === 'b') efcAudBank(v);
   else if (k === 'i') efcAudInv(v);
+  else if (k === 'w') efcWorkbenchTurnSound(v === 'settle' ? 'hit' : 'handle', v === 'grip' ? 0.6 : 0.5);
   efcAudStatus();
 }
 function efcAudRender() { const el = document.getElementById('efcAud'); if (el) { el.innerHTML = efcAudHtml(); efcAudStatus(); } }

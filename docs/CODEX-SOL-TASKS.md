@@ -759,7 +759,7 @@ the shot list after C13-1.
 
 - **Batch A pilot edit files:** `tools/sfx/weapon_foley.py`, `tools/build_sfx.py`, `assets/sfx/weapon_foley/`, `assets/sfx/credits.json`, and the shot list. Verify decoded attack, active RMS, peak, duration and credits before mapping.
 - **Batch A pilot mapping files:** `src/05a-sfx.js`, `src/efc/45-efc-sounds.js`, `src/efc/45-efc-sounds-audition.js`, `tools/dev/efc/test-sounds.mjs` and the shot list. Verify that the three clips play in order on rifle reload, including the scheduled slap delay, and that incomplete or missing banks fall back during normal play.
-- **Workbench turn Foley files:** `showcase/workbench/stg44/raid-preview.js`, `src/efc/50-efc-ui-workbench.js`, both `45-efc-sounds` scripts and `tools/dev/efc/test-weaponmods.mjs`. Verify the grip, turn and settle using the interactive preview, with zoom remaining silent. Reuse the local workbench handling and hit banks.
+- **Workbench turn Foley files:** `showcase/workbench/stg44/raid-preview.js`, `src/efc/50-efc-ui-workbench.js`, both `45-efc-sounds` scripts, `tools/dev/efc/test-weaponmods.mjs` and `tools/dev/efc/test-sounds.mjs`. Verify the grip, turn and settle using the interactive preview, with zoom remaining silent. Reuse the local workbench handling and hit banks.
 - **C3, C4 to C8 and C14** are split into cards in section 7.
 
 ## 7. Later tracks as cards (planned 26 November 2026)

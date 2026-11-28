@@ -77,6 +77,18 @@ The [Batch A generation manifest](weapon-foley-batch-a.json) records the other 3
 
 Batch A has 48 unique, credited MP3s, including eight re-edited legacy cuts. The decoded active RMS range is −19.6 to −16.9 dBFS around a −17.6 dBFS median. Peak level is below 0 dBFS. The browser verified all 12 banks and the reload order and slap timing for rifle, SMG, pistol and sniper. The `Recorded Foley` buttons in `#sounds` compare the new sources with the existing takes. The Batch A pack adds 119,482 bytes.
 
+### B–E renders and credits
+
+The [B–E generation manifest](weapon-foley-batches.json) records the remaining completed generations and their run sessions. The provider rate-limited some starts in batches D and E. Smaller requests recovered only unstarted slots. The completed generation records report 644.1023 credits across A–E.
+
+| Batch | New takes | Quote (credits) | Completed generation credits |
+| --- | ---: | ---: | ---: |
+| A | 40 | 308.0 | 93.324 |
+| B | 25 | 227.15 | 68.8265 |
+| C | 32 | 228.8 | 69.3264 |
+| D | 140 | 1001.0 | 303.303 |
+| E | 48 | 360.8 | 109.3224 |
+
 ## Mapping and verification
 
 - Existing keys cover magazine out and in, slap, charging, bolt opening, pump, shell, draw, stow, aim, inspect, dry fire and pickup. Separate semiautomatic sniper charging from bolt closure in the mapping. Keep the hold-R magazine check on the matching magout and insert cues.

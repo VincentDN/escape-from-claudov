@@ -49,7 +49,8 @@
       "window_ms": [
         408,
         490
-      ]
+      ],
+      "gain_db": 0.75
     },
     {
       "file": "wf_pistol_magout_04.mp3",
@@ -183,7 +184,7 @@
       "session_id": "LOLOy7ehupOuRButwrW2",
       "window_ms": [
         247,
-        329
+        294
       ]
     },
     {
@@ -301,7 +302,8 @@
       "window_ms": [
         125,
         228
-      ]
+      ],
+      "gain_db": 0.5
     },
     {
       "file": "wf_sniper_slap_01.mp3",
@@ -403,7 +405,8 @@
       "window_ms": [
         0,
         40
-      ]
+      ],
+      "gain_db": 0.45
     }
   ]
 }

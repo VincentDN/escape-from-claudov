@@ -37,7 +37,7 @@ def level(samples):
     return np.copysign(limited, samples)
 
 
-def prepare(path, start_ms, end_ms):
+def prepare(path, start_ms, end_ms, gain_db=0):
     samples = common.ff(common.load(path), 'highpass=f=65,lowpass=f=15000')
     start, end = (round(ms * SR / 1000) for ms in (start_ms, end_ms))
     if not 0 <= start < end <= len(samples) or end - start < round(SR * 0.02):
@@ -52,19 +52,23 @@ def prepare(path, start_ms, end_ms):
     else:
         samples = np.pad(samples, (lead - attack, 0))
     samples = common.fade(samples, fin=0.001, fout=0.012)
-    return level(samples)
+    return level(samples) * 10 ** (gain_db / 20)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--take', action='append', nargs=3, required=True, metavar=('FILE', 'START_MS', 'END_MS'))
+    parser.add_argument('--gain-db', action='append', nargs=2, default=[], metavar=('TAKE_ID', 'DB'))
     args = parser.parse_args()
+    adjustments = {name: float(value) for name, value in args.gain_db}
     masters = {}
     for filename, start_ms, end_ms in args.take:
         path = Path(filename)
         if not re.fullmatch(r'wf_(rifle|smg|pistol|sniper|shotgun)_[a-z_]+_0[1-4]', path.stem) or path.stem in masters:
             parser.error(f'invalid or duplicate shot-list filename: {path.name}')
-        masters[path.stem] = prepare(path, float(start_ms), float(end_ms))
+        masters[path.stem] = prepare(path, float(start_ms), float(end_ms), adjustments.get(path.stem, 0))
+    if adjustments.keys() - masters.keys():
+        parser.error('gain adjustment names must match the supplied takes')
     for name, samples in masters.items():
         common.save_master(PACK, name, samples)
     encode_pack(PACK, garder=True)

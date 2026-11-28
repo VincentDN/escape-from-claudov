@@ -206,7 +206,7 @@ before starting).
 | C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | done |
 | C13-1 | Audit weapon foley and write the [generation shot list](weapon-foley-shot-list.md) | S | none | done |
 | C13-2 | Generate missing takes with ElevenLabs | M | C13-1 | done (285 completed renders across A–E) |
-| C13-3 | Edit, level and credit the generated foley | M | C13-2 | open |
+| C13-3 | Edit, level and credit the generated foley | M | C13-2 | done (304 distinct credited takes, all within 2 dB of the median) |
 | C13-4 | Map the takes and extend the audition page | M | C13-3 | open |
 | C13-5 | Verify family coverage, timing and download budget | S | C13-4 | open |
 | C16-4 | Invented language and the voice script | S | C16-1 | done |
@@ -760,7 +760,7 @@ the shot list after C13-1.
 - **Batch A pilot edit files:** `tools/sfx/weapon_foley.py`, `tools/build_sfx.py`, `assets/sfx/weapon_foley/`, `assets/sfx/credits.json`, and the shot list. Verify decoded attack, active RMS, peak, duration and credits before mapping.
 - **Batch A pilot mapping files:** `src/05a-sfx.js`, `src/efc/45-efc-sounds.js`, `src/efc/45-efc-sounds-audition.js`, `tools/dev/efc/test-sounds.mjs` and the shot list. Verify that the three clips play in order on rifle reload, including the scheduled slap delay, and that incomplete or missing banks fall back during normal play.
 - **Workbench turn Foley files:** `showcase/workbench/stg44/raid-preview.js`, `src/efc/50-efc-ui-workbench.js`, both `45-efc-sounds` scripts, `tools/dev/efc/test-weaponmods.mjs` and `tools/dev/efc/test-sounds.mjs`. Verify the grip, turn and settle using the interactive preview, with zoom remaining silent. Reuse the local workbench handling and hit banks.
-- **Remaining C13 files:** `assets/sfx/weapon_foley/`, `assets/sfx/credits.json`, `docs/weapon-foley-batches.json`, `docs/weapon-foley-shot-list.md`, `docs/audio-events.md`, both `45-efc-sounds` scripts, `src/efc/50-efc-ui-workbench.js`, `tools/dev/efc/test-sounds.mjs` and `tools/dev/efc/test-weaponmods.mjs`. Verify all four registered takes per pair, browser timing, checkout fallback, workbench cues and download size.
+- **Remaining C13 files:** `assets/sfx/weapon_foley/`, `assets/sfx/credits.json`, `docs/weapon-foley-batches.json`, `docs/weapon-foley-shot-list.md`, `docs/audio-events.md`, both `45-efc-sounds` scripts, `src/08c-pickups.js`, `src/efc/50-efc-ui-workbench.js`, `tools/dev/efc/test-sounds.mjs` and `tools/dev/efc/test-weaponmods.mjs`. Verify all four registered takes per pair, browser timing, missing-pack fallback, workbench cues and download size.
 - **C3, C4 to C8 and C14** are split into cards in section 7.
 
 ## 7. Later tracks as cards (planned 26 November 2026)

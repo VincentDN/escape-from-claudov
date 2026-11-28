@@ -89,6 +89,8 @@ The [B–E generation manifest](weapon-foley-batches.json) records the remaining
 | D | 140 | 1001.0 | 303.303 |
 | E | 48 | 360.8 | 109.3224 |
 
+All 19 legacy candidates were re-edited for the C13 pack. Each of the 304 MP3s has a direct source record in `assets/sfx/credits.json`. The manifests retain source windows and any final gain adjustments. The decoded active RMS median is −17.23 dBFS, all takes are within 2 dB, and the highest decoded peak is −0.44 dBFS.
+
 ## Mapping and verification
 
 - Existing keys cover magazine out and in, slap, charging, bolt opening, pump, shell, draw, stow, aim, inspect, dry fire and pickup. Separate semiautomatic sniper charging from bolt closure in the mapping. Keep the hold-R magazine check on the matching magout and insert cues.

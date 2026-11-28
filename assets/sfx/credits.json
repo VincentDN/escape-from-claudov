@@ -377,6 +377,34 @@
    "url": "https://elevenlabs.io/app/flows/fGI5t2npBQAFra6A9MhL",
    "preuve": "The owner confirmed game usage rights on 20 November 2026 (docs/HANDOFF-CODEX.md, C13)."
   },
+  "elevenlabs-c13-b": {
+   "nom": "ElevenLabs Sound Effects v2",
+   "auteur": "Generated on Vincent De Nil’s ElevenLabs account for Escape From Claudov",
+   "licence": "ElevenLabs paid-plan terms for generated output",
+   "url": "https://elevenlabs.io/app/flows/HhJxvLtdtOFnrsh8JATL",
+   "preuve": "The owner confirmed game usage rights on 20 November 2026 (docs/HANDOFF-CODEX.md, C13)."
+  },
+  "elevenlabs-c13-c": {
+   "nom": "ElevenLabs Sound Effects v2",
+   "auteur": "Generated on Vincent De Nil’s ElevenLabs account for Escape From Claudov",
+   "licence": "ElevenLabs paid-plan terms for generated output",
+   "url": "https://elevenlabs.io/app/flows/0YZiBzGUwyNzZRtfJgyA",
+   "preuve": "The owner confirmed game usage rights on 20 November 2026 (docs/HANDOFF-CODEX.md, C13)."
+  },
+  "elevenlabs-c13-d": {
+   "nom": "ElevenLabs Sound Effects v2",
+   "auteur": "Generated on Vincent De Nil’s ElevenLabs account for Escape From Claudov",
+   "licence": "ElevenLabs paid-plan terms for generated output",
+   "url": "https://elevenlabs.io/app/flows/sbPWdJYHUm2gm0q52jZM",
+   "preuve": "The owner confirmed game usage rights on 20 November 2026 (docs/HANDOFF-CODEX.md, C13)."
+  },
+  "elevenlabs-c13-e": {
+   "nom": "ElevenLabs Sound Effects v2",
+   "auteur": "Generated on Vincent De Nil’s ElevenLabs account for Escape From Claudov",
+   "licence": "ElevenLabs paid-plan terms for generated output",
+   "url": "https://elevenlabs.io/app/flows/IpKj8tJ7tIsjXdpUzyZG",
+   "preuve": "The owner confirmed game usage rights on 20 November 2026 (docs/HANDOFF-CODEX.md, C13)."
+  },
   "erbsland": {
    "nom": "« Large ceramic plate hit » (freesound 634154)",
    "auteur": "Erbsland-Music",
@@ -6196,7 +6224,7 @@
    "pack": "weapon_foley",
    "source": "elevenlabs-c13-a",
    "fichier": "iFUO2w5dM4U5r0lb7Qyu",
-   "detail": "Generated 28 November 2026. Source window 408–490 ms, mono, filtered, transient aligned and level matched."
+   "detail": "Generated 28 November 2026. Source window 408–490 ms, mono, filtered, transient aligned and level matched. Final adjustment +0.75 dB."
   },
   {
    "id": "wf_pistol_magout_04",
@@ -6301,7 +6329,7 @@
    "pack": "weapon_foley",
    "source": "elevenlabs-c13-a",
    "fichier": "TrC3TUtjfnrZ9eCVGze5",
-   "detail": "Generated 28 November 2026. Source window 247–329 ms, mono, filtered, transient aligned and level matched."
+   "detail": "Generated 28 November 2026. Source window 247–294 ms, mono, filtered, transient aligned and level matched."
   },
   {
    "id": "wf_smg_magout_04",
@@ -6392,7 +6420,7 @@
    "pack": "weapon_foley",
    "source": "elevenlabs-c13-a",
    "fichier": "9o4YubT0NiBUrHDdf040",
-   "detail": "Generated 28 November 2026. Source window 125–228 ms, mono, filtered, transient aligned and level matched."
+   "detail": "Generated 28 November 2026. Source window 125–228 ms, mono, filtered, transient aligned and level matched. Final adjustment +0.50 dB."
   },
   {
    "id": "wf_sniper_slap_01",
@@ -6476,7 +6504,1799 @@
    "pack": "weapon_foley",
    "source": "ffsl",
    "fichier": "Carl Gustav M45_Swedish K/G_9.wav",
-   "detail": "From credited legacy Foley f_magout_smg. Carl Gustav M45 : chargeur retiré (G_9, 0,455-0,955 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–40 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+   "detail": "From credited legacy Foley f_magout_smg. Carl Gustav M45 : chargeur retiré (G_9, 0,455-0,955 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–40 ms from the legacy cut, mono, filtered, transient aligned and level matched. Final adjustment +0.45 dB."
+  },
+  {
+   "id": "wf_rifle_charge_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "2kWFrArXjlz6nA7ItpnW",
+   "detail": "Generated 28 November 2026. Source window 0–310 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_charge_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "eVwkucISkDXJXFNnTJD1",
+   "detail": "Generated 28 November 2026. Source window 0–430 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_charge_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "upKXsymnKNrk9OTt01xC",
+   "detail": "Generated 28 November 2026. Source window 68–385 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_charge_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "xS998BeQFe7LCeUsL0Kh",
+   "detail": "Generated 28 November 2026. Source window 3–340 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_charge_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "Vtn6hZ8cJ89U0Ap4KPDK",
+   "detail": "Generated 28 November 2026. Source window 0–265 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_charge_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "HQiqLveTnG6dfPxuPTb8",
+   "detail": "Generated 28 November 2026. Source window 0–415 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_charge_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "S2X3mxOjUKpq15kJZ47Y",
+   "detail": "Generated 28 November 2026. Source window 0–505 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_charge_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "ki9AJS9MWvSQNR7W4kp3",
+   "detail": "Generated 28 November 2026. Source window 0–550 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_charge_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "pTXXHZQbGMI6QHAYOsI5",
+   "detail": "Generated 28 November 2026. Source window 13–430 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_charge_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "hCIdbMgVABkThcJpEcXE",
+   "detail": "Generated 28 November 2026. Source window 0–340 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_charge_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "lw9Vm8GmzDVeTXJluvtR",
+   "detail": "Generated 28 November 2026. Source window 0–510 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_charge_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "ANFNcgwEtCir7Rlh6rPo",
+   "detail": "Generated 28 November 2026. Source window 0–470 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_charge_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "Bo37JEjQdf5JntkyKR9z",
+   "detail": "Generated 28 November 2026. Source window 0–460 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_charge_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "FaPyLNuo2i01uzm8PTsJ",
+   "detail": "Generated 28 November 2026. Source window 0–215 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_slide_release_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "ba95Ey1Peb6yWQbpzYTl",
+   "detail": "Generated 28 November 2026. Source window 0–430 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_slide_release_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "VTO6a3Pm7Di5fZqrdr9n",
+   "detail": "Generated 28 November 2026. Source window 203–350 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bolt_back_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "JL7WCricCgxNW3kRTv9X",
+   "detail": "Generated 28 November 2026. Source window 0–225 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bolt_back_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "sri1M0SiW2eUcL4TqeYZ",
+   "detail": "Generated 28 November 2026. Source window 208–400 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bolt_forward_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "PIxQLMb36LbwnMGz39ml",
+   "detail": "Generated 28 November 2026. Source window 0–300 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bolt_forward_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "xZ4dnpMC6ShESDikfUwx",
+   "detail": "Generated 28 November 2026. Source window 88–290 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bolt_forward_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "X2QODLSdirZKGzHVnXSP",
+   "detail": "Generated 28 November 2026. Source window 0–375 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bolt_forward_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "KWFKHbFppwTUlRYPmvOR",
+   "detail": "Generated 28 November 2026. Source window 253–595 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_pump_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "56pwrl4x4XAbYrNKI0xm",
+   "detail": "Generated 28 November 2026. Source window 0–500 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_pump_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "RLx560Tgy2CcPcFuD6bq",
+   "detail": "Generated 28 November 2026. Source window 0–530 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_shell_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-b",
+   "fichier": "ZoVYDONC7T0BO8eoFSth",
+   "detail": "Generated 28 November 2026. Source window 0–520 ms, mono, filtered, transient aligned and level matched. Final adjustment -0.65 dB."
+  },
+  {
+   "id": "wf_rifle_safety_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "G7Jris0tDbErj20m9oFt",
+   "detail": "Generated 28 November 2026. Source window 68–190 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_safety_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "rrGpOZDerxZm1Je3ycci",
+   "detail": "Generated 28 November 2026. Source window 278–345 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_safety_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "DwWSkskIqRs7R9Bl5PoH",
+   "detail": "Generated 28 November 2026. Source window 38–160 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_safety_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "CJksEvRoAXgkrHVjlNFV",
+   "detail": "Generated 28 November 2026. Source window 0–95 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_safety_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "xSpmRrEzgZj9zNWW4Cex",
+   "detail": "Generated 28 November 2026. Source window 273–360 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_safety_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "4nEde8Gb9R7htQXIz0T9",
+   "detail": "Generated 28 November 2026. Source window 133–205 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_safety_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "Y2xbGbcsrECC3lyjGB5i",
+   "detail": "Generated 28 November 2026. Source window 18–75 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_safety_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "UXKH3e6QuG0keHJ7kvmK",
+   "detail": "Generated 28 November 2026. Source window 118–180 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_safety_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "RWwLObzEQmq6HYqbECMZ",
+   "detail": "Generated 28 November 2026. Source window 78–160 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_safety_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "u8tE3Bb2E0f55NGLu8Re",
+   "detail": "Generated 28 November 2026. Source window 43–120 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_safety_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "WJkHbElC1wOomebDDHqH",
+   "detail": "Generated 28 November 2026. Source window 358–420 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_safety_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "zKGTa4e1VlnbZolgJZox",
+   "detail": "Generated 28 November 2026. Source window 43–165 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_safety_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "WFYyXQQ1haS02hsKyMvG",
+   "detail": "Generated 28 November 2026. Source window 3–60 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_safety_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "SztnFVRTpQ3wGYpnu9B6",
+   "detail": "Generated 28 November 2026. Source window 38–115 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_safety_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "nOZ3JPn7BhNAdrGNed1q",
+   "detail": "Generated 28 November 2026. Source window 0–50 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_safety_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "MTbZuiAoWUEUMRAhJ4VM",
+   "detail": "Generated 28 November 2026. Source window 58–115 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_safety_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "JGJCN7Wj2LfrlwZcEnKQ",
+   "detail": "Generated 28 November 2026. Source window 213–275 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_safety_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "Uo9p2OXwirMooTuusVCk",
+   "detail": "Generated 28 November 2026. Source window 73–140 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_safety_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "nI9aso2dfYiLSIeDfkca",
+   "detail": "Generated 28 November 2026. Source window 318–375 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_safety_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "X3eFmkf4Pbk3uwB0vAXk",
+   "detail": "Generated 28 November 2026. Source window 138–190 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_selector_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "3yRzWJRtVJIrJhtbttFh",
+   "detail": "Generated 28 November 2026. Source window 0–95 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_selector_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "5Yr70aA65cmvB8Gq0g4n",
+   "detail": "Generated 28 November 2026. Source window 303–425 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_selector_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "ixGrvPvsIcSBnqqbXx8q",
+   "detail": "Generated 28 November 2026. Source window 0–85 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_selector_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "NXN0kHZorQgraZIrwXyU",
+   "detail": "Generated 28 November 2026. Source window 48–95 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_selector_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "GyLRZyNE9uNhkPOrtZQu",
+   "detail": "Generated 28 November 2026. Source window 0–100 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_selector_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "a8xv4WsjN0n4SF4VtMMU",
+   "detail": "Generated 28 November 2026. Source window 68–190 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_selector_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "8D1UG3OIqtOQSpHFq4T3",
+   "detail": "Generated 28 November 2026. Source window 0–100 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_selector_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "07QvEzyBUzlOzBsxerBI",
+   "detail": "Generated 28 November 2026. Source window 0–100 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_selector_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "zPu24rP2cuMTDcQ539Vh",
+   "detail": "Generated 28 November 2026. Source window 28–150 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_selector_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "9pvoOHmNZCm4pS4C5Izj",
+   "detail": "Generated 28 November 2026. Source window 0–105 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_selector_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "fggjSjGBPcLisXlIYLT9",
+   "detail": "Generated 28 November 2026. Source window 238–360 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_selector_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-c",
+   "fichier": "sN6U3B80a6xAotbfnTmA",
+   "detail": "Generated 28 November 2026. Source window 88–200 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_draw_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Ip4AUU7suarneG42gwGr",
+   "detail": "Generated 28 November 2026. Source window 0–290 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_draw_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "qUyUtkcvYeOZAmSShIBK",
+   "detail": "Generated 28 November 2026. Source window 0–265 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_draw_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Qy7RHpfg3YGKpICwaRET",
+   "detail": "Generated 28 November 2026. Source window 0–230 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_draw_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "q6OMGjkc3kEKqAcZE6WR",
+   "detail": "Generated 28 November 2026. Source window 0–155 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_draw_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "uYZAYtyTQyrhkY3LmvNr",
+   "detail": "Generated 28 November 2026. Source window 0–255 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_draw_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "gPfKAseJvmdqd5jNxN7x",
+   "detail": "Generated 28 November 2026. Source window 0–125 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_draw_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "erLLbbAHECq4gOAZ23Jo",
+   "detail": "Generated 28 November 2026. Source window 33–300 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_draw_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Bg0LLJg8NaE30psaDmLX",
+   "detail": "Generated 28 November 2026. Source window 0–165 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_draw_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "hWiMRkVSyUdAsVwch8Sy",
+   "detail": "Generated 28 November 2026. Source window 0–190 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_draw_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "zgSSNxVEq1dihZRxRKvL",
+   "detail": "Generated 28 November 2026. Source window 0–525 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_draw_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "NoAREUHX4f5XBUrfXM4E",
+   "detail": "Generated 28 November 2026. Source window 0–175 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_draw_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "mx7HtZocwzFMOfqImn8x",
+   "detail": "Generated 28 November 2026. Source window 0–165 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_draw_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "rfNpCxiVq58N7rrY4j9V",
+   "detail": "Generated 28 November 2026. Source window 103–375 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_draw_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "NO1tuFaqOhngjsuPP7YK",
+   "detail": "Generated 28 November 2026. Source window 0–165 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_draw_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Uxm9CDIxl5dVorSgOLIL",
+   "detail": "Generated 28 November 2026. Source window 23–325 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_draw_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "3bpt864pDuQvvqcLKV8b",
+   "detail": "Generated 28 November 2026. Source window 0–290 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_draw_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "f9MFLHMdL4cRKeT94mJT",
+   "detail": "Generated 28 November 2026. Source window 53–370 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_draw_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "XRoIgMIIBUBFZTo6B1Jd",
+   "detail": "Generated 28 November 2026. Source window 23–245 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_draw_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "6YqsIFU38HZCZLbJpzww",
+   "detail": "Generated 28 November 2026. Source window 0–280 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_draw_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "heIPaVvusoFJ5h47nIIt",
+   "detail": "Generated 28 November 2026. Source window 0–320 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_stow_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "wElYztV40WjgNbFv0HrB",
+   "detail": "Generated 28 November 2026. Source window 133–360 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_stow_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "VGMkZebluMGfBV78jmj2",
+   "detail": "Generated 28 November 2026. Source window 38–310 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_stow_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "2IyaW59pQ15ZW9UIyvJW",
+   "detail": "Generated 28 November 2026. Source window 48–280 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_stow_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "ypPLO6Mmh6edw8JUGgbO",
+   "detail": "Generated 28 November 2026. Source window 18–210 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_stow_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "hCzpaLKzn7Gg3EaJYY4t",
+   "detail": "Generated 28 November 2026. Source window 28–230 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_stow_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "ThPASN7wpQogSu2jBs9n",
+   "detail": "Generated 28 November 2026. Source window 58–280 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_stow_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "quGzLY0FrkGWEXVhWYN3",
+   "detail": "Generated 28 November 2026. Source window 118–350 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_stow_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "5IxRrnHmxjjysnXo3jyM",
+   "detail": "Generated 28 November 2026. Source window 53–270 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_stow_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "r9mr3WU7nGTiyO538y0m",
+   "detail": "Generated 28 November 2026. Source window 0–135 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_stow_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "vHdCKw27RzO92FqfUiTg",
+   "detail": "Generated 28 November 2026. Source window 0–265 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_stow_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "nHEjyZNxLP9XWYxgjAcy",
+   "detail": "Generated 28 November 2026. Source window 0–190 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_stow_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "ADxc5Q6J5ByjY1BhThhu",
+   "detail": "Generated 28 November 2026. Source window 13–205 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_stow_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "L0NFW9NE6UCyF1CMdGlZ",
+   "detail": "Generated 28 November 2026. Source window 0–180 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_stow_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "2k3WHAmk36i5gNkPSlvD",
+   "detail": "Generated 28 November 2026. Source window 78–290 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_stow_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "nAhtgVIyWVKmJuUDa4yg",
+   "detail": "Generated 28 November 2026. Source window 38–310 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_stow_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "BfIzCoM34Odm9S4Ukyx7",
+   "detail": "Generated 28 November 2026. Source window 53–270 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_stow_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "hJUBVbf5JPXChPglfkLs",
+   "detail": "Generated 28 November 2026. Source window 0–270 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_stow_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "qbc7sprN7HROtTClGBAg",
+   "detail": "Generated 28 November 2026. Source window 58–425 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_stow_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "TuYsQ8OwCycAAIo9u0gj",
+   "detail": "Generated 28 November 2026. Source window 73–400 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_stow_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "BQpBAFKW08e2oZyWJPB9",
+   "detail": "Generated 28 November 2026. Source window 43–255 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_ads_in_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "HVYCSeu8S9EOhV4OQ8XD",
+   "detail": "Generated 28 November 2026. Source window 0–290 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_ads_in_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "CIp8H8sRijEBoCLMyVuA",
+   "detail": "Generated 28 November 2026. Source window 0–235 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_ads_in_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "ydzig7NEmGqnAaXgGp9t",
+   "detail": "Generated 28 November 2026. Source window 0–120 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_ads_in_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "vVkOllgyi0etHRsdvLLT",
+   "detail": "Generated 28 November 2026. Source window 0–305 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_ads_in_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "8ktHPnyL9vIe9w7oJdSD",
+   "detail": "Generated 28 November 2026. Source window 0–350 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_ads_in_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "LPHRYoV7hNBOqnL3ZKzh",
+   "detail": "Generated 28 November 2026. Source window 0–155 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_ads_in_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "FeqTzNB399S4AvX5yofv",
+   "detail": "Generated 28 November 2026. Source window 0–230 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_ads_in_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "YPrlbKChso6xDQ1hGSBE",
+   "detail": "Generated 28 November 2026. Source window 0–305 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_ads_in_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "R5pRVti9g0rzjBSvSt2o",
+   "detail": "Generated 28 November 2026. Source window 0–405 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_ads_in_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "EbnOKsDNU7L7tV9GO2cF",
+   "detail": "Generated 28 November 2026. Source window 0–205 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_ads_in_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "6dlAAGIzYGDmwsTds1st",
+   "detail": "Generated 28 November 2026. Source window 0–245 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_ads_in_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "LpmxyO1ss9z1XR8iY3DK",
+   "detail": "Generated 28 November 2026. Source window 0–375 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_ads_in_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "J99v3dJGhghB8L2mMXeu",
+   "detail": "Generated 28 November 2026. Source window 0–365 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_ads_in_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "8g9v2CTSwH0JUbnvyNWo",
+   "detail": "Generated 28 November 2026. Source window 0–255 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_ads_in_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "1OsObSniaLtaok9dSocA",
+   "detail": "Generated 28 November 2026. Source window 0–250 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_ads_in_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "H3wj28leIC5qXqalwyQY",
+   "detail": "Generated 28 November 2026. Source window 0–305 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_ads_in_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "4Q5cfWiXn2tZHGs1okkT",
+   "detail": "Generated 28 November 2026. Source window 0–250 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_ads_in_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Bd04FAM2T8OoWoSMhI18",
+   "detail": "Generated 28 November 2026. Source window 0–485 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_ads_in_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "JyzVhKzzjV33GFLPi8Rk",
+   "detail": "Generated 28 November 2026. Source window 0–440 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_ads_in_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "HU7ciRElUaHBweGaEsPl",
+   "detail": "Generated 28 November 2026. Source window 0–445 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_ads_out_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "ZBsw4iqeTxSkOiSl1g1Y",
+   "detail": "Generated 28 November 2026. Source window 0–135 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_ads_out_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Ex4TIcQPhLkFjKBZeHYh",
+   "detail": "Generated 28 November 2026. Source window 0–375 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_ads_out_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "XKOBMCE1kh2RlSUljhbn",
+   "detail": "Generated 28 November 2026. Source window 0–140 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_ads_out_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "nQUGUu9DLYBa0T0qVAxS",
+   "detail": "Generated 28 November 2026. Source window 0–155 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_ads_out_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "KJBMBfLJeqJBrZ3WAVaL",
+   "detail": "Generated 28 November 2026. Source window 0–365 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_ads_out_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "cuxnh03mlve3f8fmfSv2",
+   "detail": "Generated 28 November 2026. Source window 0–505 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_ads_out_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "4BfdRXfKM2LVt2HWyt7g",
+   "detail": "Generated 28 November 2026. Source window 0–245 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_ads_out_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "HcOXx95SI3kb7CtZ7WxF",
+   "detail": "Generated 28 November 2026. Source window 0–210 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_ads_out_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "nle84L08oNhAhg3GUaHe",
+   "detail": "Generated 28 November 2026. Source window 0–405 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_ads_out_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Dhl3qUtGIoPvmrjwLLJs",
+   "detail": "Generated 28 November 2026. Source window 53–375 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_ads_out_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "efuAJdfelRWWob2XK2O7",
+   "detail": "Generated 28 November 2026. Source window 0–310 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_ads_out_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "qeUKsmu2mcQ5oOC6420l",
+   "detail": "Generated 28 November 2026. Source window 3–470 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_ads_out_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "j5xFv7944qv4SMTK4lHB",
+   "detail": "Generated 28 November 2026. Source window 0–305 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_ads_out_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "MMKqF3SK47Jx2RDv9kUx",
+   "detail": "Generated 28 November 2026. Source window 18–240 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_ads_out_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "pVzJdK3pNXGrBB9Jbzqt",
+   "detail": "Generated 28 November 2026. Source window 0–350 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_ads_out_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Q5ZkQyYGsmx6Yxuz6C4K",
+   "detail": "Generated 28 November 2026. Source window 0–330 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_ads_out_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "8AYfW7J70i6g0KEKSA5K",
+   "detail": "Generated 28 November 2026. Source window 0–360 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_ads_out_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "KNtpmJsluh99qRrYl8in",
+   "detail": "Generated 28 November 2026. Source window 0–485 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_ads_out_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "HskKoRHEguqRThZZ7iD8",
+   "detail": "Generated 28 November 2026. Source window 0–305 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_ads_out_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "f1jER2StgbJieBAEn0PB",
+   "detail": "Generated 28 November 2026. Source window 0–400 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_inspect_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "14b6gLwcyzblsAViHsoN",
+   "detail": "Generated 28 November 2026. Source window 0–400 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_inspect_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "KRx4FUvsl92PrZuJwBYY",
+   "detail": "Generated 28 November 2026. Source window 0–460 ms, mono, filtered, transient aligned and level matched. Final adjustment -0.60 dB."
+  },
+  {
+   "id": "wf_rifle_inspect_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "aCRW3UL9GRe9BhzPrVt1",
+   "detail": "Generated 28 November 2026. Source window 48–490 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_inspect_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "qRXwSPnJ4uPOs1xTKQba",
+   "detail": "Generated 28 November 2026. Source window 0–530 ms, mono, filtered, transient aligned and level matched. Final adjustment -0.60 dB."
+  },
+  {
+   "id": "wf_smg_inspect_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "XOryc5CrI4N6pafzPflS",
+   "detail": "Generated 28 November 2026. Source window 0–515 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_inspect_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "tNmbkmzy0PiPxmAwh1Hj",
+   "detail": "Generated 28 November 2026. Source window 0–520 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_inspect_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "aT2TLcyGogdhPv7fve0o",
+   "detail": "Generated 28 November 2026. Source window 0–405 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_inspect_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "0OqDJZaylO25bfC9xttg",
+   "detail": "Generated 28 November 2026. Source window 0–280 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_inspect_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "ID5yCYerr9V4zZ6ZoAfa",
+   "detail": "Generated 28 November 2026. Source window 0–385 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_inspect_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "IAQDrOzhrgqD3bh1U6dK",
+   "detail": "Generated 28 November 2026. Source window 0–330 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_inspect_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "kWJpvTXQxuQUJmleGqxd",
+   "detail": "Generated 28 November 2026. Source window 0–310 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_inspect_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "glCUTudPpaoDM8yUMCT1",
+   "detail": "Generated 28 November 2026. Source window 0–425 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_inspect_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "0cmOmMPskouInbIFXXWB",
+   "detail": "Generated 28 November 2026. Source window 0–480 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_inspect_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "6tSL9Ij1ZmjFpxFjeM6Y",
+   "detail": "Generated 28 November 2026. Source window 0–440 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_inspect_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Zr5whFpYBawz3abkdVDt",
+   "detail": "Generated 28 November 2026. Source window 0–560 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_inspect_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "ckU8KdqTzrJsSFb5l3qq",
+   "detail": "Generated 28 November 2026. Source window 0–380 ms, mono, filtered, transient aligned and level matched. Final adjustment -0.40 dB."
+  },
+  {
+   "id": "wf_shotgun_inspect_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "8gf6SFBmYcPLCJgFKn6L",
+   "detail": "Generated 28 November 2026. Source window 0–445 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_inspect_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "O20KV6Dd6DmrdxaMw2j3",
+   "detail": "Generated 28 November 2026. Source window 0–355 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_inspect_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "mfx4l7EeeFifVZr3ze1Y",
+   "detail": "Generated 28 November 2026. Source window 0–440 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_inspect_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "16GQUWWgoUQa7exPkCWz",
+   "detail": "Generated 28 November 2026. Source window 0–335 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_empty_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "cMUJB8UwOAyphntaB7uA",
+   "detail": "Generated 28 November 2026. Source window 88–170 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_empty_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "vShPlFeamHbFRsYrnRGx",
+   "detail": "Generated 28 November 2026. Source window 148–270 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_empty_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "TuEvHjUkCI6ub9stUdhL",
+   "detail": "Generated 28 November 2026. Source window 0–75 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_empty_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "IRwimkQAKeMWdNyQENtY",
+   "detail": "Generated 28 November 2026. Source window 0–75 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_empty_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Acm6SF1AyoWGDQjzJJWZ",
+   "detail": "Generated 28 November 2026. Source window 68–190 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_empty_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "IBveltOYMBag5aeZHMvy",
+   "detail": "Generated 28 November 2026. Source window 63–180 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_empty_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "x6Nd6YXrrsfrg4SNJnrL",
+   "detail": "Generated 28 November 2026. Source window 68–145 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_empty_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "R20DLZfdClUIsw3sbr92",
+   "detail": "Generated 28 November 2026. Source window 0–55 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_empty_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "DLKL12Pn1glT9SLk2uZN",
+   "detail": "Generated 28 November 2026. Source window 0–95 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_empty_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Ag8LvbmzKV4IqhoM2Qdb",
+   "detail": "Generated 28 November 2026. Source window 108–230 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_empty_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "f4rEzo5K2xizwrExTvYS",
+   "detail": "Generated 28 November 2026. Source window 178–285 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_empty_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "ikYKbcYhMiz6YMCAHdGm",
+   "detail": "Generated 28 November 2026. Source window 143–265 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_empty_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "9yWWCWL4P0chLObSqmFd",
+   "detail": "Generated 28 November 2026. Source window 148–220 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_empty_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "j8HCBUhAZwdWupzADdCM",
+   "detail": "Generated 28 November 2026. Source window 128–250 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_empty_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "QrLLtD88pEN80ywkV3cf",
+   "detail": "Generated 28 November 2026. Source window 83–205 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_empty_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "wjDNvf8kIA6WTgpvjF7u",
+   "detail": "Generated 28 November 2026. Source window 298–355 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_empty_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "TfqJT92sVP3pGgsttjc3",
+   "detail": "Generated 28 November 2026. Source window 0–115 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_empty_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "x3wQs0bgGbD1SlntSsUv",
+   "detail": "Generated 28 November 2026. Source window 43–165 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_empty_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "xwJ0KtYWrFltbFplT49d",
+   "detail": "Generated 28 November 2026. Source window 168–290 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_empty_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "TKmnACdcBhUVHRvKm0QR",
+   "detail": "Generated 28 November 2026. Source window 218–340 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_pickup_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "L2UdAXAZL6MJWqPcbdyU",
+   "detail": "Generated 28 November 2026. Source window 0–190 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_pickup_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "8qv0RNGYxgs1UhfJVwmw",
+   "detail": "Generated 28 November 2026. Source window 78–400 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_pickup_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "qBdert5orA89KJMgI5qA",
+   "detail": "Generated 28 November 2026. Source window 0–200 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_pickup_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "mI6bmALnAIdxgNCLcQk8",
+   "detail": "Generated 28 November 2026. Source window 0–255 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_pickup_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "F1UivOtpTvArBtRldwrf",
+   "detail": "Generated 28 November 2026. Source window 0–135 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_pickup_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Ve0h6Hg3RlQI5J9qPqFy",
+   "detail": "Generated 28 November 2026. Source window 83–300 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_pickup_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "g4M4nfRmkSQ2RbzDb0Ya",
+   "detail": "Generated 28 November 2026. Source window 0–350 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_pickup_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "hzoCq173kLhoPUH26WTw",
+   "detail": "Generated 28 November 2026. Source window 0–145 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_pickup_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "2hneLnAb2pwXzGqzkFUA",
+   "detail": "Generated 28 November 2026. Source window 108–300 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_pickup_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "9WQZq33S6xSOvpIPFA98",
+   "detail": "Generated 28 November 2026. Source window 83–235 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_pickup_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Sizsb8HOQqNr2Bga6BSf",
+   "detail": "Generated 28 November 2026. Source window 38–320 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_pickup_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "Nah3UNMtHGS963DDzzYS",
+   "detail": "Generated 28 November 2026. Source window 18–200 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_pickup_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "VyxGK855fxnKKOJCqB4b",
+   "detail": "Generated 28 November 2026. Source window 0–125 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_pickup_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "PL0eIN3zKFOl0AbfYJYA",
+   "detail": "Generated 28 November 2026. Source window 0–200 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_pickup_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "VV1t53TosGQfeDO6dhzp",
+   "detail": "Generated 28 November 2026. Source window 0–365 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_pickup_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "KT8ARYyErahdcMa6336u",
+   "detail": "Generated 28 November 2026. Source window 0–285 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_pickup_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "5oQefGnXCsPIqKL8dkTS",
+   "detail": "Generated 28 November 2026. Source window 0–425 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_pickup_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "NcQcKL2zhsyyVSN9YMbD",
+   "detail": "Generated 28 November 2026. Source window 0–185 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_pickup_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "2leNBk5w2l18LnaJAsZO",
+   "detail": "Generated 28 November 2026. Source window 0–330 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_pickup_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-d",
+   "fichier": "z1PIqp8PxMc717IqTv2Z",
+   "detail": "Generated 28 November 2026. Source window 0–305 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_mount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "XTxyafZuTuI4WwJUqR7N",
+   "detail": "Generated 28 November 2026. Source window 0–175 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_mount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "0K7q56SoqFrhfQLUP0o7",
+   "detail": "Generated 28 November 2026. Source window 23–345 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_mount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "K9nV6bLA9YtaZLYJUZXY",
+   "detail": "Generated 28 November 2026. Source window 23–215 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_mount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "VYPtxaj9nIutjzRIHhjg",
+   "detail": "Generated 28 November 2026. Source window 237–425 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_mount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "lSHChXGcYNnb4CWBIBL9",
+   "detail": "Generated 28 November 2026. Source window 136–350 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_mount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "nLmbYl3ih9h0mp9r82TF",
+   "detail": "Generated 28 November 2026. Source window 0–375 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_mount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "87cVT4cqRETeA9jnMQil",
+   "detail": "Generated 28 November 2026. Source window 0–290 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_mount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "saGtksY0qWx5vRQUYO0g",
+   "detail": "Generated 28 November 2026. Source window 0–475 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_mount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "XApswjro1ulYCvi0hn2T",
+   "detail": "Generated 28 November 2026. Source window 38–380 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_mount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "pFX7FJeWxQvHJtTlsTz0",
+   "detail": "Generated 28 November 2026. Source window 48–440 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_mount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "CKrhT0ejtpr1pDZVBmKc",
+   "detail": "Generated 28 November 2026. Source window 0–315 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_mount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "ooS9rhN9gzvRnqtnFUfL",
+   "detail": "Generated 28 November 2026. Source window 68–395 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_mount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "K4QOiJ51oOaCIf6TgTAQ",
+   "detail": "Generated 28 November 2026. Source window 0–400 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_mount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "FHIsA8dItntG1sG9c95a",
+   "detail": "Generated 28 November 2026. Source window 0–285 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_mount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "ws6Hdq4WxOgXbfCb0JQY",
+   "detail": "Generated 28 November 2026. Source window 0–395 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_mount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "FiuH5HCMZMDk6MSqM4AC",
+   "detail": "Generated 28 November 2026. Source window 0–430 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_mount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "Fy7NTctBPWJTsqs9qpRT",
+   "detail": "Generated 28 November 2026. Source window 13–305 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_mount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "XzRsnPdy90sNDa4UNlnX",
+   "detail": "Generated 28 November 2026. Source window 0–375 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_mount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "v4emijnDYA03jwGPAhkF",
+   "detail": "Generated 28 November 2026. Source window 0–380 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_mount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "pSMQT2IjT4IxYnCumBpm",
+   "detail": "Generated 28 November 2026. Source window 0–325 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_unmount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "dsrY34a5fmGxTFBr4TJb",
+   "detail": "Generated 28 November 2026. Source window 0–255 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_unmount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "D4JToXZDGfLYJ4jy2Ijl",
+   "detail": "Generated 28 November 2026. Source window 0–75 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_unmount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "rbq6VwR3MjjZ7VQMfrE1",
+   "detail": "Generated 28 November 2026. Source window 0–155 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_unmount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "2q4GLm12yU6Q3GOXqDM5",
+   "detail": "Generated 28 November 2026. Source window 0–145 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_unmount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "r8kyxxlI5XWfyOgAU7ra",
+   "detail": "Generated 28 November 2026. Source window 0–330 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_unmount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "VpqYE6g4Q91CLPO1Uzlv",
+   "detail": "Generated 28 November 2026. Source window 0–230 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_unmount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "Xgru6JhExMeiNYenChtL",
+   "detail": "Generated 28 November 2026. Source window 0–225 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_unmount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "qrQdxFq2kcqjdMPYePb5",
+   "detail": "Generated 28 November 2026. Source window 0–135 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_unmount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "5GYiMzehVgzFAOXXVHXq",
+   "detail": "Generated 28 November 2026. Source window 0–190 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_unmount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "BZxVEMbS71qGsJZItiac",
+   "detail": "Generated 28 November 2026. Source window 0–265 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_unmount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "n4XEYVStvBUdlnhwFTCa",
+   "detail": "Generated 28 November 2026. Source window 38–350 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_unmount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "7YB0Y7um9lJMpt8BmWYL",
+   "detail": "Generated 28 November 2026. Source window 0–260 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_unmount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "bTAo4rpAp6BnYjMHUe74",
+   "detail": "Generated 28 November 2026. Source window 8–290 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_unmount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "Dm4twKGizGDY5BzXxraN",
+   "detail": "Generated 28 November 2026. Source window 0–60 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_unmount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "Wilm97m2imfN4Kh46MPC",
+   "detail": "Generated 28 November 2026. Source window 0–480 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_unmount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "AvJqKZTwdhlG3ITbHtsI",
+   "detail": "Generated 28 November 2026. Source window 113–495 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_unmount_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "eaSpmXhwQBBMBsPq8cre",
+   "detail": "Generated 28 November 2026. Source window 0–310 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_unmount_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "vkE34Qp8pRGlmOB9nztw",
+   "detail": "Generated 28 November 2026. Source window 0–325 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_unmount_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "8EHoFx8TwwatZxYbyeEx",
+   "detail": "Generated 28 November 2026. Source window 0–320 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_unmount_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "i2Xl8tzJPysEI9Lil6Bn",
+   "detail": "Generated 28 November 2026. Source window 0–320 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_bipod_deploy_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "dD3DTJ4ohOwOlYFx9sc3",
+   "detail": "Generated 28 November 2026. Source window 0–80 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_bipod_deploy_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "8nud8lINO4BnmORzbItQ",
+   "detail": "Generated 28 November 2026. Source window 0–225 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_bipod_deploy_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "5mUSTdNmIuS0zAwpMwby",
+   "detail": "Generated 28 November 2026. Source window 0–230 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_bipod_deploy_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "aRFChNwQutdNIaSANRLA",
+   "detail": "Generated 28 November 2026. Source window 18–405 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bipod_deploy_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "lnNPJAQ1jUCDns1h3LGC",
+   "detail": "Generated 28 November 2026. Source window 0–225 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bipod_deploy_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "kHGtQBOb7oWHRayBRbxa",
+   "detail": "Generated 28 November 2026. Source window 0–80 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bipod_deploy_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "RksZjAiX8554ml0mcRdn",
+   "detail": "Generated 28 November 2026. Source window 138–465 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bipod_deploy_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-e",
+   "fichier": "KyIxN70bhu1pXZcTIz9S",
+   "detail": "Generated 28 November 2026. Source window 0–305 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_charge_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "AR-15/D_14.wav",
+   "detail": "From credited legacy Foley f_charge_rifle-1. AR-15 : levier tiré puis relâché (D_14, 0,36-0,96 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 163–260 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_charge_02",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "AK-47/C_14.wav",
+   "detail": "From credited legacy Foley f_charge_rifle-2. AK-47 : culasse tirée puis relâchée (C_14, prise 2, 1,10-1,70 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 278–390 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_slide_release_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Walther PPQ/X_10.wav",
+   "detail": "From credited legacy Foley f_slide_pistol-1. Walther PPQ : culasse relâchée (X_10, extrait 0,77-1,27 s, début sur le claquement) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–40 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_slide_release_02",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Walther PPQ/X_17.wav",
+   "detail": "From credited legacy Foley f_slide_pistol-2. Walther PPQ : culasse relâchée, chargeur plein (X_17, extrait 1,13-1,63 s, début sur le claquement) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–45 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bolt_back_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Tikka/W_16.wav",
+   "detail": "From credited legacy Foley f_bolt-1. Tikka T3 : cycle complet du verrou (W_16, 0,27-1,67 s) ; silences entre les 4 temps raccourcis à 50 ms, passe-haut 80 Hz ; niveau aligné sur les autres variantes (-0,1 dB) C13 re-edit window 403–580 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_bolt_back_02",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Mosin Nagant/M_14.wav",
+   "detail": "From credited legacy Foley f_bolt-2. Mosin-Nagant : cycle complet du verrou (M_14, 0,53-1,88 s) ; silences entre les 4 temps raccourcis à 50 ms, passe-haut 80 Hz C13 re-edit window 248–395 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_pump_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Nova/O_6.wav",
+   "detail": "From credited legacy Foley f_pump-1. Benelli Nova : pompe aller-retour (O_6, 1,01-1,61 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–210 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_pump_02",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Charles Daly/H_6.wav",
+   "detail": "From credited legacy Foley f_pump-2. Charles Daly cal. 12 : pompe aller-retour (H_6, 1,21-1,81 s), coupe-bande à 9,69 kHz (le tube sonne entre les deux temps) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–170 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_shell_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Nova/O_3.wav",
+   "detail": "From credited legacy Foley f_shell-1. Benelli Nova : cartouche poussée dans le tube (O_3, prise 1, 1,53-1,95 s) ; silences raccourcis, passe-haut 80 Hz C13 re-edit window 0–235 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_shotgun_shell_02",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Nova/O_3.wav",
+   "detail": "From credited legacy Foley f_shell-2. Benelli Nova : cartouche poussée dans le tube (O_3, prise 3, 11,76-12,26 s) ; silences raccourcis, passe-haut 80 Hz C13 re-edit window 0–44 ms from the legacy cut, mono, filtered, transient aligned and level matched. Final adjustment +0.65 dB."
+  },
+  {
+   "id": "wf_shotgun_shell_03",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Model 12/K_3.wav",
+   "detail": "From credited legacy Foley f_shell-3. Winchester Model 12 : cartouche poussée dans le tube (K_3, 1,58-2,00 s) ; silences raccourcis, passe-haut 80 Hz C13 re-edit window 0–43 ms from the legacy cut, mono, filtered, transient aligned and level matched. Final adjustment -0.25 dB."
   }
  ]
 }

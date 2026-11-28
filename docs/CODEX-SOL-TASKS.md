@@ -204,6 +204,11 @@ before starting).
 | C15-2 | Separate tap reload from hold magazine check | S | C15-1 | done |
 | C15-3 | Magazine check pose and ammo readout | M | C15-2 | done |
 | C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | done |
+| C13-1 | Audit weapon foley and write the generation shot list | S | — | open |
+| C13-2 | Generate missing takes with ElevenLabs | M | C13-1 | blocked (ElevenLabs Sound Effects connector unavailable) |
+| C13-3 | Edit, level and credit the generated foley | M | C13-2 | open |
+| C13-4 | Map the takes and extend the audition page | M | C13-3 | open |
+| C13-5 | Verify family coverage, timing and download budget | S | C13-4 | open |
 | C16-4 | Invented language and the voice script | S | C16-1 | done |
 | C16-5 | Record the lines with ElevenLabs | M | C16-4 | blocked (owner approval of the five sample lines and ElevenLabs connector) |
 | C16-6 | Radio processing and packaging | S | C16-5 | open |
@@ -220,15 +225,17 @@ before starting).
 | C2-4 to C2-8 | One card per weapon: AK-15K, AK-74M Zenitco, RPK, M16, G3 | S each | C2-3 | open |
 | C11-1 to C11-3 | Full-screen map and extraction flares | M total | C15-4 | open |
 | C12 | Dirty lens | M | C11-3 | blocked (reference image missing, see findings) |
-| C13 | Weapon foley | M | C12 | open (ElevenLabs budget approved by the owner, 25 November 2026) |
-| C3-1 to C3-7 | Remaining modern weapons and parts (section 7) | M total each | C13 | open |
+| C3-1 to C3-7 | Remaining modern weapons and parts (section 7) | M total each | C13-5 | open |
 | C4-1 to C4-8 | Marksman, Breacher, Heavy (section 7) | S to M | C3-7 | open |
 | C5-1 to C5-8 | AI behaviour upgrade (section 7) | S to M | C4-8 | open |
 | C6-1 to C6-6 | Rival raider squads (section 7) | S to M | C5-8 | open |
 | C7-1 to C7-7 | Optimisation, part 1 (section 7) | XS to M | C6-6 | open |
 | C8-1 to C8-6 | Raid balance (section 7) | XS to M | C7-7 | open |
 | C14-1 to C14-5 | Second World War weapons (section 7) | S to M | C8-6, C9-4 | open |
-| C17-1 to C17-4 | First-person lower body: the player always sees their own legs and feet (cards in `docs/plans/2026-11-27-omnimovement-2.md`) | M total | C15-4 | open |
+| C17-1 | First-person lower-body mesh (cards in `docs/plans/2026-11-27-omnimovement-2.md`) | M | C15-4 | done |
+| C17-2 | Place the lower body under the camera | S | C17-1 | open |
+| C17-3 | Verify legs across stances | M | C17-2 | open |
+| C17-4 | Shadows, setting, budget and closing sheet | S | C17-3 | open |
 | C18-1 to C18-16 | Omnimovement 2, aimed at the feel of Black Ops 6 (cards in `docs/plans/2026-11-27-omnimovement-2.md`, section 6 gives the order) | S to M each | C17-1 (C18-1) | open (owner: O1 to O5 in the plan) |
 
 ---
@@ -734,12 +741,21 @@ Sol agent starts it. A planning agent writes the split into this file first.
   keyboard; (3) flare columns per open extract.
 - **C12 Dirty lens:** blocked until the owner adds the reference image (see findings). The lab shader to start from is
   `src/efc/47-efc-artlab-fx.js` (lens dirt at line 83).
-- **C13 Weapon foley:** the owner approved the ElevenLabs budget on 25 November 2026. Split into cards first: (1) the shot list
-  (events times weapon families times four takes) from `docs/audio-events.md` and `docs/handling-foley.md`, with the expected
-  number of generations; (2) generation through the ElevenLabs connector, logging credits used per batch in the commit body;
-  (3) editing and levelling with `tools/sfx/` and `tools/build_sfx.py`; (4) mapping in `src/efc/45-efc-sounds.js` and the
-  `#sounds` audition page; (5) `test-sounds.mjs` coverage. Generation needs the ElevenLabs connector: an agent without it
-  stops after card (1) and hands the shot list to the owner.
+### C13-1. Audit weapon foley and write the generation shot list (S)
+
+- **Read:** `docs/HANDOFF-CODEX.md` (C13), `docs/audio-events.md`, `docs/handling-foley.md`, `src/efc/45-efc-sounds.js`
+  (take banks and lookup), and the weapon-foley entries in `assets/sfx/credits.json`.
+- **Edit:** `docs/weapon-foley-shot-list.md`.
+- **Steps:** Audit each supported weapon family and applicable action, identify which credited takes can be reused, and
+  list what is missing to meet four distinct takes per pairing. Specify generation batches, counts, names and prompts so
+  the owner can run them if the connector is unavailable. Highlight shared pools and any new event hooks separately.
+- **Verify:** Check family and action coverage against the source inventory and recalculate the generation total.
+- **Acceptance:** The shot list is ready to record. Generation requires the ElevenLabs Sound Effects connector.
+
+**C13-2 through C13-5:** The owner approved the ElevenLabs budget on 25 November 2026. Generate C13-1's missing takes, log
+credits used per batch, edit and level with `tools/sfx/` and `tools/build_sfx.py`, map the banks and extend `#sounds`, then
+verify with `test-sounds.mjs`. Add exact card files and checks before each stage starts. Without the connector, hand off
+the shot list after C13-1.
 - **C3, C4 to C8 and C14** are split into cards in section 7.
 
 ## 7. Later tracks as cards (planned 26 November 2026)

@@ -29,11 +29,11 @@ mergeable branch.
 | 1 | C1 | Raid-start weapon check (P9), from the T7 proposal | medium |
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
 | done | C15 | Minimal HUD hides ammo and weapon name in raids. Tap R to reload and hold R to check the magazine. See [Raid HUD](hud.md). | medium |
+| next | C13 | Sound design: weapon handling and workbench foley for every action, with at least four takes per applicable action and weapon family | medium to large |
 | 4 | C16 | Enemy combat barks: every hostile action announced before it happens, with an on-screen caption and an ElevenLabs radio voice in an invented gibberish language (owner, 26 November); plus a downed state and the execution of a downed player (a hostile walks up, taunts, draws a pistol, last line, finishing shot), telegraphed so teammates can save them | large |
 | 4b | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3. Integrate Partisan’s modding system and assets with Riposte’s base weapons in the same workbench. Use the StG 44 bench only for lighting, background, floor and canted weapon view. | large |
 | 5 | C11 | `M` opens a full-screen map with extracts and points of interest; green smoke flares over open extracts | medium |
 | 6 | C12 | Dirty lens, lens flare and bloom when looking at light sources | medium |
-| 7 | C13 | Real weapon foley for every action, with ElevenLabs alternatives and variants (plan use approved) | medium to large |
 | 8 | C3 | Remaining modern weapons (MK14, SPEAR) and every remaining attachment through the same Partisan modding system | large |
 | 9 | C4 | Marksman, Breacher and Heavy enemy types | medium to large |
 | 10 | C5 | AI behaviour upgrade for every hostile | large |

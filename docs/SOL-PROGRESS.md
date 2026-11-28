@@ -5,22 +5,20 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C17-2, first-person legs framing
-- **Branch:** `codex/c17-2-legs-framing`
-- **Started:** 2026-11-27 23:36 UTC
-- **Steps done:** The branch includes C17-1 and the C17-2 offsets, camera clearance guard, and first pitch contact sheet.
-- **Next step:** Resume C17-2 once the standing −60° framing direction is confirmed. C16-5 waits for sample approval and the ElevenLabs connector.
-- **How to verify:** On the C17-2 branch, run `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** `first-person legs follow the soldier, retain body yaw, and hide on camera overlap or death`, `smoke ok`, and `eight standing and crouched pitch screenshots captured`. Standing boots are below frame at −60°.
-- **Questions for the owner:** Should C17-2 use forward compensation at steep pitch or keep the backward offset? C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
-- **Watch out for:** Keep the C17 code on its feature branch while visual acceptance is open. C18 follows the card dependencies and owner defaults in section 5 of the plan.
+- **Card:** none in progress.
+- **Next step:** Take C13-1, the weapon-foley audit and recording shot list.
+- **How to verify:** C13-1 checks the family/action matrix and take totals against the source inventory. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
+- **Checks so far:** The C17-2 pose, body yaw, camera overlap and death checks passed. The standing boots are below frame at −60°.
+- **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
+- **Watch out for:** The current first-person legs are on beta for staging. C17-2 remains open and C17-3 waits on its visual acceptance. The ElevenLabs connector is unavailable for C13-2 and C16-5.
 
 ## Next open cards, in order
 
-1. C16-5 to C16-13, enemy combat barks (captions and radio voice; telegraphing is a core rule), then the downed state and the execution of a downed player.
-2. C17 and C18 may run alongside C16 after C15 reaches beta. Follow the dependencies in the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
-3. C2-1 to C2-8, Partisan modding rules, stats table, one test, one card per weapon.
-4. Then C11, C12, C13 (section 6, split first), and C3, C4 to C8, C14 (section 7, already split).
+1. C13-1 to C13-5, sound design and weapon foley. Start with the shot list.
+2. C16-5 to C16-13, enemy combat barks, downed state and enemy execution.
+3. C17 and C18 can run alongside C16. Follow the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
+4. C2-1 to C2-8, Partisan modding and weapons.
+5. Then C11 and C12 (section 6), followed by C3 to C8 and C14 (section 7).
 
 Blocked on the owner: K8 (stash names, one line or two), C12 (reference image missing). Owner may still change K10's drop zone.
 C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the owner's eye.

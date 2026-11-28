@@ -25,11 +25,11 @@ Work in this order. Each line is one or more mergeable branches.
 1. **C1** raid-start weapon check
 2. **C9** omnimovement (moved up by the owner: right after C1)
 3. **C15** minimal HUD and the magazine check (next open priority, owner, 27 November 2026)
+3b. **C13** sound design and weapon foley (next open priority, owner, 28 November 2026)
 4. **C16** enemy combat barks: captions and radio voice telegraphing every hostile action
 4b. **C2** Partisan modern weapons, batch 1
 5. **C11** full-screen map and extraction flares
 6. **C12** dirty lens and light effects
-7. **C13** real weapon foley for every action
 8. **C3** remaining modern Partisan weapons and attachments
 9. **C4**, **C5**, **C6** enemy types, AI upgrade, rival raiders
 10. **C7** optimisation part 1, **C8** raid balance
@@ -337,7 +337,7 @@ bright light reaches them. Keep it subtler than the reference by default; streng
 - Tests: the effect strength rises when the camera faces the sun and falls to zero when the light is occluded or behind;
   frame cost measured on the A1 route at each quality; before and after screenshots in `docs/lens/`.
 
-## C13. Real weapon foley for every action (medium to large; after C12)
+## C13. Sound design and weapon foley (medium to large; next open priority)
 
 The owner likes the handling sounds of the Partisan Project workbench and wants that quality for **every** weapon action in
 Claudov, with more variety.

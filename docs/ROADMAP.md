@@ -1,6 +1,6 @@
 # Escape From Claudov: roadmap
 
-Single status page for the whole project. Updated 21 November 2026. The linked handoffs record what is done, what is assigned, and what needs the owner.
+Single status page for the whole project. Updated 28 November 2026. The linked handoffs record what is done, what is assigned, and what needs the owner.
 
 ## Done and merged on `main`
 
@@ -30,7 +30,7 @@ mergeable branch.
 | 2 | C9 | Omnimovement: dives, slides, prone in every direction, weapon canting with the body | very large, two parts |
 | done | C15 | Minimal HUD hides ammo and weapon name in raids. Tap R to reload and hold R to check the magazine. See [Raid HUD](hud.md). | medium |
 | done | C13 | Weapon handling and workbench Foley. The [shot list](weapon-foley-shot-list.md) covers four takes per applicable action and family. | medium to large |
-| next audio | C19 | Platform gunfire pass. Audit first-person, nearby, distant and suppressed recordings for rifles, SMGs, pistols, shotguns, DMRs and bolt-action/heavy snipers. Replace weak takes from credited CC0 recordings or approved ElevenLabs generations. Verify reload coverage, mix, transients, rapid fire and missing-pack fallback in a raid. | medium |
+| done in beta | C19 | Platform gunfire pass. Two new first-person takes for each of 17 firing profiles, using ElevenLabs attacks layered into CC0 recordings. Verify nearby, distant and suppressed routing and C13 reload coverage in the [beta checklist](../outbound/BETA_PLAYTEST_CHECKLIST.md). | medium |
 | 4 | C16 | Enemy combat barks: every hostile action announced before it happens, with an on-screen caption and an ElevenLabs radio voice in an invented gibberish language (owner, 26 November); plus a downed state and the execution of a downed player (a hostile walks up, taunts, draws a pistol, last line, finishing shot), telegraphed so teammates can save them | large |
 | 4b | C2 | Partisan modern weapons, batch 1: AK-15K, AK-74M Zenitco, RPK, M16, G3. Integrate Partisan’s modding system and assets with Riposte’s base weapons in the same workbench. Use the StG 44 bench only for lighting, background, floor and canted weapon view. | large |
 | 5 | C11 | `M` opens a full-screen map with extracts and points of interest; green smoke flares over open extracts | medium |

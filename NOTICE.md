@@ -14,6 +14,8 @@ What remains under its own terms:
    - Workbench turn bank (`assets/sfx/workbench_foley/`): the 12 Partisan Project handling and hit recordings used by the StG 44
      workbench, supplied and cleared by Vincent De Nil for this repository. Shared handling uses ElevenLabs and CC0 takes. The
      `weapon_foley` pack combines ElevenLabs generations and credited legacy recordings. See `assets/sfx/credits.json` for sources.
+   - First-person firing pack (`assets/sfx/platform_fire/`) layers ElevenLabs Sound Effects v2 attacks into CC0 Free Firearm Sound
+     Library recordings. The credits ledger identifies both sources for every mix.
 2. **Textures, skies and HDRI** (`assets/tex/`, `assets/sky/`, `assets/vendor/hdri/`): Poly Haven and ambientCG, CC0 (`assets/tex/credits.json`).
 3. **Libraries**: three.js r147 (MIT, notice at the top of `assets/vendor/three-r147.js`); PeerJS 1.5.5 (MIT), from
    https://registry.npmjs.org/peerjs/-/peerjs-1.5.5.tgz for online lobbies. Its distribution and license are in `assets/vendor/`.

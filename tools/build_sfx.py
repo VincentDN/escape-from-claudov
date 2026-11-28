@@ -26,8 +26,8 @@ import common  # noqa: E402
 
 FAMILLES = ['armes', 'maniement', 'impacts', 'series', 'ambiances', 'interface', 'mecha', 'partisan']
 OUT = ROOT / 'assets' / 'sfx'
-COMMITTED_FOLEY_PACKS = {'weapon_foley', 'workbench_foley'}
-EXTERNAL_PACKS = {'handling'} | COMMITTED_FOLEY_PACKS
+COMMITTED_PACKS = {'weapon_foley', 'workbench_foley', 'platform_fire'}
+EXTERNAL_PACKS = {'handling'} | COMMITTED_PACKS
 
 # Encodage par paquet : (fréquence du MP3, qualité VBR de LAME : 0 meilleure, 9 plus légère). Les masters restent à 48 kHz ;
 # le jeu décode à la fréquence de son contexte audio.
@@ -132,7 +132,7 @@ def main():
         return
     # encodage des masters
     packs = sorted(p.name for p in common.MASTERS.iterdir() if p.is_dir()) if common.MASTERS.exists() else []
-    # Committed Foley banks with independent source workflows.
+    # Committed sound banks with independent source workflows.
     packs = [p for p in packs if p not in EXTERNAL_PACKS]
     if a.paquet: packs = [p for p in packs if p in a.paquet.split(',')]
     total = 0
@@ -150,9 +150,9 @@ def main():
     ledger = OUT / 'credits.json'
     if ledger.exists():
         committed = json.loads(ledger.read_text(encoding='utf-8'))
-        entries = [entry for entry in entries if entry['pack'] not in COMMITTED_FOLEY_PACKS]
+        entries = [entry for entry in entries if entry['pack'] not in COMMITTED_PACKS]
         for entry in committed['sons']:
-            if entry['pack'] in COMMITTED_FOLEY_PACKS:
+            if entry['pack'] in COMMITTED_PACKS:
                 entries.append(entry)
                 sources[entry['source']] = committed['sources'][entry['source']]
     used = sorted({e['source'] for e in entries})

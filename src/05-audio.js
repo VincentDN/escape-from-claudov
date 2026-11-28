@@ -335,15 +335,18 @@ function sfxGun(kind, pos, who) {
   if (d > S.maxD) return;
   const id = S.sup ? (pos ? (d < GUN_NEAR ? 'g_sup_near' : 'g_sup_far') : (S.cls === 'pistol' || S.cls === 'smg' ? 'g_sup_pistol_pov' : 'g_sup_rifle_pov'))
     : pos ? (d < GUN_NEAR ? 'g_' + S.bank + '_near' : 'g_far_' + S.cls) : 'g_' + S.bank + '_pov';
-  const alt = !pos && S.pov2 && !(typeof EFC_SND !== 'undefined' && !EFC_SND.on) && sfxHas(S.pov2) ? S.pov2 : null; // replacement first-person bank
-  if (!sfxHas(id) && !alt) return sfxGunSynth(kind, pos, d);
+  const enhanced = !pos && !S.sup && typeof EFC_SND !== 'undefined' && EFC_SND.on;
+  const platform = enhanced && sfxHas('g_c19_' + S.bank + '_pov') ? 'g_c19_' + S.bank + '_pov' : null;
+  const alt = enhanced && !platform && S.pov2 && sfxHas(S.pov2) ? S.pov2 : null;
+  if (!sfxHas(id) && !platform && !alt) return sfxGunSynth(kind, pos, d);
   if (!auAfford(pos ? 5 : 7, pos ? d : 0)) return;
   const ctx = AU.ctx, t = ctx.currentTime + (pos ? Math.min(d / 343, 0.5) : 0), far = clamp(d / 80, 0, 1);
   // à l'intérieur (peu de ciel au-dessus du joueur) : la queue extérieure enregistrée s'éteint plus tôt et la salle prend le relais
   const inside = 1 - clamp(VM.sky === undefined ? 1 : VM.sky, 0, 1);
   const H = (!pos || d < GUN_NEAR) && !S.sup ? S.heavy : null; // poids des armes lourdes (GUN_HEAVY)
   const g0 = ctx.createGain(); g0.gain.value = (pos ? S.world * (d < GUN_NEAR ? GUN_SMP.near : GUN_SMP.far) : S.fp * GUN_SMP.pov) * (S.smp || 1) * (GUN_CLS_GAIN[S.cls] || 1) * (H ? H.drive : 1) * rand(0.93, 1.0);
-  const v = sfxPlay(alt || id, g0, t, { rate: rand(0.97, 1.03) * (S.rate || 1), gain: alt ? S.pov2Gain : 1 }); if (!v) return;
+  const sampleGain = alt ? S.pov2Gain : 1;
+  const v = sfxPlay(platform || alt || id, g0, t, { rate: rand(0.97, 1.03) * (S.rate || 1), gain: sampleGain }); if (!v) return;
   let out = g0;
   if (H) {
     out = ctx.createBiquadFilter(); out.type = 'lowshelf'; out.frequency.value = 150; out.gain.value = H.low; g0.connect(out);
@@ -356,7 +359,7 @@ function sfxGun(kind, pos, who) {
     if (S.brass && d < 10 && Math.random() < 0.35 && CURMAP.def) { const sf = surfaceAt(pos); if (sf !== 'water') sfxCasing(sf, pos, t + rand(0.35, 0.5)); }
   } else { out.connect(AU.fpBus); const vb = ctx.createGain(); vb.gain.value = lerp(GUN_VERB.pov, GUN_VERB.inside, inside) * vk; g0.connect(vb); vb.connect(AU.verb); }
   const e = ctx.createGain(); e.gain.value = S.echo * GUN_VERB.echo * vk * (pos ? 0.5 + far * 0.8 : 1) * (1 - inside * 0.7); g0.connect(e); e.connect(AU.echo);
-  if (inside > 0.35) { v.g.gain.setValueAtTime(1, t + 0.16); v.g.gain.setTargetAtTime(0, t + 0.16, 0.06 + 0.2 * (1 - inside)); }
+  if (inside > 0.35) { v.g.gain.setValueAtTime(sampleGain, t + 0.16); v.g.gain.setTargetAtTime(0, t + 0.16, 0.06 + 0.2 * (1 - inside)); }
   // étouffe le coup précédent du même tireur
   const key = who || (pos ? null : GUN_ME);
   if (key) { const prev = GUN_VOICE.get(key); if (prev) sfxFadeOut(prev, t + 0.025, 0.04); GUN_VOICE.set(key, v); }

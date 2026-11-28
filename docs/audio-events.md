@@ -47,6 +47,16 @@ sniper (L96 bolt action; SVD and M82 use the rifle magazine rig), shotgun (M1014
 
 ## Firing
 
+C19 adds two first-person variants for each of 17 profiles across rifles, SMGs, pistols, shotguns, DMRs, bolt-action
+snipers and heavy snipers. Fourteen ElevenLabs Sound Effects v2 generations used 233.310 credits. The first 85 ms
+of each edited generation is blended with the profile's own Free Firearm Sound Library CC0 recording. The mix
+matches the original level over the first 60 ms and retains the original decay and action. The game selects the new
+bank when it is ready and falls back to the older recording while loading or when the pack is absent. Nearby, distant
+and suppressed shots use the existing CC0 banks. The [credits ledger](../assets/sfx/credits.json) records both sources
+for every mix, and `tools/sfx/platform_fire.py` prepares the pack from the credited source takes.
+
+The following table records the earlier P2 changes.
+
 | Event | Before P2 | After P2 |
 |---|---|---|
 | First person (all profiles) | recorded `g_<profile>_pov` (3 takes), FFSL; synthesis while loading | unchanged, except the L96 |

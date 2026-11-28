@@ -32,6 +32,7 @@ const bootAudio = () => (async () => {
   const st = await page.evaluate(bootAudio);
   ok(st.handling === 'ready' && st.ballistics === 'ready' && st.armes === 'ready' && st.foley === 'ready', 'packs ready ' + JSON.stringify(st));
   ok(st.weapon_foley === 'ready', 'weapon Foley pack ready ' + JSON.stringify(st));
+  ok(st.platform_fire === 'ready', 'platform firing pack ready');
   ok(await page.evaluate(() => !SFX.state.has('workbench_foley')), 'workbench turn pack stays out of raid preloads');
   const firearmRoutes = await page.evaluate(() => {
     const missing = [];
@@ -57,6 +58,37 @@ const bootAudio = () => (async () => {
   });
   ok(!firearmRoutes.missing.length, 'every raid weapon has recorded firing banks ' + firearmRoutes.missing.join(', '));
   ok(firearmRoutes.remote === 0 && firearmRoutes.local === 1, 'only local gunfire connects to the first-person bus');
+  const firing = await page.evaluate(() => {
+    const faults = [], shots = new Map(), play = sfxPlay;
+    const profiles = Object.entries(GUNSND).filter(([, profile]) => !profile.sup);
+    sfxPlay = (id, ...args) => {
+      const shot = play(id, ...args);
+      if (id.startsWith('g_')) shots.set(id, shot);
+      return shot;
+    };
+    try {
+      for (const [kind, profile] of profiles) {
+        const bank = 'g_c19_' + profile.bank + '_pov', takes = SFX.bank.get(bank);
+        shots.clear();
+        const shooter = {};
+        sfxGun(kind, null, shooter);
+        const first = shots.get(bank);
+        sfxGun(kind, null, shooter);
+        const second = shots.get(bank);
+        if (takes?.length !== 2 || !first || !second || first.s.buffer === second.s.buffer) faults.push(kind + ' POV');
+        shots.clear();
+        sfxGun(kind, camera.position.clone().add(new THREE.Vector3(12, 0, 0)), shooter);
+        sfxGun(kind, camera.position.clone().add(new THREE.Vector3(54, 0, 0)), shooter);
+        if (!shots.get('g_' + profile.bank + '_near') || !shots.get('g_far_' + profile.cls) || shots.has(bank)) faults.push(kind + ' distance');
+      }
+      shots.clear();
+      sfxGun('rifle_s', null);
+      sfxGun('pistol_s', null);
+      if (!shots.get('g_sup_rifle_pov') || !shots.get('g_sup_pistol_pov')) faults.push('suppressed POV');
+      return faults;
+    } finally { sfxPlay = play; }
+  });
+  ok(firing.length === 0, 'new POV variants and separate distance and suppressed routes ' + firing.join(', '));
   const R = await page.evaluate(() => {
     const out = { missing: [], clip: [], levels: {}, events: 0 };
     out.banks = [];
@@ -65,7 +97,7 @@ const bootAudio = () => (async () => {
     // handling events (every EFC_HANDLING key is an event of the audit)
     for (const k of Object.keys(EFC_HANDLING)) need('handling ' + k, [EFC_HANDLING[k][0][0]]);
     for (const k of Object.keys(EFC_HANDLING)) for (const l of EFC_HANDLING[k]) { out.banks.push(l[0]); if (!sfxHas(l[0])) out.missing.push('layer ' + k + ' ' + l[0]); }
-    for (const p of ['handling', 'ballistics', 'weapon_foley']) out.banks.push(...(SFX.of.get(p) || []));
+    for (const p of ['handling', 'ballistics', 'weapon_foley', 'platform_fire']) out.banks.push(...(SFX.of.get(p) || []));
     for (const id of ['f_magout_rifle', 'f_magout_smg', 'f_magout_pistol', 'f_magin_rifle', 'f_magin_smg', 'f_magin_pistol', 'f_slap', 'f_charge_rifle', 'f_slide_pistol', 'f_bolt', 'f_pump', 'f_shell', 'f_draw', 'f_stow', 'f_ads', 'f_dry', 'f_pickup']) need('old ' + id, [id]);
     for (const k of ['knife', 'pin', 'spoon', 'throw', 'windup', 'magdrop']) need('engine ' + k, [mechId(k, 'rifle')]);
     // firing per sound profile: first person, near, far, suppressed
@@ -108,6 +140,31 @@ const bootAudio = () => (async () => {
 
   // ---------- 2. reload choreography timing, one weapon per family ----------
   await startSolo(page);
+  const raidFire = await page.evaluate(() => {
+    const entity = PL.ent, weapon = armsW(entity), { def, mag } = weapon, play = sfxPlay;
+    const shots = [], keys = ['m4', 'mp5', 'm9', 'rem870', 'svd', 'l96', 'm82'];
+    sfxPlay = (id, ...args) => {
+      if (id.startsWith('g_c19_')) shots.push(id);
+      return play(id, ...args);
+    };
+    try {
+      for (const key of keys) {
+        weapon.def = WEAPONS[key];
+        weapon.mag = 2;
+        vmEquip(weapon.def);
+        ctlShoot(entity, MATCH.time);
+        if (key === 'mp5') ctlShoot(entity, MATCH.time + 0.08);
+      }
+      return shots;
+    } finally {
+      sfxPlay = play;
+      weapon.def = def;
+      weapon.mag = mag;
+      vmEquip(def);
+    }
+  });
+  ok(raidFire.join() === ['rifle', 'smg', 'smg', 'pistol', 'shotgun', 'dmr', 'sniper', 'sniper50'].map(k => 'g_c19_' + k + '_pov').join(),
+    'live raid firing across all seven families and a short burst: ' + raidFire.join(', '));
   const controls = await page.evaluate(() => {
     const entity = PL.ent, weapon = armsW(entity), def = weapon.def;
     const { crouch, onGround } = entity, velocity = entity.vel.clone();
@@ -306,9 +363,9 @@ const bootAudio = () => (async () => {
 {
   const browser = await launch();
   const { page, errors } = await openGame({ browser });
-  await page.evaluate(() => { delete SFX_PACKS.handling; delete SFX_PACKS.ballistics; delete SFX_PACKS.weapon_foley; });
+  await page.evaluate(() => { delete SFX_PACKS.handling; delete SFX_PACKS.ballistics; delete SFX_PACKS.weapon_foley; delete SFX_PACKS.platform_fire; });
   const st = await page.evaluate(bootAudio);
-  ok(!st.handling && st.foley === 'ready', 'fallback packs ' + JSON.stringify(st));
+  ok(!st.handling && !st.platform_fire && st.armes === 'ready' && st.foley === 'ready', 'fallback packs ' + JSON.stringify(st));
   await startSolo(page);
   const ran = await simRun(page, 10, 'PL.ent.health = 100;');
   const F = await page.evaluate(() => {
@@ -325,7 +382,7 @@ const bootAudio = () => (async () => {
   });
   ok(ran >= 9, 'match runs without the new packs: ' + ran);
   ok(F.includes('f_magout_rifle') && F.includes('f_magin_rifle') && !F.some((i) => /^hf_|^pt_|^g_pt_|casing_wood/.test(i)), 'engine sounds play: ' + F.join(','));
-  ok(F.includes('g_sniper_pov') && F.includes('f_brass'), 'engine shot and casing play');
+  ok(F.includes('g_sniper_pov') && F.includes('f_brass'), 'engine shot and casing play: ' + F.join(', '));
   ok(!errors.length, 'page errors (fallback): ' + errors.slice(0, 5).join('\n'));
   await browser.close();
 }
@@ -342,6 +399,12 @@ const expectedTakes = expectedFoley.flatMap((bank) => ['01', '02', '03', '04'].m
 const takeHashes = new Set(takeFiles.map((name) => createHash('sha256').update(fs.readFileSync(path.join(foleyDir, name))).digest('hex')));
 const ledger = JSON.parse(fs.readFileSync(path.join(REPO, 'assets/sfx/credits.json'), 'utf8'));
 const credits = ledger.sons.filter((entry) => entry.pack === 'weapon_foley');
+const firingPack = fs.readdirSync(sfxDir).find((name) => /^platform_fire\./.test(name));
+const firingBytes = firingPack ? fs.statSync(path.join(sfxDir, firingPack)).size : 0;
+const firingCredits = ledger.sons.filter((entry) => entry.pack === 'platform_fire');
+ok(firingBytes > 0 && firingBytes < 600 * 1024, 'platform firing download budget ' + firingBytes);
+ok(firingCredits.length === 34 && new Set(firingCredits.map((entry) => entry.fichier)).size === 14
+  && firingCredits.every((entry) => ledger.sources[entry.source]), 'platform firing provenance covers 34 mixes and 14 generations');
 ok(takeFiles.join() === expectedTakes.join() && takeHashes.size === 304, '304 distinct shot-list assets');
 ok(credits.map((entry) => entry.id + '.mp3').sort().join() === expectedTakes.join() && credits.every((entry) => ledger.sources[entry.source]), 'every take has provenance');
 ok(weaponBytes > 0 && weaponBytes < 2 * 1024 * 1024, 'weapon Foley download budget ' + weaponBytes);

@@ -2,6 +2,11 @@
 
 [Open beta](https://vincentdn.github.io/escape-from-claudov/beta/)
 
+## Firing audio in a raid
+
+- [ ] Fire single shots and short bursts with a rifle, SMG, pistol, shotgun, DMR, bolt-action sniper and heavy sniper. For example, use the M4, MP5, M9, Remington 870, SVD, L96 and M82. Check that each shot sounds distinct, has a clear attack, and stays intelligible in a burst.
+- [ ] Fire with and without a suppressor. Then have a teammate or bot fire nearby and at a distance. Check direction and distance, including when no casing is audible, and try both indoors and outdoors.
+
 ## Weapon Foley in a raid
 
 - [ ] While holding a weapon, toggle safety with **U**. Check for one click on each toggle and confirm the trigger is blocked while safety is on.
@@ -9,7 +14,6 @@
 - [ ] Fit a bipod to a compatible weapon. In a raid, crouch and stop moving. Listen for one deployment sound. Move, then stop again to check that it only plays on deployment.
 - [ ] Reload a rifle, pistol, bolt-action sniper and pump shotgun. Listen for removal and seating, slide release, separate bolt opening and closing, and shell and pump cues.
 - [ ] In the workbench, rotate a weapon and fit or remove an attachment. Check that the sounds match the action. Zoom should stay quiet.
-- [ ] Hear another player or bot fire at close and long range indoors and outdoors. Check direction and distance, including when no casing is audible. Compare suppressed and unsuppressed fire where available.
 
 ## Partisan first-person view
 

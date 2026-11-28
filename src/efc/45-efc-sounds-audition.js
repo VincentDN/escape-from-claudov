@@ -25,7 +25,7 @@ function efcAudHandling(neu, kind, key, wk, delay) {
   const fam = efcAudFam(wk), k = typeof key === 'function' ? key(fam) : key;
   if (!AU.ready) return;
   if (neu) {
-    const bank = neu === 'pilot' && efcWeaponFoleyBank(k, fam, true);
+    const bank = neu === 'recorded' && efcWeaponFoleyBank(k, fam, true);
     if (!bank && !efcHandlingReady(k)) return efcAudStatus('pack handling not loaded yet');
     efcHandlingLayers(k, auOut(null, 0.05, 1), AU.ctx.currentTime + (delay || 0), { rate: efcSndWeightRate(EFC_SND_KG[wk] || EFC_SND_FAM_KG[fam]), bank });
   } else efcAudWith(false, () => sfxMech(kind, delay || 0, null, fam));
@@ -66,20 +66,20 @@ function efcAudStatus(msg) {
   el.textContent = (msg ? msg + ' | ' : '') + st;
 }
 
-function efcAudBtns(oldAct, newAct, pilotAct) {
+function efcAudBtns(oldAct, newAct, recordedAct) {
   const b = (n, a) => (a ? `<button data-a="${a}">${n}</button>` : `<button disabled>${n === 'old' ? 'none' : n}</button>`);
-  return `<td>${b('old', oldAct)}</td><td>${b('new', newAct)}</td>` + (pilotAct ? `<td>${b('Foley pilot', pilotAct)}</td>` : '');
+  return `<td>${b('old', oldAct)}</td><td>${b('new', newAct)}</td>` + (recordedAct ? `<td>${b('Recorded Foley', recordedAct)}</td>` : '');
 }
 function efcAudHtml() {
-  const fam = efcAudFam(EFC_AUD.wk), pilot = fam === 'rifle' && SFX_PACKS.weapon_foley;
+  const fam = efcAudFam(EFC_AUD.wk), magazineFoley = ['rifle', 'smg', 'pistol', 'sniper'].includes(fam) && SFX_PACKS.weapon_foley;
   const row = (label, o, n, p) => `<tr><th>${label}</th>${efcAudBtns(o, n, p)}</tr>`;
   let h = '<h1>Escape From Claudov: sound audition</h1><p>Old: the sound before the polish pass. New: the Partisan takes. Press Start audio first; '
     + 'repeat a button to hear the other takes (random take, pitch and level, as in the game).</p>'
     + '<p><button data-a="start">Start audio</button> <span id="efcAudSt"></span></p><p>Weapon: '
     + EFC_AUD.weapons.map(([k, n]) => `<button data-w="${k}"${k === EFC_AUD.wk ? ' aria-pressed="true"' : ''}>${n}</button>`).join(' ') + '</p>';
   h += `<h2>Handling: ${EFC_AUD.weapons.find((w) => w[0] === EFC_AUD.wk)[1]} (family ${fam})</h2><table>`;
-  EFC_AUD.handling.forEach(([label, , key], i) => { h += row(label, 'h0:' + i, 'h1:' + i, pilot && ['magout', 'magin', 'slap'].includes(key) && 'h2:' + i); });
-  h += row('Full reload', 'r0:0', 'r1:0', pilot && 'r2:0') + row('Full reload from empty', 'r0:1', 'r1:1', pilot && 'r2:1') + '</table>';
+  EFC_AUD.handling.forEach(([label, , key], i) => { h += row(label, 'h0:' + i, 'h1:' + i, magazineFoley && ['magout', 'magin', 'slap'].includes(key) && 'h2:' + i); });
+  h += row('Full reload', 'r0:0', 'r1:0', magazineFoley && 'r2:0') + row('Full reload from empty', 'r0:1', 'r1:1', magazineFoley && 'r2:1') + '</table>';
   h += '<h2>Firing: selected weapon</h2><table>' + row('First person' + (WEAPONS[EFC_AUD.wk] && WEAPONS[EFC_AUD.wk].sound === 'sniper' ? ' (replaced for the L96)' : ' (unchanged)'), 'f0:pov', 'f1:pov')
     + row('Near, 12 m (unchanged)', 'f0:near', 'f1:near') + row('Far, 70 m (unchanged)', 'f0:far', 'f1:far') + '</table>';
   h += '<h2>Casings landing (player)</h2><table>';
@@ -96,8 +96,8 @@ function efcAudClick(e) {
   if (a === 'start') { efcAudStart(); efcAudStatus(); return; }
   if (!AU.ready) { efcAudStart(); }
   const [k, v] = a.split(':');
-  if (k === 'h0' || k === 'h1' || k === 'h2') { const r = EFC_AUD.handling[+v]; efcAudHandling(k === 'h2' ? 'pilot' : k === 'h1', r[1], r[2], EFC_AUD.wk, 0); }
-  else if (k === 'r0' || k === 'r1' || k === 'r2') efcAudReload(k === 'r2' ? 'pilot' : k === 'r1', v === '1');
+  if (k === 'h0' || k === 'h1' || k === 'h2') { const r = EFC_AUD.handling[+v]; efcAudHandling(k === 'h2' ? 'recorded' : k === 'h1', r[1], r[2], EFC_AUD.wk, 0); }
+  else if (k === 'r0' || k === 'r1' || k === 'r2') efcAudReload(k === 'r2' ? 'recorded' : k === 'r1', v === '1');
   else if (k === 'f0' || k === 'f1') efcAudFire(k === 'f1', v);
   else if (k === 'c0' || k === 'c1') efcAudCasing(k === 'c1', v);
   else if (k === 'b') efcAudBank(v);

@@ -7,7 +7,6 @@
 const EFC_SND = {
   on: true, // false: the engine's previous sounds (the audition page compares both)
   log: null, // array: every played layer is recorded { kind, id, t } (tests)
-  previewFoley: false, // lets the in-game pilot test use banks that are still being filled
   prevInv: null, busy: false, panelEv: false, last: {}, invLast: -1, // invLast: when the last inventory cue played (shared gap)
 };
 
@@ -104,7 +103,7 @@ function efcHandlingLayers(key, out, t, o) {
 function efcHandlingPlay(kind, delay, pos, fam) {
   if (!EFC_SND.on || typeof AU === 'undefined' || !AU.ready) return false;
   const W = efcSndWeapon(pos, fam), key = efcHandlingKey(kind, W.fam, pos);
-  const bank = key && efcWeaponFoleyBank(key, W.fam, EFC_SND.previewFoley);
+  const bank = key && efcWeaponFoleyBank(key, W.fam);
   if (!key || (!bank && !efcHandlingReady(key))) return false;
   const out = pos ? auOut(pos, 0.1, 1, 1.1, 3) : auOut(null, 0.05, 1);
   efcHandlingLayers(key, out, AU.ctx.currentTime + (delay || 0), { rate: efcSndWeightRate(W.kg), bank });

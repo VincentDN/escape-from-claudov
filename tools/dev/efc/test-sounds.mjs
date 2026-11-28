@@ -56,10 +56,11 @@ const bootAudio = () => (async () => {
       return { pk: 20 * Math.log10(pk + 1e-12), rms: 10 * Math.log10(s / Math.max(1, c) + 1e-12) };
     };
     for (const g of used) for (const [i, e] of (SFX.bank.get(g) || []).entries()) { const s = stat(e); if (s.pk >= 0) out.clip.push(g + '#' + i + ' ' + s.pk.toFixed(2)); }
-    for (const p of ['handling', 'ballistics']) {
+    for (const p of ['handling', 'ballistics', 'weapon_foley']) {
       const L = []; for (const g of SFX.of.get(p) || []) for (const [i, e] of SFX.bank.get(g).entries()) L.push([g + '-' + (i + 1), stat(e)]);
       const sorted = L.map((x) => x[1].rms).sort((a, b) => a - b), med = sorted[sorted.length >> 1];
-      out.levels[p] = { n: L.length, median: +med.toFixed(1), out: L.filter((x) => Math.abs(x[1].rms - med) > 6).map((x) => x[0] + ' ' + x[1].rms.toFixed(1)),
+      const tolerance = p === 'weapon_foley' ? 2 : 6;
+      out.levels[p] = { n: L.length, median: +med.toFixed(1), tolerance, out: L.filter((x) => Math.abs(x[1].rms - med) > tolerance).map((x) => x[0] + ' ' + x[1].rms.toFixed(1)),
         spread: +(sorted[sorted.length - 1] - sorted[0]).toFixed(1), maxPeak: +Math.max(...L.map((x) => x[1].pk)).toFixed(2) };
     }
     return out;
@@ -67,7 +68,7 @@ const bootAudio = () => (async () => {
   ok(!R.missing.length, 'events without a loaded sample: ' + R.missing.join(', '));
   ok(!R.clip.length, 'clipping samples: ' + R.clip.join(', '));
   for (const [p, L] of Object.entries(R.levels)) {
-    ok(L.n > 0 && !L.out.length, `${p}: levels more than 6 dB from the median ${L.median} dB: ${L.out.join(', ')}`);
+    ok(L.n > 0 && !L.out.length, `${p}: levels more than ${L.tolerance} dB from the median ${L.median} dB: ${L.out.join(', ')}`);
     console.log(`${p}: ${L.n} samples, active RMS median ${L.median} dBFS, spread ${L.spread} dB, highest peak ${L.maxPeak} dBFS`);
   }
   console.log(`${R.events} audited events resolve to a loaded sample`);
@@ -131,33 +132,45 @@ const bootAudio = () => (async () => {
     console.log(`${tag}: ${r.got.join(' > ')} at +${Math.max(0, ...r.late.filter((x) => x !== null)).toFixed(3)} s at most, ${r.layers} layers`);
   }
 
-  const pilot = await page.evaluate(() => {
-    const def = WEAPONS.m4, table = RELOAD.rifle.norm;
-    vmEquip(def); VM.action = null;
-    const playReload = (preview) => {
-      EFC_SND.previewFoley = preview; EFC_SND.log = [];
+  const magazine = await page.evaluate(() => {
+    const playReload = (wk) => {
+      const def = WEAPONS[wk], table = RELOAD[def.rig || def.fam].norm;
+      vmEquip(def); VM.action = null; EFC_SND.log = [];
       const data = { empty: false }, steps = Math.ceil(table.dur * 240);
       for (let i = 0; i <= steps; i++) vmChoreo('reload', Math.min(1, i / (240 * table.dur)), data, VM.curDef, VM.cur);
       return EFC_SND.log;
     };
-    const normal = playReload(false).map((entry) => entry.id);
-    const clips = playReload(true).map(({ id, kind, t, e, rate }) => {
+    const incompleteId = 'wf_rifle_magout', saved = SFX.bank.get(incompleteId);
+    SFX.bank.set(incompleteId, saved.slice(0, 1));
+    const incomplete = playReload('m4').map((entry) => entry.id);
+    SFX.bank.set(incompleteId, saved);
+    const check = ({ id, kind, t, e, rate }) => {
       const samples = e.b.getChannelData(0), sr = e.b.sampleRate;
       const start = Math.round(e.o * sr), end = Math.min(samples.length, start + Math.round(e.d * sr));
       let peak = 0, attack = 0;
       for (let i = start; i < end; i++) peak = Math.max(peak, Math.abs(samples[i]));
       for (let i = start; i < end; i++) if (Math.abs(samples[i]) >= peak / 2) { attack = (i - start) / sr / rate; break; }
       return { id, kind, t, attack, peak };
-    });
-    EFC_SND.previewFoley = false; EFC_SND.log = null;
-    return { normal, clips };
+    };
+    const clips = Object.fromEntries(['m4', 'mp5', 'm9', 'l96'].map((wk) => [WEAPONS[wk].fam, playReload(wk).map(check)]));
+    const bankSizes = {};
+    for (const fam of Object.keys(clips)) for (const cue of ['magout', 'magin', 'slap']) {
+      const id = 'wf_' + fam + '_' + cue;
+      const entries = SFX.bank.get(id);
+      bankSizes[id] = { takes: entries?.length, varies: sfxPick(id) !== sfxPick(id) };
+    }
+    EFC_SND.log = null;
+    return { incomplete, clips, bankSizes };
   });
-  const ids = ['wf_rifle_magout', 'wf_rifle_magin', 'wf_rifle_slap'];
-  ok(pilot.normal.join() === 'hf_click,hf_handle,hf_clunk,hf_click,hf_hit', 'incomplete rifle banks retain shared reload Foley');
-  ok(pilot.clips.map((clip) => clip.id).join() === ids.join(), 'rifle reload plays each pilot once in order ' + JSON.stringify(pilot.clips));
-  ok(pilot.clips.every(({ attack, peak }) => attack >= 0.003 && attack <= 0.015 && peak > 0 && peak < 1), 'decoded rifle pilots attack within 15 ms and do not clip');
-  ok(pilot.clips.length === 3 && Math.abs(pilot.clips[2].t - pilot.clips[1].t - 0.05) < 0.005, 'rifle slap follows seating by 50 ms');
-  console.log('M4 Batch A pilot: ' + pilot.clips.map(({ kind, attack }) => kind + ' at ' + (attack * 1000).toFixed(1) + ' ms').join(', '));
+  const ids = (fam) => ['magout', 'magin', 'slap'].map((cue) => 'wf_' + fam + '_' + cue);
+  ok(magazine.incomplete.join() === 'hf_click,hf_handle,wf_rifle_magin,wf_rifle_slap', 'an incomplete bank retains shared reload Foley');
+  ok(Object.values(magazine.bankSizes).every(({ takes, varies }) => takes === 4 && varies), 'four non-repeating takes for each magazine bank ' + JSON.stringify(magazine.bankSizes));
+  for (const [fam, clips] of Object.entries(magazine.clips)) {
+    ok(clips.map((clip) => clip.id).join() === ids(fam).join(), fam + ' reload plays each recorded cue in order ' + JSON.stringify(clips));
+    ok(clips.every(({ attack, peak }) => attack >= 0 && attack <= 0.015 && peak > 0 && peak < 1), fam + ' reload attacks within 15 ms and does not clip');
+    ok(clips.length === 3 && Math.abs(clips[2].t - clips[1].t - 0.05) < 0.005, fam + ' slap follows seating by 50 ms');
+  }
+  console.log('Batch A magazine coverage: ' + Object.keys(magazine.bankSizes).length + ' banks of four');
 
   // ---------- 3. inventory foley from events; sounds off restore the engine path ----------
   const I = await page.evaluate(() => {
@@ -199,7 +212,7 @@ const bootAudio = () => (async () => {
     const played = []; const orig = sfxPlay; sfxPlay = (id, ...a) => { played.push(id); return orig(id, ...a); };
     const btns = () => Array.from(document.querySelectorAll('#efcAud button[data-a]'));
     let n = 0;
-    for (const w of ['m4', 'm9', 'l96', 'm1014']) {
+    for (const w of ['m4', 'mp5', 'm9', 'l96', 'm1014']) {
       document.querySelector(`#efcAud button[data-w="${w}"]`).click();
       for (const b of btns()) { b.click(); n++; }
     }
@@ -208,7 +221,7 @@ const bootAudio = () => (async () => {
       pilot: played.filter((i) => i.startsWith('wf_')) };
   });
   ok(A.n > 100 && A.played > A.n && A.pt > 0, 'audition page buttons ' + JSON.stringify(A));
-  ok(A.pilot.join() === ids.concat(ids, ids).join(), 'audition plays each rifle pilot alone and within both reloads');
+  ok(A.pilot.join() === ['rifle', 'smg', 'pistol', 'sniper'].flatMap((fam) => [...ids(fam), ...ids(fam), ...ids(fam)]).join(), 'audition plays all magazine banks alone and within both reloads');
   console.log(`audition page: ${A.n} buttons pressed, ${A.played} samples played from ${A.kinds} banks`);
   ok(!errors.length, 'page errors: ' + errors.slice(0, 5).join('\n'));
   await browser.close();

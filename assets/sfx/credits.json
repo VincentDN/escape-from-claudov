@@ -370,6 +370,13 @@
    "url": "https://elevenlabs.io/app/flows/vQsk8E9AhsFfD2yPfZrR",
    "preuve": "The owner confirmed game usage rights on 20 November 2026 (docs/HANDOFF-CODEX.md, C13)."
   },
+  "elevenlabs-c13-a": {
+   "nom": "ElevenLabs Sound Effects v2",
+   "auteur": "Generated on Vincent De Nil’s ElevenLabs account for Escape From Claudov",
+   "licence": "ElevenLabs paid-plan terms for generated output",
+   "url": "https://elevenlabs.io/app/flows/fGI5t2npBQAFra6A9MhL",
+   "preuve": "The owner confirmed game usage rights on 20 November 2026 (docs/HANDOFF-CODEX.md, C13)."
+  },
   "erbsland": {
    "nom": "« Large ceramic plate hit » (freesound 634154)",
    "auteur": "Erbsland-Music",
@@ -6155,6 +6162,321 @@
    "source": "elevenlabs-c13",
    "fichier": "LXUIXTFUzjeY9Eti0Vkr",
    "detail": "Generated 28 November 2026. Source window 44–107 ms, mono, filtered, 6 ms attack alignment and level matched."
+  },
+  {
+   "id": "wf_pistol_magin_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "xDmFmNnne12mZFt7Zncj",
+   "detail": "Generated 28 November 2026. Source window 118–199 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_magin_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "0ATE2USw98TCyVTa3VzV",
+   "detail": "Generated 28 November 2026. Source window 103–205 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_magin_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "Ntqio41MGIm2cnk8Z8I4",
+   "detail": "Generated 28 November 2026. Source window 165–238 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_magout_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "B2PstV0U5zRBfd8hOtnH",
+   "detail": "Generated 28 November 2026. Source window 130–230 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_magout_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "iFUO2w5dM4U5r0lb7Qyu",
+   "detail": "Generated 28 November 2026. Source window 408–490 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_magout_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "HLnx0F80IbtuZETWZ75v",
+   "detail": "Generated 28 November 2026. Source window 448–550 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_slap_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "L0p6hSydvzxBulK19BVx",
+   "detail": "Generated 28 November 2026. Source window 47–134 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_slap_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "9WLnRIb2hWRaeRUJ4EMZ",
+   "detail": "Generated 28 November 2026. Source window 567–650 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_slap_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "Nf0C4XKy5crFwdHpP9Qz",
+   "detail": "Generated 28 November 2026. Source window 86–161 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_slap_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "DrVt28iw7qk4DTh04Khu",
+   "detail": "Generated 28 November 2026. Source window 118–168 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_magin_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "7bUiOXijevCkydtlSqL1",
+   "detail": "Generated 28 November 2026. Source window 100–207 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_magout_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "hvL6dO9ZPocwm5AGxrgO",
+   "detail": "Generated 28 November 2026. Source window 48–148 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_slap_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "l0VDBqZ60jlshuzg5s0k",
+   "detail": "Generated 28 November 2026. Source window 47–129 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_slap_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "Lr0lWyezst8IBYtQc1IL",
+   "detail": "Generated 28 November 2026. Source window 168–256 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_slap_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "AxRY4LSPH0M2u7JPnB01",
+   "detail": "Generated 28 November 2026. Source window 10–99 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_magin_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "EeoibEH6HOLIP1fS2Gy2",
+   "detail": "Generated 28 November 2026. Source window 326–408 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_magin_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "u3V9NLWSEsYdPJFUG5gq",
+   "detail": "Generated 28 November 2026. Source window 247–388 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_magin_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "Z0Klm6kBpsStFt2tIMfB",
+   "detail": "Generated 28 November 2026. Source window 384–461 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_magout_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "LYHHPE3zHduvo98suwkY",
+   "detail": "Generated 28 November 2026. Source window 467–583 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_magout_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "TrC3TUtjfnrZ9eCVGze5",
+   "detail": "Generated 28 November 2026. Source window 247–329 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_magout_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "lDOqxZZcow8YlAa02RPZ",
+   "detail": "Generated 28 November 2026. Source window 396–513 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_slap_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "FrZ9e2piZOLFjvUHqAkv",
+   "detail": "Generated 28 November 2026. Source window 136–213 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_slap_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "jyiZGE8HEjFR1blplPp3",
+   "detail": "Generated 28 November 2026. Source window 96–180 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_slap_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "iyzhitJ3JLAqZP9lbwyY",
+   "detail": "Generated 28 November 2026. Source window 0–78 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_slap_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "ouKgWcsJV94gg1HXUGt5",
+   "detail": "Generated 28 November 2026. Source window 8–86 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_magin_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "6nhGDefb4hnEZxVumsg0",
+   "detail": "Generated 28 November 2026. Source window 226–359 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_magin_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "kq8UqOkRbiRVAPRUsGWz",
+   "detail": "Generated 28 November 2026. Source window 186–272 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_magin_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "TZhiwJoJLNjgDeemYq1i",
+   "detail": "Generated 28 November 2026. Source window 164–284 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_magin_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "e2qap8Xdt3ZLLm68Co0j",
+   "detail": "Generated 28 November 2026. Source window 126–223 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_magout_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "S8Xp19pM7n6wDSjp3K03",
+   "detail": "Generated 28 November 2026. Source window 247–393 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_magout_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "KXmWwyKsOUTii69tcO8c",
+   "detail": "Generated 28 November 2026. Source window 118–258 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_magout_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "tTlMMu0gYNZrQEnOllXr",
+   "detail": "Generated 28 November 2026. Source window 235–404 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_magout_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "9o4YubT0NiBUrHDdf040",
+   "detail": "Generated 28 November 2026. Source window 125–228 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_slap_01",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "9gBGC5s1P1xK1Hv8Fxao",
+   "detail": "Generated 28 November 2026. Source window 107–205 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_slap_02",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "ydFBvFMzkS1ReCbWZHFc",
+   "detail": "Generated 28 November 2026. Source window 257–355 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_slap_03",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "mp1gdF6YCYNy4MdecaCN",
+   "detail": "Generated 28 November 2026. Source window 127–221 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_sniper_slap_04",
+   "pack": "weapon_foley",
+   "source": "elevenlabs-c13-a",
+   "fichier": "5e7DA0a6h1c10BlqunSy",
+   "detail": "Generated 28 November 2026. Source window 44–151 ms, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_magin_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Walther PPQ/X_4.wav",
+   "detail": "From credited legacy Foley f_magin_pistol. Walther PPQ : chargeur plein inséré (X_4, prise 2, 3,01-3,51 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 20–178 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_pistol_magout_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Walther PPQ/X_5.wav",
+   "detail": "From credited legacy Foley f_magout_pistol. Walther PPQ : chargeur plein retiré (X_5, 1,33-1,83 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–127 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_magin_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "AR-15/D_4.wav",
+   "detail": "From credited legacy Foley f_magin_rifle-1. AR-15 : chargeur plein enclenché (D_4, extrait 1,24-1,79 s, début sur le premier clac, second clac 22 ms plus tard) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–111 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_magin_02",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "AK-47/C_10.wav",
+   "detail": "From credited legacy Foley f_magin_rifle-2. AK-47 : chargeur enclenché (C_10, extrait 0,27-0,82 s coupé à l'attaque : le clac ouvre le son) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–114 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_magout_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "AR-15/D_5.wav",
+   "detail": "From credited legacy Foley f_magout_rifle-1. AR-15 : bouton puis chargeur plein retiré (D_5, 1,226-1,83 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu ; niveau aligné sur les autres variantes (-2,2 dB) C13 re-edit window 151–273 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_rifle_magout_02",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "AK-47/C_11.wav",
+   "detail": "From credited legacy Foley f_magout_rifle-2. AK-47 : levier puis chargeur retiré (C_11, 0,29-0,91 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–135 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_magin_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Carl Gustav M45_Swedish K/G_8.wav",
+   "detail": "From credited legacy Foley f_magin_smg. Carl Gustav M45 : chargeur enclenché (G_8, prise 2, extrait 1,85-2,35 s coupé à l'attaque : le clac ouvre le son) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–95 ms from the legacy cut, mono, filtered, transient aligned and level matched."
+  },
+  {
+   "id": "wf_smg_magout_01",
+   "pack": "weapon_foley",
+   "source": "ffsl",
+   "fichier": "Carl Gustav M45_Swedish K/G_9.wav",
+   "detail": "From credited legacy Foley f_magout_smg. Carl Gustav M45 : chargeur retiré (G_9, 0,455-0,955 s) ; passe-haut 80 Hz, mono, début à l'attaque, fondu C13 re-edit window 0–40 ms from the legacy cut, mono, filtered, transient aligned and level matched."
   }
  ]
 }

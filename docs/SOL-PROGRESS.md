@@ -5,16 +5,16 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C13-2 in progress on `codex/c13-2-weapon-foley`, based on C13-1 at `e430d2d`. Three Batch A pilots passed in-game checks and the other 37 takes are rendered. See the [Batch A generation manifest](weapon-foley-batch-a.json).
-- **Next step:** Edit and level the 37 Batch A renders, check the eight credited reuse candidates, then verify four distinct takes for each of the 12 magazine action and family pairs.
+- **Card:** C13-2 in progress on `codex/c13-2-weapon-foley`, based on C13-1 at `e430d2d`. Batch A is mapped and checked with 48 takes from 40 renders and eight credited source cuts. See the [Batch A generation manifest](weapon-foley-batch-a.json).
+- **Next step:** Add the requested Partisan-style workbench turn Foley, then continue with B–E and verify the remaining banks.
 - **How to verify:** Use `node tools/dev/efc/test-sounds.mjs` for the reload choreography and `#sounds` for the old/new audition. The shot list has 76 action/family pairs and four slots per pair. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** Build, declaration check and raid smoke passed. `test-sounds.mjs` passed 72/72 and measured 362 KB for handling, ballistics and weapon Foley together. The M4 pilots attacked within 6.6 ms and played from `#sounds`. The C17-2 browser checks passed. Standing boots are below frame at −60°.
+- **Checks so far:** Build, declaration check and raid smoke passed. `test-sounds.mjs` passed 83/83. Batch A has 12 banks of four, peaks below 0 dBFS and adds 119,482 bytes. The C17-2 browser checks passed. Standing boots are below frame at −60°.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
 - **Watch out for:** The current chat can download from `elevenlabsusercontent.com`. The current first-person legs are on beta for staging. C17-2 remains open and C17-3 waits on its visual acceptance.
 
 ## Next open cards, in order
 
-1. C13-2 to C13-5, sound design and weapon foley. Three Batch A pilots passed the in-game checks.
+1. C13-2 to C13-5, sound design and weapon foley. Batch A passed in-game checks and is on the C13 feature branch.
 2. C16-5 to C16-13, enemy combat barks, downed state and enemy execution.
 3. C17 and C18 can run alongside C16. Follow the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 4. C2-1 to C2-8, Partisan modding and weapons.

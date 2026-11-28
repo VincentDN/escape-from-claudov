@@ -24,6 +24,19 @@ def active_rms(samples):
     return np.sqrt(np.mean(active ** 2))
 
 
+def level(samples):
+    samples = samples * (10 ** (TARGET_RMS / 20) / active_rms(samples))
+    # Isolated peaks can prevent a cue from matching the bank's active RMS.
+    # Apply a smooth knee only to cues that would exceed the peak ceiling.
+    ceiling = 10 ** (-1.5 / 20)
+    if common.peak(samples) <= ceiling:
+        return samples
+    knee = 0.4
+    excess = np.maximum(0, np.abs(samples) - knee)
+    limited = np.minimum(np.abs(samples), knee) + excess / (1 + excess / (ceiling - knee))
+    return np.copysign(limited, samples)
+
+
 def prepare(path, start_ms, end_ms):
     samples = common.ff(common.load(path), 'highpass=f=65,lowpass=f=15000')
     start, end = (round(ms * SR / 1000) for ms in (start_ms, end_ms))
@@ -39,8 +52,7 @@ def prepare(path, start_ms, end_ms):
     else:
         samples = np.pad(samples, (lead - attack, 0))
     samples = common.fade(samples, fin=0.001, fout=0.012)
-    gain = min(10 ** (TARGET_RMS / 20) / active_rms(samples), 10 ** (-1.5 / 20) / common.peak(samples))
-    return samples * gain
+    return level(samples)
 
 
 def main():

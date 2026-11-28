@@ -9,187 +9,401 @@
     {
       "file": "wf_pistol_magin_02.mp3",
       "generation_id": "xDmFmNnne12mZFt7Zncj",
-      "session_id": "sH82fXpoI31S7NE1nW4n"
+      "session_id": "sH82fXpoI31S7NE1nW4n",
+      "window_ms": [
+        118,
+        199
+      ]
     },
     {
       "file": "wf_pistol_magin_03.mp3",
       "generation_id": "0ATE2USw98TCyVTa3VzV",
-      "session_id": "9AZjfTs3lknWp7MLi1bK"
+      "session_id": "9AZjfTs3lknWp7MLi1bK",
+      "window_ms": [
+        103,
+        205
+      ]
     },
     {
       "file": "wf_pistol_magin_04.mp3",
       "generation_id": "Ntqio41MGIm2cnk8Z8I4",
-      "session_id": "OQToTvZPvvAeupcdCrNx"
+      "session_id": "OQToTvZPvvAeupcdCrNx",
+      "window_ms": [
+        165,
+        238
+      ]
     },
     {
       "file": "wf_pistol_magout_02.mp3",
       "generation_id": "B2PstV0U5zRBfd8hOtnH",
-      "session_id": "tyLxron4a9Oh1jlMqsEg"
+      "session_id": "tyLxron4a9Oh1jlMqsEg",
+      "window_ms": [
+        130,
+        230
+      ]
     },
     {
       "file": "wf_pistol_magout_03.mp3",
       "generation_id": "iFUO2w5dM4U5r0lb7Qyu",
-      "session_id": "q9ju0TDdj8ApeDbM2f2S"
+      "session_id": "q9ju0TDdj8ApeDbM2f2S",
+      "window_ms": [
+        408,
+        490
+      ]
     },
     {
       "file": "wf_pistol_magout_04.mp3",
       "generation_id": "HLnx0F80IbtuZETWZ75v",
-      "session_id": "ofgvKcMoUyujPlJNqQHP"
+      "session_id": "ofgvKcMoUyujPlJNqQHP",
+      "window_ms": [
+        448,
+        550
+      ]
     },
     {
       "file": "wf_pistol_slap_01.mp3",
       "generation_id": "L0p6hSydvzxBulK19BVx",
-      "session_id": "YN6gRRGNSFtIkMtKyWCC"
+      "session_id": "YN6gRRGNSFtIkMtKyWCC",
+      "window_ms": [
+        47,
+        134
+      ]
     },
     {
       "file": "wf_pistol_slap_02.mp3",
       "generation_id": "9WLnRIb2hWRaeRUJ4EMZ",
-      "session_id": "NUIn34qaJbEKmnQzS79X"
+      "session_id": "NUIn34qaJbEKmnQzS79X",
+      "window_ms": [
+        567,
+        650
+      ]
     },
     {
       "file": "wf_pistol_slap_03.mp3",
       "generation_id": "Nf0C4XKy5crFwdHpP9Qz",
-      "session_id": "hDkzDVjHW3jalmkAeytJ"
+      "session_id": "hDkzDVjHW3jalmkAeytJ",
+      "window_ms": [
+        86,
+        161
+      ]
     },
     {
       "file": "wf_pistol_slap_04.mp3",
       "generation_id": "DrVt28iw7qk4DTh04Khu",
-      "session_id": "nxdkV4bOPMsQMRcufQja"
+      "session_id": "nxdkV4bOPMsQMRcufQja",
+      "window_ms": [
+        118,
+        168
+      ]
     },
     {
       "file": "wf_rifle_magin_04.mp3",
       "generation_id": "7bUiOXijevCkydtlSqL1",
-      "session_id": "OBf53AN82mukkKoZgySr"
+      "session_id": "OBf53AN82mukkKoZgySr",
+      "window_ms": [
+        100,
+        207
+      ]
     },
     {
       "file": "wf_rifle_magout_04.mp3",
       "generation_id": "hvL6dO9ZPocwm5AGxrgO",
-      "session_id": "vsuYfG3wOSp7IBWbs8hf"
+      "session_id": "vsuYfG3wOSp7IBWbs8hf",
+      "window_ms": [
+        48,
+        148
+      ]
     },
     {
       "file": "wf_rifle_slap_02.mp3",
       "generation_id": "l0VDBqZ60jlshuzg5s0k",
-      "session_id": "wXr8PG0oK4NwVkIALlMH"
+      "session_id": "wXr8PG0oK4NwVkIALlMH",
+      "window_ms": [
+        47,
+        129
+      ]
     },
     {
       "file": "wf_rifle_slap_03.mp3",
       "generation_id": "Lr0lWyezst8IBYtQc1IL",
-      "session_id": "Rz1YrUwxG9TLWEnr2fNQ"
+      "session_id": "Rz1YrUwxG9TLWEnr2fNQ",
+      "window_ms": [
+        168,
+        256
+      ]
     },
     {
       "file": "wf_rifle_slap_04.mp3",
       "generation_id": "AxRY4LSPH0M2u7JPnB01",
-      "session_id": "uSwHJcbKQGh8mD0zRNVx"
+      "session_id": "uSwHJcbKQGh8mD0zRNVx",
+      "window_ms": [
+        10,
+        99
+      ]
     },
     {
       "file": "wf_smg_magin_02.mp3",
       "generation_id": "EeoibEH6HOLIP1fS2Gy2",
-      "session_id": "IAojY03LoyELhKuKqHiB"
+      "session_id": "IAojY03LoyELhKuKqHiB",
+      "window_ms": [
+        326,
+        408
+      ]
     },
     {
       "file": "wf_smg_magin_03.mp3",
       "generation_id": "u3V9NLWSEsYdPJFUG5gq",
-      "session_id": "uEE4OhAFtMjtg8xxjopQ"
+      "session_id": "uEE4OhAFtMjtg8xxjopQ",
+      "window_ms": [
+        247,
+        388
+      ]
     },
     {
       "file": "wf_smg_magin_04.mp3",
       "generation_id": "Z0Klm6kBpsStFt2tIMfB",
-      "session_id": "yXw9hwvK5A2LVOFTSzRe"
+      "session_id": "yXw9hwvK5A2LVOFTSzRe",
+      "window_ms": [
+        384,
+        461
+      ]
     },
     {
       "file": "wf_smg_magout_02.mp3",
       "generation_id": "LYHHPE3zHduvo98suwkY",
-      "session_id": "C2TZct8g1ZiKspYWCxUx"
+      "session_id": "C2TZct8g1ZiKspYWCxUx",
+      "window_ms": [
+        467,
+        583
+      ]
     },
     {
       "file": "wf_smg_magout_03.mp3",
       "generation_id": "TrC3TUtjfnrZ9eCVGze5",
-      "session_id": "LOLOy7ehupOuRButwrW2"
+      "session_id": "LOLOy7ehupOuRButwrW2",
+      "window_ms": [
+        247,
+        329
+      ]
     },
     {
       "file": "wf_smg_magout_04.mp3",
       "generation_id": "lDOqxZZcow8YlAa02RPZ",
-      "session_id": "MoIRKXh0MOX0uRsocGam"
+      "session_id": "MoIRKXh0MOX0uRsocGam",
+      "window_ms": [
+        396,
+        513
+      ]
     },
     {
       "file": "wf_smg_slap_01.mp3",
       "generation_id": "FrZ9e2piZOLFjvUHqAkv",
-      "session_id": "GK6fNn2KwwFRaYXGsNNa"
+      "session_id": "GK6fNn2KwwFRaYXGsNNa",
+      "window_ms": [
+        136,
+        213
+      ]
     },
     {
       "file": "wf_smg_slap_02.mp3",
       "generation_id": "jyiZGE8HEjFR1blplPp3",
-      "session_id": "pu7bATvIyocfM1eIlYKY"
+      "session_id": "pu7bATvIyocfM1eIlYKY",
+      "window_ms": [
+        96,
+        180
+      ]
     },
     {
       "file": "wf_smg_slap_03.mp3",
       "generation_id": "iyzhitJ3JLAqZP9lbwyY",
-      "session_id": "8ESqxhNEQ2Be5OxYOYCD"
+      "session_id": "8ESqxhNEQ2Be5OxYOYCD",
+      "window_ms": [
+        0,
+        78
+      ]
     },
     {
       "file": "wf_smg_slap_04.mp3",
       "generation_id": "ouKgWcsJV94gg1HXUGt5",
-      "session_id": "wA5DFIZ91hbzBaKoLUQo"
+      "session_id": "wA5DFIZ91hbzBaKoLUQo",
+      "window_ms": [
+        8,
+        86
+      ]
     },
     {
       "file": "wf_sniper_magin_01.mp3",
       "generation_id": "6nhGDefb4hnEZxVumsg0",
-      "session_id": "OjT6ZQfSlNttq6rswV9n"
+      "session_id": "OjT6ZQfSlNttq6rswV9n",
+      "window_ms": [
+        226,
+        359
+      ]
     },
     {
       "file": "wf_sniper_magin_02.mp3",
       "generation_id": "kq8UqOkRbiRVAPRUsGWz",
-      "session_id": "sicnxdiGRcSQBR95kaBw"
+      "session_id": "sicnxdiGRcSQBR95kaBw",
+      "window_ms": [
+        186,
+        272
+      ]
     },
     {
       "file": "wf_sniper_magin_03.mp3",
       "generation_id": "TZhiwJoJLNjgDeemYq1i",
-      "session_id": "pwQHoEpsue9GUMIZ3oKb"
+      "session_id": "pwQHoEpsue9GUMIZ3oKb",
+      "window_ms": [
+        164,
+        284
+      ]
     },
     {
       "file": "wf_sniper_magin_04.mp3",
       "generation_id": "e2qap8Xdt3ZLLm68Co0j",
-      "session_id": "SoaReofretTqSQmsuKxP"
+      "session_id": "SoaReofretTqSQmsuKxP",
+      "window_ms": [
+        126,
+        223
+      ]
     },
     {
       "file": "wf_sniper_magout_01.mp3",
       "generation_id": "S8Xp19pM7n6wDSjp3K03",
-      "session_id": "rc25It3JCttxsk34PTnO"
+      "session_id": "rc25It3JCttxsk34PTnO",
+      "window_ms": [
+        247,
+        393
+      ]
     },
     {
       "file": "wf_sniper_magout_02.mp3",
       "generation_id": "KXmWwyKsOUTii69tcO8c",
-      "session_id": "aUfJwmHUFd5KZTupFApI"
+      "session_id": "aUfJwmHUFd5KZTupFApI",
+      "window_ms": [
+        118,
+        258
+      ]
     },
     {
       "file": "wf_sniper_magout_03.mp3",
       "generation_id": "tTlMMu0gYNZrQEnOllXr",
-      "session_id": "9udNjk7y1iD5hO6XR63S"
+      "session_id": "9udNjk7y1iD5hO6XR63S",
+      "window_ms": [
+        235,
+        404
+      ]
     },
     {
       "file": "wf_sniper_magout_04.mp3",
       "generation_id": "9o4YubT0NiBUrHDdf040",
-      "session_id": "cc0u3Z2EGQdqvqFq2mrM"
+      "session_id": "cc0u3Z2EGQdqvqFq2mrM",
+      "window_ms": [
+        125,
+        228
+      ]
     },
     {
       "file": "wf_sniper_slap_01.mp3",
       "generation_id": "9gBGC5s1P1xK1Hv8Fxao",
-      "session_id": "3X6OwQTFR38E3htCvIpO"
+      "session_id": "3X6OwQTFR38E3htCvIpO",
+      "window_ms": [
+        107,
+        205
+      ]
     },
     {
       "file": "wf_sniper_slap_02.mp3",
       "generation_id": "ydFBvFMzkS1ReCbWZHFc",
-      "session_id": "VGgu0F3Z5OM9AuGWogp0"
+      "session_id": "VGgu0F3Z5OM9AuGWogp0",
+      "window_ms": [
+        257,
+        355
+      ]
     },
     {
       "file": "wf_sniper_slap_03.mp3",
       "generation_id": "mp1gdF6YCYNy4MdecaCN",
-      "session_id": "zDKb2rCHIFud983w72jQ"
+      "session_id": "zDKb2rCHIFud983w72jQ",
+      "window_ms": [
+        127,
+        221
+      ]
     },
     {
       "file": "wf_sniper_slap_04.mp3",
       "generation_id": "5e7DA0a6h1c10BlqunSy",
-      "session_id": "aR2nj8IhXHctTQJv3j8p"
+      "session_id": "aR2nj8IhXHctTQJv3j8p",
+      "window_ms": [
+        44,
+        151
+      ]
+    }
+  ],
+  "reused": [
+    {
+      "file": "wf_pistol_magin_01.mp3",
+      "legacy_id": "f_magin_pistol",
+      "window_ms": [
+        20,
+        178
+      ]
+    },
+    {
+      "file": "wf_pistol_magout_01.mp3",
+      "legacy_id": "f_magout_pistol",
+      "window_ms": [
+        0,
+        127
+      ]
+    },
+    {
+      "file": "wf_rifle_magin_01.mp3",
+      "legacy_id": "f_magin_rifle-1",
+      "window_ms": [
+        0,
+        111
+      ]
+    },
+    {
+      "file": "wf_rifle_magin_02.mp3",
+      "legacy_id": "f_magin_rifle-2",
+      "window_ms": [
+        0,
+        114
+      ]
+    },
+    {
+      "file": "wf_rifle_magout_01.mp3",
+      "legacy_id": "f_magout_rifle-1",
+      "window_ms": [
+        151,
+        273
+      ]
+    },
+    {
+      "file": "wf_rifle_magout_02.mp3",
+      "legacy_id": "f_magout_rifle-2",
+      "window_ms": [
+        0,
+        135
+      ]
+    },
+    {
+      "file": "wf_smg_magin_01.mp3",
+      "legacy_id": "f_magin_smg",
+      "window_ms": [
+        0,
+        95
+      ]
+    },
+    {
+      "file": "wf_smg_magout_01.mp3",
+      "legacy_id": "f_magout_smg",
+      "window_ms": [
+        0,
+        40
+      ]
     }
   ]
 }

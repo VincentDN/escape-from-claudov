@@ -41,4 +41,7 @@
 - [ ] Land facing forward, sideways and backward. Look for prone, a brief side landing, and a back landing with the view raised and weapon across the chest. Turn around in the air before landing to check that the stance follows the view at contact.
 - [ ] Press Jump or release and press Sprint after a dive. Check the brief impact pause and try getting up under a low obstruction.
 
+- [ ] In a dive, turn to shoot behind you and try aiming down sights. Compare aim speed and shot spread with an ordinary jump. Try a brief sideways input and check that the dive mostly keeps its heading.
+- [ ] Try Reload, Hold to Check Magazine, Heal and Inventory in flight. Confirm the actions become available again after landing.
+
 Attach a screenshot or short clip for visual issues, along with the weapon, location and controls used to reproduce it.

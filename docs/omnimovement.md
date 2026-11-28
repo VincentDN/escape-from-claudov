@@ -38,3 +38,9 @@ The game compares the launch direction with the view at contact. Forward dives l
 the corresponding side before settling prone. A backward dive lands supine, with the view raised to at least 10 degrees and
 the weapon across the chest. Jump and a fresh sprint input can stand the player up after the 0.12-second impact window when
 there is room overhead. Hold and tap behaviour comes from the existing **Slide and dive** setting.
+
+### During flight
+
+In a raid dive, the view can turn all the way around while the body follows within 90 degrees of the launch heading. The weapon
+can fire along the current aim with 1.5 times its normal airborne spread. Aiming moves at half speed, with 10 percent air steering.
+Reload, magazine check, healing, and inventory access resume on landing.

@@ -215,7 +215,9 @@ function poseSoldier(e, dt) {
   const v = hyp(e.vel.x, e.vel.z), c = e.crouchAmt || 0, K = S.kind || 'rifle', isP = K === 'pistol';
   // clips (06ac-loco.js)
   const clipOK = locoInit();
-  const cy = Math.cos(e.yaw), sy = Math.sin(e.yaw);
+  const bodyYaw = efcOmniFlightBodyYaw(e);
+  const flightLook = clamp(e.yaw - bodyYaw, -1.3, 1.3);
+  const cy = Math.cos(bodyYaw), sy = Math.sin(bodyYaw);
   const lvx = e.vel.x * cy - e.vel.z * sy, lvz = e.vel.x * sy + e.vel.z * cy;
   const dyaw = dt > 0 ? angDiff(S.lastYaw, e.yaw) / dt : 0; S.lastYaw = e.yaw;
   S.turn = damp(S.turn, v < 0.8 ? clamp(Math.abs(dyaw) / 2.5, 0, 1) : 0, 8, dt);
@@ -372,7 +374,7 @@ function poseSoldier(e, dt) {
   // visée, aucune : le regard suit l'arme ; avant, -tY le comptait deux fois et la tête regardait 30 degrés à gauche de l'arme)
   const tY = pYaw + twist;
   _eu.set(clamp(gp * 0.55, -0.45, 0.5) + lean * -0.62 - bob * 0.8 + 0.1 * aw * (isP ? 0 : 1) + lookP - hr * hz * (S.hitHead ? 0.9 : 0.35) + rec * 0.8,
-    tY * lerp(0.3, 0, aw) + clamp(look + (e.efcHead || 0), -1.3, 1.3) - hr * hx * (S.hitHead ? 0.6 : 0.2), -roll * 0.7 - 0.22 * aw * (isP ? 0.2 : 1) + hr * hx * 0.25); _qH.setFromEuler(_eu);
+    tY * lerp(0.3, 0, aw) + clamp(look + flightLook + (e.efcHead || 0), -1.3, 1.3) - hr * hx * (S.hitHead ? 0.6 : 0.2), -roll * 0.7 - 0.22 * aw * (isP ? 0.2 : 1) + hr * hx * 0.25); _qH.setFromEuler(_eu);
   // (la tête du clip part de 30 degrés en arrière : réduite, le ressort d'impact la secoue déjà, et un second tir doit rester possible)
   if (HIT) _qH.premultiply(hitDelta(HIT.qH, LOCO.hit0.qH, S.hK * (S.hitHead ? 0.6 : 0.35)));
   if (leanQ) _qH.premultiply(leanQ); // la tête suit le buste penché
@@ -404,6 +406,11 @@ function poseSoldier(e, dt) {
   gunP.add(_tmpG.set(0.01, 0.035, -0.08).applyQuaternion(_qT).multiplyScalar(arcK));
   _qG.slerpQuaternions(_qB, _qA, aw).slerp(_qS, sw);
   if (flat) efcOmniSoldierUpper(e, flat, lowYaw, L, shc, gunP);
+  if (flightLook) {
+    _qW.setFromAxisAngle(UP, flightLook);
+    _qG.premultiply(_qW);
+    gunP.sub(shc).applyQuaternion(_qW).add(shc);
+  }
   const check = efcWeaponCheckPose(e);
   const magPull = check?.magPull || 0;
   for (const part of S.magParts) part.position.set(-0.06 * magPull, -0.105 * magPull, 0.04 * magPull);
@@ -542,7 +549,7 @@ function poseSoldier(e, dt) {
   if (flat) efcOmniSoldierLegs(e, lowYaw, L);
   // passage en coordonnées monde
   for (let i = 0; i < 15; i++) { const l = L[i]; J[i].set(e.pos.x + l.x * cy + l.z * sy, e.pos.y + l.y, e.pos.z - l.x * sy + l.z * cy); }
-  _eu.set(0, e.yaw, 0); _qW.setFromEuler(_eu);
+  _eu.set(0, bodyYaw, 0); _qW.setFromEuler(_eu);
   S.headQ = (S.headQ || new THREE.Quaternion()).copy(_qW).multiply(_qH).multiply(soldierRest().q[SB.HEA]);
   S.gun.position.set(e.pos.x + gunP.x * cy + gunP.z * sy, e.pos.y + gunP.y, e.pos.z - gunP.x * sy + gunP.z * cy);
   S.gun.quaternion.copy(_qW).multiply(_qG);

@@ -474,7 +474,7 @@ function updatePlayer(dt, now) {
   }
   wall = PL.wall || 0;
   laserUpdate(!!d.laser && e.alive && !PL.sprinting && VM.ads < 0.35 && !PL.nadeState && !healing && PL.knifeT <= 0 && VM.lower < 0.3, dt);
-  updateViewmodel(dt, { ads, sprint: PL.sprinting, speed: hs, grounded: PL.onGround, crouch: e.crouch, empty: curW().mag === 0, lat, fwd, fire: PL.held, wall, slide: e.slideAmt });
+  updateViewmodel(dt, { ads, adsRate: efcOmniFlightAimRate(e), sprint: PL.sprinting, speed: hs, grounded: PL.onGround, crouch: e.crouch, empty: curW().mag === 0, lat, fwd, fire: PL.held, wall, slide: e.slideAmt });
   // corps invisible du joueur : ne sert qu'à projeter son ombre
   const sm = e.model;
   if (sm) {

@@ -18,6 +18,7 @@ function efcUirDist(c) { const p = PL.ent.pos; return Math.hypot(c.x - p.x, c.z 
 
 /* ---------- Panels ---------- */
 function efcUirOpen(kind, cid) {
+  if (efcCall('omni:inFlight')) return;
   if (EFC_UIR.panel) efcUirClose(true);
   EFC_UIR.panel = kind; EFC_UIR.cid = cid == null ? null : cid; EFC_UIR.hold = null; EFC_UIR.sel = 0;
   efcUirPrompt('');
@@ -153,7 +154,7 @@ function efcUirTick(dt) {
   const me = PL.ent;
   if (!me.alive || MATCH.state === 'menu') { efcUirClose(true); EFC_UIR.hold = null; EFC_UIR.near = null; efcUirPrompt(''); efcUirHeal(); return; }
   if (EFC_UIR.panel === 'loot') { const c = efcUirCont(); if (!c || efcUirDist(c) > EFC.cfg.interactR + 1) efcUirClose(); }
-  const near = EFC_UIR.panel ? null : efcCall('world:near', { x: me.pos.x, y: me.pos.y, z: me.pos.z }, EFC.cfg.interactR) || null;
+  const near = EFC_UIR.panel || efcCall('omni:inFlight') ? null : efcCall('world:near', { x: me.pos.x, y: me.pos.y, z: me.pos.z }, EFC.cfg.interactR) || null;
   EFC_UIR.near = near;
   const H = EFC_UIR.hold;
   if (H && (!near || near.id !== H.id)) EFC_UIR.hold = null; // moved away: cancelled

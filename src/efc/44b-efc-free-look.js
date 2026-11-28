@@ -20,6 +20,22 @@ function efcOmniAimBlocked(entity, yaw, pitch) {
     Math.abs(efcOmniAimPitch(entity, pitch) - pitch) > 1e-6;
 }
 
+function efcOmniInFlight(entity) {
+  return !!(entity?.isPlayer && entity.efcDiving && !entity.onGround && efcRaidMode());
+}
+
+function efcOmniFlightBodyYaw(entity) {
+  if (!efcOmniInFlight(entity) || entity.efcDiveYaw == null) return entity.yaw;
+  const limit = efcOmniTune('flight', 'bodyTwist');
+  return entity.efcDiveYaw + clamp(entity.yaw - entity.efcDiveYaw, -limit, limit);
+}
+
+function efcOmniFlightAimRate(entity) {
+  return efcOmniInFlight(entity) ? efcOmniTune('flight', 'aimSpeed') : 1;
+}
+
+efcProvide('omni:inFlight', () => efcOmniInFlight(PL.ent));
+
 function efcFreeLookKey(event, down) {
   if (event.code !== 'AltLeft' && event.code !== 'AltRight') return false;
   if (MATCH.state === 'playing' && pointerActive() && !CHAT.open) {

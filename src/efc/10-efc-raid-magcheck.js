@@ -7,7 +7,7 @@ Settings.efcMagCount ??= 'rough';
 
 function efcRaidMagCheckReady() {
   return MATCH.state === 'playing' && pointerActive() && !CHAT.open && !KS.map.open &&
-    !efcCall('ui:busy') && !busy() && !efcMedHolding();
+    !efcCall('ui:busy') && !efcCall('omni:inFlight') && !busy() && !efcMedHolding();
 }
 
 function efcRaidMagCheckPress() {

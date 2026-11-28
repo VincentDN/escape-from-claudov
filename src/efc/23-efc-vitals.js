@@ -25,7 +25,7 @@ function efcMedCancel(msg) {
   if (msg && typeof hudMsg === 'function') hudMsg(msg, 'enemy', 1.5);
 }
 function efcMedUse(bagIdx, hold = false) {
-  if (efcMedCur || !EFC.inv || !Array.isArray(EFC.inv.bag)) return false;
+  if (efcCall('omni:inFlight') || efcMedCur || !EFC.inv || !Array.isArray(EFC.inv.bag)) return false;
   const it = EFC.inv.bag[bagIdx], d = it && efcItemDef(it.id);
   if (!d || d.kind !== 'med' || typeof PL === 'undefined' || !PL.ent || !PL.ent.alive) return false;
   if (PL.ent.health >= EFC_HEALTH_MAX) return false;
@@ -64,6 +64,10 @@ function efcMedKey(e, down) {
 function efcMedTick(dt) {
   if (!efcMedCur) return;
   if (typeof PL === 'undefined' || !PL.ent || !PL.ent.alive) { efcMedCancel(); return; }
+  if (efcCall('omni:inFlight')) {
+    efcMedCancelHold();
+    return;
+  }
   const stack = efcMedCur.stack;
   const bagIdx = stack ? EFC.inv?.bag.indexOf(stack) : -1;
   if (stack && (!(bagIdx >= 0) || !efcMedHoldAllowed())) { efcMedCancel(); return; }

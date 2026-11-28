@@ -9,14 +9,14 @@ the coverage and provenance. "Engine foley" is the recorded pack `foley`. The la
 - pack `ballistics` (`assets/sfx/ballistics`, 9 takes, 73 KB): Freesound CC0 ricochets `pt_ric`, fly-bys `pt_flyby` and rifle
   shots `g_pt_sniper_pov`.
 
-The committed `handling` and `weapon_foley` packs have independent source workflows. `tools/sfx/partisan.py` handles the P2
-ballistics masters, and `tools/sfx/weapon_foley.py` prepares C13 masters for the same encoder in `tools/build_sfx.py`.
+The committed `handling`, `weapon_foley` and `workbench_foley` packs have independent source workflows. `tools/sfx/partisan.py`
+handles the P2 ballistics masters, and `tools/sfx/weapon_foley.py` prepares C13 masters for the same encoder in `tools/build_sfx.py`.
 
 The game first looks for the event's recorded C13 bank, then the shared P2 layers, then the engine fallback. A bank selects a
 different take on successive calls. Pitch varies by ±4% and playback rate falls with weapon mass. Gain varies by ±1.5 dB. C13
 reload attacks are checked against the existing choreography. The pistol slide release, bolt opening and closure, and tube
-shotgun charging and pumping use different banks. The Hideout workbench plays family-specific mount and unmount cues and uses
-the shared handling/hit banks for turning the preview. `#sounds` exposes the safety, selector and bipod packs for listening while
+shotgun charging and pumping use different banks. The Hideout workbench plays family-specific mount and unmount cues and loads
+the original Partisan handling and hit recordings on demand for turning the preview. `#sounds` exposes the safety, selector and bipod banks for listening while
 those actions lack explicit gameplay events.
 
 ## Handling, per weapon family

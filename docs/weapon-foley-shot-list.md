@@ -95,9 +95,11 @@ All 19 legacy candidates were re-edited for the C13 pack. Each of the 304 MP3s h
 
 - Existing keys cover magazine out and in, slap, charging, bolt opening, pump, shell, draw, stow, aim, inspect, dry fire and pickup. Separate semiautomatic sniper charging from bolt closure in the mapping. Keep the hold-R magazine check on the matching magout and insert cues.
 - Use the existing `inv_mount` and `inv_unmount` events for workbench actions. Keep generic inventory feedback available when the family is absent.
-- The interactive Hideout workbench borrows the Partisan StG 44 preview's grip, movement and settle cues. It uses the local handling and hit banks through Claudov's menu audio mix, and `#sounds` lets the owner play the three cues directly. Arrow keys play the handling cue when they turn the model. Zoom is silent.
+- The interactive Hideout workbench uses the same six handling and six hit recordings as the Partisan StG 44 workbench, with provenance listed under `workbench_foley`. It loads that pack on demand and plays through Claudov's menu mix. `#sounds` exposes Grip, Turn and Settle. Arrow keys play the handling cue when they turn the model. Zoom is silent.
 - Add safety, selector and bipod cues when their gameplay events are available. Verify that each cue is triggered by the intended action before enabling its bank.
 - Trim and align transients against the action event times. Keep each take within 2 dB of the pack median and check for clipping. Compare old and new banks in `#sounds`, then verify four distinct takes for every applicable family and event.
 - The generation count covers weapon handling and workbench Foley. Gunshot, casing, grenade and inventory banks have their own entries in the audio inventory. Combat radio is tracked by C16.
+
+The built weapon Foley pack is 1,239,068 bytes against a 2 MiB budget. The interactive workbench turn pack is 57,844 bytes, loaded on demand. The reload suite covers pistol slide release, separate sniper bolt and semiautomatic charge cues, and shotgun charge versus pump. All 76 banks are available in `#sounds` for listening. Safety, selector and bipod deploy remain audition cues while their gameplay events are unavailable.
 
 Sources: [audio event inventory](audio-events.md), [handling Foley and unshipped references](handling-foley.md), [current lookup](../src/efc/45-efc-sounds.js), and [sound credits](../assets/sfx/credits.json).

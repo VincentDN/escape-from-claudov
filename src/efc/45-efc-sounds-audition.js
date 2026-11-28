@@ -31,7 +31,7 @@ function efcAudRecorded(key, wk) {
 function efcAudWith(neu, fn) { const was = EFC_SND.on; EFC_SND.on = neu; try { fn(); } finally { EFC_SND.on = was; } }
 function efcAudStart() {
   if (typeof initAudio !== 'function') return;
-  initAudio(); sfxBootGame(); if (AU.ctx) sfxGate(true);
+  initAudio(); sfxBootGame(); efcWorkbenchFoleyLoad(); if (AU.ctx) sfxGate(true);
 }
 function efcAudHandling(neu, kind, key, wk, delay) {
   const fam = efcAudFam(wk), k = typeof key === 'function' ? key(fam) : key;
@@ -76,7 +76,7 @@ function efcAudInv(key) {
 }
 function efcAudStatus(msg) {
   const el = document.getElementById('efcAudSt'); if (!el) return;
-  const st = typeof SFX !== 'undefined' ? ['foley', 'armes', 'impacts', 'handling', 'ballistics', 'weapon_foley'].filter((k) => SFX_PACKS[k]).map((k) => k + ': ' + ((SFX.state.get(k) || {}).s || 'not started')).join(' | ') : '';
+  const st = typeof SFX !== 'undefined' ? ['foley', 'armes', 'impacts', 'handling', 'ballistics', 'weapon_foley', 'workbench_foley'].filter((k) => SFX_PACKS[k]).map((k) => k + ': ' + ((SFX.state.get(k) || {}).s || 'not started')).join(' | ') : '';
   el.textContent = (msg ? msg + ' | ' : '') + st;
 }
 
@@ -87,8 +87,8 @@ function efcAudBtns(oldAct, newAct, recordedAct) {
 function efcAudHtml() {
   const wk = EFC_AUD.wk, fam = efcAudFam(wk);
   const row = (label, o, n, p) => `<tr><th>${label}</th>${efcAudBtns(o, n, p)}</tr>`;
-  let h = '<h1>Escape From Claudov: sound audition</h1><p>Old: the sound before the polish pass. New: the Partisan takes. Press Start audio first; '
-    + 'repeat a button to hear the other takes (random take, pitch and level, as in the game).</p>'
+  let h = '<h1>Escape From Claudov: sound audition</h1><p>Old plays the engine Foley. New plays the shared handling cues. Recorded Foley plays the weapon-specific banks. '
+    + 'Press Start audio, then repeat a button to hear the other takes.</p>'
     + '<p><button data-a="start">Start audio</button> <span id="efcAudSt"></span></p><p>Weapon: '
     + EFC_AUD.weapons.map(([k, n]) => `<button data-w="${k}"${k === EFC_AUD.wk ? ' aria-pressed="true"' : ''}>${n}</button>`).join(' ') + '</p>';
   h += `<h2>Handling: ${EFC_AUD.weapons.find((w) => w[0] === EFC_AUD.wk)[1]} (family ${fam})</h2><table>`;

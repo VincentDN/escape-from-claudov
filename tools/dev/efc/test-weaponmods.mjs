@@ -36,13 +36,13 @@ try {
     const preview = page.frameLocator('.efc-bench iframe');
     const canvas = preview.locator('#stage[data-mods*="reddot"][data-mods*="kurz40"] canvas');
     await canvas.waitFor({ timeout: 120000 });
-    await page.waitForFunction(() => sfxHas('hf_handle') && sfxHas('hf_hit'));
+    await page.waitForFunction(() => sfxReady('workbench_foley') && sfxHas('wb_handle') && sfxHas('wb_hit'));
     await page.evaluate(() => {
       const play = sfxPlay;
       window.benchTurnSounds = [];
       sfxPlay = (id, ...args) => {
         const voice = play(id, ...args);
-        if (voice && (id === 'hf_handle' || id === 'hf_hit')) benchTurnSounds.push(id);
+        if (voice && (id === 'wb_handle' || id === 'wb_hit')) benchTurnSounds.push(id);
         return voice;
       };
       window.restoreBenchTurnSounds = () => { sfxPlay = play; };
@@ -50,29 +50,30 @@ try {
     const bounds = await canvas.boundingBox();
     await page.mouse.move(bounds.x + bounds.width * 0.25, bounds.y + bounds.height * 0.5);
     await page.mouse.down();
-    await page.waitForFunction(() => benchTurnSounds.join() === 'hf_handle');
+    await page.waitForFunction(() => benchTurnSounds.join() === 'wb_handle');
     await page.mouse.move(bounds.x + bounds.width * 0.25 + 25, bounds.y + bounds.height * 0.5);
-    assert.deepEqual(await page.evaluate(() => benchTurnSounds), ['hf_handle']);
+    assert.deepEqual(await page.evaluate(() => benchTurnSounds), ['wb_handle']);
     await page.mouse.move(bounds.x + bounds.width * 0.25 + 100, bounds.y + bounds.height * 0.5);
-    await page.waitForFunction(() => benchTurnSounds.join() === 'hf_handle,hf_handle');
+    await page.waitForFunction(() => benchTurnSounds.join() === 'wb_handle,wb_handle');
     await page.waitForTimeout(110);
     await page.mouse.up();
-    await page.waitForFunction(() => benchTurnSounds.join() === 'hf_handle,hf_handle,hf_hit');
+    await page.waitForFunction(() => benchTurnSounds.join() === 'wb_handle,wb_handle,wb_hit');
     await preview.locator('#stage').press('ArrowLeft');
-    await page.waitForFunction(() => benchTurnSounds.join() === 'hf_handle,hf_handle,hf_hit,hf_handle');
+    await page.waitForFunction(() => benchTurnSounds.join() === 'wb_handle,wb_handle,wb_hit,wb_handle');
     await preview.locator('#stage').press('+');
     await page.mouse.wheel(0, 90);
-    assert.deepEqual(await page.evaluate(() => { restoreBenchTurnSounds(); return benchTurnSounds; }), ['hf_handle', 'hf_handle', 'hf_hit', 'hf_handle']);
+    assert.deepEqual(await page.evaluate(() => { restoreBenchTurnSounds(); return benchTurnSounds; }), ['wb_handle', 'wb_handle', 'wb_hit', 'wb_handle']);
     console.log('Workbench grip, drag rotation, settle and keyboard Foley passed; zoom remained silent');
     await page.waitForFunction(() => sfxHas('wf_rifle_mount') && sfxHas('wf_rifle_unmount'));
-    const cue = (kind) => page.evaluate(() => {
-      EFC_SND.invLast = -1; EFC_SND.last = {}; EFC_SND.log = [];
-    }).then(() => bench.locator('[data-part-slot=optic]').selectOption(kind === 'mount' ? 'part_red' : ''))
-      .then(() => page.evaluate(() => {
+    const cue = async (kind) => {
+      await page.evaluate(() => { EFC_SND.invLast = -1; EFC_SND.last = {}; EFC_SND.log = []; });
+      await bench.locator('[data-part-slot=optic]').selectOption(kind === 'mount' ? 'part_red' : '');
+      return page.evaluate(() => {
         const ids = EFC_SND.log.map(({ id }) => id);
         EFC_SND.log = null;
         return ids;
-      }));
+      });
+    };
     assert.deepEqual(await cue('unmount'), ['wf_rifle_unmount']);
     assert.deepEqual(await cue('mount'), ['wf_rifle_mount']);
     console.log('Workbench attachment fitting and removal use rifle Foley');

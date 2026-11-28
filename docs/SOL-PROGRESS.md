@@ -5,26 +5,26 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C13-4 complete on `codex/c13-2-weapon-foley`. All 304 clips load and all 76 banks play from `#sounds`. Available gameplay cues use the new banks.
-- **Next step:** Finish the exact Partisan workbench Foley import, then checkpoint the final coverage, timing and download-size results.
-- **How to verify:** Use `node tools/dev/efc/test-sounds.mjs` for the reload choreography and `#sounds` for the old/new audition. The shot list has 76 action/family pairs and four slots per pair. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** Build, declarations, raid smoke, 99 sound checks, magazine check and weapon mods passed. Full `#sounds` coverage, reload timing, fallback and credits passed. The C17-2 browser checks passed. Standing boots are below frame at −60°.
+- **Card:** C13 complete on `codex/c13-2-weapon-foley`, ready for owner review.
+- **Next step:** Start C18-1 from `beta`. C16-5 and C17-2 are waiting on owner decisions.
+- **How to verify:** C13 has 76 banks of four takes in `#sounds`. Use `test-sounds.mjs` and `test-weaponmods.mjs` for the runtime and interactive workbench checks. For C17-2, review `docs/omnimovement/legs-pitch.png`.
+- **Checks so far:** Build, declarations, raid smoke, 102 sound checks, magazine check and weapon mods passed. C13 weapon Foley is 1,239,068 bytes. The original Partisan turn pack is 57,844 bytes on demand.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
-- **Watch out for:** The current chat can download from `elevenlabsusercontent.com`. The current first-person legs are on beta for staging. C17-2 remains open and C17-3 waits on its visual acceptance.
+- **Watch out for:** The current chat can download from `elevenlabsusercontent.com`. C13 safety, selector and bipod deploy cues are available in `#sounds` and await gameplay hooks. C17-3 waits on C17-2 visual acceptance.
 
 ## Next open cards, in order
 
-1. C13-2 to C13-5, sound design and weapon foley. Batch A passed in-game checks and is on the C13 feature branch.
-2. C16-5 to C16-13, enemy combat barks, downed state and enemy execution.
-3. C17 and C18 can run alongside C16. Follow the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
-4. C2-1 to C2-8, Partisan modding and weapons.
-5. Then C11 and C12 (section 6), followed by C3 to C8 and C14 (section 7).
+1. C18-1, the shared movement phase model, followed by the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
+2. C16-5 to C16-13 and C17-2 to C17-4 can resume when the owner decisions are recorded.
+3. C2-1 to C2-8, Partisan modding and weapons.
+4. Then C11 and C12 (section 6), followed by C3 to C8 and C14 (section 7).
 
 Blocked on the owner: K8 (stash names, one line or two), C12 (reference image missing). Owner may still change K10's drop zone.
 C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the owner's eye.
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-28 Codex Sol: C13-2 to C13-5 done on `codex/c13-2-weapon-foley`. 304 credited takes, 76 banks, 644.1023 ElevenLabs credits, Partisan turn recordings, and 102/102 sound checks.
 - 2026-11-28 Codex Sol: C13-1 done. The foley audit verified 76 action/family pairs, 304 slots, 19 credited reuse candidates and 285 new takes across five batches.
 - 2026-11-28 Codex Sol: C16-4 integrated from `ef536b4`. The voice script has 180 takes across 15 cues and three voice groups, plus five sample lines for approval before recording.
 - 2026-11-28 Codex Sol: C15-4 done. Both clients see the magazine detach, return and cancel. Documented the raid HUD and captured rifle, pistol and pump shotgun checks. Build, declaration, translation, smoke, local and two-client checks passed.

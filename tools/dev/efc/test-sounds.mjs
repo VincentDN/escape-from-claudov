@@ -32,6 +32,7 @@ const bootAudio = () => (async () => {
   const st = await page.evaluate(bootAudio);
   ok(st.handling === 'ready' && st.ballistics === 'ready' && st.armes === 'ready' && st.foley === 'ready', 'packs ready ' + JSON.stringify(st));
   ok(st.weapon_foley === 'ready', 'weapon Foley pack ready ' + JSON.stringify(st));
+  ok(await page.evaluate(() => !SFX.state.has('workbench_foley')), 'workbench turn pack stays out of raid preloads');
   const R = await page.evaluate(() => {
     const out = { missing: [], clip: [], levels: {}, events: 0 };
     out.banks = [];
@@ -225,7 +226,7 @@ const bootAudio = () => (async () => {
   ok(I.off === false, 'sounds off: the engine plays');
   // audition page (dist/index.html#sounds): every button plays without an error
   const A = await page.evaluate(async () => {
-    efcAudOpen(); EFC_SND.log = [];
+    efcAudOpen(); efcAudStart(); await sfxLoad('workbench_foley'); EFC_SND.log = [];
     const played = []; const orig = sfxPlay; sfxPlay = (id, ...a) => { played.push(id); return orig(id, ...a); };
     const btns = () => Array.from(document.querySelectorAll('#efcAud button[data-a]'));
     let n = 0;
@@ -234,11 +235,14 @@ const bootAudio = () => (async () => {
       for (const b of btns()) { b.click(); n++; }
     }
     sfxPlay = orig; EFC_SND.log = null; document.getElementById('efcAud').remove();
+    const workbench = played.filter((id) => id.startsWith('wb_'));
+    const turnTakes = ['wb_handle', 'wb_hit'].map((id) => SFX.bank.get(id)?.length);
     return { n, played: played.length, kinds: new Set(played).size, pt: played.filter((i) => /^(hf_|pt_|g_pt_|f_casing)/.test(i)).length,
-      recorded: [...new Set(played.filter((i) => i.startsWith('wf_')))].sort() };
+      recorded: [...new Set(played.filter((i) => i.startsWith('wf_')))].sort(), workbench, turnTakes };
   });
   ok(A.n > 100 && A.played > A.n && A.pt > 0, 'audition page buttons ' + JSON.stringify(A));
   ok(A.recorded.join() === expectedFoley.join(), 'audition reaches every recorded bank');
+  ok(A.turnTakes.join() === '6,6' && A.workbench.length > 6 && A.workbench.slice(0, 3).join() === 'wb_handle,wb_handle,wb_hit', 'audition plays the Partisan grip, turn and settle recordings');
   console.log(`audition page: ${A.n} buttons pressed, ${A.played} samples played from ${A.kinds} banks`);
   ok(!errors.length, 'page errors: ' + errors.slice(0, 5).join('\n'));
   await browser.close();
@@ -276,6 +280,8 @@ const bootAudio = () => (async () => {
 const sfxDir = path.join(REPO, 'dist/sfx');
 const weaponFoley = fs.readdirSync(sfxDir).find((name) => /^weapon_foley\./.test(name));
 const weaponBytes = weaponFoley ? fs.statSync(path.join(sfxDir, weaponFoley)).size : 0;
+const workbenchFoley = fs.readdirSync(sfxDir).find((name) => /^workbench_foley\./.test(name));
+const workbenchBytes = workbenchFoley ? fs.statSync(path.join(sfxDir, workbenchFoley)).size : 0;
 const foleyDir = path.join(REPO, 'assets/sfx/weapon_foley');
 const takeFiles = fs.readdirSync(foleyDir).filter((name) => name.endsWith('.mp3')).sort();
 const expectedTakes = expectedFoley.flatMap((bank) => ['01', '02', '03', '04'].map((take) => `${bank}_${take}.mp3`)).sort();
@@ -285,7 +291,9 @@ const credits = ledger.sons.filter((entry) => entry.pack === 'weapon_foley');
 ok(takeFiles.join() === expectedTakes.join() && takeHashes.size === 304, '304 distinct shot-list assets');
 ok(credits.map((entry) => entry.id + '.mp3').sort().join() === expectedTakes.join() && credits.every((entry) => ledger.sources[entry.source]), 'every take has provenance');
 ok(weaponBytes > 0 && weaponBytes < 2 * 1024 * 1024, 'weapon Foley download budget ' + weaponBytes);
+ok(workbenchBytes > 0 && workbenchBytes < 256 * 1024, 'workbench Foley download budget ' + workbenchBytes);
 console.log(`weapon Foley download: ${weaponBytes} bytes, 2 MiB budget`);
+console.log(`workbench turn download: ${workbenchBytes} bytes on demand`);
 const added = fs.readdirSync(sfxDir).filter((f) => /^(handling|ballistics|weapon_foley)\./.test(f)).reduce((s, f) => s + fs.statSync(path.join(sfxDir, f)).size, 0);
 ok(added > 0 && added < 3 * 1024 * 1024, 'added download ' + added);
 console.log(`added download: ${(added / 1024).toFixed(0)} KB (handling, ballistics and weapon Foley)`);

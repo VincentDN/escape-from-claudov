@@ -145,15 +145,20 @@ efcOn('ui:inventory-gesture', (kind, item) => {
   }
 });
 
-/* The workbench shares the Partisan preview's handling and hit banks, through the menu mix. */
+/* Play the Partisan recordings through the menu mix, with the shared handling bank available during loading. */
 function efcWorkbenchTurnSound(cue, intensity) {
   if (!AU.ready || !EFC_SND.on) return false;
-  const id = 'hf_' + cue, gain = cue === 'hit' ? 0.22 : 0.44 * (0.5 + 0.5 * intensity);
+  const recorded = 'wb_' + cue, id = sfxHas(recorded) ? recorded : 'hf_' + cue;
+  const gain = cue === 'hit' ? 0.22 : 0.44 * (0.5 + 0.5 * intensity);
   return !!sfxPlay(id, uiOut(gain), AU.ctx.currentTime + 0.01, { rate: rand(0.97, 1.03) });
+}
+function efcWorkbenchFoleyLoad() {
+  if (AU.ready && SFX_PACKS.workbench_foley) sfxLoad('workbench_foley');
 }
 efcOn('workbench:open', () => {
   initAudio();
   if (!AU.ready) return;
+  efcWorkbenchFoleyLoad();
   sfxLoad('handling');
   if (SFX_PACKS.weapon_foley) sfxLoad('weapon_foley');
 });

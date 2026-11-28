@@ -11,9 +11,9 @@ What remains under its own terms:
 
 1. **Sounds and voices** (`assets/sfx/`): each source keeps its license, listed in `assets/sfx/credits.json`. Most are CC0; the CC BY
    ones require crediting their author, as that file does.
-   - Weapon handling bank (`assets/sfx/handling/hf_*`, 42 takes from Partisan Project): supplied by the owner, checked and cleared by
-     the owner for this public repository. The other Partisan sounds (`f_casing_wood`, `assets/sfx/ballistics/`) are Freesound CC0,
-     authors and source pages in `assets/sfx/credits.json`.
+   - Workbench turn bank (`assets/sfx/workbench_foley/`): the 12 Partisan Project handling and hit recordings used by the StG 44
+     workbench, supplied and cleared by Vincent De Nil for this repository. Shared handling uses ElevenLabs and CC0 takes. The
+     `weapon_foley` pack combines ElevenLabs generations and credited legacy recordings. See `assets/sfx/credits.json` for sources.
 2. **Textures, skies and HDRI** (`assets/tex/`, `assets/sky/`, `assets/vendor/hdri/`): Poly Haven and ambientCG, CC0 (`assets/tex/credits.json`).
 3. **Libraries**: three.js r147 (MIT, notice at the top of `assets/vendor/three-r147.js`); PeerJS 1.5.5 (MIT), from
    https://registry.npmjs.org/peerjs/-/peerjs-1.5.5.tgz for online lobbies. Its distribution and license are in `assets/vendor/`.

@@ -8297,6 +8297,90 @@
    "source": "ffsl",
    "fichier": "Model 12/K_3.wav",
    "detail": "From credited legacy Foley f_shell-3. Winchester Model 12 : cartouche poussée dans le tube (K_3, 1,58-2,00 s) ; silences raccourcis, passe-haut 80 Hz C13 re-edit window 0–43 ms from the legacy cut, mono, filtered, transient aligned and level matched. Final adjustment -0.25 dB."
+  },
+  {
+   "id": "wb_handle-1",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0494_00s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_handle-2",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0505_05s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_handle-3",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0504_10s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_handle-4",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0499_49s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_handle-5",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0527_74s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_handle-6",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/handle/sar-0554_24s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_hit-1",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/bolt-0075_79s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_hit-2",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/bolt-0039_37s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_hit-3",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/bolt-0043_31s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_hit-4",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/bolt-0029_02s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_hit-5",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/sapistol-0280_34s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
+  },
+  {
+   "id": "wb_hit-6",
+   "pack": "workbench_foley",
+   "source": "partisan-foley",
+   "fichier": "assets/audio/foley/hit/pump-0142_41s.wav",
+   "detail": "Original Partisan StG 44 workbench source. Encoded as mono 48 kHz LAME V5 with peak headroom."
   }
  ]
 }

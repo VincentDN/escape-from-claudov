@@ -208,7 +208,7 @@ before starting).
 | C13-2 | Generate missing takes with ElevenLabs | M | C13-1 | done (285 completed renders across A–E) |
 | C13-3 | Edit, level and credit the generated foley | M | C13-2 | done (304 distinct credited takes, all within 2 dB of the median) |
 | C13-4 | Map the takes and extend the audition page | M | C13-3 | done (recorded banks play in-game and all 76 are available in #sounds) |
-| C13-5 | Verify family coverage, timing and download budget | S | C13-4 | open |
+| C13-5 | Verify family coverage, timing and download budget | S | C13-4 | done (102 sound checks, 1,239,068 bytes against 2 MiB budget) |
 | C16-4 | Invented language and the voice script | S | C16-1 | done |
 | C16-5 | Record the lines with ElevenLabs | M | C16-4 | blocked (owner approval of the five sample lines and ElevenLabs connector) |
 | C16-6 | Radio processing and packaging | S | C16-5 | open |

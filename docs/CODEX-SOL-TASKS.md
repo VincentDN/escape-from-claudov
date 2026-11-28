@@ -204,7 +204,7 @@ before starting).
 | C15-2 | Separate tap reload from hold magazine check | S | C15-1 | done |
 | C15-3 | Magazine check pose and ammo readout | M | C15-2 | done |
 | C15-4 | Replicate magazine checks and document the HUD | M | C15-3 | done |
-| C13-1 | Audit weapon foley and write the generation shot list | S | — | open |
+| C13-1 | Audit weapon foley and write the [generation shot list](weapon-foley-shot-list.md) | S | none | done |
 | C13-2 | Generate missing takes with ElevenLabs | M | C13-1 | blocked (ElevenLabs Sound Effects connector unavailable) |
 | C13-3 | Edit, level and credit the generated foley | M | C13-2 | open |
 | C13-4 | Map the takes and extend the audition page | M | C13-3 | open |

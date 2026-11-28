@@ -6,15 +6,15 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 ## Current card
 
 - **Card:** none in progress.
-- **Next step:** Take C13-1, the weapon-foley audit and recording shot list.
-- **How to verify:** C13-1 checks the family/action matrix and take totals against the source inventory. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** The C17-2 pose, body yaw, camera overlap and death checks passed. The standing boots are below frame at −60°.
+- **Next step:** C13-2 needs the ElevenLabs Sound Effects connector or generated files from the owner. Start from the [weapon-foley shot list](weapon-foley-shot-list.md).
+- **How to verify:** The shot list has 76 action/family pairs, four slots each, with the new-take totals matching generation batches. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
+- **Checks so far:** `foley audit ok: 76 pairs, 304 slots, 19 credited candidates, 285 new takes`. The C17-2 browser checks passed. Standing boots are below frame at −60°.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
 - **Watch out for:** The current first-person legs are on beta for staging. C17-2 remains open and C17-3 waits on its visual acceptance. The ElevenLabs connector is unavailable for C13-2 and C16-5.
 
 ## Next open cards, in order
 
-1. C13-1 to C13-5, sound design and weapon foley. Start with the shot list.
+1. C13-2 to C13-5, sound design and weapon foley. The shot list is ready and generation waits for access.
 2. C16-5 to C16-13, enemy combat barks, downed state and enemy execution.
 3. C17 and C18 can run alongside C16. Follow the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 4. C2-1 to C2-8, Partisan modding and weapons.
@@ -25,6 +25,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-28 Codex Sol: C13-1 done. The foley audit verified 76 action/family pairs, 304 slots, 19 credited reuse candidates and 285 new takes across five batches.
 - 2026-11-28 Codex Sol: C16-4 integrated from `ef536b4`. The voice script has 180 takes across 15 cues and three voice groups, plus five sample lines for approval before recording.
 - 2026-11-28 Codex Sol: C15-4 done. Both clients see the magazine detach, return and cancel. Documented the raid HUD and captured rifle, pistol and pump shotgun checks. Build, declaration, translation, smoke, local and two-client checks passed.
 - 2026-11-27 Codex Sol: C15-3 done. Hold Reload to show and keep the magazine in view and release to put it back. Rough is the owner-selected default, and exact numbers are selectable. Browser pose/readout, insertion check and all base checks passed.

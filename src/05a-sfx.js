@@ -13,7 +13,7 @@
    Variantes : « id-1 », « id-2 »... forment la banque « id », dont on tire une prise sans répéter la précédente.
    ========================================================================== */
 const SFX_PACKS = /*__SFX_PACKS__*/ {};
-const SFX_GAME = ['armes', 'foley', 'impacts', 'series', 'fin', 'mecha', 'handling', 'ballistics']; // handling, ballistics: Partisan takes (P2)
+const SFX_GAME = ['armes', 'foley', 'impacts', 'series', 'fin', 'mecha', 'handling', 'ballistics', 'weapon_foley'];
 // bank : id → [{ b : AudioBuffer, o : début du son dans le tampon (s), d : durée (s), pk : instant de la crête (s) }]
 // state : paquet → { s : 'loading' | 'ready' | 'failed', p : promesse } ; of : paquet → banques qu'il a remplies
 const SFX = { bank: new Map(), last: new Map(), state: new Map(), cb: new Map(), of: new Map(), dec: new Map() };
@@ -75,10 +75,11 @@ function sfxLoad(key) {
     const ids = new Set(); SFX.of.set(key, ids);
     for (const id of Object.keys(d.s)) {
       if (SFX.state.get(key) !== st || !AU.ctx) return false; // paquet libéré pendant le décodage
-      if (COARSE && +((id.match(/-(\d+)$/) || [])[1] || 0) > 2) continue; // téléphone : deux variantes par banque
+      const takeSuffix = key === 'weapon_foley' ? /_0([1-4])$/ : /-(\d+)$/;
+      if (COARSE && +((id.match(takeSuffix) || [])[1] || 0) > 2) continue; // téléphone : deux variantes par banque
       const v = d.s[id], b = await sfxDecode(sfxDecodeCtx(key, id), v[2]);
       if (!b || SFX.state.get(key) !== st) continue;
-      const g = id.replace(/-\d+$/, '');
+      const g = id.replace(takeSuffix, '');
       let a = SFX.bank.get(g); if (!a) SFX.bank.set(g, a = []);
       a.push({ b, o: sfxLead(b, v[0], v[1], d.rate), d: v[0] / 48000, pk: v[1] / 48000 }); ids.add(g);
     }

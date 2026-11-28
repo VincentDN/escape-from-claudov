@@ -26,6 +26,7 @@ const bootAudio = () => (async () => {
   const { page, errors } = await openGame({ browser });
   const st = await page.evaluate(bootAudio);
   ok(st.handling === 'ready' && st.ballistics === 'ready' && st.armes === 'ready' && st.foley === 'ready', 'packs ready ' + JSON.stringify(st));
+  ok(st.weapon_foley === 'ready', 'weapon Foley pack ready ' + JSON.stringify(st));
   const R = await page.evaluate(() => {
     const out = { missing: [], clip: [], levels: {}, events: 0 };
     out.banks = [];
@@ -33,7 +34,7 @@ const bootAudio = () => (async () => {
     // handling events (every EFC_HANDLING key is an event of the audit)
     for (const k of Object.keys(EFC_HANDLING)) need('handling ' + k, [EFC_HANDLING[k][0][0]]);
     for (const k of Object.keys(EFC_HANDLING)) for (const l of EFC_HANDLING[k]) { out.banks.push(l[0]); if (!sfxHas(l[0])) out.missing.push('layer ' + k + ' ' + l[0]); }
-    for (const p of ['handling', 'ballistics']) out.banks.push(...(SFX.of.get(p) || []));
+    for (const p of ['handling', 'ballistics', 'weapon_foley']) out.banks.push(...(SFX.of.get(p) || []));
     for (const id of ['f_magout_rifle', 'f_magout_smg', 'f_magout_pistol', 'f_magin_rifle', 'f_magin_smg', 'f_magin_pistol', 'f_slap', 'f_charge_rifle', 'f_slide_pistol', 'f_bolt', 'f_pump', 'f_shell', 'f_draw', 'f_stow', 'f_ads', 'f_dry', 'f_pickup']) need('old ' + id, [id]);
     for (const k of ['knife', 'pin', 'spoon', 'throw', 'windup', 'magdrop']) need('engine ' + k, [mechId(k, 'rifle')]);
     // firing per sound profile: first person, near, far, suppressed
@@ -130,6 +131,34 @@ const bootAudio = () => (async () => {
     console.log(`${tag}: ${r.got.join(' > ')} at +${Math.max(0, ...r.late.filter((x) => x !== null)).toFixed(3)} s at most, ${r.layers} layers`);
   }
 
+  const pilot = await page.evaluate(() => {
+    const def = WEAPONS.m4, table = RELOAD.rifle.norm;
+    vmEquip(def); VM.action = null;
+    const playReload = (preview) => {
+      EFC_SND.previewFoley = preview; EFC_SND.log = [];
+      const data = { empty: false }, steps = Math.ceil(table.dur * 240);
+      for (let i = 0; i <= steps; i++) vmChoreo('reload', Math.min(1, i / (240 * table.dur)), data, VM.curDef, VM.cur);
+      return EFC_SND.log;
+    };
+    const normal = playReload(false).map((entry) => entry.id);
+    const clips = playReload(true).map(({ id, kind, t, e, rate }) => {
+      const samples = e.b.getChannelData(0), sr = e.b.sampleRate;
+      const start = Math.round(e.o * sr), end = Math.min(samples.length, start + Math.round(e.d * sr));
+      let peak = 0, attack = 0;
+      for (let i = start; i < end; i++) peak = Math.max(peak, Math.abs(samples[i]));
+      for (let i = start; i < end; i++) if (Math.abs(samples[i]) >= peak / 2) { attack = (i - start) / sr / rate; break; }
+      return { id, kind, t, attack, peak };
+    });
+    EFC_SND.previewFoley = false; EFC_SND.log = null;
+    return { normal, clips };
+  });
+  const ids = ['wf_rifle_magout', 'wf_rifle_magin', 'wf_rifle_slap'];
+  ok(pilot.normal.join() === 'hf_click,hf_handle,hf_clunk,hf_click,hf_hit', 'incomplete rifle banks retain shared reload Foley');
+  ok(pilot.clips.map((clip) => clip.id).join() === ids.join(), 'rifle reload plays each pilot once in order ' + JSON.stringify(pilot.clips));
+  ok(pilot.clips.every(({ attack, peak }) => attack >= 0.003 && attack <= 0.015 && peak > 0 && peak < 1), 'decoded rifle pilots attack within 15 ms and do not clip');
+  ok(pilot.clips.length === 3 && Math.abs(pilot.clips[2].t - pilot.clips[1].t - 0.05) < 0.005, 'rifle slap follows seating by 50 ms');
+  console.log('M4 Batch A pilot: ' + pilot.clips.map(({ kind, attack }) => kind + ' at ' + (attack * 1000).toFixed(1) + ' ms').join(', '));
+
   // ---------- 3. inventory foley from events; sounds off restore the engine path ----------
   const I = await page.evaluate(() => {
     EFC_SND.log = []; EFC_SND.last = {};
@@ -175,9 +204,11 @@ const bootAudio = () => (async () => {
       for (const b of btns()) { b.click(); n++; }
     }
     sfxPlay = orig; EFC_SND.log = null; document.getElementById('efcAud').remove();
-    return { n, played: played.length, kinds: new Set(played).size, pt: played.filter((i) => /^(hf_|pt_|g_pt_|f_casing)/.test(i)).length };
+    return { n, played: played.length, kinds: new Set(played).size, pt: played.filter((i) => /^(hf_|pt_|g_pt_|f_casing)/.test(i)).length,
+      pilot: played.filter((i) => i.startsWith('wf_')) };
   });
   ok(A.n > 100 && A.played > A.n && A.pt > 0, 'audition page buttons ' + JSON.stringify(A));
+  ok(A.pilot.join() === ids.concat(ids, ids).join(), 'audition plays each rifle pilot alone and within both reloads');
   console.log(`audition page: ${A.n} buttons pressed, ${A.played} samples played from ${A.kinds} banks`);
   ok(!errors.length, 'page errors: ' + errors.slice(0, 5).join('\n'));
   await browser.close();
@@ -187,7 +218,7 @@ const bootAudio = () => (async () => {
 {
   const browser = await launch();
   const { page, errors } = await openGame({ browser });
-  await page.evaluate(() => { delete SFX_PACKS.handling; delete SFX_PACKS.ballistics; });
+  await page.evaluate(() => { delete SFX_PACKS.handling; delete SFX_PACKS.ballistics; delete SFX_PACKS.weapon_foley; });
   const st = await page.evaluate(bootAudio);
   ok(!st.handling && st.foley === 'ready', 'fallback packs ' + JSON.stringify(st));
   await startSolo(page);
@@ -213,8 +244,8 @@ const bootAudio = () => (async () => {
 
 // ---------- 5. download size ----------
 const sfxDir = path.join(REPO, 'dist/sfx');
-const added = fs.readdirSync(sfxDir).filter((f) => /^(handling|ballistics)\./.test(f)).reduce((s, f) => s + fs.statSync(path.join(sfxDir, f)).size, 0);
+const added = fs.readdirSync(sfxDir).filter((f) => /^(handling|ballistics|weapon_foley)\./.test(f)).reduce((s, f) => s + fs.statSync(path.join(sfxDir, f)).size, 0);
 ok(added > 0 && added < 3 * 1024 * 1024, 'added download ' + added);
-console.log(`added download: ${(added / 1024).toFixed(0)} KB (dist/sfx/handling + ballistics)`);
+console.log(`added download: ${(added / 1024).toFixed(0)} KB (handling, ballistics and weapon Foley)`);
 console.log(`${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);

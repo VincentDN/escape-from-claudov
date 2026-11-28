@@ -63,13 +63,15 @@ ElevenLabs Sound Effects v2 rendered one take per cue on 28 November 2026. Each 
 | `wf_rifle_magin_03` | `dtPcnFBrh6Wq0shCxxmO` | `gl2vr9EDetNZMXV0fEzj` | Firm contact followed by a clean latch |
 | `wf_rifle_slap_01` | `LXUIXTFUzjeY9Eti0Vkr` | `p6nkQtBUqMr5cnijnVeM` | One short gloved impact with body resonance |
 
-The committed pilot MP3s are mono, 48 kHz and encoded as LAME V5 through `tools/build_sfx.py`. The raw renders contained separate transients outside the desired cues. `tools/sfx/weapon_foley.py --take FILE START_MS END_MS` applied the windows below, aligned the first half-peak to 6 ms and matched active RMS to the existing handling bank. Each decoded file peaks below 0 dBFS. In-game checks are pending.
+The committed pilot MP3s are mono, 48 kHz and encoded as LAME V5 through `tools/build_sfx.py`. The raw renders contained separate transients outside the desired cues. `tools/sfx/weapon_foley.py --take FILE START_MS END_MS` applied the windows below, aligned the first half-peak to 6 ms and matched active RMS to the existing handling bank. Each decoded file peaks below 0 dBFS.
 
 | Filename | Source window (ms) | Output (ms) | Active RMS (dBFS) | Peak (dBFS) |
 | --- | ---: | ---: | ---: | ---: |
 | `wf_rifle_magout_03` | 260–300 | 35.7 | −18.6 | −1.7 |
 | `wf_rifle_magin_03` | 375–441 | 58.8 | −17.1 | −3.6 |
 | `wf_rifle_slap_01` | 44–107 | 57.1 | −17.5 | −1.6 |
+
+The M4 reload played the three cues in order with a 50 ms seating-to-slap schedule and browser-decoded attacks at 6.3–6.6 ms. `#sounds` offers each pilot alone and in both M4 reloads alongside the existing sounds. Normal play uses the shared takes while the recorded banks have fewer than four takes on desktop. The pilot pack adds 6,120 bytes to the built audio download.
 
 ## Mapping and verification
 

@@ -7,6 +7,7 @@
 const EFC_SND = {
   on: true, // false: the engine's previous sounds (the audition page compares both)
   log: null, // array: every played layer is recorded { kind, id, t } (tests)
+  previewFoley: false, // lets the in-game pilot test use banks that are still being filled
   prevInv: null, busy: false, panelEv: false, last: {}, invLast: -1, // invLast: when the last inventory cue played (shared gap)
 };
 
@@ -79,10 +80,21 @@ function efcSndWeapon(pos, fam) {
 /* True when every bank of the layers is loaded */
 function efcHandlingReady(key) { const L = EFC_HANDLING[key]; return !!L && L.every((l) => sfxHas(l[0])); }
 
-/* Plays the layers of key at time t (AudioContext seconds) into out. o: { rate, gain } multiply the whole event. */
+function efcWeaponFoleyBank(key, fam, preview = false) {
+  const id = 'wf_' + fam + '_' + key;
+  const takeCount = SFX.bank.get(id)?.length || 0;
+  return takeCount >= (preview ? 1 : COARSE ? 2 : 4) ? id : null;
+}
+
+/* Plays the recorded cue or its shared layers at time t (AudioContext seconds) into out. */
 function efcHandlingLayers(key, out, t, o) {
   const L = EFC_HANDLING[key], base = (EFC_SND_GAIN[key] !== undefined ? EFC_SND_GAIN[key] : (typeof MECH_GAIN !== 'undefined' && MECH_GAIN[key.replace(/_.*/, '')]) || 0.5);
   const rate = o.rate * rand(0.96, 1.04), g = base * (o.gain || 1) * Math.pow(10, rand(-1.5, 1.5) / 20);
+  if (o.bank) {
+    const v = sfxPlay(o.bank, out, t, { gain: g, rate });
+    if (v && EFC_SND.log) EFC_SND.log.push({ kind: key, id: o.bank, t, e: v.e, rate });
+    return;
+  }
   for (const [id, off, lg, lr] of L) {
     const v = sfxPlay(id, out, t + off / rate, { gain: g * lg, rate: rate * lr });
     if (v && EFC_SND.log) EFC_SND.log.push({ kind: key, id, t: t + off / rate, e: v.e, rate: rate * lr });
@@ -92,9 +104,10 @@ function efcHandlingLayers(key, out, t, o) {
 function efcHandlingPlay(kind, delay, pos, fam) {
   if (!EFC_SND.on || typeof AU === 'undefined' || !AU.ready) return false;
   const W = efcSndWeapon(pos, fam), key = efcHandlingKey(kind, W.fam, pos);
-  if (!key || !efcHandlingReady(key)) return false;
+  const bank = key && efcWeaponFoleyBank(key, W.fam, EFC_SND.previewFoley);
+  if (!key || (!bank && !efcHandlingReady(key))) return false;
   const out = pos ? auOut(pos, 0.1, 1, 1.1, 3) : auOut(null, 0.05, 1);
-  efcHandlingLayers(key, out, AU.ctx.currentTime + (delay || 0), { rate: efcSndWeightRate(W.kg) });
+  efcHandlingLayers(key, out, AU.ctx.currentTime + (delay || 0), { rate: efcSndWeightRate(W.kg), bank });
   return true;
 }
 /* Inventory and looting sound (respects the effects volume and mute: it goes through the game's mix like every effect) */

@@ -38,4 +38,7 @@
 - [ ] In raid settings, try all three **Slide and dive** options. With the default, tap Crouch during a ground sprint to slide and hold it to dive. Check the reversed option and the slide-only option.
 - [ ] Sprint and dive in all eight directions. Check that travel follows your movement and stops at a wall. Jump and crouch from a sprint to check that the airborne dive still works.
 
+- [ ] Land facing forward, sideways and backward. Look for prone, a brief side landing, and a back landing with the view raised and weapon across the chest. Turn around in the air before landing to check that the stance follows the view at contact.
+- [ ] Press Jump or release and press Sprint after a dive. Check the brief impact pause and try getting up under a low obstruction.
+
 Attach a screenshot or short clip for visual issues, along with the weapon, location and controls used to reproduce it.

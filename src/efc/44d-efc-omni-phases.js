@@ -8,7 +8,7 @@ const EFC_OMNI_TUNING = {
   slide: { enter: 0.12, glide: 0.9, exit: 0.15, retainedSpeed: 0.7, retentionTime: 0.6 },
   dive: { anticipation: 0.08, launch: 0.06, flight: 0.5, impact: 0.12, settle: 0.25,
     apex: 0.45, minDistance: 3.5, maxDistance: 4.5, boostedDistance: 5 },
-  landing: { backArc: 2 * Math.PI / 3, sideSettle: 0.3 },
+  landing: { forwardArc: Math.PI / 4, backArc: 2 * Math.PI / 3, sideSettle: 0.3 },
   getup: { prone: 0.45, supine: 0.55, fast: 0.35 },
   flight: { airControl: 0.1, bodyTwist: Math.PI / 2, hipSpread: 1.5, aimSpeed: 0.5 },
   camera: { anticipationDrop: 0.06, anticipationPitch: 2, launchFov: 6, launchFovTime: 0.25,

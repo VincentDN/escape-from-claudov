@@ -5,8 +5,8 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C18-1 and C18-2 integrated with the C19 firing and C13 reload changes.
-- **Next step:** C18-3 directional landings.
+- **Card:** C18-3 directional landings integrated with C18-1 and C18-2. C19 firing and C13 reloads are on beta.
+- **Next step:** C18-4 aerial look, body twist, aiming and firing.
 - **How to verify:** Use the [beta playtest checklist](../outbound/BETA_PLAYTEST_CHECKLIST.md).
 - **Checks so far:** Build, declarations, raid smoke, the seven-family raid firing check and recorded fallback passed. The C19 pack is 400,083 bytes. C13 sound, operator and Partisan alignment checks passed before C19.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
@@ -14,7 +14,7 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Next open cards, in order
 
-1. Continue with C18-3 and the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
+1. Continue with C18-4 and the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 2. C16-5 to C16-13 and C17-2 to C17-4 can resume when the owner decisions are recorded.
 3. C2-1 to C2-8, Partisan modding and weapons.
 4. Then C11 and C12 (section 6), followed by C3 to C8 and C14 (section 7).
@@ -23,6 +23,8 @@ Blocked on the owner: K8 (stash names, one line or two), C12 (reference image mi
 C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the owner's eye.
 
 ## Log (one line per finished card, newest first)
+
+- 2026-11-28 Codex Sol: Integrated directional prone, side and supine landings. Ground and air tests covered all headings, two in-flight view changes, impact, side settle and return to standing. The final C19 audio suite passed 111 checks.
 
 - 2026-11-28 Codex Sol: Integrated the C18-1 phase model and C18-2 ground dives. All eight directions, three slide/dive settings, wall clearance and cooldown passed.
 

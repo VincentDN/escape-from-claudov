@@ -50,7 +50,8 @@ try {
         const distance = displacement.length();
         const direction = displacement.normalize().dot(heading);
 
-        jump(e); // Rise from prone before testing another airborne request.
+        for (let tick = 0; tick < Math.ceil(efcOmniTune('dive', 'impact') / dt); tick++) ctlMove(e, dt);
+        jump(e); // Rise after the impact window before testing another airborne request.
         ctlMove(e, dt); // Release Jump for the next press.
         jump(e);
         e.input.crouch = true;
@@ -96,16 +97,17 @@ try {
     }
   });
 
-  for (const entry of result.cases) {
+  const landings = ['prone', 'prone', 'side', 'supine', 'supine', 'supine', 'side', 'prone'];
+  for (const [index, entry] of result.cases.entries()) {
     const label = JSON.stringify(entry);
     assert.equal(entry.began, 'dive', label);
-    assert.equal(entry.landed, 'prone', label);
+    assert.equal(entry.landed, landings[index], label);
     assert.ok(entry.distance > 2 && entry.direction > 0.99, label);
     assert.equal(entry.duringCooldown, 'air', label);
     assert.equal(entry.afterCooldown, 'dive', label);
   }
   assert.equal(result.wall.began, 'dive');
-  assert.equal(result.wall.landed, 'prone');
+  assert.equal(result.wall.landed, 'side');
   assert.ok(result.wall.clearance >= 0.35 && result.wall.clearance <= 0.5, JSON.stringify(result.wall));
   assert.equal(result.grounded, 'slide');
   assert.equal(result.wardenState, 'air');
@@ -132,7 +134,7 @@ try {
   });
   assert.deepEqual(inputState, { before: 'air', after: 'dive' });
   assert.deepEqual(errors, []);
-  console.log('Dive passed in eight directions, stops at a wall, lands prone, respects cooldown and preserves grounded Slide');
+  console.log('Air dive passed in eight directions with directional landings, wall clearance, cooldown and grounded Slide');
 } finally {
   await browser.close();
 }

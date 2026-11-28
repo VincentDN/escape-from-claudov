@@ -75,6 +75,7 @@ function efcOmniGroundDive(entity, sprint, requested, dt) {
   entity.vy = lift + gravity * dt / 2;
   entity.onGround = false;
   entity.efcDiving = true;
+  entity.efcDiveYaw = gesture.yaw;
   entity.slideBuf = 0;
   gesture.phase = 'launch';
   gesture.t = 0;
@@ -102,13 +103,27 @@ function efcOmniDive(entity, sprint, dt) {
   entity.vel.z *= impulse;
   entity.vy = EFC_DIVE.lift;
   entity.efcDiving = true;
+  entity.efcDiveYaw = Math.atan2(-entity.vel.x, -entity.vel.z);
   input.slide = false;
   entity.slideBuf = 0;
   return true;
 }
 
 function efcOmniDiveLand(entity) {
+  const bearing = entity.yaw - (entity.efcDiveYaw ?? entity.yaw);
+  const offset = Math.atan2(Math.sin(bearing), Math.cos(bearing));
+  const angle = Math.abs(offset);
+  const onBack = angle > efcOmniTune('landing', 'backArc');
+  const side = !onBack && angle > efcOmniTune('landing', 'forwardArc') + 1e-6 ? Math.sign(offset) : 0;
+  const bodyYaw = entity.yaw + (onBack ? Math.PI : 0);
+  entity.efcDiveLanding = { t: 0, side, waitSprintRelease: !!entity.input.sprint };
+  entity.efcProneTurn = { anchorYaw: bodyYaw, bodyYaw, onBack, side };
+  if (onBack) {
+    entity.pitch = Math.max(entity.pitch ?? 0, efcOmniTune('camera', 'backPitch') * Math.PI / 180);
+    if (entity === PL.ent) PL.pitch = entity.pitch;
+  }
   entity.efcDiving = false;
+  entity.efcDiveYaw = null;
   entity.efcGroundDive = null;
   entity.efcDiveCooldown = EFC_DIVE.cooldown;
   entity.crouch = true;
@@ -133,12 +148,20 @@ function efcOmniProne(entity, sprint, diving, dt) {
   const heldFor = entity.efcProneHeldFor || 0;
 
   if (entity.efcProne) {
+    const landing = entity.efcDiveLanding;
+    if (landing) {
+      landing.t += dt;
+      if (!input.sprint) landing.waitSprintRelease = false;
+      if (landing.t < efcOmniTune('dive', 'impact') - 1e-6) return true;
+    }
     entity.efcProneHeldFor = trackingHold ? heldFor + dt : 0;
     const tapped = canHold && !crouchHeld && heldFor > 0 && heldFor < EFC_PRONE.hold - 1e-6;
-    const jumpPressed = input.jump && !entity.jumpHeld;
-    if (entity.onGround && (tapped || jumpPressed) &&
+    const jumpPressed = input.jump && (!entity.jumpHeld || !!landing);
+    const sprintPressed = landing && !landing.waitSprintRelease && sprint;
+    if (entity.onGround && (tapped || jumpPressed || sprintPressed) &&
         ceilingAbove(entity.pos.x, entity.pos.z, entity.pos.y + 0.3, 0.36) >= entity.pos.y + 1.8) {
       entity.efcProne = false;
+      entity.efcDiveLanding = null;
       entity.efcProneHeldFor = 0;
       entity.efcProneWaitRelease = crouchHeld;
       entity.crouch = input.crouch = false;
@@ -180,7 +203,11 @@ function efcOmniProneTurn(entity, prone, dt) {
   const step = config.bodySpeed * dt;
   turn.bodyYaw += clamp(target - turn.bodyYaw, -step, step);
   turn.onBack = Math.abs(offset) >= (turn.onBack ? config.backExit : config.backEnter);
-  if (entity === PL.ent) turn.side = Number(!!KEYS.LeanR) - Number(!!KEYS.LeanL);
+  if (entity === PL.ent) {
+    const landing = entity.efcDiveLanding;
+    turn.side = landing?.side && landing.t < efcOmniTune('landing', 'sideSettle') - 1e-6
+      ? landing.side : Number(!!KEYS.LeanR) - Number(!!KEYS.LeanL);
+  }
 }
 
 function efcOmniReset(entity) {
@@ -190,6 +217,8 @@ function efcOmniReset(entity) {
   entity.efcTactical = 0;
   entity.efcTacticalCooldown = 0;
   entity.efcDiving = false;
+  entity.efcDiveYaw = null;
+  entity.efcDiveLanding = null;
   entity.efcGroundDive = null;
   entity.efcDiveCrouchHeld = false;
   entity.efcDiveCooldown = 0;

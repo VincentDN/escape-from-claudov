@@ -99,6 +99,43 @@ try {
       warden.input.fire = warden.input.firePressed = false;
     }
 
+    const second = entities.find((entity) => entity !== warden && entity.squad === 'w' && entity.alive);
+    if (!second) throw new Error('The firing regression needs two Wardens');
+    second.pos.copy(player.pos).x -= 4;
+    const pair = [warden, second], shotRay = fireRay;
+    MATCH.time = time += 10;
+    efcBarkActionReset();
+    efcBark(warden, 'spot');
+    efcBark(second, 'move_up');
+    const counts = pair.map((bot) => bot.arms.shots);
+    for (const bot of pair) {
+      bot.busy = bot.sprinting = false;
+      Object.assign(bot.arms, { reload: null, fireCd: 0, sprintW: 0, switching: 0, boltT: 0 });
+      armsW(bot).mag = 2;
+    }
+    const pullTriggers = () => {
+      for (const bot of pair) {
+        bot.input.fire = bot.input.firePressed = true;
+        ctlWeapon(bot, 1 / 60, MATCH.time);
+      }
+    };
+    try {
+      fireRay = () => false;
+      pullTriggers();
+      const warnings = events.filter((event) => event.kind === 'suppress' && event.at === MATCH.time);
+      if (warnings.length !== 2 || pair.some((bot, i) => bot.arms.shots !== counts[i])) {
+        throw new Error('Both Wardens must warn before their first shots');
+      }
+      MATCH.time += EFC_BARKS.suppress.lead + 0.001;
+      pullTriggers();
+      if (pair.some((bot, i) => bot.arms.shots !== counts[i] + 1 || armsW(bot).mag !== 1)) {
+        throw new Error('Both Wardens must fire and spend a round after the same warning window');
+      }
+    } finally {
+      fireRay = shotRay;
+      for (const bot of pair) bot.input.fire = bot.input.firePressed = false;
+    }
+
     const oldLine = lineClear;
     try {
       lineClear = () => true;

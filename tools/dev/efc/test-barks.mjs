@@ -125,26 +125,26 @@ test('cooldown queues wait for an actual bark and cancel stale or duplicate acti
   const { context, warden, bark, events, hooks } = fixture();
   const tick = () => hooks.get('tick').forEach((listener) => listener());
   const actions = [];
-  bark(warden, 'reload');
-  context.efcBarkAction(warden, 'reload', () => actions.push(context.MATCH.time));
-  context.efcBarkAction(warden, 'reload', () => actions.push('duplicate'));
-  context.MATCH.time = 4.9;
+  bark(warden, 'search');
+  context.efcBarkAction(warden, 'search', () => actions.push(context.MATCH.time));
+  context.efcBarkAction(warden, 'search', () => actions.push('duplicate'));
+  context.MATCH.time = 6.9;
   tick();
   assert.equal(events.length, 1);
   assert.deepEqual(actions, []);
-  context.MATCH.time = 5;
+  context.MATCH.time = 7;
   tick();
-  assert.equal(events[1][1].at, 5);
-  context.MATCH.time = 5.59;
+  assert.equal(events[1][1].at, 7);
+  context.MATCH.time = 7.59;
   tick();
   assert.deepEqual(actions, []);
-  context.MATCH.time = 5.6;
+  context.MATCH.time = 7.6;
   tick();
-  assert.deepEqual(actions, [5.6]);
+  assert.deepEqual(actions, [7.6]);
   context.efcBarkAction(warden, 'spot', () => actions.push('stale'), () => false);
   context.MATCH.time = 20;
   tick();
-  assert.deepEqual(actions, [5.6]);
+  assert.deepEqual(actions, [7.6]);
 });
 
 test('an audible firing burst waits for the warning while other modes are unaffected', () => {
@@ -160,4 +160,41 @@ test('an audible firing burst waits for the warning while other modes are unaffe
   context.live = false;
   context.MATCH.time = 3;
   assert.equal(context.efcBarkFireReady(warden), true);
+});
+
+test('two hostiles can open fire after contact without waiting for chatter cooldowns', () => {
+  const { context, warden, scavenger, bark, events } = fixture();
+  assert.ok(bark(warden, 'spot'));
+  assert.ok(bark(scavenger, 'move_up'));
+
+  context.MATCH.time = 0.4;
+  for (const speaker of [warden, scavenger]) assert.equal(context.efcBarkFireReady(speaker), false);
+  assert.deepEqual(events.filter(([, e]) => e.kind === 'suppress').map(([, e]) => e.id), [1, 2]);
+  context.MATCH.time = 0.99;
+  for (const speaker of [warden, scavenger]) assert.equal(context.efcBarkFireReady(speaker), false);
+  context.MATCH.time = 1;
+  for (const speaker of [warden, scavenger]) assert.equal(context.efcBarkFireReady(speaker), true);
+  context.MATCH.time = 1.2;
+  for (const speaker of [warden, scavenger]) assert.equal(context.efcBarkFireReady(speaker), true);
+  assert.equal(events.filter(([, e]) => e.kind === 'suppress').length, 2);
+  context.MATCH.time = 2.6;
+  for (const speaker of [warden, scavenger]) assert.equal(context.efcBarkFireReady(speaker), false);
+  assert.equal(events.filter(([, e]) => e.kind === 'suppress').length, 4);
+  context.MATCH.time = 3.21;
+  for (const speaker of [warden, scavenger]) assert.equal(context.efcBarkFireReady(speaker), true);
+});
+
+test('combat reloads warn promptly during firing and another bot’s reload', () => {
+  const { context, warden, scavenger, bark, events } = fixture();
+  const reloaded = [];
+  assert.ok(bark(warden, 'suppress'));
+  context.efcBarkAction(scavenger, 'reload', () => reloaded.push(2));
+  context.efcBarkAction(warden, 'reload', () => reloaded.push(1));
+  assert.deepEqual(events.filter(([, e]) => e.kind === 'reload').map(([, e]) => e.id), [2, 1]);
+  context.MATCH.time = 0.59;
+  context.efcBarkActionTick();
+  assert.deepEqual(reloaded, []);
+  context.MATCH.time = 0.6;
+  context.efcBarkActionTick();
+  assert.deepEqual(reloaded, [2, 1]);
 });

@@ -24,6 +24,8 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-28 Codex Sol: Fixed a beta regression where bark cooldowns blocked Warden firing and reloads. Two Wardens fired after their own lead times even during shared cooldowns.
+
 - 2026-11-28 Codex Sol: Integrated directional prone, side and supine landings. Ground and air tests covered all headings, two in-flight view changes, impact, side settle and return to standing. The final C19 audio suite passed 111 checks.
 
 - 2026-11-28 Codex Sol: Integrated the C18-1 phase model and C18-2 ground dives. All eight directions, three slide/dive settings, wall clearance and cooldown passed.

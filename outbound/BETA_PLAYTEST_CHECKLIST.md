@@ -15,6 +15,11 @@
 - [ ] Reload a rifle, pistol, bolt-action sniper and pump shotgun. Listen for removal and seating, slide release, separate bolt opening and closing, and shell and pump cues.
 - [ ] In the workbench, rotate a weapon and fit or remove an attachment. Check that the sounds match the action. Zoom should stay quiet.
 
+## Warden combat
+
+- [ ] Give two Wardens a clear shot after they spot you. Both should fire soon after their warning, with brief gaps between bursts.
+- [ ] Break line of sight and reappear. Check that a Warden can resume firing and reload an empty weapon during a firefight.
+
 ## Partisan first-person view
 
 - [ ] Compare a Partisan AK with the Riposte AK, the M16 with the M4, and the G3 or SPEAR with the SCAR-H. Check that the hip hold has a similar angle and leaves the centre of the screen clear.

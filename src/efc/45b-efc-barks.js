@@ -43,7 +43,7 @@ function efcBark(bot, kind, data = {}) {
   const now = MATCH.time;
   const last = efcBarkSpeakers.get(bot);
   const lastKind = efcBarkKinds.get(kind) ?? -Infinity;
-  if (rule.priority < EFC_BARK_WARNING_PRIORITY &&
+  if (!data.actionWarning && rule.priority < EFC_BARK_WARNING_PRIORITY &&
       (now - lastKind < rule.cooldown ||
        (last && now - last.at < EFC_BARK_BOT_COOLDOWN && rule.priority <= last.priority))) return null;
 
@@ -66,7 +66,7 @@ function efcBarkAction(bot, kind, action, valid = () => true, slot = kind) {
   if (actions?.has(slot)) return false;
   if (!efcBarkEligible(bot) || !efcBarkAudible(bot, EFC_BARKS[kind].range)) return action();
   if (!actions) efcBarkActions.set(bot, actions = new Map());
-  const bark = efcBark(bot, kind);
+  const bark = efcBark(bot, kind, { actionWarning: kind === 'reload' });
   actions.set(slot, { kind, action, valid, life: bot.spawnAt, at: bark ? bark.at + EFC_BARKS[kind].lead : null });
   return false;
 }
@@ -101,7 +101,9 @@ function efcBarkFireReady(bot) {
     if (now < burst.ready) return false;
     if (now - burst.lastShot <= 1.25) { burst.lastShot = now; return true; }
   }
-  const bark = efcBark(bot, kind);
+  // A firefight can involve several speakers. Keep the warning lead for each
+  // new burst without making one hostile wait for another's cooldown.
+  const bark = efcBark(bot, kind, { actionWarning: true });
   if (!bark) return false;
   const ready = bark.at + EFC_BARKS[kind].lead;
   efcBarkBursts.set(bot, { life: bot.spawnAt, ready, lastShot: ready });

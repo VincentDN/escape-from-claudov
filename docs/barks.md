@@ -94,3 +94,5 @@ Low and measured, with a clear first word.
 | `man_down` | Teammate down | `bark_x_man_down_1` mavren tho | `bark_x_man_down_2` mavrek vek | `bark_x_man_down_3` mavren vek | `bark_x_man_down_4` mavrek tho |
 | `search` | Searching the area | `bark_x_search_1` shavor tho | `bark_x_search_2` shavri vek | `bark_x_search_3` shavor vek | `bark_x_search_4` shavri tho |
 | `all_clear` | Area clear | `bark_x_all_clear_1` loren tho | `bark_x_all_clear_2` lorek vek | `bark_x_all_clear_3` loren vek | `bark_x_all_clear_4` lorek tho |
+
+During combat, firing and reload warnings use their full lead even while ordinary chatter is on cooldown. Each hostile announces its own burst. Sustained fire shares the same warning.

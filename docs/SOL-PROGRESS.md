@@ -5,10 +5,10 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C13-3 complete on `codex/c13-2-weapon-foley`. All 304 distinct MP3s are edited, levelled and credited, from 285 ElevenLabs renders and 19 legacy source cuts.
-- **Next step:** Verify the complete runtime mapping and `#sounds` coverage, then check the download budget and finish the exact Partisan workbench Foley import.
+- **Card:** C13-4 complete on `codex/c13-2-weapon-foley`. All 304 clips load and all 76 banks play from `#sounds`. Available gameplay cues use the new banks.
+- **Next step:** Finish the exact Partisan workbench Foley import, then checkpoint the final coverage, timing and download-size results.
 - **How to verify:** Use `node tools/dev/efc/test-sounds.mjs` for the reload choreography and `#sounds` for the old/new audition. The shot list has 76 action/family pairs and four slots per pair. For first-person legs, use `node tools/dev/efc/test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** Build, declarations, raid smoke and the 304-take media audit passed. Decoded RMS is −19.01 to −16.52 dBFS around a −17.23 dBFS median, and the highest peak is −0.44 dBFS. Workbench rotation and attachment playback passed. The C17-2 browser checks passed. Standing boots are below frame at −60°.
+- **Checks so far:** Build, declarations, raid smoke, 99 sound checks, magazine check and weapon mods passed. Full `#sounds` coverage, reload timing, fallback and credits passed. The C17-2 browser checks passed. Standing boots are below frame at −60°.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
 - **Watch out for:** The current chat can download from `elevenlabsusercontent.com`. The current first-person legs are on beta for staging. C17-2 remains open and C17-3 waits on its visual acceptance.
 

@@ -64,6 +64,18 @@ try {
     await page.mouse.wheel(0, 90);
     assert.deepEqual(await page.evaluate(() => { restoreBenchTurnSounds(); return benchTurnSounds; }), ['hf_handle', 'hf_handle', 'hf_hit', 'hf_handle']);
     console.log('Workbench grip, drag rotation, settle and keyboard Foley passed; zoom remained silent');
+    await page.waitForFunction(() => sfxHas('wf_rifle_mount') && sfxHas('wf_rifle_unmount'));
+    const cue = (kind) => page.evaluate(() => {
+      EFC_SND.invLast = -1; EFC_SND.last = {}; EFC_SND.log = [];
+    }).then(() => bench.locator('[data-part-slot=optic]').selectOption(kind === 'mount' ? 'part_red' : ''))
+      .then(() => page.evaluate(() => {
+        const ids = EFC_SND.log.map(({ id }) => id);
+        EFC_SND.log = null;
+        return ids;
+      }));
+    assert.deepEqual(await cue('unmount'), ['wf_rifle_unmount']);
+    assert.deepEqual(await cue('mount'), ['wf_rifle_mount']);
+    console.log('Workbench attachment fitting and removal use rifle Foley');
     if (process.env.EFC_BENCH_SHOT) await page.screenshot({ path: process.env.EFC_BENCH_SHOT, timeout: 120000 });
   }
   await bench.locator('.efc-bench-save').click();

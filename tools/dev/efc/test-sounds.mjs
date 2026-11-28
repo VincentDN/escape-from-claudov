@@ -4,10 +4,15 @@
 // node tools/dev/efc/test-sounds.mjs   (needs a build: python3 build.py)
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { openGame, startSolo, simRun, REPO, launchEfcBrowser } from './harness.mjs';
 let fails = 0, passes = 0;
 const ok = (c, msg) => { if (c) passes++; else { fails++; console.error('FAIL ' + msg); } };
 const launch = () => launchEfcBrowser(['--autoplay-policy=no-user-gesture-required']);
+const familyCodes = { R: 'rifle', S: 'smg', P: 'pistol', N: 'sniper', T: 'shotgun' };
+const shotList = fs.readFileSync(path.join(REPO, 'docs/weapon-foley-shot-list.md'), 'utf8');
+const expectedFoley = [...shotList.matchAll(/^\| `(\w+)` \| ([RSPNT ]+) \| \d+ \|/gm)]
+  .flatMap(([, cue, families]) => families.split(' ').map((family) => `wf_${familyCodes[family]}_${cue}`)).sort();
 
 /* In the page: start audio, load the game packs, wait until each is ready or failed */
 const bootAudio = () => (async () => {
@@ -30,6 +35,7 @@ const bootAudio = () => (async () => {
   const R = await page.evaluate(() => {
     const out = { missing: [], clip: [], levels: {}, events: 0 };
     out.banks = [];
+    out.recorded = Object.fromEntries([...(SFX.of.get('weapon_foley') || [])].map((id) => [id, SFX.bank.get(id).length]));
     const need = (ev, ids) => { out.events++; out.banks.push(...ids); if (!ids.some((id) => sfxHas(id))) out.missing.push(ev + ' -> ' + ids.join('|')); };
     // handling events (every EFC_HANDLING key is an event of the audit)
     for (const k of Object.keys(EFC_HANDLING)) need('handling ' + k, [EFC_HANDLING[k][0][0]]);
@@ -67,6 +73,8 @@ const bootAudio = () => (async () => {
   });
   ok(!R.missing.length, 'events without a loaded sample: ' + R.missing.join(', '));
   ok(!R.clip.length, 'clipping samples: ' + R.clip.join(', '));
+  ok(expectedFoley.length === 76 && Object.keys(R.recorded).sort().join() === expectedFoley.join() &&
+     Object.values(R.recorded).every((count) => count === 4), 'every shot-list bank loads four takes');
   for (const [p, L] of Object.entries(R.levels)) {
     ok(L.n > 0 && !L.out.length, `${p}: levels more than ${L.tolerance} dB from the median ${L.median} dB: ${L.out.join(', ')}`);
     console.log(`${p}: ${L.n} samples, active RMS median ${L.median} dBFS, spread ${L.spread} dB, highest peak ${L.maxPeak} dBFS`);
@@ -78,6 +86,7 @@ const bootAudio = () => (async () => {
   await simRun(page, 1, 'PL.ent.health = 100;');
   const holster = await page.evaluate(() => {
     const player = PL.ent, arms = player.arms;
+    const fam = VM.curDef?.fam || 'rifle';
     EFC_SND.log = [];
     const target = arms.slots.findIndex((_, i) => i !== arms.cur);
     const started = ctlSwitch(player, target);
@@ -86,9 +95,9 @@ const bootAudio = () => (async () => {
     const takes = EFC_SND.log.filter((event) => event.kind === 'stow').map((event) => event.id);
     EFC_SND.log = null;
     arms.switching = 0;
-    return { mode: MATCH.mode, started, repeated, takes };
+    return { mode: MATCH.mode, started, repeated, takes, fam };
   });
-  ok(holster.mode === 'raid' && holster.started && !holster.repeated && holster.takes.join() === 'hf_handle,hf_hit',
+  ok(holster.mode === 'raid' && holster.started && !holster.repeated && holster.takes.join() === `wf_${holster.fam}_stow`,
     'Raid switch plays the holster once ' + JSON.stringify(holster));
   const T = await page.evaluate(() => {
     const rec = [], orig = efcHandlingPlay;
@@ -109,8 +118,9 @@ const bootAudio = () => (async () => {
       // decisive transient of click, clunk and hit takes: first sample at half the take's peak, in seconds after the take's start
       const attack = (e) => { const d = e.b.getChannelData(0), sr = e.b.sampleRate, i0 = Math.floor(e.o * sr), n = Math.min(d.length - i0, Math.ceil(e.d * sr));
         let m = 0; for (let i = 0; i < n; i++) m = Math.max(m, Math.abs(d[i0 + i])); for (let i = 0; i < n; i++) if (Math.abs(d[i0 + i]) >= m * 0.5) return i / sr; return 0; };
-      const firstPk = EFC_SND.log.filter((l) => /^hf_(click|clunk|hit)$/.test(l.id)).map((l) => +(attack(l.e) / l.rate).toFixed(4));
-      res.push({ wk, name, empty, want, got, played: rec.every((r) => r.played), late, firstPk, layers: EFC_SND.log.length });
+      const firstPk = EFC_SND.log.filter((l) => /^hf_(click|clunk|hit)$|^wf_/.test(l.id)).map((l) => +(attack(l.e) / l.rate).toFixed(4));
+      const banks = EFC_SND.log.map((l) => l.id);
+      res.push({ wk, name, empty, want, got, played: rec.every((r) => r.played), late, firstPk, banks });
     };
     const F = { rifle: 'm4', smg: 'mp5', pistol: 'm9', sniper: 'l96' };
     for (const [fam, wk] of Object.entries(F)) {
@@ -118,7 +128,9 @@ const bootAudio = () => (async () => {
       run(wk, 'reload', false, R0.norm); run(wk, 'reload', true, R0.empty);
     }
     run('l96', 'bolt', false, RELOAD.boltAction);
+    run('m82', 'reload', true, RELOAD.rifle.empty);
     run('m1014', 'shellStart', true, RELOAD.shotgun.shellStart); run('m1014', 'shell', true, RELOAD.shotgun.shell); run('m1014', 'shellEnd', true, RELOAD.shotgun.shellEnd);
+    run('rem870', 'shellEnd', true, RELOAD.shotgun.shellEnd);
     efcHandlingPlay = orig; EFC_SND.log = null;
     return res;
   });
@@ -129,8 +141,13 @@ const bootAudio = () => (async () => {
     ok(r.played, `${tag}: an event fell back to the engine`);
     ok(r.late.every((d) => d !== null && d >= 0 && d < STEP), `${tag}: sound vs choreography time (s) ${r.late.join(', ')}`);
     ok(r.firstPk.every((p) => p <= 0.015), `${tag}: decisive transient later than 15 ms into the take: ${r.firstPk.join(', ')}`);
-    console.log(`${tag}: ${r.got.join(' > ')} at +${Math.max(0, ...r.late.filter((x) => x !== null)).toFixed(3)} s at most, ${r.layers} layers`);
+    console.log(`${tag}: ${r.got.join(' > ')} at +${Math.max(0, ...r.late.filter((x) => x !== null)).toFixed(3)} s at most, ${r.banks.length} layers`);
   }
+  const binding = (wk, name) => T.find((t) => t.wk === wk && t.name === name && (name !== 'reload' || t.empty))?.banks || [];
+  ok(binding('m9', 'reload').includes('wf_pistol_slide_release'), 'pistol empty reload plays slide release');
+  ok(binding('l96', 'bolt').join() === 'wf_sniper_bolt_back,wf_sniper_bolt_forward', 'bolt opening and closing use separate banks');
+  ok(binding('m82', 'reload').includes('wf_sniper_charge'), 'semiautomatic sniper uses charging bank');
+  ok(binding('m1014', 'shellEnd').includes('wf_shotgun_charge') && binding('rem870', 'shellEnd').includes('wf_shotgun_pump'), 'semiautomatic tube shotgun and pump use separate banks');
 
   const magazine = await page.evaluate(() => {
     const playReload = (wk) => {
@@ -212,16 +229,16 @@ const bootAudio = () => (async () => {
     const played = []; const orig = sfxPlay; sfxPlay = (id, ...a) => { played.push(id); return orig(id, ...a); };
     const btns = () => Array.from(document.querySelectorAll('#efcAud button[data-a]'));
     let n = 0;
-    for (const w of ['m4', 'mp5', 'm9', 'l96', 'm1014']) {
+    for (const [w] of EFC_AUD.weapons) {
       document.querySelector(`#efcAud button[data-w="${w}"]`).click();
       for (const b of btns()) { b.click(); n++; }
     }
     sfxPlay = orig; EFC_SND.log = null; document.getElementById('efcAud').remove();
     return { n, played: played.length, kinds: new Set(played).size, pt: played.filter((i) => /^(hf_|pt_|g_pt_|f_casing)/.test(i)).length,
-      pilot: played.filter((i) => i.startsWith('wf_')) };
+      recorded: [...new Set(played.filter((i) => i.startsWith('wf_')))].sort() };
   });
   ok(A.n > 100 && A.played > A.n && A.pt > 0, 'audition page buttons ' + JSON.stringify(A));
-  ok(A.pilot.join() === ['rifle', 'smg', 'pistol', 'sniper'].flatMap((fam) => [...ids(fam), ...ids(fam), ...ids(fam)]).join(), 'audition plays all magazine banks alone and within both reloads');
+  ok(A.recorded.join() === expectedFoley.join(), 'audition reaches every recorded bank');
   console.log(`audition page: ${A.n} buttons pressed, ${A.played} samples played from ${A.kinds} banks`);
   ok(!errors.length, 'page errors: ' + errors.slice(0, 5).join('\n'));
   await browser.close();
@@ -257,6 +274,18 @@ const bootAudio = () => (async () => {
 
 // ---------- 5. download size ----------
 const sfxDir = path.join(REPO, 'dist/sfx');
+const weaponFoley = fs.readdirSync(sfxDir).find((name) => /^weapon_foley\./.test(name));
+const weaponBytes = weaponFoley ? fs.statSync(path.join(sfxDir, weaponFoley)).size : 0;
+const foleyDir = path.join(REPO, 'assets/sfx/weapon_foley');
+const takeFiles = fs.readdirSync(foleyDir).filter((name) => name.endsWith('.mp3')).sort();
+const expectedTakes = expectedFoley.flatMap((bank) => ['01', '02', '03', '04'].map((take) => `${bank}_${take}.mp3`)).sort();
+const takeHashes = new Set(takeFiles.map((name) => createHash('sha256').update(fs.readFileSync(path.join(foleyDir, name))).digest('hex')));
+const ledger = JSON.parse(fs.readFileSync(path.join(REPO, 'assets/sfx/credits.json'), 'utf8'));
+const credits = ledger.sons.filter((entry) => entry.pack === 'weapon_foley');
+ok(takeFiles.join() === expectedTakes.join() && takeHashes.size === 304, '304 distinct shot-list assets');
+ok(credits.map((entry) => entry.id + '.mp3').sort().join() === expectedTakes.join() && credits.every((entry) => ledger.sources[entry.source]), 'every take has provenance');
+ok(weaponBytes > 0 && weaponBytes < 2 * 1024 * 1024, 'weapon Foley download budget ' + weaponBytes);
+console.log(`weapon Foley download: ${weaponBytes} bytes, 2 MiB budget`);
 const added = fs.readdirSync(sfxDir).filter((f) => /^(handling|ballistics|weapon_foley)\./.test(f)).reduce((s, f) => s + fs.statSync(path.join(sfxDir, f)).size, 0);
 ok(added > 0 && added < 3 * 1024 * 1024, 'added download ' + added);
 console.log(`added download: ${(added / 1024).toFixed(0)} KB (handling, ballistics and weapon Foley)`);

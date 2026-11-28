@@ -3,18 +3,30 @@
    family, through the game's own loader and mix. Inactive unless the address ends in #sounds. */
 const EFC_AUD = {
   weapons: [['m4', 'Rifle (M4)'], ['ak47', 'Rifle (AK-47)'], ['mp5', 'SMG (MP5)'], ['m9', 'Pistol (M9)'], ['deagle', 'Pistol (Desert Eagle)'],
-    ['l96', 'Sniper (L96, bolt)'], ['m82', 'Sniper (Barrett)'], ['m1014', 'Shotgun (M1014)']],
+    ['l96', 'Sniper (L96, bolt)'], ['m82', 'Sniper (Barrett)'], ['m1014', 'Shotgun (M1014)'], ['rem870', 'Shotgun (Remington 870, pump)']],
   // [label, engine sfxMech kind, EFC_HANDLING key or a function of the family]
   handling: [['Magazine out', 'magout', 'magout'], ['Magazine in', 'magin', 'magin'], ['Magazine slap', 'slap', 'slap'],
     ['Charging handle / slide release / bolt forward', 'charge', (f) => (f === 'pistol' ? 'charge_pistol' : f === 'sniper' ? 'charge_sniper' : 'charge')],
     ['Bolt back', 'bolt', 'bolt'], ['Pump', 'pump', 'pump'], ['Shell insert', 'shell', 'shell'], ['Draw', 'draw', 'draw'],
     ['Holster (old: weapon switch had none; killstreak stow shown)', 'stow', 'stow'], ['Aim in', 'ads', 'ads_in'], ['Aim out', 'ads', 'ads_out'],
-    ['Inspect (old: the draw sound)', 'draw', 'inspect'], ['Dry fire', 'empty', 'empty'], ['Weapon pickup', 'pickup', 'pickup']],
+    ['Inspect (old: the draw sound)', 'draw', 'inspect'], ['Dry fire', 'empty', 'empty'], ['Weapon pickup', 'pickup', 'pickup'],
+    ['Safety', null, 'safety'], ['Fire selector', null, 'selector'], ['Bipod deploy', null, 'bipod_deploy']],
+  workbench: [['Mount attachment', null, 'inv_mount'], ['Unmount attachment', null, 'inv_unmount']],
   inv: [['Open a container', 'inv_open'], ['Close it', 'inv_close'], ['Take an item', 'inv_take'], ['Equip', 'inv_equip'], ['Unequip', 'inv_unequip'],
     ['Drop', 'inv_drop'], ['Use a med item', 'inv_med']],
   wk: 'm4',
 };
+const EFC_AUD_RECORDED = {
+  magout: 'rifle smg pistol sniper', magin: 'rifle smg pistol sniper', slap: 'rifle smg pistol sniper',
+  charge: 'rifle smg sniper shotgun', slide_release: 'pistol', bolt_back: 'sniper', bolt_forward: 'sniper', pump: 'shotgun', shell: 'shotgun',
+  selector: 'rifle smg pistol', bipod_deploy: 'rifle sniper',
+};
 function efcAudFam(wk) { const W = typeof WEAPONS !== 'undefined' && WEAPONS[wk]; return W ? W.fam : 'rifle'; }
+function efcAudRecorded(key, wk) {
+  const def = WEAPONS[wk], fam = efcAudFam(wk);
+  const cue = efcWeaponFoleyCue(typeof key === 'function' ? key(fam) : key, def);
+  return SFX_PACKS.weapon_foley && (!EFC_AUD_RECORDED[cue] || EFC_AUD_RECORDED[cue].split(' ').includes(fam));
+}
 /* Runs fn with the P2 sounds off (old) or on (new) */
 function efcAudWith(neu, fn) { const was = EFC_SND.on; EFC_SND.on = neu; try { fn(); } finally { EFC_SND.on = was; } }
 function efcAudStart() {
@@ -25,7 +37,9 @@ function efcAudHandling(neu, kind, key, wk, delay) {
   const fam = efcAudFam(wk), k = typeof key === 'function' ? key(fam) : key;
   if (!AU.ready) return;
   if (neu) {
-    const bank = neu === 'recorded' && efcWeaponFoleyBank(k, fam, true);
+    const cue = efcWeaponFoleyCue(k, WEAPONS[wk]);
+    const bank = neu === 'recorded' && efcWeaponFoleyBank(cue, fam);
+    if (neu === 'recorded' && !bank && efcAudRecorded(key, wk)) return efcAudStatus('recorded Foley not loaded yet');
     if (!bank && !efcHandlingReady(k)) return efcAudStatus('pack handling not loaded yet');
     efcHandlingLayers(k, auOut(null, 0.05, 1), AU.ctx.currentTime + (delay || 0), { rate: efcSndWeightRate(EFC_SND_KG[wk] || EFC_SND_FAM_KG[fam]), bank });
   } else efcAudWith(false, () => sfxMech(kind, delay || 0, null, fam));
@@ -71,15 +85,18 @@ function efcAudBtns(oldAct, newAct, recordedAct) {
   return `<td>${b('old', oldAct)}</td><td>${b('new', newAct)}</td>` + (recordedAct ? `<td>${b('Recorded Foley', recordedAct)}</td>` : '');
 }
 function efcAudHtml() {
-  const fam = efcAudFam(EFC_AUD.wk), magazineFoley = ['rifle', 'smg', 'pistol', 'sniper'].includes(fam) && SFX_PACKS.weapon_foley;
+  const wk = EFC_AUD.wk, fam = efcAudFam(wk);
   const row = (label, o, n, p) => `<tr><th>${label}</th>${efcAudBtns(o, n, p)}</tr>`;
   let h = '<h1>Escape From Claudov: sound audition</h1><p>Old: the sound before the polish pass. New: the Partisan takes. Press Start audio first; '
     + 'repeat a button to hear the other takes (random take, pitch and level, as in the game).</p>'
     + '<p><button data-a="start">Start audio</button> <span id="efcAudSt"></span></p><p>Weapon: '
     + EFC_AUD.weapons.map(([k, n]) => `<button data-w="${k}"${k === EFC_AUD.wk ? ' aria-pressed="true"' : ''}>${n}</button>`).join(' ') + '</p>';
   h += `<h2>Handling: ${EFC_AUD.weapons.find((w) => w[0] === EFC_AUD.wk)[1]} (family ${fam})</h2><table>`;
-  EFC_AUD.handling.forEach(([label, , key], i) => { h += row(label, 'h0:' + i, 'h1:' + i, magazineFoley && ['magout', 'magin', 'slap'].includes(key) && 'h2:' + i); });
-  h += row('Full reload', 'r0:0', 'r1:0', magazineFoley && 'r2:0') + row('Full reload from empty', 'r0:1', 'r1:1', magazineFoley && 'r2:1') + '</table>';
+  EFC_AUD.handling.forEach(([label, kind, key], i) => {
+    const recorded = efcAudRecorded(key, wk);
+    if (kind || recorded) h += row(label, kind && 'h0:' + i, kind && 'h1:' + i, recorded && 'h2:' + i);
+  });
+  h += row('Full reload', 'r0:0', 'r1:0', SFX_PACKS.weapon_foley && 'r2:0') + row('Full reload from empty', 'r0:1', 'r1:1', SFX_PACKS.weapon_foley && 'r2:1') + '</table>';
   h += '<h2>Firing: selected weapon</h2><table>' + row('First person' + (WEAPONS[EFC_AUD.wk] && WEAPONS[EFC_AUD.wk].sound === 'sniper' ? ' (replaced for the L96)' : ' (unchanged)'), 'f0:pov', 'f1:pov')
     + row('Near, 12 m (unchanged)', 'f0:near', 'f1:near') + row('Far, 70 m (unchanged)', 'f0:far', 'f1:far') + '</table>';
   h += '<h2>Casings landing (player)</h2><table>';
@@ -87,7 +104,9 @@ function efcAudHtml() {
   h += '</table><h2>Bullets</h2><table>' + row('Ricochet', 'b:i_ric', 'b:pt_ric') + row('Fly-by', 'b:i_whiz', 'b:pt_flyby') + '</table>';
   h += '<h2>Inventory and looting (old: no sound)</h2><table>';
   for (const [label, k] of EFC_AUD.inv) h += row(label, null, 'i:' + k);
-  return h + '</table><h2>Workbench rotation</h2><p><button data-a="w:grip">Grip</button> '
+  h += '</table><h2>Workbench</h2><table>';
+  EFC_AUD.workbench.forEach(([label, , key], i) => { h += row(label, null, 'i:' + key, efcAudRecorded(key, wk) && 'b2:' + i); });
+  return h + '</table><p><button data-a="w:grip">Grip</button> '
     + '<button data-a="w:turn">Turn</button> <button data-a="w:settle">Settle</button></p>';
 }
 function efcAudClick(e) {
@@ -103,6 +122,7 @@ function efcAudClick(e) {
   else if (k === 'c0' || k === 'c1') efcAudCasing(k === 'c1', v);
   else if (k === 'b') efcAudBank(v);
   else if (k === 'i') efcAudInv(v);
+  else if (k === 'b2') efcAudHandling('recorded', null, EFC_AUD.workbench[+v][2], EFC_AUD.wk, 0);
   else if (k === 'w') efcWorkbenchTurnSound(v === 'settle' ? 'hit' : 'handle', v === 'grip' ? 0.6 : 0.5);
   efcAudStatus();
 }

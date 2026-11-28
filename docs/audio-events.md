@@ -1,23 +1,23 @@
 # Audio events: weapon handling, firing and inventory (polish pass, P2)
 
-Audit of every handling and firing sound the engine plays, what played before P2 and what plays now. "Engine foley" is the
-recorded pack `foley` (`assets/sfx/foley`, CC0 sources listed in `assets/sfx/credits.json`); "synthesis" is the fallback in
-`src/05-audio.js` that plays while a pack is loading or when it is missing. New sounds come from Partisan Project:
+Audit of handling and firing sounds. The P2 tables below document the shared recordings and engine fallback. C13 adds four
+action-specific takes per applicable family in `assets/sfx/weapon_foley`. The [C13 shot list](weapon-foley-shot-list.md) records
+the coverage and provenance. "Engine foley" is the recorded pack `foley`. The last fallback is synthesis in `src/05-audio.js`.
 
-- pack `handling` (`assets/sfx/handling`, 44 takes, 168 KB): the 42 owner-cleared handling takes, six per category, banks
-  `hf_click`, `hf_clunk`, `hf_ratchet`, `hf_slide`, `hf_hit`, `hf_handle`, `hf_long`, plus `f_casing_wood` (two Freesound CC0 takes);
+- pack `handling` (`assets/sfx/handling`, 50 takes): seven shared handling banks, `f_casing_wood` and six later CC0 additions.
+  [Handling Foley provenance](handling-foley.md)
 - pack `ballistics` (`assets/sfx/ballistics`, 9 takes, 73 KB): Freesound CC0 ricochets `pt_ric`, fly-bys `pt_flyby` and rifle
   shots `g_pt_sniper_pov`.
 
-Both are built by `python3 tools/build_sfx.py --build --famille partisan` then `python3 tools/build_sfx.py --paquet handling,ballistics`
-(family `tools/sfx/partisan.py`). The game loads them after the other game packs (`SFX_GAME`, `src/05a-sfx.js`). While they load,
-or if they are missing, every event below plays exactly what it played before (engine foley, else synthesis).
+The committed `handling` and `weapon_foley` packs have independent source workflows. `tools/sfx/partisan.py` handles the P2
+ballistics masters, and `tools/sfx/weapon_foley.py` prepares C13 masters for the same encoder in `tools/build_sfx.py`.
 
-How a handling event plays now (`src/efc/45-efc-sounds.js`): the engine's `sfxMech(kind)` asks `efcHandlingPlay` first. Each event
-is one to two layers of the bank, a random take per layer (never the same take twice in a row), random pitch +-4 % and gain +-1.5 dB,
-and a playback rate from the weapon's mass (`1.08 * kg^-0.09`: Glock 1.12, M4 0.98, L96 0.91, Barrett 0.86; bots use their family's
-mass). The decisive click of click, clunk and hit takes sits 6 ms into the take, so it lands on the event time of the reload
-choreography (`src/06d-reload.js`).
+The game first looks for the event's recorded C13 bank, then the shared P2 layers, then the engine fallback. A bank selects a
+different take on successive calls. Pitch varies by ±4% and playback rate falls with weapon mass. Gain varies by ±1.5 dB. C13
+reload attacks are checked against the existing choreography. The pistol slide release, bolt opening and closure, and tube
+shotgun charging and pumping use different banks. The Hideout workbench plays family-specific mount and unmount cues and uses
+the shared handling/hit banks for turning the preview. `#sounds` exposes the safety, selector and bipod packs for listening while
+those actions lack explicit gameplay events.
 
 ## Handling, per weapon family
 

@@ -72,17 +72,29 @@ function efcHandlingKey(kind, fam, pos) {
 }
 /* The weapon whose foley plays: { fam, kg } */
 function efcSndWeapon(pos, fam) {
-  if (!pos && !fam && typeof VM !== 'undefined' && VM.curDef) return { fam: VM.curDef.fam, kg: EFC_SND_KG[VM.curDef.id] || EFC_SND_FAM_KG[VM.curDef.fam] };
+  if (!pos && !fam && typeof VM !== 'undefined' && VM.curDef) {
+    const def = VM.curDef;
+    return { def, fam: def.fam, kg: EFC_SND_KG[def.id] || EFC_SND_FAM_KG[def.fam] };
+  }
   const f = fam || 'rifle';
   return { fam: f, kg: EFC_SND_FAM_KG[f] || 3.4 };
 }
 /* True when every bank of the layers is loaded */
 function efcHandlingReady(key) { const L = EFC_HANDLING[key]; return !!L && L.every((l) => sfxHas(l[0])); }
 
-function efcWeaponFoleyBank(key, fam, preview = false) {
+function efcWeaponFoleyBank(key, fam) {
   const id = 'wf_' + fam + '_' + key;
   const takeCount = SFX.bank.get(id)?.length || 0;
-  return takeCount >= (preview ? 1 : COARSE ? 2 : 4) ? id : null;
+  return takeCount >= (COARSE ? 2 : 4) ? id : null;
+}
+
+function efcWeaponFoleyCue(key, def) {
+  if (key === 'charge_pistol') return 'slide_release';
+  if (key === 'charge_sniper') return def?.bolt ? 'bolt_forward' : 'charge';
+  if (key === 'bolt') return 'bolt_back';
+  if (key === 'pump' && def?.fam === 'shotgun' && !def.pump) return 'charge';
+  if (key === 'inv_mount' || key === 'inv_unmount') return key.slice(4);
+  return key;
 }
 
 /* Plays the recorded cue or its shared layers at time t (AudioContext seconds) into out. */
@@ -103,28 +115,34 @@ function efcHandlingLayers(key, out, t, o) {
 function efcHandlingPlay(kind, delay, pos, fam) {
   if (!EFC_SND.on || typeof AU === 'undefined' || !AU.ready) return false;
   const W = efcSndWeapon(pos, fam), key = efcHandlingKey(kind, W.fam, pos);
-  const bank = key && efcWeaponFoleyBank(key, W.fam);
+  const bank = key && (key !== 'pickup' || fam) && efcWeaponFoleyBank(efcWeaponFoleyCue(key, W.def), W.fam);
   if (!key || (!bank && !efcHandlingReady(key))) return false;
   const out = pos ? auOut(pos, 0.1, 1, 1.1, 3) : auOut(null, 0.05, 1);
   efcHandlingLayers(key, out, AU.ctx.currentTime + (delay || 0), { rate: efcSndWeightRate(W.kg), bank });
   return true;
 }
 /* Inventory and looting sound (respects the effects volume and mute: it goes through the game's mix like every effect) */
-function efcInvSound(key, rate = 1) {
-  if (!EFC_SND.on || typeof AU === 'undefined' || !AU.ready || !efcHandlingReady(key)) return false;
+function efcInvSound(key, rate = 1, fam = null) {
+  if (!EFC_SND.on || typeof AU === 'undefined' || !AU.ready) return false;
+  const bank = fam && efcWeaponFoleyBank(efcWeaponFoleyCue(key), fam);
+  if (!bank && !efcHandlingReady(key)) return false;
   const t = AU.ctx.currentTime;
   if (t - (EFC_SND.last[key] || -1) < 0.05) return false; // 'take all' and quick clicks
   // one gap shared by every inventory cue, so a fast drag never stacks pick, rotate and place; a refusal is always heard
   if (key !== 'inv_refuse' && t - EFC_SND.invLast < 0.07) return false;
   EFC_SND.last[key] = t; EFC_SND.invLast = t;
-  efcHandlingLayers(key, auOut(null, 0.02, 1), t, { rate });
+  const out = MATCH.state === 'menu' ? uiOut() : auOut(null, 0.02, 1);
+  efcHandlingLayers(key, out, t, { rate, bank });
   return true;
 }
 efcOn('ui:inventory-gesture', (kind, item) => {
   const def = item && efcCall('item:def', item.id);
   const key = { pick: def?.kind === 'weapon' ? 'pickup' : 'inv_take', place: 'inv_drop', rotate: 'inv_rotate',
     refuse: 'inv_refuse', split: 'inv_split', equip: 'inv_equip', mount: 'inv_mount', unmount: 'inv_unmount' }[kind];
-  if (key) efcInvSound(key, efcSndWeightRate(def ? def.w * (item.n || 1) : 1));
+  if (key) {
+    const weapon = def?.weapon && WEAPONS[def.weapon.wkey];
+    efcInvSound(key, efcSndWeightRate(def ? def.w * (item.n || 1) : 1), weapon?.fam);
+  }
 });
 
 /* The workbench shares the Partisan preview's handling and hit banks, through the menu mix. */
@@ -133,7 +151,12 @@ function efcWorkbenchTurnSound(cue, intensity) {
   const id = 'hf_' + cue, gain = cue === 'hit' ? 0.22 : 0.44 * (0.5 + 0.5 * intensity);
   return !!sfxPlay(id, uiOut(gain), AU.ctx.currentTime + 0.01, { rate: rand(0.97, 1.03) });
 }
-efcOn('workbench:preview-open', () => { initAudio(); sfxLoad('handling'); });
+efcOn('workbench:open', () => {
+  initAudio();
+  if (!AU.ready) return;
+  sfxLoad('handling');
+  if (SFX_PACKS.weapon_foley) sfxLoad('weapon_foley');
+});
 efcOn('workbench:turn-foley', efcWorkbenchTurnSound);
 
 /* ---------- Inventory diff: what the last inv:changed did ---------- */

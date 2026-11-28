@@ -57,6 +57,7 @@ function efcBenchOptions() {
         return;
       }
       session.parts = draft;
+      if (select.value !== (old || '')) efcEmit('ui:inventory-gesture', select.value ? 'mount' : 'unmount', session.item);
       dialog.querySelector('[role=status]').textContent = '';
       efcBenchOptions();
       slots.querySelector('[data-part-slot="' + slot + '"]').focus();
@@ -148,11 +149,11 @@ function efcBenchOpen(where) {
     frame.addEventListener('load', efcBenchPreview);
     frame.src = 'showcase/workbench/stg44/raid-preview.html?model=' + def.weapon.wkey;
     stage.replaceChildren(frame);
-    efcEmit('workbench:preview-open');
   } else stage.innerHTML = efcThumbImg(item.id, def.kind, 'big');
   efcBenchOptions();
   efcBenchPreview();
   dialog.showModal();
+  efcEmit('workbench:open');
   return true;
 }
 efcProvide('weaponmods:open', efcBenchOpen);

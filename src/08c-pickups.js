@@ -168,5 +168,5 @@ function swapWithDrop() {
   A.reload = null; A.boltT = 0; A.switching = 0.52; A.switchTo = A.cur; P.busy = false;
   VM.action = null; VM.lowerTarget = 1;
   kcEvent('vma', { sid: P.kcI, name: 'switch', dur: 0.52, data: { to: d.def.key, from: old.def.key } });
-  sfxMech('pickup');
+  sfxMech('pickup', 0, null, d.def.fam);
 }

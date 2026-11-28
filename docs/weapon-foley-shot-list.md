@@ -53,6 +53,18 @@ Name files `wf_<family>_<cue>_<01–04>` using `rifle`, `smg`, `pistol`, `sniper
 
 For family character, use a firm metal-and-polymer contact for rifles, a tighter and lighter contact for SMGs, small bright transients for pistols, a heavier steel resonance for sniper rifles, and longer sliding contact for tube shotguns. Describe the desired character in the prompt. The unshipped references in the handling notes are listening references.
 
+### Batch A pilot
+
+ElevenLabs Sound Effects v2 rendered one take per cue on 28 November 2026. Each request used 0.7 s, prompt influence 0.5 and looping disabled. The quote was 23.1 credits. The completed generation records list 2.3331 credits per take (6.9993 total). The start response listed 2 credits per take. [ElevenLabs pilot session](https://elevenlabs.io/app/flows/vQsk8E9AhsFfD2yPfZrR)
+
+| Filename | ElevenLabs generation | Run session | Cue |
+| --- | --- | --- | --- |
+| `wf_rifle_magout_03` | `4n6U4Tu0zCkwH2H52Aaq` | `NRwk4t3aCYNEd4VcEVGZ` | Small release click followed by a brief polymer-on-metal scrape |
+| `wf_rifle_magin_03` | `dtPcnFBrh6Wq0shCxxmO` | `gl2vr9EDetNZMXV0fEzj` | Firm contact followed by a clean latch |
+| `wf_rifle_slap_01` | `LXUIXTFUzjeY9Eti0Vkr` | `p6nkQtBUqMr5cnijnVeM` | One short gloved impact with body resonance |
+
+Pilot import and in-game audition are pending. Reuse these completed generations when resuming.
+
 ## Mapping and verification
 
 - Existing keys cover magazine out and in, slap, charging, bolt opening, pump, shell, draw, stow, aim, inspect, dry fire and pickup. Separate semiautomatic sniper charging from bolt closure in the mapping. Keep the hold-R magazine check on the matching magout and insert cues.

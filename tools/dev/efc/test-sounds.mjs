@@ -33,6 +33,30 @@ const bootAudio = () => (async () => {
   ok(st.handling === 'ready' && st.ballistics === 'ready' && st.armes === 'ready' && st.foley === 'ready', 'packs ready ' + JSON.stringify(st));
   ok(st.weapon_foley === 'ready', 'weapon Foley pack ready ' + JSON.stringify(st));
   ok(await page.evaluate(() => !SFX.state.has('workbench_foley')), 'workbench turn pack stays out of raid preloads');
+  const firearmRoutes = await page.evaluate(() => {
+    const missing = [];
+    for (const [id, def] of Object.entries(WEAPONS)) {
+      const profile = gunSndOf(def.sound);
+      if (!profile) { missing.push(id); continue; }
+      for (const bank of ['g_' + profile.bank + '_pov', 'g_' + profile.bank + '_near', 'g_far_' + profile.cls]) {
+        if (!sfxHas(bank)) missing.push(id + ' ' + bank);
+      }
+    }
+    const connect = AudioNode.prototype.connect;
+    let firstPerson = 0;
+    AudioNode.prototype.connect = function (destination, ...args) {
+      if (destination === AU.fpBus) firstPerson++;
+      return connect.call(this, destination, ...args);
+    };
+    try {
+      sfxGun('rifle', camera.position.clone().add(new THREE.Vector3(15, 0, 0)), {});
+      const remote = firstPerson;
+      sfxGun('rifle', null, {});
+      return { missing, remote, local: firstPerson - remote };
+    } finally { AudioNode.prototype.connect = connect; }
+  });
+  ok(!firearmRoutes.missing.length, 'every raid weapon has recorded firing banks ' + firearmRoutes.missing.join(', '));
+  ok(firearmRoutes.remote === 0 && firearmRoutes.local === 1, 'only local gunfire connects to the first-person bus');
   const R = await page.evaluate(() => {
     const out = { missing: [], clip: [], levels: {}, events: 0 };
     out.banks = [];
@@ -84,6 +108,36 @@ const bootAudio = () => (async () => {
 
   // ---------- 2. reload choreography timing, one weapon per family ----------
   await startSolo(page);
+  const controls = await page.evaluate(() => {
+    const entity = PL.ent, weapon = armsW(entity), def = weapon.def;
+    const { crouch, onGround } = entity, velocity = entity.vel.clone();
+    EFC_SND.log = [];
+    weapon.def = { ...def, fam: 'rifle', auto: true, bipod: true };
+    entity.crouch = entity.onGround = true; entity.vel.set(0, 0, 0);
+    efcWeaponControlPress('safety');
+    entity.input.fire = entity.input.firePressed = true;
+    efcWeaponControlInput(entity);
+    const safe = !entity.input.fire && !entity.input.firePressed;
+    efcWeaponControlInput(entity);
+    efcWeaponControlPress('safety');
+    efcWeaponControlPress('selector');
+    entity.input.fire = true; entity.input.firePressed = false;
+    efcWeaponControlInput(entity);
+    const released = !entity.input.fire;
+    entity.input.firePressed = true;
+    efcWeaponControlInput(entity);
+    const pressed = entity.input.fire;
+    efcWeaponControlPress('selector');
+    entity.input.fire = entity.input.firePressed = false;
+    const banks = EFC_SND.log.map(({ id }) => id);
+    EFC_SND.log = null;
+    weapon.def = def; entity.crouch = crouch; entity.onGround = onGround; entity.vel.copy(velocity);
+    entity.efcBipodWeapon = null;
+    return { safe, released, pressed, banks };
+  });
+  ok(controls.safe && controls.released && controls.pressed, 'raid safety and selectable semi-auto gate firing');
+  ok(controls.banks.join() === 'wf_rifle_safety,wf_rifle_bipod_deploy,wf_rifle_safety,wf_rifle_selector,wf_rifle_selector',
+    'safety, selector and bipod play recorded cues only on changes ' + JSON.stringify(controls.banks));
   await simRun(page, 1, 'PL.ent.health = 100;');
   const holster = await page.evaluate(() => {
     const player = PL.ent, arms = player.arms;

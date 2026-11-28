@@ -76,6 +76,7 @@ function onKey(e, down) {
   else if (c === 'Digit5') useKs(1);
   else if (c === 'Digit6') useKs(2);
   else if (c === 'KeyI') inspectWeapon();
+  else if (c === 'KeyU' || c === 'KeyB') efcWeaponControlPress(c === 'KeyU' ? 'safety' : 'selector');
   else if (c === 'LeanL') efcLeanPress(-1); // se pencher (src/efc/42-efc-lean.js)
   else if (c === 'LeanR') efcLeanPress(1);
 }
@@ -442,6 +443,7 @@ function updatePlayer(dt, now) {
   PL.knifeHold = damp(PL.knifeHold, PL.knifeOut && !PL.nadeState && !KS.mode && !(PL.knifeT > 0 && !PL.knifeNew) ? 1 : 0, PL.knifeOut ? 8 : 12, dt); // la sortie se voit (0,3 s), le rangement est plus vif
   // arme : même contrôleur que les bots
   const shotsBefore = e.arms.shots;
+  efcWeaponControlInput(e);
   ctlWeapon(e, dt, now);
   if (e.arms.shots !== shotsBefore || curW().mag <= 0 || PL.sprinting) PL.queued = false;
   if (e.arms.shots !== shotsBefore) PL.runShot = false;

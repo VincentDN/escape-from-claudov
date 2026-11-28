@@ -62,9 +62,10 @@ defineGun('stg44', 'rifle', context => {
   info.mount.side = { x: -0.028, y: 0.054, z: -0.32 };
   info.mount.muzzle = { y: 0.05, z: -0.554, r: 0.012 };
   info.eject.position.set(0.035, 0.075, -0.04);
-  info.sightY = 0.128; info.adsZ = 0.012;
   info.butt = [0, 0.05, 0.36];
   info.gripR.set(0, -0.035, 0.063); info.gripL.set(0, 0.025, -0.31);
+  efcPartisanViewGrip(info, 'ak47');
+  efcPartisanIrons(context, { name: 'StG 44', mount: { optic: [0, 0.126, -0.2] } }, [0, 0.05, -0.6], new THREE.Box3().setFromObject(g).max.toArray());
   info.gripDef = {
     R: [{ c: [0, -0.03, 0.063], h: [0.017, 0.05, 0.036], r: 0.011, rx: -0.36 }],
     L: [{ c: [0, 0.047, -0.31], h: [0.026, 0.024, 0.09], r: 0.01 }],

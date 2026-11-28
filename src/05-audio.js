@@ -351,9 +351,10 @@ function sfxGun(kind, pos, who) {
   }
   const vk = H && H.verb || 1;
   if (H && H.roll && !pos && !alt && sfxHas('g_far_' + S.cls)) sfxPlay('g_far_' + S.cls, g0, t + H.roll[1], { gain: H.roll[0], rate: rand(0.97, 1.03) });
-  if (pos) out.connect(auOut(pos, lerp(GUN_VERB.world, GUN_VERB.inside, inside) * vk, 1, 0.8, 5, AU.wpn));
-  if (pos && S.brass && d < 10 && Math.random() < 0.35 && CURMAP.def) { const sf = surfaceAt(pos); if (sf !== 'water') sfxCasing(sf, pos, t + rand(0.35, 0.5)); } // a shooter close by: his casings
-  else { out.connect(AU.fpBus); const vb = ctx.createGain(); vb.gain.value = lerp(GUN_VERB.pov, GUN_VERB.inside, inside) * vk; g0.connect(vb); vb.connect(AU.verb); }
+  if (pos) {
+    out.connect(auOut(pos, lerp(GUN_VERB.world, GUN_VERB.inside, inside) * vk, 1, 0.8, 5, AU.wpn));
+    if (S.brass && d < 10 && Math.random() < 0.35 && CURMAP.def) { const sf = surfaceAt(pos); if (sf !== 'water') sfxCasing(sf, pos, t + rand(0.35, 0.5)); }
+  } else { out.connect(AU.fpBus); const vb = ctx.createGain(); vb.gain.value = lerp(GUN_VERB.pov, GUN_VERB.inside, inside) * vk; g0.connect(vb); vb.connect(AU.verb); }
   const e = ctx.createGain(); e.gain.value = S.echo * GUN_VERB.echo * vk * (pos ? 0.5 + far * 0.8 : 1) * (1 - inside * 0.7); g0.connect(e); e.connect(AU.echo);
   if (inside > 0.35) { v.g.gain.setValueAtTime(1, t + 0.16); v.g.gain.setTargetAtTime(0, t + 0.16, 0.06 + 0.2 * (1 - inside)); }
   // étouffe le coup précédent du même tireur

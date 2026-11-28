@@ -9,6 +9,9 @@ try {
   const operator = page.locator('#efcOpHideout canvas');
   await operator.waitFor();
   await page.waitForFunction(() => EFC_OPERATOR_VIEWS.get('efcOpHideout')?.drawn);
+  const drawTime = await page.evaluate(() => EFC_OPERATOR_VIEWS.get('efcOpHideout').drawTime);
+  await page.waitForFunction(t => EFC_OPERATOR_VIEWS.get('efcOpHideout').drawTime > t, drawTime);
+  assert.equal(await page.locator('#efcOpStash [data-efc-id="med_kit"]').getAttribute('data-tone'), 'green');
   assert.equal(await page.locator('#scr-hideout .efc-op-slot').count(), 8);
   assert.equal(await page.locator('#scr-hideout .efc-op-quick button').count(), 9);
   assert.match(await page.locator('#scr-hideout .efc-op-hands').textContent(), /MP5/i);
@@ -32,6 +35,8 @@ try {
   const ghost = page.locator('.efc-op-ghost');
   assert.equal(await ghost.getAttribute('data-efc-id'), 'med_kit');
   assert.equal(await stashTarget.getAttribute('data-op-drop'), 'valid');
+  const mark = await stashTarget.locator('.efc-placement').boundingBox(), drawnGhost = await ghost.boundingBox();
+  assert.ok(Math.abs(mark.x - drawnGhost.x) < 1 && Math.abs(mark.y - drawnGhost.y) < 1);
   const columns = Number(await stashTarget.getAttribute('data-op-cols'));
   assert.ok(Math.abs((await ghost.boundingBox()).width - targetRect.width * 2 / columns) < 1);
   await page.mouse.up();

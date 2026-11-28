@@ -5,16 +5,16 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C13 complete on `codex/c13-2-weapon-foley`, ready for owner review.
-- **Next step:** Start C18-1 from `beta`. C16-5 and C17-2 are waiting on owner decisions.
-- **How to verify:** C13 has 76 banks of four takes in `#sounds`. Use `test-sounds.mjs` and `test-weaponmods.mjs` for the runtime and interactive workbench checks. For C17-2, review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** Build, declarations, raid smoke, 102 sound checks, magazine check and weapon mods passed. C13 weapon Foley is 1,239,068 bytes. The original Partisan turn pack is 57,844 bytes on demand.
+- **Card:** C13 deployed to beta. The follow-up adds live safety, fire selector and bipod Foley, stash fixes, an animated Hideout operator, and Partisan viewmodel calibration.
+- **Next step:** C19 covers new platform firing recordings. C18-1 and C18-2 have tested feature branches ready for beta integration.
+- **How to verify:** Use the [beta playtest checklist](../outbound/BETA_PLAYTEST_CHECKLIST.md).
+- **Checks so far:** Build, declarations, raid smoke, 106 sound checks, operator and imported rifle alignment checks passed. C13 includes 76 banks of four takes, plus the original Partisan workbench turn sounds.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
-- **Watch out for:** The current chat can download from `elevenlabsusercontent.com`. C13 safety, selector and bipod deploy cues are available in `#sounds` and await gameplay hooks. C17-3 waits on C17-2 visual acceptance.
+- **Watch out for:** C13 covers handling and reloads. C19 covers new firing recordings. C17-3 waits on C17-2 visual acceptance.
 
 ## Next open cards, in order
 
-1. C18-1, the shared movement phase model, followed by the [first-person legs and Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
+1. C19 platform firing effects, then integrate C18-1 and C18-2 and continue the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 2. C16-5 to C16-13 and C17-2 to C17-4 can resume when the owner decisions are recorded.
 3. C2-1 to C2-8, Partisan modding and weapons.
 4. Then C11 and C12 (section 6), followed by C3 to C8 and C14 (section 7).
@@ -24,6 +24,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-28 Codex Sol: Wired the final C13 gameplay cues, corrected remote gunshot routing, aligned all imported Partisan rifle profiles, and updated stash placement and operator preview. Added the beta playtest checklist and C19 firing card.
 - 2026-11-28 Codex Sol: C13-2 to C13-5 done on `codex/c13-2-weapon-foley`. 304 credited takes, 76 banks, 644.1023 ElevenLabs credits, Partisan turn recordings, and 102/102 sound checks.
 - 2026-11-28 Codex Sol: C13-1 done. The foley audit verified 76 action/family pairs, 304 slots, 19 credited reuse candidates and 285 new takes across five batches.
 - 2026-11-28 Codex Sol: C16-4 integrated from `ef536b4`. The voice script has 180 takes across 15 cues and three voice groups, plus five sample lines for approval before recording.

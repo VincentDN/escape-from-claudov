@@ -65,6 +65,12 @@ for (const part of Object.values(EFC_PARTISAN_PARTS)) {
       mesh.position.set(mount?.x || 0, mount?.y || info.sightY, mount?.z || 0);
     }
     g.add(mesh);
+    if (slot === 'optic') {
+      geometry.computeBoundingBox();
+      const box = geometry.boundingBox, center = box.getCenter(new V3()).add(mesh.position);
+      info.sightX = center.x; info.sightY = center.y;
+      info.adsZ = mesh.position.z + box.max.z + 0.19;
+    }
   };
   const large = ['muzzle', 'stock', 'handguard', 'optic'].includes(slot);
   EFC_PARTISAN_ITEM_PARTS.push(['part_' + id, {

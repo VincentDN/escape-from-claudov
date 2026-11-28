@@ -472,7 +472,9 @@ function updateViewmodel(dt, S) {
   }
   const h0 = VM_HIP[m.kind] || VM_HIP.rifle, h1 = VM_HIP_ACT[m.kind] || h0, fk = smoothstep(0, 1, VM.farK) * fOut, hip = _hipK;
   for (let i = 0; i < 6; i++) hip[i] = lerp(h0[i], h1[i], fk);
-  const px = lerp(hip[0], 0, a), py = lerp(hip[1], -m.sightY, a), pz = lerp(hip[2], -m.adsZ, a);
+  const px = lerp(hip[0] + (m.efcHip?.x || 0), -(m.sightX || 0), a);
+  const py = lerp(hip[1] + (m.efcHip?.y || 0), -m.sightY, a);
+  const pz = lerp(hip[2] + (m.efcHip?.z || 0), -m.adsZ, a);
   // balancement en « sourire » : l'arme glisse d'un côté à l'autre et descend au milieu, sans rebond
   // brusque aux extrémités (cos 2θ au lieu de |sin θ|)
   const bx = Math.cos(VM.bobT), by = (Math.cos(2 * VM.bobT) - 1) * 0.5;

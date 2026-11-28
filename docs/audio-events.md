@@ -16,8 +16,8 @@ The game first looks for the event's recorded C13 bank, then the shared P2 layer
 different take on successive calls. Pitch varies by ±4% and playback rate falls with weapon mass. Gain varies by ±1.5 dB. C13
 reload attacks are checked against the existing choreography. The pistol slide release, bolt opening and closure, and tube
 shotgun charging and pumping use different banks. The Hideout workbench plays family-specific mount and unmount cues and loads
-the original Partisan handling and hit recordings on demand for turning the preview. `#sounds` exposes the safety, selector and bipod banks for listening while
-those actions lack explicit gameplay events.
+the original Partisan handling and hit recordings on demand for turning the preview. In raid, **U** toggles weapon safety, **B**
+switches supported weapons between semi-auto and automatic, and a fitted bipod plays its cue on entering crouched, stationary support.
 
 ## Handling, per weapon family
 

@@ -80,7 +80,8 @@ function efcPartisanGeometry(model) {
   EFC_PARTISAN_GEOMETRY.set(model, set);
   return set;
 }
-function efcPartisanBuild(model, { g, info, M, spec, A }) {
+function efcPartisanBuild(model, context, template = 'stg44') {
+  const { g, info, M, spec, A } = context;
   const { meshes, magAt, min, max } = efcPartisanGeometry(model);
   const { mount } = model, length = max[2] - min[2];
   const sight = mount.optic || [0, max[1] * 0.75, -length * 0.18];
@@ -106,12 +107,40 @@ function efcPartisanBuild(model, { g, info, M, spec, A }) {
   info.muzzle.position.set(0, muzzle[1], min[2]);
   info.eject.position.set(max[0], sight[1] * 0.75, sight[2] + 0.05);
   info.butt = [0, sight[1] * 0.66, max[2]];
-  info.sightY = sight[1] + 0.012;
-  info.adsZ = 0.02;
+  efcPartisanViewGrip(info, template);
+  efcPartisanIrons(context, model, muzzle, max);
   info.mount.optic = { y: sight[1], z: sight[2], len: 0.13, D: 0.22 };
   info.mount.muzzle = { y: muzzle[1], z: min[2], r: 0.011 };
   info.mount.under = { y: hand[1], z: hand[2], len: 0.09 };
   info.mount.side = { x: side[0], y: side[1], z: side[2] };
+}
+
+function efcPartisanViewGrip(info, template) {
+  const referenceGrip = gripsFor(template).R;
+  const hip = VM_HIP[info.kind] || VM_HIP.rifle;
+  const hipRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(hip[3], hip[4], hip[5]));
+  info.efcHip = new V3().subVectors(referenceGrip, info.gripR).applyQuaternion(hipRotation);
+}
+
+function efcPartisanIrons({ g, M, info, A }, model, muzzle, max) {
+  const rear = Math.min(max[2] - 0.12, info.gripR.z - 0.045);
+  const front = Math.min(muzzle[2] + 0.095, rear - 0.18);
+  const center = model.name.toLowerCase().includes('bren') ? 0.049 : muzzle[0];
+  const line = max[1] + 0.016, eyeRelief = info.kind === 'smg' ? 0.135 : 0.19;
+  info.sightX = A.optic ? 0 : center;
+  info.sightY = line;
+  info.adsZ = rear + eyeRelief;
+  info.efcIron = { rear, front, center, line };
+  if (A.optic) return;
+  const irons = new THREE.Group();
+  irons.position.x = center;
+  g.add(irons);
+  const c = { g: irons, M, info };
+  const rim = ironRing(c, rear, IRON.hole[info.kind] || IRON.hole.rifle);
+  const base = model.mount.optic?.[1] ?? max[1] - 0.035;
+  ironFoot(c, M.sight, rear, Math.min(base, rim - 0.008), rim, 0.014);
+  const bladeBase = Math.min(muzzle[1] + 0.018, line - 0.014);
+  bx(irons, M.sight, 0, (line + bladeBase) / 2, front, ironW(c, front, IRON.post), line - bladeBase, 0.008);
 }
 
 for (const [id, source, template, mag, rpm, impact] of EFC_PARTISAN_PROFILES) {
@@ -125,5 +154,5 @@ for (const [id, source, template, mag, rpm, impact] of EFC_PARTISAN_PROFILES) {
   def.base = def;
   WEAPONS[id] = def;
   WEAPON_ID_BY_NAME[def.name] = id;
-  defineGun(id, base.fam, context => efcPartisanBuild(model, context));
+  defineGun(id, base.fam, context => efcPartisanBuild(model, context, template));
 }

@@ -62,6 +62,7 @@ const EFC_SND_KEEP = new Set(['knife', 'pin', 'spoon', 'throw', 'windup', 'magdr
 /* Resolves an engine sfxMech kind to an EFC_HANDLING key, from the weapon in hand (player) or the family given (bots) */
 function efcHandlingKey(kind, fam, pos) {
   if (EFC_SND_KEEP.has(kind)) return null;
+  if (kind === 'safety' || kind === 'selector' || kind === 'bipod_deploy') return kind;
   if (!pos && typeof VM !== 'undefined') {
     if (kind === 'draw' && VM.action === 'inspect') return 'inspect';
     if (kind === 'ads') return typeof PL !== 'undefined' && PL.ads ? 'ads_out' : 'ads_in'; // called before PL.ads takes the new state

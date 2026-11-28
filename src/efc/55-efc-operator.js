@@ -77,18 +77,48 @@ function efcOperatorGear(view) {
 
 function efcOperatorDraw(view) {
   if (view.frame) return;
-  view.frame = requestAnimationFrame(() => {
+  view.frame = requestAnimationFrame((now) => {
     view.frame = 0;
     const canvas = view.canvas;
-    if (!canvas.getClientRects().length || !renderer || gpuLostNow()) return;
+    if (!canvas.getClientRects().length || !renderer || gpuLostNow() || document.hidden) return;
+    const animated = view.hideout && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (view.hideout) {
+      const scale = Math.min(devicePixelRatio || 1, 1.5), box = canvas.getBoundingClientRect();
+      const width = Math.min(900, Math.round(box.width * scale)), height = Math.min(1100, Math.round(box.height * scale));
+      if (width > 1 && height > 1 && (width !== canvas.width || height !== canvas.height)) {
+        canvas.width = width; canvas.height = height; view.drawn = '';
+      }
+    }
     const kit = efcOperatorGear(view);
     const key = JSON.stringify([view.skin, view.weapon, view.gearKey, view.angle]);
-    if (view.drawn === key) return;
+    if (view.drawn === key && (!animated || now - view.drawTime < 42)) {
+      if (animated) efcOperatorDraw(view);
+      return;
+    }
     try {
-      skinDraw(canvas.getContext('2d'), canvas.width, canvas.height, view.skin, 0, view.angle, view.weapon, kit);
+      view.idleStart ??= now;
+      const pose = view.hideout ? model => efcOperatorIdle(model, animated ? (now - view.idleStart) / 1000 : 0) : null;
+      skinDraw(canvas.getContext('2d'), canvas.width, canvas.height, view.skin, 0, view.angle, view.weapon, kit, pose);
       view.drawn = key;
+      view.drawTime = now;
+      if (animated) efcOperatorDraw(view);
     } catch (error) { gpuLog('operator preview: ' + error.message); }
   });
+}
+
+function efcOperatorResumeDraw() {
+  const view = EFC_OPERATOR_VIEWS.get('efcOpHideout');
+  if (view) { view.drawn = ''; efcOperatorDraw(view); }
+}
+addEventListener('resize', efcOperatorResumeDraw);
+document.addEventListener('visibilitychange', efcOperatorResumeDraw);
+matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', efcOperatorResumeDraw);
+
+function efcOperatorTone(def) {
+  const value = def.value || 0;
+  if (value >= 7500) return 'gold';
+  if (value >= 3000) return 'violet';
+  return value >= 350 || def.kind === 'ammo' ? 'green' : 'neutral';
 }
 
 const EFC_OPERATOR_SLOTS = [['head', 'Head'], ['face', 'Face'], ['armor', 'Armour'], ['rig', 'Rig'],
@@ -115,7 +145,7 @@ function efcOperatorGrid(grid, name, target, source, container, area = target, p
       data-op-cols="${grid.cols}" data-op-rows="${grid.rows}" style="--cols:${grid.cols};--rows:${grid.rows}">
     ${items.map(({ item, w, h, x, y, rotated, index }) => {
       const d = efcUiDef(item.id), count = item.n > 1 ? ' ×' + item.n : '';
-      return `<button type="button" class="efc-op-item"${efcOperatorItemAttrs(item)} data-op-source="${source}" data-op-key="${index}" data-key="${source}-${index}" aria-pressed="false"
+      return `<button type="button" class="efc-op-item" data-tone="${efcOperatorTone(d)}"${efcOperatorItemAttrs(item)} data-op-source="${source}" data-op-key="${index}" data-key="${source}-${index}" aria-pressed="false"
         data-op-x="${x}" data-op-y="${y}" data-op-rotated="${rotated ? '1' : '0'}" ${container ? `data-op-container="${esc(container.id)}" data-op-rev="${container.rev}"` : ''}
         style="grid-area:${y + 1}/${x + 1}/span ${h}/span ${w}" aria-label="${esc(d.name + count)}">${efcThumbImg(item.id, d.kind, 'slot')}<span>${esc(d.name + count)}</span></button>`;
     }).join('')}</div></section>`;
@@ -127,7 +157,7 @@ function efcOperatorEquipment(id, inv) {
   const equipment = EFC_OPERATOR_SLOTS.map(([slot, label]) => {
     const item = slots[slot], d = item && efcUiDef(item.id);
     const editable = EFC_OPERATOR_EDITABLE.has(slot);
-    return `<button type="button" class="efc-op-slot" data-op-target="slot" data-op-key="${slot}" data-key="operator-slot-${slot}"${editable ? '' : ' disabled'}
+    return `<button type="button" class="efc-op-slot"${d ? ` data-tone="${efcOperatorTone(d)}"` : ''} data-op-target="slot" data-op-key="${slot}" data-key="operator-slot-${slot}"${editable ? '' : ' disabled'}
       ${item ? 'data-op-source="slot" aria-pressed="false"' : ''}${efcOperatorItemAttrs(item)} aria-label="${esc(label + ' · ' + (d?.name || (editable ? 'Empty' : 'Unavailable')))}">
       <span>${esc(label)}</span>${d ? efcThumbImg(item.id, d.kind, 'slot') : ''}<b>${esc(d?.name || (editable ? 'Empty' : '—'))}</b></button>`;
   }).join('');
@@ -415,6 +445,7 @@ function efcOperatorDragMove(view, pick, x, y, grid = null) {
   let cell = null;
   let width = pick.rotated === pick.initialRotation ? pick.w : pick.h;
   let height = pick.rotated === pick.initialRotation ? pick.h : pick.w;
+  let left, top;
   if (data?.opArea) {
     const rect = target.getBoundingClientRect(), cols = +data.opCols, rows = +data.opRows;
     const size = efcCall('grid:size', pick.source.item, pick.rotated);
@@ -422,11 +453,13 @@ function efcOperatorDragMove(view, pick, x, y, grid = null) {
     const xCell = clamp(Math.floor((x - rect.left) * cols / rect.width), 0, cols - 1);
     const yCell = clamp(Math.floor((y - rect.top) * rows / rect.height), 0, rows - 1);
     cell = { area: data.opArea, page: +data.opPage, x: xCell, y: yCell, rotated: pick.rotated };
+    left = rect.left + target.clientLeft + xCell * target.clientWidth / cols;
+    top = rect.top + target.clientTop + yCell * target.clientHeight / rows;
   }
   pick.ghost.style.width = width + 'px';
   pick.ghost.style.height = height + 'px';
-  pick.ghost.style.left = x - width * pick.offsetX / pick.w + 'px';
-  pick.ghost.style.top = y - height * pick.offsetY / pick.h + 'px';
+  pick.ghost.style.left = (left ?? x - width * pick.offsetX / pick.w) + 'px';
+  pick.ghost.style.top = (top ?? y - height * pick.offsetY / pick.h) + 'px';
   if (target === pick.target && cell?.x === pick.cell?.x && cell?.y === pick.cell?.y && cell?.rotated === pick.cell?.rotated) return;
   pick.target?.removeAttribute('data-op-drop');
   pick.preview?.remove();

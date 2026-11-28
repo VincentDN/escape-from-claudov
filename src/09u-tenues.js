@@ -49,7 +49,7 @@ function skinPvGun(key) { return SKV.guns[key] || (SKV.guns[key] = buildGunModel
 function skinPvPose(key) {
   if (SKV.pose && SKV.pose.key === key) return SKV.pose;
   const R = soldierRest(), G = worldGunGeometry(key);
-  const P = { key, J: R.J.map((v) => v.clone()), Jp: R.J.map((v) => v.clone()), gun: new THREE.Object3D(), grips: G.grips, kind: G.kind };
+  const P = { key, J: R.J.map((v) => v.clone()), Jp: R.J.map((v) => v.clone()), gun: new THREE.Object3D(), grips: G.grips, kind: G.kind, magParts: [] };
   const e = { model: P, pos: new V3(), vel: new V3(), yaw: 0, pitch: SK_POSE.pitch, crouchAmt: 0, sprinting: false, onGround: true, isPlayer: false, visible: false, target: null, lastShotT: -1e9, lastSeenT: -1e9, recoil: 0, throwT: 0, arms: null };
   for (let i = 0; i < 30; i++) {
     Object.assign(P, { wtClk: 1e9, lkClk: 1e9, wtT: 0, lkT: 0, lkP: 0, gyL: 0, gyR: 0 }); // (le sol de l'aperçu est plat, à hauteur 0)
@@ -74,11 +74,12 @@ function skinPvPlace(S, key) {
    affiché restait celui de la première image (une cape figée, collée au bassin, que les bras traversaient) */
 function skinSkel(M) { renderer.info.render.frame++; M.root.updateMatrixWorld(true); M.skel.update(); }
 /* Rend la tenue skin vue par rel (0 allié, 1 ennemi), caméra à l'azimut a, dans ctx (dw x dh) ; la vitrine ne montre qu'elle */
-function skinDraw(ctx, dw, dh, skin, rel, a, key = skinPvGunKey(), kit) {
+function skinDraw(ctx, dw, dh, skin, rel, a, key = skinPvGunKey(), kit, pose) {
   const S = vwScene(), M = skinPvModel(skin), m = skinPvMat(skin), live = VW.model && VW.model.visible ? VW.model : null;
   skinPvPlace(M, key || skinPvGunKey());
   const gunVisible = M.gun.visible;
   M.gun.visible = !!key;
+  if (pose) { M.key = null; pose(M); layoutSoldier(M, true); }
   skinTone(skin, rel, m.color); skinRelColor(rel, m.userData.skU.tag.value);
   if (kit) M.bones[SB.CHE].add(kit);
   skinSkel(M);

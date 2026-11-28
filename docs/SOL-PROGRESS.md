@@ -5,16 +5,16 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C18-3 directional landings integrated with C18-1 and C18-2. C19 firing and C13 reloads are on beta.
-- **Next step:** C18-4 aerial look, body twist, aiming and firing.
+- **Card:** C18-4 dive flight complete.
+- **Next step:** C18-5 momentum chains and fast get-up.
 - **How to verify:** Use the [beta playtest checklist](../outbound/BETA_PLAYTEST_CHECKLIST.md).
-- **Checks so far:** Build, declarations, raid smoke, the seven-family raid firing check and recorded fallback passed. The C19 pack is 400,083 bytes. C13 sound, operator and Partisan alignment checks passed before C19.
+- **Checks so far:** Build, declarations, raid smoke, flight, free look, air dive and movement-phase checks passed.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
 - **Watch out for:** C19 retains the existing CC0 nearby, distant and suppressed shots. C17-3 waits on C17-2 visual acceptance.
 
 ## Next open cards, in order
 
-1. Continue with C18-4 and the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
+1. Continue with C18-5 and the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 2. C16-5 to C16-13 and C17-2 to C17-4 can resume when the owner decisions are recorded.
 3. C2-1 to C2-8, Partisan modding and weapons.
 4. Then C11 and C12 (section 6), followed by C3 to C8 and C14 (section 7).
@@ -24,7 +24,9 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
-- 2026-11-28 Codex Sol: Fixed a beta regression where bark cooldowns blocked Warden firing and reloads. Two Wardens fired after their own lead times even during shared cooldowns.
+- 2026-11-28 Codex Sol: Fixed a beta regression where bark cooldowns blocked Warden firing and reloads. Verified simultaneous firing and the sight-to-fire raid scenario.
+
+- 2026-11-28 Codex Sol: C18-4 verified firing behind the dive heading, bounded body twist, half-speed aiming, air steering and the in-flight action gates.
 
 - 2026-11-28 Codex Sol: Integrated directional prone, side and supine landings. Ground and air tests covered all headings, two in-flight view changes, impact, side settle and return to standing. The final C19 audio suite passed 111 checks.
 

@@ -75,7 +75,7 @@ function efcOmniGroundDive(entity, sprint, requested, dt) {
   entity.vy = lift + gravity * dt / 2;
   entity.onGround = false;
   entity.efcDiving = true;
-  entity.efcDiveYaw = gesture.yaw;
+  entity.efcDiveYaw = entity.yaw + angDiff(entity.yaw, gesture.yaw);
   entity.slideBuf = 0;
   gesture.phase = 'launch';
   gesture.t = 0;
@@ -103,7 +103,7 @@ function efcOmniDive(entity, sprint, dt) {
   entity.vel.z *= impulse;
   entity.vy = EFC_DIVE.lift;
   entity.efcDiving = true;
-  entity.efcDiveYaw = Math.atan2(-entity.vel.x, -entity.vel.z);
+  entity.efcDiveYaw = entity.yaw + angDiff(entity.yaw, Math.atan2(-entity.vel.x, -entity.vel.z));
   input.slide = false;
   entity.slideBuf = 0;
   return true;

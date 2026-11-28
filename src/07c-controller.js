@@ -79,7 +79,7 @@ function ctlMove(ent, dt) {
   else if (ent.crouch && ceilingAbove(ent.pos.x, ent.pos.z, ent.pos.y + 1.0, 0.3) > ent.pos.y + 1.8) ent.crouch = false;
   ent.crouchAmt = damp(ent.crouchAmt, ent.crouch ? 1 : 0, 10, dt);
   ent.adsActive = I.ads && !sprint && !A.reload && !ent.busy && !A.knife && A.switching <= 0 && (A.boltT <= 0.2 || !!d.bolt || !!d.pump);
-  A.adsW = damp(A.adsW, ent.adsActive ? 1 : 0, (1 / Math.max(0.05, d.adsTime)) * 2.2, dt);
+  A.adsW = damp(A.adsW, ent.adsActive ? 1 : 0, (1 / Math.max(0.05, d.adsTime)) * 2.2 * efcOmniFlightAimRate(ent), dt);
   let spd = MOVE_SPEED * (A.knife ? KNIFE_MOVE : d.move);
   const tactical = efcOmniTacticalSprint(ent, sprint, dt);
   if (sprint) spd *= SPRINT_MUL * tactical; else if (A.adsW > 0.5) spd *= d.scope ? 0.4 : 0.58;
@@ -105,6 +105,11 @@ function ctlMove(ent, dt) {
     ent.slideT -= dt;
     if (ent.slideT <= 0) { ent.slideT = 0; ent.slideCd = SLIDE.cd; }
   } else if (!diving) { ent.vel.x = damp(ent.vel.x, wx * spd, acc, dt); ent.vel.z = damp(ent.vel.z, wz * spd, acc, dt); }
+  else if (efcOmniInFlight(ent) && wl > 0) {
+    const steer = efcOmniTune('flight', 'airControl') * acc * spd * dt;
+    ent.vel.x += wx * steer;
+    ent.vel.z += wz * steer;
+  }
   let jumped = false;
   if (!prone && !wasProne && I.jump && ent.onGround && !ent.jumpHeld) { // on saute même en lançant une grenade ou en changeant d'arme
     if (sliding) { ent.slideT = 0; ent.slideCd = SLIDE.cd; ent.crouch = false; sliding = false; ent.vy = 6.3; ent.onGround = false; jumped = true; } // saut de glissade : l'élan est gardé
@@ -176,7 +181,7 @@ function ctlAction(ent, name, dur, data) {
 }
 function ctlStartReload(ent, barkReady = false) {
   const A = ent.arms, w = armsW(ent), d = w.def;
-  if (A.reload || ent.busy || A.knife || w.mag >= d.mag || w.reserve <= 0 || A.boltT > 0 || A.switching > 0) return false;
+  if (efcOmniInFlight(ent) || A.reload || ent.busy || A.knife || w.mag >= d.mag || w.reserve <= 0 || A.boltT > 0 || A.switching > 0) return false;
   if (!barkReady && efcBarkEligible(ent)) {
     return efcBarkAction(ent, 'reload', () => ctlStartReload(ent, true), () => ent.arms === A && armsW(ent) === w);
   }
@@ -210,6 +215,11 @@ function ctlWeapon(ent, dt, now) {
     if (before > SWITCH.swap && A.switching <= SWITCH.swap) { A.cur = A.switchTo; w = armsW(ent); d = w.def; if (ent.isPlayer) { vmEquip(d); VM.lowerTarget = 0; sfxMech('draw'); VM.rec.vy += 0.5; VM.rec.vrx -= 0.9; VM.rec.vz += 0.15; } }
   }
   if (I.switchTo >= 0) { ctlSwitch(ent, I.switchTo); I.switchTo = -1; }
+  const flight = efcOmniInFlight(ent);
+  if (flight && A.reload) {
+    A.reload = null;
+    VM.actFade = true;
+  }
   if (I.reload) { ctlStartReload(ent); I.reload = false; }
   if (A.autoReload > 0) { A.autoReload -= dt; if (A.autoReload <= 0) ctlStartReload(ent); }
   if (A.reload) {
@@ -227,7 +237,7 @@ function ctlWeapon(ent, dt, now) {
       if (R.t >= R.dur) A.reload = null;
     }
   }
-  const canFire = !ent.busy && !A.reload && !A.knife && A.boltT <= 0 && A.switching <= 0 && A.sprintW < 0.3 && !ent.sprinting;
+  const canFire = !ent.busy && !A.reload && !A.knife && A.boltT <= 0 && A.switching <= 0 && (flight || (A.sprintW < 0.3 && !ent.sprinting));
   const pressed = I.firePressed; I.firePressed = false;
   if ((I.fire || pressed) && canFire && A.fireCd <= 0) {
     if (w.mag > 0 && (d.auto ? I.fire : pressed) && efcBarkFireReady(ent)) return ctlShoot(ent, now);
@@ -249,7 +259,11 @@ function ctlShoot(ent, now) {
   if (d.scope && ads < 0.95) spread = Math.max(spread, 0.06);
   let origin, f, muzzle;
   if (ent.isPlayer) {
-    origin = camera.position.clone(); f = efcActionForward(new V3());
+    origin = camera.position.clone();
+    if (efcOmniInFlight(ent)) {
+      const cp = Math.cos(ent.pitch);
+      f = new V3(-Math.sin(ent.yaw) * cp, Math.sin(ent.pitch), -Math.cos(ent.yaw) * cp);
+    } else f = efcActionForward(new V3());
     const right = new V3().crossVectors(f, UP).normalize();
     muzzle = origin.clone().addScaledVector(f, 0.7).addScaledVector(right, 0.12 * (1 - ads)).add(new V3(0, -0.09 * (1 - ads), 0));
   } else {
@@ -258,9 +272,11 @@ function ctlShoot(ent, now) {
     muzzle = ent.model.gun.localToWorld(ent.model.muzzleLocal.clone());
   }
   const pellets = d.pellets || 1;
+  const cone = (d.pellets ? lerp(d.spread[0], d.spread[1], ads) : spread) *
+    (efcOmniInFlight(ent) ? efcOmniTune('flight', 'hipSpread') : 1);
   let hitAny = false;
   for (let i = 0; i < pellets; i++) {
-    const dir = coneDir(f, d.pellets ? lerp(d.spread[0], d.spread[1], ads) : spread);
+    const dir = coneDir(f, cone);
     const r = fireRay(ent, origin, dir, d, muzzle, !d.silent && (ent.isPlayer ? pellets === 1 && Math.random() < 0.25 : i === 0 && Math.random() < 0.6), ent.dmgMul || 1);
     if (r) hitAny = true;
   }

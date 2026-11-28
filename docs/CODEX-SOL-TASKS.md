@@ -239,7 +239,8 @@ before starting).
 | C18-1 | Omnimovement phase model and tuning table | S | C17-1 | done |
 | C18-2 | Ground sprint slide and dive input with three options | M | C18-1 | done |
 | C18-3 | Directional dive landings and impact recovery | M | C18-2 | done |
-| C18-4 to C18-16 | Omnimovement 2 (order in section 6 of `docs/plans/2026-11-27-omnimovement-2.md`) | S to M each | C18-3 (C18-4) | open |
+| C18-4 | Dive flight, independent view and body yaw, aiming and firing | M | C18-3 | done |
+| C18-5 to C18-16 | Omnimovement 2 (order in section 6 of `docs/plans/2026-11-27-omnimovement-2.md`) | S to M each | C18-4 (C18-5) | open |
 
 ---
 

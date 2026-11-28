@@ -423,7 +423,7 @@ function updateViewmodel(dt, S) {
   if (!VM.cur) return;
   VM.handDt = dt;
   const def = VM.curDef, m = VM.cur;
-  VM.ads = damp(VM.ads, S.ads ? 1 : 0, 1 / Math.max(0.05, def.adsTime) * 2.2, dt);
+  VM.ads = damp(VM.ads, S.ads ? 1 : 0, 1 / Math.max(0.05, def.adsTime) * 2.2 * (S.adsRate ?? 1), dt);
   // la visée se cale : un petit choc de l'arme et de la vue quand elle arrive à l'épaule (une fois par mise en joue)
   if (S.ads && !VM.adsSnap && VM.ads > 0.82) { VM.adsSnap = true; const C = vmaCfg(def).recharge; if (C.ev.visee && !def.scope) { vmChoc(C.ev.visee.vm, C); vmCamKick(C.ev.visee.cam, C.ev.visee.fov, C.cam); } } // (pas sous une lunette : l'image entière bougerait)
   else if (!S.ads && VM.ads < 0.3) VM.adsSnap = false;

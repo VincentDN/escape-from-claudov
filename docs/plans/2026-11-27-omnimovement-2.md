@@ -163,7 +163,7 @@ whichever of C16-8 or C16-13 lands first. C9's files (`44*-efc-omni*.js`) belong
 | C17-4 | Shadows, setting, budget and closing sheet | S | C17-3 | open |
 | C18-1 | Phase model and one tuning table | S | C17-1 | done |
 | C18-2 | Hold-to-dive from a ground sprint, in every direction | M | C18-1 | done |
-| C18-3 | Dive landings by direction: prone, side, supine | M | C18-2 | open |
+| C18-3 | Dive landings by direction: prone, side, supine | M | C18-2 | done |
 | C18-4 | In the air: free look, body twist, firing and aiming | M | C18-3 | open |
 | C18-5 | Momentum chains: slide to dive, tactical to dive, fast get-up | M | C18-3 | open |
 | C18-6 | Sprint speeds by direction and slide in any direction | S | C18-1 | open |

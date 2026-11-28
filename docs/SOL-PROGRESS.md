@@ -5,8 +5,8 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C18-2 done on `codex/c18-2-ground-dive`, stacked on C18-1.
-- **Next step:** Take C18-3, directional dive landings, from the Omnimovement 2 plan.
+- **Card:** C18-3 directional dive landings complete.
+- **Next step:** Take C18-4, aerial look and firing, from the Omnimovement 2 plan.
 - **How to verify:** `node tools/dev/efc/test-omni-phases.mjs` drives all eight grounded dive directions, slide settings, phases and wall clearance. For first-person legs, review `docs/omnimovement/legs-pitch.png`.
 - **Checks so far:** Phases and grounded dives, eight-direction air dive and sprint regressions, build, declarations and raid smoke passed. C17-2 standing boots are below frame at −60°.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
@@ -14,7 +14,7 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Next open cards, in order
 
-1. C18-3 onward in the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
+1. C18-4 onward in the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 2. C16-5 to C16-13 and C17-2 to C17-4 can resume when the owner decisions are recorded.
 3. C13-1 to C13-5 are complete on `codex/c13-2-weapon-foley` at `4f2c272`.
 4. C2-1 to C2-8, Partisan modding and weapons.
@@ -24,6 +24,8 @@ Blocked on the owner: K8 (stash names, one line or two), C12 (reference image mi
 C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the owner's eye.
 
 ## Log (one line per finished card, newest first)
+
+- 2026-11-28 Codex Sol: C18-3 added prone, side and supine landings, including contact-time look direction and a timed impact window.
 
 - 2026-11-28 Codex Sol: C18-2 done. Grounded sprint tap and hold controls, anticipation, eight-direction dive, wall clearance, apex, distance and cooldown passed.
 - 2026-11-28 Codex Sol: C18-1 done. A shared tuning table and local raid phase reporting passed the new browser sequence and existing movement regressions.

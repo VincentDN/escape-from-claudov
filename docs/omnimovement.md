@@ -30,3 +30,11 @@ The owner chose to keep Crouch during a grounded sprint as Slide and use Crouch 
 ## Ground dive
 
 By default, tap Crouch during a grounded sprint to slide or hold it for 0.18 seconds to dive in the movement direction. The dive anticipates for 0.08 seconds and uses the tuned travel and apex. The **Slide and dive** setting also offers **Tap dives, hold slides** and **Slide only**. Air dives retain their existing trigger. The hold gesture uses the keyboard Crouch binding.
+
+
+## Dive landings
+
+The game compares the launch direction with the view at contact. Forward dives land prone. Side dives spend 0.30 seconds on
+the corresponding side before settling prone. A backward dive lands supine, with the view raised to at least 10 degrees and
+the weapon across the chest. Jump and a fresh sprint input can stand the player up after the 0.12-second impact window when
+there is room overhead. Hold and tap behaviour comes from the existing **Slide and dive** setting.

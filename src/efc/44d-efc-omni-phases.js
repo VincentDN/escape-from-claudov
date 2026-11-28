@@ -35,11 +35,14 @@ function efcOmniPhase(entity) {
 }
 
 function efcOmniPhaseFromState(entity) {
+  const dive = entity.efcGroundDive;
+  if (dive?.phase === 'anticipation') return { move: 'dive', phase: dive.phase, t: 0, dir: dive.dir };
   const move = efcOmniState(entity);
   let phase = 'loop';
   if (move === 'slide') phase = 'enter';
-  if (move === 'air' || move === 'dive') phase = 'flight';
-  return { move, phase, t: 0, dir: efcOmniDirection(entity) };
+  if (move === 'air' || move === 'dive') phase = dive?.phase === 'launch' ? 'launch' : 'flight';
+  const dir = move === 'dive' && dive ? dive.dir : efcOmniDirection(entity);
+  return { move, phase, t: 0, dir };
 }
 
 function efcOmniPhaseAdvance(entity, dt) {
@@ -51,7 +54,7 @@ function efcOmniPhaseAdvance(entity, dt) {
   const flat = next.move === 'prone' || next.move === 'supine' || next.move === 'side';
 
   if (previous.move === 'dive' && flat) {
-    if (previous.phase === 'flight') {
+    if (previous.phase === 'flight' || previous.phase === 'launch') {
       Object.assign(next, { move: 'dive', phase: 'impact', dir: previous.dir });
     } else if (previous.phase === 'impact' && elapsed >= efcOmniTune('dive', 'impact')) {
       Object.assign(next, { move: 'dive', phase: 'settle', dir: previous.dir });
@@ -64,7 +67,7 @@ function efcOmniPhaseAdvance(entity, dt) {
   } else if (next.move === previous.move) {
     if (next.move === 'slide' && previous.phase === 'enter' && elapsed >= efcOmniTune('slide', 'enter')) {
       Object.assign(next, { phase: 'glide', dir: previous.dir });
-    } else if (previous.phase !== 'exit') {
+    } else if (previous.phase !== 'exit' && (next.move !== 'dive' || next.phase === previous.phase)) {
       Object.assign(next, previous, { t: elapsed });
     }
   }

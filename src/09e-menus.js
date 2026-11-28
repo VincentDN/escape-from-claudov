@@ -283,6 +283,7 @@ const OPT_TABS = [
     ['select', 'padLay', _t('Disposition de la manette'), [['default', _t('Par défaut')], ['southpaw', _t('Gaucher (bâtons échangés)')], ['bumper', _t('Bumper jumper (saut sur LB)')]]],
     ['select', 'padRun', _t('Course à la manette'), [['click', _t('Appui sur le bâton gauche (L3)')], ['auto', _t('Bâton poussé à fond')]]],
     ['check', 'padVib', _t('Vibrations de la manette')],
+    ['select', 'efcSlideDive', 'Slide and dive', [['tap-slide', 'Tap slides, hold dives'], ['tap-dive', 'Tap dives, hold slides'], ['slide-only', 'Slide only']]],
     ['head', _t('Interface')],
     ['check', 'efcHudMinimal', _t('ATH minimal en raid'), efcUirHudSync],
     ['select', 'efcMagCount', _t('Affichage du contenu du chargeur'), [['rough', _t('Approximatif')], ['exact', _t('Exact')]]],

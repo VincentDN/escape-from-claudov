@@ -5,16 +5,16 @@ fresh session reads this first and continues from **Next step**. Keep it short: 
 
 ## Current card
 
-- **Card:** C18-1 done on `codex/c18-1-movement-phases`.
-- **Next step:** Take C18-2, grounded sprint tap-to-slide and hold-to-dive, from the Omnimovement 2 plan.
-- **How to verify:** `node tools/dev/efc/test-omni-phases.mjs` drives sprint, slide and air dive through landing. For first-person legs, use `test-self-legs.mjs` and review `docs/omnimovement/legs-pitch.png`.
-- **Checks so far:** Movement phases, legacy movement states, eight-direction sprint and slide, build, declarations and raid smoke passed. C17-2 standing boots are below frame at −60°.
+- **Card:** C18-2 done on `codex/c18-2-ground-dive`, stacked on C18-1.
+- **Next step:** Take C18-3, directional dive landings, from the Omnimovement 2 plan.
+- **How to verify:** `node tools/dev/efc/test-omni-phases.mjs` drives all eight grounded dive directions, slide settings, phases and wall clearance. For first-person legs, review `docs/omnimovement/legs-pitch.png`.
+- **Checks so far:** Phases and grounded dives, eight-direction air dive and sprint regressions, build, declarations and raid smoke passed. C17-2 standing boots are below frame at −60°.
 - **Questions for the owner:** C17-2 still needs the steep-pitch framing choice. C16-5 requires approval of the [five-line bark sample sheet](barks.md#recording-plan) before generation.
-- **Watch out for:** C18-1 samples the preceding controller step and leaves movement physics unchanged. C13 is complete on a separate feature branch and ElevenLabs is accessible. C17-3 waits on C17-2 visual acceptance.
+- **Watch out for:** Ground dive hold uses the keyboard Crouch binding. C13 is complete on a separate feature branch and ElevenLabs is accessible. C17-3 waits on C17-2 visual acceptance.
 
 ## Next open cards, in order
 
-1. C18-2 onward in the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
+1. C18-3 onward in the [Omnimovement 2 plan](plans/2026-11-27-omnimovement-2.md).
 2. C16-5 to C16-13 and C17-2 to C17-4 can resume when the owner decisions are recorded.
 3. C13-1 to C13-5 are complete on `codex/c13-2-weapon-foley` at `4f2c272`.
 4. C2-1 to C2-8, Partisan modding and weapons.
@@ -25,6 +25,7 @@ C1-2 hand contact quality on the contact sheets (`docs/weapon-check/`) needs the
 
 ## Log (one line per finished card, newest first)
 
+- 2026-11-28 Codex Sol: C18-2 done. Grounded sprint tap and hold controls, anticipation, eight-direction dive, wall clearance, apex, distance and cooldown passed.
 - 2026-11-28 Codex Sol: C18-1 done. A shared tuning table and local raid phase reporting passed the new browser sequence and existing movement regressions.
 - 2026-11-28 Codex Sol: C13-1 to C13-5 done on `codex/c13-2-weapon-foley` at `4f2c272`. 304 credited takes, the original Partisan workbench turn recordings and 102 sound checks.
 - 2026-11-28 Codex Sol: C16-4 integrated from `ef536b4`. The voice script has 180 takes across 15 cues and three voice groups, plus five sample lines for approval before recording.

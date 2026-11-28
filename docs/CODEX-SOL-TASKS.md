@@ -237,7 +237,8 @@ before starting).
 | C17-3 | Verify legs across stances | M | C17-2 | open |
 | C17-4 | Shadows, setting, budget and closing sheet | S | C17-3 | open |
 | C18-1 | Omnimovement phase model and tuning table | S | C17-1 | done |
-| C18-2 to C18-16 | Omnimovement 2 (order in section 6 of `docs/plans/2026-11-27-omnimovement-2.md`) | S to M each | C18-1 (C18-2) | open |
+| C18-2 | Ground sprint slide and dive input with three options | M | C18-1 | done |
+| C18-3 to C18-16 | Omnimovement 2 (order in section 6 of `docs/plans/2026-11-27-omnimovement-2.md`) | S to M each | C18-2 (C18-3) | open |
 
 ---
 

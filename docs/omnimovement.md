@@ -26,3 +26,7 @@ The owner chose to keep Crouch during a grounded sprint as Slide and use Crouch 
 `efcOmniPhase(PL.ent)` reports the local raid player's movement and phase, seconds in that phase and direction in radians relative to the view at entry. A rightward launch is `+Math.PI / 2`. Dive direction stays fixed through impact and settle. The observer uses the raid tick to report the preceding controller step. Existing input handling, physics and movement speeds still use their current values.
 
 `EFC_OMNI_TUNING` holds the C18 starting values and references the existing tactical sprint, air dive and prone settings. Use `EFC.cfg.omni = { dive: { impact: 0.2 } }` in the console to override the impact reporting duration. `efcOmniTune('dive', 'impact')` reads the override and leaves the defaults intact. The first card uses the table for slide and landing phase durations.
+
+## Ground dive
+
+By default, tap Crouch during a grounded sprint to slide or hold it for 0.18 seconds to dive in the movement direction. The dive anticipates for 0.08 seconds and uses the tuned travel and apex. The **Slide and dive** setting also offers **Tap dives, hold slides** and **Slide only**. Air dives retain their existing trigger. The hold gesture uses the keyboard Crouch binding.
